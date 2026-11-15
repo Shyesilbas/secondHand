@@ -1,0 +1,2193 @@
+[
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "1 Series",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "1 Series (2019–, F40)",
+        "trims": [
+          "Sport Line",
+          "M Sport",
+          "First Edition Sport Line",
+          "First Edition M Sport"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "118i",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1499,
+            "torqueNm": 220,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "116d",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "120d xDrive",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "M135i xDrive",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "1 Series (2011–2019, F20)",
+        "engines": [
+          {
+            "name": "116i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "118i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "116d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "120d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "M140i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Joy",
+          "Joy Plus",
+          "Urban Line",
+          "Sport Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "1 Series (2004–2011, E81/E87)",
+        "engines": [
+          {
+            "name": "116i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "118i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "120i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "120d",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Dynamic",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "2 Series Coupe",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "2 Series Coupe (2014–2021, F22)",
+        "engines": [
+          {
+            "name": "218i Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "220d Coupe",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Sport Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "2 Series Cabrio (2015–2021, F23)",
+        "engines": [
+          {
+            "name": "218i Cabrio",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Luxury Line",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "2 Series Gran Coupe",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "2 Series Gran Coupe (2020–, F44)",
+        "engines": [
+          {
+            "name": "218i Gran Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "216d Gran Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "M235i xDrive Gran Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Sport Line",
+          "Luxury Line",
+          "M Sport",
+          "First Edition M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "2 Series Active Tourer",
+    "supportedBodyTypes": [
+      "HATCHBACK",
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "2 Series Active Tourer (2022–, U06)",
+        "engines": [
+          {
+            "name": "218i Active Tourer",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "220i Active Tourer",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "225e xDrive Active Tourer",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Luxury Line",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "3 Series",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "3 Series (2019–, G20)",
+        "trims": [
+          "Sport Line",
+          "Luxury Line",
+          "M Sport",
+          "First Edition M Sport",
+          "Edition M Sport Shadow"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "320i 170",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1597,
+            "horsePower": 170,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "RWD",
+            "source": "verified"
+          },
+          {
+            "name": "320d xDrive",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "330i",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "330e",
+            "fuelType": "HYBRID",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "3 Series (2012–2019, F30)",
+        "trims": [
+          "Joy",
+          "Joy Plus",
+          "Techno Line",
+          "Sport Line",
+          "Luxury Line",
+          "Modern Line",
+          "M Sport"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2012,
+        "endYear": 2019,
+        "versions": [
+          {
+            "name": "316i",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "318i",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "320i EfficientDynamics",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 170,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "320d",
+            "fuelType": "DIESEL",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "320d 190",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1995,
+            "horsePower": 190,
+            "torqueNm": 400,
+            "drivetrain": "RWD",
+            "startYear": 2015,
+            "source": "claude-draft"
+          },
+          {
+            "name": "320d xDrive",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "328i",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "330i",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "3 Series (2005–2013, E90)",
+        "engines": [
+          {
+            "name": "316i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "318i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "320i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "320d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "325i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "330i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Comfort",
+          "Premium",
+          "Exclusive",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "3 Series (1998–2005, E46)",
+        "engines": [
+          {
+            "name": "316i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "318i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "320i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "320d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "325i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "330i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "3 Series Touring",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "3 Series Touring (2019–, G21)",
+        "engines": [
+          {
+            "name": "320i Touring",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "320d xDrive Touring",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "330i Touring",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Luxury Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "3 Series Touring (2012–2019, F31)",
+        "engines": [
+          {
+            "name": "320d Touring",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Sport Line",
+          "Luxury Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "3 Series Touring (2005–2013, E91)",
+        "engines": [
+          {
+            "name": "320d Touring",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "4 Series",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "4 Series Coupe (2020–, G22)",
+        "engines": [
+          {
+            "name": "420i Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "430i Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "M Sport",
+          "Edition M Sport"
+        ]
+      },
+      {
+        "name": "4 Series Cabrio (2020–, G23)",
+        "engines": [
+          {
+            "name": "420i Cabrio",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      },
+      {
+        "name": "4 Series Gran Coupe (2021–, G26)",
+        "engines": [
+          {
+            "name": "420i Gran Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "430i xDrive Gran Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "M Sport",
+          "Performance"
+        ]
+      },
+      {
+        "name": "4 Series Gran Coupe (2014–2021, F36)",
+        "engines": [
+          {
+            "name": "418i Gran Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "420d Gran Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "420d xDrive Gran Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "430i Gran Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Prestige",
+          "Sport Line",
+          "Luxury Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "4 Series Coupe (2013–2020, F32)",
+        "engines": [
+          {
+            "name": "418i Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "420d Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "428i Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "430i Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Sport Line",
+          "Luxury Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "4 Series Cabrio (2014–2020, F33)",
+        "engines": [
+          {
+            "name": "420d Cabrio",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "428i Cabrio",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "430i Cabrio",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Luxury Line",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "5 Series",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "5 Series (2023–, G60)",
+        "trims": [
+          "Edition Professional",
+          "M Sport"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2023,
+        "versions": [
+          {
+            "name": "520i",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1597,
+            "horsePower": 170,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "520d xDrive",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1995,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "530e",
+            "fuelType": "HYBRID",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "5 Series (2017–2023, G30)",
+        "trims": [
+          "Sport Line",
+          "Luxury Line",
+          "M Sport",
+          "Special Edition M Sport"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2017,
+        "endYear": 2023,
+        "versions": [
+          {
+            "name": "520i",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1597,
+            "horsePower": 170,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "520d",
+            "fuelType": "DIESEL",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "520d xDrive",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "530i xDrive",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "530e",
+            "fuelType": "HYBRID",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "5 Series (2010–2017, F10)",
+        "engines": [
+          {
+            "name": "520i 1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "520d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "525d xDrive",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "528i xDrive",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "530d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "535d",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Business",
+          "Comfort",
+          "Premium",
+          "Exclusive",
+          "Modern Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "5 Series (2003–2010, E60)",
+        "engines": [
+          {
+            "name": "520i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "520d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "525d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "530i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "530d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "545i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Premium",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "5 Series (1995–2003, E39)",
+        "engines": [
+          {
+            "name": "520i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "525tds",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "525d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "528i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "530i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "530d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "540i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Exclusive",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "5 Series Touring",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "5 Series Touring (2024–, G61)",
+        "engines": [
+          {
+            "name": "520d xDrive Touring",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      },
+      {
+        "name": "5 Series Touring (2017–2023, G31)",
+        "engines": [
+          {
+            "name": "520d xDrive Touring",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Luxury Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "5 Series Touring (2010–2017, F11)",
+        "engines": [
+          {
+            "name": "520d Touring",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "525d xDrive Touring",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Exclusive",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "5 Series Touring (2004–2010, E61)",
+        "engines": [
+          {
+            "name": "525d Touring",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "530d Touring",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "6 Series",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "6 Series Coupe (2011–2018, F13)",
+        "engines": [
+          {
+            "name": "640d xDrive Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "640i Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Luxury Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "6 Series Cabrio (2011–2018, F12)",
+        "engines": [
+          {
+            "name": "640d Cabrio",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "640i Cabrio",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      },
+      {
+        "name": "6 Series Gran Coupe (2012–2018, F06)",
+        "engines": [
+          {
+            "name": "640d Gran Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "640d xDrive Gran Coupe",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Luxury Line",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "7 Series",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "7 Series (2022–, G70)",
+        "engines": [
+          {
+            "name": "740d xDrive",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "750e xDrive",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Pure Excellence",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "7 Series (2015–2022, G11)",
+        "engines": [
+          {
+            "name": "730i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "730d xDrive",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "740Li xDrive",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Pure Excellence",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "7 Series (2008–2015, F01)",
+        "engines": [
+          {
+            "name": "730d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "740i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "7 Series (2001–2008, E65)",
+        "engines": [
+          {
+            "name": "730d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "730i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "745i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "8 Series",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "8 Series Coupe (2018–, G15)",
+        "engines": [
+          {
+            "name": "840i Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "840d xDrive Coupe",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      },
+      {
+        "name": "8 Series Cabrio (2019–, G14)",
+        "engines": [
+          {
+            "name": "840i Cabrio",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      },
+      {
+        "name": "8 Series Gran Coupe (2019–, G16)",
+        "engines": [
+          {
+            "name": "840i Gran Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "840d xDrive Gran Coupe",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X1",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X1 (2022–, U11)",
+        "trims": [
+          "xLine",
+          "M Sport"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2022,
+        "versions": [
+          {
+            "name": "sDrive18i",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1499,
+            "horsePower": 136,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "sDrive20i",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "X1 (2015–2022, F48)",
+        "trims": [
+          "Prestige",
+          "Sport Line",
+          "xLine",
+          "M Sport"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2015,
+        "endYear": 2022,
+        "versions": [
+          {
+            "name": "sDrive16d",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "sDrive18i",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1499,
+            "torqueNm": 220,
+            "drivetrain": "FWD",
+            "endYear": 2019,
+            "source": "claude-draft"
+          },
+          {
+            "name": "sDrive18i 140",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1499,
+            "horsePower": 140,
+            "torqueNm": 220,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "startYear": 2019,
+            "source": "verified"
+          },
+          {
+            "name": "xDrive20d",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "X1 (2009–2015, E84)",
+        "engines": [
+          {
+            "name": "sDrive16i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "sDrive18i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "sDrive20d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive20d",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige",
+          "Sport Line",
+          "xLine"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X2",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X2 (2024–, U10)",
+        "engines": [
+          {
+            "name": "sDrive20i",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "M35i xDrive",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      },
+      {
+        "name": "X2 (2018–2023, F39)",
+        "engines": [
+          {
+            "name": "sDrive18i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "sDrive16d",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "M Sport",
+          "M Sport X"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X3",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X3 (2017–, G01)",
+        "trims": [
+          "xLine",
+          "M Sport"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2017,
+        "versions": [
+          {
+            "name": "sDrive20i",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1998,
+            "horsePower": 184,
+            "torqueNm": 290,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "xDrive20d",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1995,
+            "horsePower": 190,
+            "torqueNm": 400,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "source": "verified"
+          },
+          {
+            "name": "xDrive30e",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "X3 (2010–2017, F25)",
+        "engines": [
+          {
+            "name": "sDrive20i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "xDrive20d",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige",
+          "xLine",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "X3 (2003–2010, E83)",
+        "engines": [
+          {
+            "name": "xDrive20d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X4",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X4 (2018–, G02)",
+        "engines": [
+          {
+            "name": "xDrive20d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive20i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "xLine",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "X4 (2014–2018, F26)",
+        "engines": [
+          {
+            "name": "xDrive20d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive28i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "xLine",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X5",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X5 (2018–, G05)",
+        "trims": [
+          "xLine",
+          "M Sport"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": null,
+        "startYear": 2018,
+        "versions": [
+          {
+            "name": "xDrive25d",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1995,
+            "horsePower": 231,
+            "torqueNm": 450,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "source": "verified"
+          },
+          {
+            "name": "xDrive30d",
+            "fuelType": "DIESEL",
+            "engineCapacity": 2993,
+            "horsePower": 265,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "endYear": 2023,
+            "source": "claude-draft"
+          },
+          {
+            "name": "xDrive30d 298",
+            "fuelType": "DIESEL",
+            "engineCapacity": 2993,
+            "horsePower": 298,
+            "torqueNm": 670,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "startYear": 2023,
+            "source": "verified"
+          },
+          {
+            "name": "xDrive40i",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 2998,
+            "horsePower": 340,
+            "torqueNm": 450,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "endYear": 2023,
+            "source": "verified"
+          },
+          {
+            "name": "xDrive40i 381",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 2998,
+            "horsePower": 381,
+            "torqueNm": 520,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "startYear": 2023,
+            "source": "verified"
+          },
+          {
+            "name": "xDrive45e",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "xDrive50e",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "X5 (2013–2018, F15)",
+        "engines": [
+          {
+            "name": "sDrive25d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive25d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive40d",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Prestige",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "X5 (2006–2013, E70)",
+        "engines": [
+          {
+            "name": "3.0d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "30d xDrive",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "35d xDrive",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "4.8i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "X5 (1999–2006, E53)",
+        "engines": [
+          {
+            "name": "3.0d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "4.4i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X6",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X6 (2019–, G06)",
+        "engines": [
+          {
+            "name": "xDrive40d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive40i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      },
+      {
+        "name": "X6 (2014–2019, F16)",
+        "engines": [
+          {
+            "name": "xDrive30d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive40d",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Pure Extravagance",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "X6 (2008–2014, E71)",
+        "engines": [
+          {
+            "name": "xDrive30d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive35d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive40d",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X7",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X7 (2019–, G07)",
+        "engines": [
+          {
+            "name": "xDrive40d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "M50d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "xDrive40i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Pure Excellence",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "XM",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "XM (2023–, G09)",
+        "engines": [
+          {
+            "name": "XM 4.4 V8",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "XM Label Red",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "M Sport",
+          "Label Red"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "Z4",
+    "supportedBodyTypes": [
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "Z4 (2019–, G29)",
+        "engines": [
+          {
+            "name": "sDrive20i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "M40i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Sport Line",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "Z4 (2009–2016, E89)",
+        "engines": [
+          {
+            "name": "sDrive20i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "sDrive23i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "sDrive35i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "M Sport"
+        ]
+      },
+      {
+        "name": "Z4 (2002–2008, E85)",
+        "engines": [
+          {
+            "name": "2.0i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.5i",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "3.0i",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "i3",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "i3 (2013–2022, I01)",
+        "engines": [
+          {
+            "name": "i3 94 Ah",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "i3s 120 Ah",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Edition Electric"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "i4",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "i4 (2021–, G26)",
+        "engines": [
+          {
+            "name": "eDrive35",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "eDrive40",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "M50",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "i5",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "i5 (2023–, G60)",
+        "engines": [
+          {
+            "name": "eDrive40",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "M60 xDrive",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "i7",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "i7 (2022–, G70)",
+        "engines": [
+          {
+            "name": "eDrive50",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "xDrive60",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "M70 xDrive",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "iX1",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "iX1 (2022–, U11)",
+        "engines": [
+          {
+            "name": "xDrive30",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "eDrive20",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "xLine",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "iX3",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "iX3 (2021–, G08)",
+        "engines": [
+          {
+            "name": "iX3",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Impressive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "iX",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "iX (2021–, I20)",
+        "engines": [
+          {
+            "name": "xDrive40",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "xDrive50",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "M60",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "First Edition Essence",
+          "First Edition Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "M2",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "M2 (2023–, G87)",
+        "engines": [
+          {
+            "name": "M2",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "M Sport",
+          "Competition"
+        ]
+      },
+      {
+        "name": "M2 (2015–2021, F87)",
+        "engines": [
+          {
+            "name": "M2 Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "M2 Competition",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Competition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "M3",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "M3 (2021–, G80)",
+        "engines": [
+          {
+            "name": "M3 Competition",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Competition"
+        ]
+      },
+      {
+        "name": "M3 (2014–2020, F80)",
+        "engines": [
+          {
+            "name": "M3 Sedan",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "M3 (2007–2013, E90)",
+        "engines": [
+          {
+            "name": "M3 Sedan",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "M4",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "M4 (2021–, G82)",
+        "engines": [
+          {
+            "name": "M4 Competition",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Competition"
+        ]
+      },
+      {
+        "name": "M4 (2014–2020, F82)",
+        "engines": [
+          {
+            "name": "M4 Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "M5",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "M5 (2024–, G90)",
+        "engines": [
+          {
+            "name": "M5",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "M Sport",
+          "Competition"
+        ]
+      },
+      {
+        "name": "M5 (2017–2023, F90)",
+        "engines": [
+          {
+            "name": "M5 Sedan",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "M5 Competition",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Competition"
+        ]
+      },
+      {
+        "name": "M5 (2011–2016, F10)",
+        "engines": [
+          {
+            "name": "M5 Sedan",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "M5 (2005–2010, E60)",
+        "engines": [
+          {
+            "name": "M5 Sedan",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "M8",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "M8 (2019–, F91/F92/F93)",
+        "engines": [
+          {
+            "name": "M8 Competition",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Competition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X3 M",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X3 M (2019–, F97)",
+        "engines": [
+          {
+            "name": "X3 M Competition",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Competition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X5 M",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X5 M (2019–, F95)",
+        "engines": [
+          {
+            "name": "X5 M Competition",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Competition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "CAR",
+    "name": "X6 M",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X6 M (2019–, F96)",
+        "engines": [
+          {
+            "name": "X6 M Competition",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Competition"
+        ]
+      }
+    ]
+  }
+]

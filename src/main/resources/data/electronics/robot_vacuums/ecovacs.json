@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "ECOVACS",
+    "type": "ROBOT_VACUUM",
+    "name": "DEEBOT X2 OMNI",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Ecovacs X2 Omni",
+      "Deebot X2"
+    ]
+  },
+  {
+    "brand": "ECOVACS",
+    "type": "ROBOT_VACUUM",
+    "name": "DEEBOT T30 PRO OMNI",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Ecovacs T30 Pro",
+      "Deebot T30"
+    ]
+  },
+  {
+    "brand": "ECOVACS",
+    "type": "ROBOT_VACUUM",
+    "name": "DEEBOT T20 OMNI",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Ecovacs T20 Omni",
+      "Deebot T20"
+    ]
+  },
+  {
+    "brand": "ECOVACS",
+    "type": "ROBOT_VACUUM",
+    "name": "DEEBOT N10 PLUS",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Ecovacs N10 Plus",
+      "Deebot N10"
+    ]
+  }
+]

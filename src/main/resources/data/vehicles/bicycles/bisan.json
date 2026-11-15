@@ -1,0 +1,87 @@
+[
+  {
+    "brand": "BISAN",
+    "type": "BICYCLE",
+    "name": "MTX",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "MTX Dağ Bisikleti (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "MTX 7100",
+          "MTX 7200",
+          "MTX 7300",
+          "MTX 7400"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BISAN",
+    "type": "BICYCLE",
+    "name": "Grand Tour",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Grand Tour Yol (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Grand Tour Claris",
+          "Grand Tour Sora",
+          "Grand Tour 105"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BISAN",
+    "type": "BICYCLE",
+    "name": "TRX",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "TRX Tur/Şehir (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "TRX 8100",
+          "TRX 8200",
+          "TRX 8300",
+          "TRX 8400"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BISAN",
+    "type": "BICYCLE",
+    "name": "All Trail",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "All Trail Gravel (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "All Trail Sora",
+          "All Trail GRX"
+        ]
+      }
+    ]
+  }
+]

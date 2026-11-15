@@ -91,8 +91,7 @@ public class ListingController {
     @PostMapping("/bulks")
     @Operation(summary = "Get listings by IDs")
     public ResponseEntity<List<ListingDto>> getListingsByIds(
-            @NotNull @Size(max = com.serhat.secondhand.listing.util.ListingBusinessConstants.MAX_BULK_LISTING_IDS)
-            @RequestBody List<@NotNull UUID> ids,
+            @NotNull @Size(max = com.serhat.secondhand.listing.util.ListingBusinessConstants.MAX_BULK_LISTING_IDS) @RequestBody List<@NotNull UUID> ids,
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser != null ? currentUser.getId() : null;
         return ResultResponses.ok(Result.success(listingQueryService.findByIds(ids, userId)));
@@ -152,7 +151,8 @@ public class ListingController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.ok(Result.success(listingQueryService.getMyListingsByStatus(currentUser.getId(), status, page, size)));
+        return ResultResponses
+                .ok(Result.success(listingQueryService.getMyListingsByStatus(currentUser.getId(), status, page, size)));
     }
 
     @PutMapping("/{id}/publish")
@@ -195,9 +195,12 @@ public class ListingController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @AuthenticationPrincipal User currentUser) {
-        if (endDate == null) endDate = LocalDateTime.now();
-        if (startDate == null) startDate = endDate.minusDays(7);
-        return ResultResponses.ok(Result.success(listingViewService.getAggregatedViewStatisticsForSeller(currentUser.getId(), startDate, endDate)));
+        if (endDate == null)
+            endDate = LocalDateTime.now();
+        if (startDate == null)
+            startDate = endDate.minusDays(7);
+        return ResultResponses.ok(Result.success(
+                listingViewService.getAggregatedViewStatisticsForSeller(currentUser.getId(), startDate, endDate)));
     }
 
     @PublicEndpoint
@@ -218,7 +221,8 @@ public class ListingController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateQuantityRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingCommandService.updateSingleQuantity(id, request.quantity(), currentUser.getId()));
+        return ResultResponses
+                .noContent(listingCommandService.updateSingleQuantity(id, request.quantity(), currentUser.getId()));
     }
 
     @PutMapping("/{id}/price")
@@ -226,21 +230,24 @@ public class ListingController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdatePriceRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingCommandService.updateSinglePrice(id, request.price(), currentUser.getId()));
+        return ResultResponses
+                .noContent(listingCommandService.updateSinglePrice(id, request.price(), currentUser.getId()));
     }
 
     @PutMapping("/quantity/batch")
     public ResponseEntity<Void> updateBatchQuantity(
             @Valid @RequestBody UpdateBatchQuantityRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingCommandService.updateBatchQuantity(request.listingIds(), request.quantity(), currentUser.getId()));
+        return ResultResponses.noContent(listingCommandService.updateBatchQuantity(request.listingIds(),
+                request.quantity(), currentUser.getId()));
     }
 
     @PutMapping("/price/batch")
     public ResponseEntity<Void> updateBatchPrice(
             @Valid @RequestBody UpdateBatchPriceRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingCommandService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId()));
+        return ResultResponses.noContent(
+                listingCommandService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId()));
     }
 
     @PublicEndpoint

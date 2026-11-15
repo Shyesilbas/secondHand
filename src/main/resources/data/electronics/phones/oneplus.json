@@ -1,0 +1,87 @@
+[
+  {
+    "brand": "ONEPLUS",
+    "type": "MOBILE_PHONE",
+    "name": "12",
+    "isLegacy": false,
+    "releaseYear": 2024,
+    "aliases": [
+      "OnePlus 12",
+      "12",
+      "OP12",
+      "1+12"
+    ]
+  },
+  {
+    "brand": "ONEPLUS",
+    "type": "MOBILE_PHONE",
+    "name": "12R",
+    "isLegacy": false,
+    "releaseYear": 2024,
+    "aliases": [
+      "OnePlus 12R",
+      "12R",
+      "OP12R",
+      "1+12R"
+    ]
+  },
+  {
+    "brand": "ONEPLUS",
+    "type": "MOBILE_PHONE",
+    "name": "11",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "OnePlus 11",
+      "11",
+      "OP11",
+      "1+11"
+    ]
+  },
+  {
+    "brand": "ONEPLUS",
+    "type": "MOBILE_PHONE",
+    "name": "Nord 4",
+    "isLegacy": false,
+    "releaseYear": 2024,
+    "aliases": [
+      "OnePlus Nord 4",
+      "Nord 4",
+      "OnePlus Nord4"
+    ]
+  },
+  {
+    "brand": "ONEPLUS",
+    "type": "MOBILE_PHONE",
+    "name": "Nord CE 3",
+    "isLegacy": false,
+    "aliases": [
+      "OnePlus Nord CE 3",
+      "Nord CE 3"
+    ],
+    "releaseYear": 2023
+  },
+  {
+    "brand": "ONEPLUS",
+    "type": "MOBILE_PHONE",
+    "name": "10 Pro",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "OnePlus 10 Pro",
+      "OP10 Pro",
+      "10 Pro"
+    ]
+  },
+  {
+    "brand": "ONEPLUS",
+    "type": "MOBILE_PHONE",
+    "name": "9 Pro",
+    "isLegacy": true,
+    "aliases": [
+      "OnePlus 9 Pro",
+      "9 Pro"
+    ],
+    "releaseYear": 2021
+  }
+]

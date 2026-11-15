@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "MICROSOFT",
+    "type": "TABLET",
+    "name": "Surface Go 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Microsoft Surface Go 4",
+      "Go 4"
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "TABLET",
+    "name": "Surface Go 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Microsoft Surface Go 3",
+      "Go 3"
+    ]
+  }
+]

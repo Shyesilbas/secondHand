@@ -1,0 +1,87 @@
+[
+  {
+    "brand": "GIANT",
+    "type": "BICYCLE",
+    "name": "ATX",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "ATX Serisi (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "ATX 26",
+          "ATX 27.5"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "GIANT",
+    "type": "BICYCLE",
+    "name": "Talon",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Talon (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Talon 0",
+          "Talon 1",
+          "Talon 2",
+          "Talon 3",
+          "Talon 4"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "GIANT",
+    "type": "BICYCLE",
+    "name": "Escape",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Escape City / Disc (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Escape 1 Disc",
+          "Escape 2 Disc",
+          "Escape 3"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "GIANT",
+    "type": "BICYCLE",
+    "name": "TCR",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "TCR Advanced (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Advanced 1 Disc",
+          "Advanced 2 Disc",
+          "Advanced Pro"
+        ]
+      }
+    ]
+  }
+]

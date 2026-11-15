@@ -1,0 +1,58 @@
+[
+  {
+    "brand": "MITSUBISHI",
+    "type": "COMMERCIAL",
+    "name": "L200",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "L200 (2019–, KL facelift)",
+        "engines": [
+          {
+            "name": "2.2 DI-D 150",
+            "fuelType": "DIESEL",
+            "horsePower": 150,
+            "engineCapacity": 2268
+          },
+          {
+            "name": "2.2 DI-D 179",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Intense",
+          "Spirit",
+          "Instyle",
+          "Invite",
+          "Blizzard"
+        ]
+      },
+      {
+        "name": "L200 Series 5 (2015–2019)",
+        "startYear": 2015,
+        "endYear": 2019,
+        "engines": [
+          {
+            "name": "2.4 DI-D 154",
+            "fuelType": "DIESEL",
+            "horsePower": 154,
+            "engineCapacity": 2442
+          },
+          {
+            "name": "2.4 DI-D 181",
+            "fuelType": "DIESEL",
+            "horsePower": 181,
+            "engineCapacity": 2442
+          }
+        ],
+        "trims": [
+          "Invite",
+          "Intense",
+          "Instyle"
+        ]
+      }
+    ]
+  }
+]

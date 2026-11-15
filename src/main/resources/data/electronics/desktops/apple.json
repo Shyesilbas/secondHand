@@ -1,0 +1,24 @@
+[
+  { "brand": "APPLE", "type": "DESKTOP", "name": "iMac 21.5-inch Intel", "releaseYear": 2019, "isLegacy": true, "aliases": ["iMac Intel 21.5"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "iMac 24-inch M1", "releaseYear": 2021, "isLegacy": false, "aliases": ["iMac M1 24"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "iMac 24-inch M3", "releaseYear": 2023, "isLegacy": false, "aliases": ["iMac M3 24"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "iMac 24-inch M4", "releaseYear": 2024, "isLegacy": false, "aliases": ["iMac M4 24"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "iMac 27-inch Intel", "releaseYear": 2020, "isLegacy": true, "aliases": ["iMac Intel 27"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "iMac Pro", "releaseYear": 2017, "isLegacy": true, "aliases": ["iMac Pro Intel"] },
+
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac mini Intel", "releaseYear": 2018, "isLegacy": true, "aliases": ["Mac mini Intel Core"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac mini M1", "releaseYear": 2020, "isLegacy": false, "aliases": ["Mac mini M1 2020"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac mini M2", "releaseYear": 2023, "isLegacy": false, "aliases": ["Mac mini M2 2023"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac mini M2 Pro", "releaseYear": 2023, "isLegacy": false, "aliases": ["Mac mini M2 Pro 2023"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac mini M4", "releaseYear": 2024, "isLegacy": false, "aliases": ["Mac mini M4 2024"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac mini M4 Pro", "releaseYear": 2024, "isLegacy": false, "aliases": ["Mac mini M4 Pro 2024"] },
+
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac Studio M1 Max", "releaseYear": 2022, "isLegacy": false, "aliases": ["Mac Studio M1 Max 2022"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac Studio M1 Ultra", "releaseYear": 2022, "isLegacy": false, "aliases": ["Mac Studio M1 Ultra 2022"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac Studio M2 Max", "releaseYear": 2023, "isLegacy": false, "aliases": ["Mac Studio M2 Max 2023"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac Studio M2 Ultra", "releaseYear": 2023, "isLegacy": false, "aliases": ["Mac Studio M2 Ultra 2023"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac Studio M3 Ultra", "releaseYear": 2024, "isLegacy": false, "aliases": ["Mac Studio M3 Ultra 2024"] },
+
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac Pro Intel", "releaseYear": 2019, "isLegacy": true, "aliases": ["Mac Pro 2019"] },
+  { "brand": "APPLE", "type": "DESKTOP", "name": "Mac Pro M2 Ultra", "releaseYear": 2023, "isLegacy": false, "aliases": ["Mac Pro M2 Ultra 2023"] }
+]

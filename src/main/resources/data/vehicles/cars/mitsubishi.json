@@ -1,0 +1,104 @@
+[
+  {
+    "brand": "MITSUBISHI",
+    "type": "CAR",
+    "name": "Eclipse Cross",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Eclipse Cross (2021–, GK facelift)",
+        "engines": [
+          {
+            "name": "2.4 MIVEC PHEV",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Intense",
+          "Spirit",
+          "Instyle"
+        ]
+      },
+      {
+        "name": "Eclipse Cross (2017–2021, GK)",
+        "engines": [
+          {
+            "name": "1.5 Turbo 163",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.2 DI-D 150",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Intense",
+          "Spirit",
+          "Instyle"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MITSUBISHI",
+    "type": "CAR",
+    "name": "Outlander",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Outlander (2021–, GN)",
+        "engines": [
+          {
+            "name": "2.5 MIVEC 181",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4 MIVEC PHEV S-AWC",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Intense",
+          "Spirit",
+          "Instyle Plus"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MITSUBISHI",
+    "type": "CAR",
+    "name": "ASX",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "ASX (2023–, GA4W)",
+        "engines": [
+          {
+            "name": "1.0 Turbo 100",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 Hybrid 145",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "1.6 PHEV 180",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Intense",
+          "Spirit",
+          "Instyle"
+        ]
+      }
+    ]
+  }
+]

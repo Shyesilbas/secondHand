@@ -1,0 +1,129 @@
+[
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "Z8",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Nikon Z8"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 45
+    }
+  },
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "Z9",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Nikon Z9"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 45
+    }
+  },
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "Z6 III",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Nikon Z6 3",
+      "Z6 Mark 3"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 24
+    }
+  },
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "Z6 II",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Nikon Z6 2"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 24
+    }
+  },
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "Zf",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Nikon Zf"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 24
+    }
+  },
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "Z50",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Nikon Z50"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 20
+    }
+  },
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "Zfc",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Nikon Zfc"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 20
+    }
+  },
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "D850",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Nikon D850"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 45
+    }
+  },
+  {
+    "brand": "NIKON",
+    "type": "CAMERA",
+    "name": "D7500",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Nikon D7500"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 20
+    }
+  }
+]

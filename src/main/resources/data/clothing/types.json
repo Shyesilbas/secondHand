@@ -1,0 +1,1685 @@
+[
+  {
+    "key": "T_SHIRT",
+    "label": "T-Shirt",
+    "group": "APPAREL",
+    "sortOrder": 10,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SHIRT",
+    "label": "Gömlek",
+    "group": "APPAREL",
+    "sortOrder": 20,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "BLOUSE",
+    "label": "Bluz",
+    "group": "APPAREL",
+    "sortOrder": 30,
+    "sizes": {
+      "WOMEN": [
+        "LETTER",
+        "WOMEN_NUMERIC"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "TUNIC",
+    "label": "Tunik",
+    "group": "APPAREL",
+    "sortOrder": 40,
+    "sizes": {
+      "WOMEN": [
+        "LETTER",
+        "WOMEN_NUMERIC"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SWEATER",
+    "label": "Kazak",
+    "group": "APPAREL",
+    "sortOrder": 50,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "HOODIE",
+    "label": "Kapüşonlu Sweatshirt",
+    "group": "APPAREL",
+    "sortOrder": 60,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SWEATSHIRT",
+    "label": "Sweatshirt",
+    "group": "APPAREL",
+    "sortOrder": 70,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "CARDIGAN",
+    "label": "Hırka",
+    "group": "APPAREL",
+    "sortOrder": 80,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "VEST",
+    "label": "Yelek",
+    "group": "APPAREL",
+    "sortOrder": 90,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "PANTS",
+    "label": "Pantolon",
+    "group": "APPAREL",
+    "sortOrder": 100,
+    "sizes": {
+      "WOMEN": [
+        "WOMEN_NUMERIC",
+        "LETTER",
+        "JEANS"
+      ],
+      "MEN": [
+        "JEANS",
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "JEANS",
+    "label": "Kot Pantolon (Jean)",
+    "group": "APPAREL",
+    "sortOrder": 110,
+    "sizes": {
+      "WOMEN": [
+        "JEANS",
+        "WOMEN_NUMERIC"
+      ],
+      "MEN": [
+        "JEANS"
+      ],
+      "UNISEX": [
+        "JEANS"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SHORTS",
+    "label": "Şort",
+    "group": "APPAREL",
+    "sortOrder": 120,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "LEGGINGS",
+    "label": "Tayt",
+    "group": "APPAREL",
+    "sortOrder": 130,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "DRESS",
+    "label": "Elbise",
+    "group": "APPAREL",
+    "sortOrder": 140,
+    "sizes": {
+      "WOMEN": [
+        "WOMEN_NUMERIC",
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SKIRT",
+    "label": "Etek",
+    "group": "APPAREL",
+    "sortOrder": 150,
+    "sizes": {
+      "WOMEN": [
+        "WOMEN_NUMERIC",
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "JUMPSUIT",
+    "label": "Tulum",
+    "group": "APPAREL",
+    "sortOrder": 160,
+    "sizes": {
+      "WOMEN": [
+        "LETTER",
+        "WOMEN_NUMERIC"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SUIT",
+    "label": "Takım Elbise",
+    "group": "APPAREL",
+    "sortOrder": 170,
+    "sizes": {
+      "WOMEN": [
+        "WOMEN_NUMERIC"
+      ],
+      "MEN": [
+        "MEN_NUMERIC"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "JACKET",
+    "label": "Ceket / Mont",
+    "group": "APPAREL",
+    "sortOrder": 180,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "COAT",
+    "label": "Kaban & Palto",
+    "group": "APPAREL",
+    "sortOrder": 190,
+    "sizes": {
+      "WOMEN": [
+        "LETTER",
+        "WOMEN_NUMERIC"
+      ],
+      "MEN": [
+        "LETTER",
+        "MEN_NUMERIC"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "BLAZER",
+    "label": "Blazer Ceket",
+    "group": "APPAREL",
+    "sortOrder": 200,
+    "sizes": {
+      "WOMEN": [
+        "WOMEN_NUMERIC",
+        "LETTER"
+      ],
+      "MEN": [
+        "MEN_NUMERIC",
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "TRENCH_COAT",
+    "label": "Trençkot / Pardösü",
+    "group": "APPAREL",
+    "sortOrder": 210,
+    "sizes": {
+      "WOMEN": [
+        "LETTER",
+        "WOMEN_NUMERIC"
+      ],
+      "MEN": [
+        "LETTER",
+        "MEN_NUMERIC"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "WINDBREAKER",
+    "label": "Rüzgarlık",
+    "group": "APPAREL",
+    "sortOrder": 220,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "RAINCOAT",
+    "label": "Yağmurluk",
+    "group": "APPAREL",
+    "sortOrder": 230,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "TRACKSUIT",
+    "label": "Eşofman Takımı",
+    "group": "APPAREL",
+    "sortOrder": 240,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "PYJAMA",
+    "label": "Pijama Takımı",
+    "group": "APPAREL",
+    "sortOrder": 250,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "UNDERWEAR",
+    "label": "İç Giyim",
+    "group": "APPAREL",
+    "sortOrder": 260,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SWIMWEAR",
+    "label": "Mayo & Bikini",
+    "group": "APPAREL",
+    "sortOrder": 270,
+    "sizes": {
+      "WOMEN": [
+        "LETTER"
+      ],
+      "MEN": [
+        "LETTER"
+      ],
+      "UNISEX": [
+        "LETTER"
+      ],
+      "GIRL": [
+        "KIDS_AGE"
+      ],
+      "BOY": [
+        "KIDS_AGE"
+      ],
+      "BABY": [
+        "BABY_MONTHS"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "SOCKS",
+    "label": "Çorap",
+    "group": "APPAREL",
+    "sortOrder": 280,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE",
+        "SHOE_EU"
+      ],
+      "MEN": [
+        "ONE_SIZE",
+        "SHOE_EU"
+      ],
+      "UNISEX": [
+        "ONE_SIZE",
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU",
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "KIDS_SHOE_EU",
+        "ONE_SIZE"
+      ],
+      "BABY": [
+        "BABY_MONTHS",
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "SNEAKERS",
+    "label": "Spor Ayakkabı / Sneaker",
+    "group": "FOOTWEAR",
+    "sortOrder": 290,
+    "sizes": {
+      "WOMEN": [
+        "SHOE_EU"
+      ],
+      "MEN": [
+        "SHOE_EU"
+      ],
+      "UNISEX": [
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU"
+      ],
+      "BOY": [
+        "KIDS_SHOE_EU"
+      ],
+      "BABY": [
+        "KIDS_SHOE_EU"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "BOOTS",
+    "label": "Bot & Çizme",
+    "group": "FOOTWEAR",
+    "sortOrder": 300,
+    "sizes": {
+      "WOMEN": [
+        "SHOE_EU"
+      ],
+      "MEN": [
+        "SHOE_EU"
+      ],
+      "UNISEX": [
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU"
+      ],
+      "BOY": [
+        "KIDS_SHOE_EU"
+      ],
+      "BABY": [
+        "KIDS_SHOE_EU"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SANDALS",
+    "label": "Sandalet",
+    "group": "FOOTWEAR",
+    "sortOrder": 310,
+    "sizes": {
+      "WOMEN": [
+        "SHOE_EU"
+      ],
+      "MEN": [
+        "SHOE_EU"
+      ],
+      "UNISEX": [
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU"
+      ],
+      "BOY": [
+        "KIDS_SHOE_EU"
+      ],
+      "BABY": [
+        "KIDS_SHOE_EU"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SLIPPERS",
+    "label": "Terlik",
+    "group": "FOOTWEAR",
+    "sortOrder": 320,
+    "sizes": {
+      "WOMEN": [
+        "SHOE_EU"
+      ],
+      "MEN": [
+        "SHOE_EU"
+      ],
+      "UNISEX": [
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU"
+      ],
+      "BOY": [
+        "KIDS_SHOE_EU"
+      ],
+      "BABY": [
+        "KIDS_SHOE_EU"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "HEELS",
+    "label": "Topuklu Ayakkabı",
+    "group": "FOOTWEAR",
+    "sortOrder": 330,
+    "sizes": {
+      "WOMEN": [
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "FLATS",
+    "label": "Babet / Düz Ayakkabı",
+    "group": "FOOTWEAR",
+    "sortOrder": 340,
+    "sizes": {
+      "WOMEN": [
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU"
+      ],
+      "BABY": [
+        "KIDS_SHOE_EU"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "LOAFERS",
+    "label": "Loafer / Makosen",
+    "group": "FOOTWEAR",
+    "sortOrder": 350,
+    "sizes": {
+      "WOMEN": [
+        "SHOE_EU"
+      ],
+      "MEN": [
+        "SHOE_EU"
+      ],
+      "UNISEX": [
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU"
+      ],
+      "BOY": [
+        "KIDS_SHOE_EU"
+      ],
+      "BABY": [
+        "KIDS_SHOE_EU"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SHOES",
+    "label": "Klasik Ayakkabı",
+    "group": "FOOTWEAR",
+    "sortOrder": 360,
+    "sizes": {
+      "WOMEN": [
+        "SHOE_EU"
+      ],
+      "MEN": [
+        "SHOE_EU"
+      ],
+      "UNISEX": [
+        "SHOE_EU"
+      ],
+      "GIRL": [
+        "KIDS_SHOE_EU"
+      ],
+      "BOY": [
+        "KIDS_SHOE_EU"
+      ],
+      "BABY": [
+        "KIDS_SHOE_EU"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "BAG",
+    "label": "Omuz Çantası / Tote",
+    "group": "ACCESSORY",
+    "sortOrder": 370,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "BACKPACK",
+    "label": "Sırt Çantası",
+    "group": "ACCESSORY",
+    "sortOrder": 380,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "HANDBAG",
+    "label": "El Çantası",
+    "group": "ACCESSORY",
+    "sortOrder": 390,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "CROSSBODY_BAG",
+    "label": "Çapraz Askılı Çanta",
+    "group": "ACCESSORY",
+    "sortOrder": 400,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "CLUTCH",
+    "label": "Portföy / Clutch",
+    "group": "ACCESSORY",
+    "sortOrder": 410,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SUITCASE",
+    "label": "Bavul / Valiz",
+    "group": "ACCESSORY",
+    "sortOrder": 420,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "WALLET",
+    "label": "Cüzdan & Kartlık",
+    "group": "ACCESSORY",
+    "sortOrder": 430,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "WATCH",
+    "label": "Kol Saati",
+    "group": "ACCESSORY",
+    "sortOrder": 440,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "SUNGLASSES",
+    "label": "Güneş Gözlüğü",
+    "group": "ACCESSORY",
+    "sortOrder": 450,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "NECKLACE",
+    "label": "Kolye",
+    "group": "ACCESSORY",
+    "sortOrder": 460,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "BRACELET",
+    "label": "Bileklik & Bilezik",
+    "group": "ACCESSORY",
+    "sortOrder": 470,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "EARRINGS",
+    "label": "Küpe",
+    "group": "ACCESSORY",
+    "sortOrder": 480,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "RING",
+    "label": "Yüzük",
+    "group": "ACCESSORY",
+    "sortOrder": 490,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "JEWELRY",
+    "label": "Takı Seti & Diğer Takı",
+    "group": "ACCESSORY",
+    "sortOrder": 500,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "HIDDEN"
+    }
+  },
+  {
+    "key": "BELT",
+    "label": "Kemer",
+    "group": "ACCESSORY",
+    "sortOrder": 510,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "MEN": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "UNISEX": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "GIRL": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "BOY": [
+        "ONE_SIZE",
+        "LETTER"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "HAT",
+    "label": "Şapka",
+    "group": "ACCESSORY",
+    "sortOrder": 520,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "MEN": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "UNISEX": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "GIRL": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "BOY": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "BABY": [
+        "ONE_SIZE",
+        "LETTER"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "CAP",
+    "label": "Kep / Beyzbol Şapkası",
+    "group": "ACCESSORY",
+    "sortOrder": 530,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "BEANIE",
+    "label": "Bere",
+    "group": "ACCESSORY",
+    "sortOrder": 540,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ],
+      "BABY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "SCARF",
+    "label": "Atkı & Eşarp & Şal",
+    "group": "ACCESSORY",
+    "sortOrder": 550,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE"
+      ],
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "GIRL": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ],
+      "BABY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "GLOVES",
+    "label": "Eldiven",
+    "group": "ACCESSORY",
+    "sortOrder": 560,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "MEN": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "UNISEX": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "GIRL": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "BOY": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "BABY": [
+        "ONE_SIZE",
+        "LETTER"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "HIDDEN",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "TIE",
+    "label": "Kravat",
+    "group": "ACCESSORY",
+    "sortOrder": 570,
+    "sizes": {
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "BOW_TIE",
+    "label": "Papyon",
+    "group": "ACCESSORY",
+    "sortOrder": 580,
+    "sizes": {
+      "MEN": [
+        "ONE_SIZE"
+      ],
+      "UNISEX": [
+        "ONE_SIZE"
+      ],
+      "BOY": [
+        "ONE_SIZE"
+      ]
+    },
+    "fields": {
+      "fit": "HIDDEN",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  },
+  {
+    "key": "OTHER",
+    "label": "Diğer Giyim & Aksesuar",
+    "group": "ACCESSORY",
+    "sortOrder": 590,
+    "sizes": {
+      "WOMEN": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "MEN": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "UNISEX": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "GIRL": [
+        "ONE_SIZE",
+        "LETTER"
+      ],
+      "BOY": [
+        "ONE_SIZE",
+        "LETTER"
+      ]
+    },
+    "fields": {
+      "fit": "OPTIONAL",
+      "pattern": "OPTIONAL",
+      "fabricType": "OPTIONAL"
+    }
+  }
+]

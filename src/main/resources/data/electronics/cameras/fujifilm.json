@@ -1,0 +1,106 @@
+[
+  {
+    "brand": "FUJIFILM",
+    "type": "CAMERA",
+    "name": "X100VI",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Fuji X100VI",
+      "X100 6"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 40
+    }
+  },
+  {
+    "brand": "FUJIFILM",
+    "type": "CAMERA",
+    "name": "X100V",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Fuji X100V",
+      "X100 5"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 26
+    }
+  },
+  {
+    "brand": "FUJIFILM",
+    "type": "CAMERA",
+    "name": "X-T5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Fuji X-T5",
+      "XT5"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 40
+    }
+  },
+  {
+    "brand": "FUJIFILM",
+    "type": "CAMERA",
+    "name": "X-T4",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Fuji X-T4",
+      "XT4"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 26
+    }
+  },
+  {
+    "brand": "FUJIFILM",
+    "type": "CAMERA",
+    "name": "X-S20",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Fuji X-S20",
+      "XS20"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 26
+    }
+  },
+  {
+    "brand": "FUJIFILM",
+    "type": "CAMERA",
+    "name": "X-T30 II",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Fuji XT30 II",
+      "XT30 2"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 26
+    }
+  },
+  {
+    "brand": "FUJIFILM",
+    "type": "CAMERA",
+    "name": "GFX 100 II",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Fuji GFX 100 II"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 102
+    }
+  }
+]

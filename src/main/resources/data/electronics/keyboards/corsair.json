@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "CORSAIR",
+    "type": "KEYBOARD",
+    "name": "K70 RGB PRO",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Corsair K70 Pro",
+      "K70 RGB"
+    ]
+  },
+  {
+    "brand": "CORSAIR",
+    "type": "KEYBOARD",
+    "name": "K100 RGB",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Corsair K100",
+      "K100 OPX"
+    ]
+  },
+  {
+    "brand": "CORSAIR",
+    "type": "KEYBOARD",
+    "name": "K65 PLUS WIRELESS",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Corsair K65 Plus",
+      "K65 75%"
+    ]
+  }
+]

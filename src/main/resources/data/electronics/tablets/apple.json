@@ -1,0 +1,908 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad Pro 13 (M4)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPad Pro M4 13",
+      "iPad Pro 7th Gen 13"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "Apple M4",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 13.0,
+      "displayType": "Tandem OLED",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "512 GB Wi-Fi",
+        "storage": 512,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "512 GB Wi-Fi + Cellular",
+        "storage": 512,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "1 TB Wi-Fi",
+        "storage": 1024,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "1 TB Wi-Fi + Cellular",
+        "storage": 1024,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "2 TB Wi-Fi",
+        "storage": 2048,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "2 TB Wi-Fi + Cellular",
+        "storage": 2048,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 16
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad Pro 11 (M4)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPad Pro M4 11",
+      "iPad Pro 5th Gen 11"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "Apple M4",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 11.0,
+      "displayType": "Tandem OLED",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "512 GB Wi-Fi",
+        "storage": 512,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "512 GB Wi-Fi + Cellular",
+        "storage": 512,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "1 TB Wi-Fi",
+        "storage": 1024,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "1 TB Wi-Fi + Cellular",
+        "storage": 1024,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "2 TB Wi-Fi",
+        "storage": 2048,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "2 TB Wi-Fi + Cellular",
+        "storage": 2048,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 16
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad Air 13 (M2)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPad Air M2 13"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "Apple M2",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 13.0,
+      "displayType": "LCD",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Purple",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB Wi-Fi",
+        "storage": 128,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "128 GB Wi-Fi + Cellular",
+        "storage": 128,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB Wi-Fi",
+        "storage": 512,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB Wi-Fi + Cellular",
+        "storage": 512,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB Wi-Fi",
+        "storage": 1024,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB Wi-Fi + Cellular",
+        "storage": 1024,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad Air 11 (M2)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPad Air M2 11",
+      "iPad Air 6th Gen"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "Apple M2",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 11.0,
+      "displayType": "LCD",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Purple",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB Wi-Fi",
+        "storage": 128,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "128 GB Wi-Fi + Cellular",
+        "storage": 128,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB Wi-Fi",
+        "storage": 512,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB Wi-Fi + Cellular",
+        "storage": 512,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB Wi-Fi",
+        "storage": 1024,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB Wi-Fi + Cellular",
+        "storage": 1024,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad Mini (A17 Pro)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPad Mini 7",
+      "iPad Mini 7th Gen"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A17 Pro",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 8.3,
+      "displayType": "LCD",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Purple",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB Wi-Fi",
+        "storage": 128,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "128 GB Wi-Fi + Cellular",
+        "storage": 128,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB Wi-Fi",
+        "storage": 512,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB Wi-Fi + Cellular",
+        "storage": 512,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad 10.9 (10th Gen)",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "iPad 10",
+      "iPad 10th Gen"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A14 Bionic",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 10.9,
+      "displayType": "LCD",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Pink",
+        "color": "PINK"
+      },
+      {
+        "name": "Yellow",
+        "color": "YELLOW"
+      }
+    ],
+    "variants": [
+      {
+        "name": "64 GB Wi-Fi",
+        "storage": 64,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "64 GB Wi-Fi + Cellular",
+        "storage": 64,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad Mini (6th Gen)",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "iPad Mini 6"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A15 Bionic",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 8.3,
+      "displayType": "LCD",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Pink",
+        "color": "PINK"
+      },
+      {
+        "name": "Purple",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "64 GB Wi-Fi",
+        "storage": 64,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "64 GB Wi-Fi + Cellular",
+        "storage": 64,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad Pro 12.9 (M2)",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "iPad Pro M2 12.9"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "Apple M2",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 12.9,
+      "displayType": "Mini-LED",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB Wi-Fi",
+        "storage": 128,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "128 GB Wi-Fi + Cellular",
+        "storage": 128,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "512 GB Wi-Fi",
+        "storage": 512,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "512 GB Wi-Fi + Cellular",
+        "storage": 512,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "1 TB Wi-Fi",
+        "storage": 1024,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "1 TB Wi-Fi + Cellular",
+        "storage": 1024,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "2 TB Wi-Fi",
+        "storage": 2048,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "2 TB Wi-Fi + Cellular",
+        "storage": 2048,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 16
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "TABLET",
+    "name": "iPad Pro 11 (M2)",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "iPad Pro M2 11"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "Apple M2",
+      "operatingSystem": "iPadOS",
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 11.0,
+      "displayType": "LCD",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB Wi-Fi",
+        "storage": 128,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "128 GB Wi-Fi + Cellular",
+        "storage": 128,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "256 GB Wi-Fi",
+        "storage": 256,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "256 GB Wi-Fi + Cellular",
+        "storage": 256,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "512 GB Wi-Fi",
+        "storage": 512,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "512 GB Wi-Fi + Cellular",
+        "storage": 512,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 8
+      },
+      {
+        "name": "1 TB Wi-Fi",
+        "storage": 1024,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "1 TB Wi-Fi + Cellular",
+        "storage": 1024,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "2 TB Wi-Fi",
+        "storage": 2048,
+        "specs": {
+          "supports5g": false
+        },
+        "source": "claude-draft",
+        "ram": 16
+      },
+      {
+        "name": "2 TB Wi-Fi + Cellular",
+        "storage": 2048,
+        "specs": {
+          "supports5g": true
+        },
+        "source": "claude-draft",
+        "ram": 16
+      }
+    ],
+    "source": "claude-draft"
+  }
+]

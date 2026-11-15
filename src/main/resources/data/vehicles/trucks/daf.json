@@ -1,0 +1,76 @@
+[
+  {
+    "brand": "DAF",
+    "type": "TRUCK",
+    "name": "XF",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "XF (2021–)",
+        "startYear": 2021,
+        "versions": [
+          {
+            "name": "XF 480",
+            "fuelType": "DIESEL",
+            "horsePower": 480,
+            "source": "claude-draft"
+          },
+          {
+            "name": "XF 530",
+            "fuelType": "DIESEL",
+            "horsePower": 530,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "XF (2013–2021, XF106)",
+        "startYear": 2013,
+        "versions": [
+          {
+            "name": "XF 460",
+            "fuelType": "DIESEL",
+            "horsePower": 460,
+            "source": "claude-draft"
+          },
+          {
+            "name": "XF 480",
+            "fuelType": "DIESEL",
+            "horsePower": 480,
+            "source": "claude-draft"
+          },
+          {
+            "name": "XF 510",
+            "fuelType": "DIESEL",
+            "horsePower": 510,
+            "source": "claude-draft"
+          }
+        ],
+        "endYear": 2021
+      }
+    ]
+  },
+  {
+    "brand": "DAF",
+    "type": "TRUCK",
+    "name": "CF",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK",
+      "TIPPER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "DAF",
+    "type": "TRUCK",
+    "name": "LF",
+    "supportedBodyTypes": [
+      "TRUCK"
+    ],
+    "generations": []
+  }
+]

@@ -1,0 +1,85 @@
+[
+  {
+    "brand": "MOSSO",
+    "type": "BICYCLE",
+    "name": "Wildfire",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Wildfire Dağ (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Wildfire 26 V",
+          "Wildfire 27.5 HD",
+          "Wildfire 29 HD"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MOSSO",
+    "type": "BICYCLE",
+    "name": "Legarda",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Legarda Şehir/Tur (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Legarda 2121",
+          "Legarda 2124",
+          "Legarda 2227",
+          "Legarda 2230"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MOSSO",
+    "type": "BICYCLE",
+    "name": "Cavalier",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Cavalier Yol (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Cavalier 700 Claris",
+          "Cavalier 700 Sora",
+          "Cavalier 700 105"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MOSSO",
+    "type": "BICYCLE",
+    "name": "Monza",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Monza Gravel (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Monza GRX"
+        ]
+      }
+    ]
+  }
+]

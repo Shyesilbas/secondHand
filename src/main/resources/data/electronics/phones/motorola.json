@@ -1,0 +1,65 @@
+[
+  {
+    "brand": "MOTOROLA",
+    "type": "MOBILE_PHONE",
+    "name": "Edge 50 Ultra",
+    "isLegacy": false,
+    "releaseYear": 2024,
+    "aliases": [
+      "Moto Edge 50 Ultra",
+      "Edge 50 Ultra"
+    ]
+  },
+  {
+    "brand": "MOTOROLA",
+    "type": "MOBILE_PHONE",
+    "name": "Edge 50 Pro",
+    "isLegacy": false,
+    "releaseYear": 2024,
+    "aliases": [
+      "Moto Edge 50 Pro",
+      "Edge 50 Pro"
+    ]
+  },
+  {
+    "brand": "MOTOROLA",
+    "type": "MOBILE_PHONE",
+    "name": "Edge 40 Neo",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Moto Edge 40 Neo",
+      "Edge 40 Neo"
+    ]
+  },
+  {
+    "brand": "MOTOROLA",
+    "type": "MOBILE_PHONE",
+    "name": "Moto G84",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Moto G84"
+    ]
+  },
+  {
+    "brand": "MOTOROLA",
+    "type": "MOBILE_PHONE",
+    "name": "Moto G54",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Moto G54"
+    ]
+  },
+  {
+    "brand": "MOTOROLA",
+    "type": "MOBILE_PHONE",
+    "name": "Edge 30",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Edge 30"
+    ]
+  }
+]

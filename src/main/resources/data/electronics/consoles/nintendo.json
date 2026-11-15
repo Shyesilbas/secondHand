@@ -1,0 +1,91 @@
+[
+  {
+    "brand": "NINTENDO",
+    "type": "GAME_CONSOLE",
+    "name": "Switch OLED",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Nintendo Switch OLED",
+      "OLED Switch"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "64 GB",
+        "storage": 64,
+        "storageType": "EMMC",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "NINTENDO",
+    "type": "GAME_CONSOLE",
+    "name": "Switch",
+    "releaseYear": 2017,
+    "isLegacy": false,
+    "aliases": [
+      "Nintendo Switch V2",
+      "Switch V1"
+    ]
+  },
+  {
+    "brand": "NINTENDO",
+    "type": "GAME_CONSOLE",
+    "name": "Switch Lite",
+    "releaseYear": 2019,
+    "isLegacy": false,
+    "aliases": [
+      "Nintendo Switch Lite"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "32 GB",
+        "storage": 32,
+        "storageType": "EMMC",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "NINTENDO",
+    "type": "GAME_CONSOLE",
+    "name": "Switch 2",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "Nintendo Switch 2"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "NINTENDO",
+    "type": "GAME_CONSOLE",
+    "name": "Wii U",
+    "releaseYear": 2012,
+    "isLegacy": true,
+    "aliases": [
+      "Nintendo Wii U"
+    ]
+  },
+  {
+    "brand": "NINTENDO",
+    "type": "GAME_CONSOLE",
+    "name": "New 3DS XL",
+    "releaseYear": 2015,
+    "isLegacy": true,
+    "aliases": [
+      "3DS XL",
+      "New Nintendo 3DS XL"
+    ]
+  }
+]

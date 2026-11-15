@@ -1,0 +1,138 @@
+[
+  {
+    "brand": "BYD",
+    "type": "CAR",
+    "name": "Atto 3",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Atto 3 (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "EV (204 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 204,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Design"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BYD",
+    "type": "CAR",
+    "name": "Seal U",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Seal U (2024–)",
+        "startYear": 2024,
+        "endYear": null,
+        "trims": [
+          "Design"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "DM-i 1.5 Plug-in Hybrid 218 FWD",
+            "fuelType": "HYBRID",
+            "engineCapacity": 1498,
+            "horsePower": 218,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft",
+            "specs": {
+              "batteryCapacity": 18.3,
+              "fuelTankCapacity": 60
+            }
+          },
+          {
+            "name": "DM-i 1.5 Plug-in Hybrid 324 AWD",
+            "fuelType": "HYBRID",
+            "engineCapacity": 1498,
+            "horsePower": 324,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "AWD",
+            "source": "claude-draft",
+            "specs": {
+              "acceleration0to100": 5.9,
+              "fuelTankCapacity": 60
+            }
+          },
+          {
+            "name": "EV (218 hp)",
+            "fuelType": "ELECTRIC",
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BYD",
+    "type": "CAR",
+    "name": "Dolphin",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Dolphin (2023–)",
+        "startYear": 2023,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "EV (204 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 204,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Design"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BYD",
+    "type": "CAR",
+    "name": "Han",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Han (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "EV AWD (517 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 517,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Executive"
+        ]
+      }
+    ]
+  }
+]

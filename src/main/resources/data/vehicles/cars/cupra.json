@@ -1,0 +1,173 @@
+[
+  {
+    "brand": "CUPRA",
+    "type": "CAR",
+    "name": "Formentor",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Formentor (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 TSI (150 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 150,
+            "engineCapacity": 1498
+          },
+          {
+            "name": "1.5 eTSI Mild Hybrid (150 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 150,
+            "engineCapacity": 1498
+          },
+          {
+            "name": "2.0 TSI VZ 4Drive (310 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 310,
+            "engineCapacity": 1984
+          },
+          {
+            "name": "1.4 e-Hybrid (204 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 204,
+            "engineCapacity": 1395
+          }
+        ],
+        "trims": [
+          "Standart",
+          "VZ",
+          "VZ-Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CUPRA",
+    "type": "CAR",
+    "name": "Leon",
+    "supportedBodyTypes": [
+      "HATCHBACK",
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Leon (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 eTSI (150 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 150,
+            "engineCapacity": 1498
+          },
+          {
+            "name": "2.0 TSI (300 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 300,
+            "engineCapacity": 1984
+          }
+        ],
+        "trims": [
+          "Standart",
+          "VZ"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CUPRA",
+    "type": "CAR",
+    "name": "Ateca",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Ateca (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.0 TSI 4Drive (300 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 300,
+            "engineCapacity": 1984
+          }
+        ],
+        "trims": [
+          "VZ"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CUPRA",
+    "type": "CAR",
+    "name": "Born",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Born (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "e-Boost 58 kWh (231 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 231,
+            "engineCapacity": 0
+          },
+          {
+            "name": "e-Boost 77 kWh (231 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 231,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Standart"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CUPRA",
+    "type": "CAR",
+    "name": "Terramar",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Terramar (2024–)",
+        "startYear": 2024,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 eTSI (150 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 150,
+            "engineCapacity": 1498
+          },
+          {
+            "name": "1.5 e-HYBRID (204 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 204,
+            "engineCapacity": 1498
+          }
+        ],
+        "trims": [
+          "Standart",
+          "VZ"
+        ]
+      }
+    ]
+  }
+]

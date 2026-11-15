@@ -1,0 +1,102 @@
+[
+  {
+    "brand": "KYMCO",
+    "type": "MOTORCYCLE",
+    "name": "Agility",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Agility (2015–)",
+        "startYear": 2015,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "125cc Delivery",
+            "fuelType": "GASOLINE",
+            "horsePower": 9,
+            "engineCapacity": 125
+          },
+          {
+            "name": "16+ 150cc",
+            "fuelType": "GASOLINE",
+            "horsePower": 11,
+            "engineCapacity": 150
+          },
+          {
+            "name": "16+ 200cc",
+            "fuelType": "GASOLINE",
+            "horsePower": 12,
+            "engineCapacity": 163
+          }
+        ],
+        "trims": [
+          "Carry",
+          "Delivery",
+          "16+"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KYMCO",
+    "type": "MOTORCYCLE",
+    "name": "DT X360",
+    "supportedBodyTypes": [
+      "SCOOTER",
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "DT X360 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "300cc (28.4 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 28,
+            "engineCapacity": 276
+          },
+          {
+            "name": "350cc (28.8 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 29,
+            "engineCapacity": 321
+          }
+        ],
+        "trims": [
+          "ABS / TCS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KYMCO",
+    "type": "MOTORCYCLE",
+    "name": "AK 550",
+    "supportedBodyTypes": [
+      "SCOOTER",
+      "TOURING"
+    ],
+    "generations": [
+      {
+        "name": "AK 550 Premium (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "550cc Twin (51 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 51,
+            "engineCapacity": 550
+          }
+        ],
+        "trims": [
+          "Premium"
+        ]
+      }
+    ]
+  }
+]

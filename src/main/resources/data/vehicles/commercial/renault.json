@@ -1,0 +1,224 @@
+[
+  {
+    "brand": "RENAULT",
+    "type": "COMMERCIAL",
+    "name": "Trafic",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Trafic (2014–, Trafic 3)",
+        "engines": [
+          {
+            "name": "2.0 dCi 120",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi 150",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Grand Comfort",
+          "Passenger",
+          "Standard",
+          "Combi",
+          "Spaceclass"
+        ]
+      },
+      {
+        "name": "Trafic (2001–2014, Trafic 2)",
+        "engines": [
+          {
+            "name": "1.9 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Passenger"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "COMMERCIAL",
+    "name": "Master",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS",
+      "LIGHT_TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "Master (2010–2024, Master 3)",
+        "engines": [
+          {
+            "name": "2.3 dCi 110",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.3 dCi 135",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.3 dCi 165",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Panel Van",
+          "Şasi",
+          "Standard",
+          "Combi"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "COMMERCIAL",
+    "name": "Kangoo",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Kangoo (2021–, Kangoo 3)",
+        "trims": [
+          "Equilibre",
+          "Techno",
+          "Standard",
+          "Evolution"
+        ],
+        "versions": [
+          {
+            "name": "1.3 TCe 130",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft",
+            "horsePower": 130,
+            "torqueNm": 240,
+            "gearbox": "MANUAL",
+            "gearCount": 6
+          },
+          {
+            "name": "1.3 TCe 130 EDC",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft",
+            "horsePower": 130,
+            "torqueNm": 240,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7
+          },
+          {
+            "name": "1.5 Blue dCi 95",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 95,
+            "torqueNm": 230
+          },
+          {
+            "name": "1.5 Blue dCi 115",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 115,
+            "torqueNm": 270,
+            "gearbox": "MANUAL",
+            "gearCount": 6
+          },
+          {
+            "name": "1.5 Blue dCi 115 EDC",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 115,
+            "torqueNm": 270,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7
+          },
+          {
+            "name": "E-Tech Electric",
+            "fuelType": "ELECTRIC",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Kangoo (2008–2021, Kangoo 2)",
+        "engines": [
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Authentique",
+          "Expression",
+          "Extreme",
+          "Multix"
+        ]
+      },
+      {
+        "name": "Kangoo (2003–2008, Kangoo 1)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.9 dTi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Expression",
+          "Alize",
+          "Authentique"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "COMMERCIAL",
+    "name": "Express",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Express Van (2021–, Express)",
+        "engines": [
+          {
+            "name": "1.5 Blue dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Joy",
+          "Touch"
+        ]
+      }
+    ]
+  }
+]

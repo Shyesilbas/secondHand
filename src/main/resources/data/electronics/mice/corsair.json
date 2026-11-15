@@ -1,0 +1,33 @@
+[
+  {
+    "brand": "CORSAIR",
+    "type": "MOUSE",
+    "name": "Scimitar RGB ELITE",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Corsair Scimitar Elite",
+      "Scimitar MMO"
+    ]
+  },
+  {
+    "brand": "CORSAIR",
+    "type": "MOUSE",
+    "name": "Dark Core RGB PRO SE",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Corsair Dark Core Pro"
+    ]
+  },
+  {
+    "brand": "CORSAIR",
+    "type": "MOUSE",
+    "name": "M65 RGB ULTRA",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Corsair M65 Ultra"
+    ]
+  }
+]

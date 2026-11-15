@@ -1,0 +1,56 @@
+[
+  {
+    "brand": "INSTA360",
+    "type": "CAMERA",
+    "name": "X4",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Insta360 X4",
+      "X4 8K"
+    ]
+  },
+  {
+    "brand": "INSTA360",
+    "type": "CAMERA",
+    "name": "X3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Insta360 X3",
+      "X3 360"
+    ]
+  },
+  {
+    "brand": "INSTA360",
+    "type": "CAMERA",
+    "name": "Ace Pro 2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Insta360 Ace Pro 2"
+    ]
+  },
+  {
+    "brand": "INSTA360",
+    "type": "CAMERA",
+    "name": "Ace Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Insta360 Ace Pro",
+      "Ace Pro Leica"
+    ]
+  },
+  {
+    "brand": "INSTA360",
+    "type": "CAMERA",
+    "name": "GO 3S",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Insta360 GO 3S",
+      "GO 3S 4K"
+    ]
+  }
+]

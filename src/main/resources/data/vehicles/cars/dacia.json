@@ -1,0 +1,553 @@
+[
+  {
+    "brand": "DACIA",
+    "type": "CAR",
+    "name": "Sandero",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Sandero (2020–, BJI)",
+        "trims": [
+          "Essential",
+          "Expression"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "1.0 SCe 65",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 65,
+            "torqueNm": 95,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TCe 90",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 90,
+            "torqueNm": 160,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 TCe 90 X-Tronic",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 90,
+            "torqueNm": 142,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 TCe 100 ECO-G",
+            "fuelType": "LPG",
+            "engineCapacity": 999,
+            "horsePower": 100,
+            "torqueNm": 170,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Sandero (2012–2020, B52)",
+        "engines": [
+          {
+            "name": "1.2 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "0.9 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate"
+        ]
+      },
+      {
+        "name": "Sandero (2008–2012, B90)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DACIA",
+    "type": "CAR",
+    "name": "Sandero Stepway",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Sandero Stepway (2020–, BJI)",
+        "trims": [
+          "Essential",
+          "Expression",
+          "Extreme"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "1.0 TCe 90",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 90,
+            "torqueNm": 160,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 TCe 90 X-Tronic",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 90,
+            "torqueNm": 142,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 TCe 100 ECO-G",
+            "fuelType": "LPG",
+            "engineCapacity": 999,
+            "horsePower": 100,
+            "torqueNm": 170,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Sandero Stepway (2012–2020, B52)",
+        "engines": [
+          {
+            "name": "0.9 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 Blue dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Stepway",
+          "Stepway Gold",
+          "Stepway Prestige"
+        ]
+      },
+      {
+        "name": "Sandero Stepway (2009–2012, B90)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stepway"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DACIA",
+    "type": "CAR",
+    "name": "Logan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Logan (2012–2020, L52)",
+        "engines": [
+          {
+            "name": "1.2 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "0.9 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate"
+        ]
+      },
+      {
+        "name": "Logan (2004–2012, L90)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DACIA",
+    "type": "CAR",
+    "name": "Logan MCV",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Logan MCV (2013–2020, R52)",
+        "engines": [
+          {
+            "name": "1.2 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "0.9 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 Blue dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate"
+        ]
+      },
+      {
+        "name": "Logan MCV (2006–2012, R90)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DACIA",
+    "type": "CAR",
+    "name": "Duster",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Duster (2024–, P1310)",
+        "engines": [
+          {
+            "name": "1.0 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 TCe 4x4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "Hybrid 140",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Evolution",
+          "Expression",
+          "Journey",
+          "Extreme"
+        ]
+      },
+      {
+        "name": "Duster (2017–2024, HM)",
+        "trims": [
+          "Comfort",
+          "Prestige",
+          "Prestige Plus",
+          "Journey",
+          "Extreme"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2017,
+        "endYear": 2024,
+        "versions": [
+          {
+            "name": "1.6 SCe",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TCe",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe 130",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1332,
+            "horsePower": 130,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe 150 EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1332,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe 4x4",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 4x4",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 Blue dCi 115",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 115,
+            "torqueNm": 260,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 Blue dCi 115 4x4",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 115,
+            "torqueNm": 260,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "AWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Duster (2010–2017, HS)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 dCi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate",
+          "Look",
+          "Blackshadow"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DACIA",
+    "type": "CAR",
+    "name": "Lodgy",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Lodgy (2012–2022, J92)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 Blue dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate",
+          "Stepway"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DACIA",
+    "type": "CAR",
+    "name": "Jogger",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Jogger (2021–)",
+        "engines": [
+          {
+            "name": "1.0 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "Hybrid 140",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Essential",
+          "Expression",
+          "Extreme"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DACIA",
+    "type": "CAR",
+    "name": "Spring Electric",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Spring Electric (2021–)",
+        "engines": [
+          {
+            "name": "Spring EV 33 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Spring EV 48 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Essential",
+          "Extreme"
+        ]
+      }
+    ]
+  }
+]

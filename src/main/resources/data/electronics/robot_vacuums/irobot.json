@@ -1,0 +1,57 @@
+[
+  {
+    "brand": "IROBOT",
+    "type": "ROBOT_VACUUM",
+    "name": "Roomba Combo j9+",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "iRobot Roomba j9+",
+      "Roomba j9 Plus"
+    ]
+  },
+  {
+    "brand": "IROBOT",
+    "type": "ROBOT_VACUUM",
+    "name": "Roomba j7+",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "iRobot Roomba j7+",
+      "Roomba j7 Plus"
+    ]
+  },
+  {
+    "brand": "IROBOT",
+    "type": "ROBOT_VACUUM",
+    "name": "Roomba i7+",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "iRobot Roomba i7+",
+      "Roomba i7"
+    ]
+  },
+  {
+    "brand": "IROBOT",
+    "type": "ROBOT_VACUUM",
+    "name": "Roomba s9+",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "iRobot Roomba s9+",
+      "Roomba s9"
+    ]
+  },
+  {
+    "brand": "IROBOT",
+    "type": "ROBOT_VACUUM",
+    "name": "Braava jet m6",
+    "releaseYear": 2019,
+    "isLegacy": false,
+    "aliases": [
+      "iRobot Braava jet m6",
+      "Braava m6"
+    ]
+  }
+]

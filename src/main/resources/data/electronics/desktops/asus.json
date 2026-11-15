@@ -1,0 +1,122 @@
+[
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "ROG G22CH",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG G22CH",
+      "ROG G22CH",
+      "G22CH"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "ROG G35CA",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG G35CA",
+      "ROG G35CA",
+      "G35CA"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "ROG Strix G15DK",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Strix G15DK",
+      "ROG Strix G15DK",
+      "G15DK"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "ROG Strix GA35",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS ROG Strix GA35",
+      "ROG Strix GA35",
+      "GA35"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "TUF Gaming GT15",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS TUF Gaming GT15",
+      "TUF Gaming GT15",
+      "TUF GT15"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "TUF Gaming GT501",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS TUF Gaming GT501",
+      "TUF Gaming GT501",
+      "TUF GT501"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "NUC 14 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS NUC 14 Pro",
+      "NUC 14 Pro",
+      "Asus NUC 14"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "PN64 Mini PC",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS PN64 Mini PC",
+      "PN64 Mini PC",
+      "Mini PC PN64"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "ExpertCenter PN53",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ExpertCenter PN53",
+      "ExpertCenter PN53",
+      "PN53"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "DESKTOP",
+    "name": "ProArt Station PD5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ProArt Station PD5",
+      "ProArt Station PD5",
+      "ProArt PD5"
+    ]
+  }
+]

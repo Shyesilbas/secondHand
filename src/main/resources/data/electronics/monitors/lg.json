@@ -1,0 +1,283 @@
+[
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "24MK430H",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG 24MK430H",
+      "24MK430H",
+      "24MK430"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27UK850",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG 27UK850",
+      "27UK850",
+      "27UK850-W"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 27,
+      "screenInches": 27.0,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "32UN880",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG 32UN880",
+      "32UN880",
+      "32UN880-B",
+      "Ergo 32UN880"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 32,
+      "screenInches": 31.5,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27GP950",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG 27GP950",
+      "27GP950",
+      "27GP950-B",
+      "UltraGear 27GP950"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "34WN80C",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG 34WN80C",
+      "34WN80C",
+      "34WN80C-B",
+      "UltraWide 34WN80C"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27GN950",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG 27GN950",
+      "27GN950",
+      "27GN950-B",
+      "UltraGear 27GN950"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 27,
+      "screenInches": 27.0,
+      "displayType": "IPS",
+      "refreshRateHz": 144
+    }
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "34GP83A",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG 34GP83A",
+      "34GP83A",
+      "34GP83A-B",
+      "UltraGear 34GP83A"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27UP850",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG 27UP850",
+      "27UP850",
+      "27UP850-W"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "32GP850",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG 32GP850",
+      "32GP850",
+      "32GP850-B",
+      "UltraGear 32GP850"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27GQ50F",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG 27GQ50F",
+      "27GQ50F",
+      "27GQ50F-B"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27GP750",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG 27GP750",
+      "27GP750",
+      "27GP750-B",
+      "UltraGear 27GP750"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "45GR95QE",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG 45GR95QE",
+      "45GR95QE",
+      "45GR95QE-B",
+      "UltraGear OLED 45"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 45,
+      "screenInches": 44.5,
+      "displayType": "OLED",
+      "refreshRateHz": 240
+    }
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27GR95QE",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG 27GR95QE",
+      "27GR95QE",
+      "27GR95QE-B",
+      "UltraGear OLED 27"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 27,
+      "screenInches": 26.5,
+      "displayType": "OLED",
+      "refreshRateHz": 240
+    }
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "32SQ780S",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG 32SQ780S",
+      "32SQ780S",
+      "MyView Smart Monitor 32"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27BP85UN",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG 27BP85UN",
+      "27BP85UN",
+      "UltraFine 4K 27"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "27GS95QE",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG 27GS95QE",
+      "27GS95QE",
+      "UltraGear OLED 2023"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 27,
+      "screenInches": 26.5,
+      "displayType": "OLED",
+      "refreshRateHz": 240
+    }
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "32GS95UE",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG 32GS95UE",
+      "32GS95UE",
+      "UltraGear OLED 32 2024"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 32,
+      "screenInches": 31.5,
+      "displayType": "OLED",
+      "refreshRateHz": 240
+    }
+  },
+  {
+    "brand": "LG",
+    "type": "MONITOR",
+    "name": "45GS95QE",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG 45GS95QE",
+      "45GS95QE",
+      "UltraGear OLED 45 2024"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 45,
+      "screenInches": 44.5,
+      "displayType": "OLED",
+      "refreshRateHz": 240
+    }
+  }
+]

@@ -1,0 +1,190 @@
+[
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 9 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 9 Pro",
+      "ROG Phone 9 Pro",
+      "ROG 9 Pro"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 9",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 9",
+      "ROG Phone 9",
+      "ROG 9"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 8 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 8 Pro",
+      "ROG Phone 8 Pro",
+      "ROG 8 Pro"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 8",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 8",
+      "ROG Phone 8",
+      "ROG 8"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 7 Ultimate",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 7 Ultimate",
+      "ROG Phone 7 Ultimate",
+      "ROG 7 Ultimate"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 7",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 7",
+      "ROG Phone 7",
+      "ROG 7"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 6D Ultimate",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 6D Ultimate",
+      "ROG Phone 6D Ultimate",
+      "ROG 6D Ultimate"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 6",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 6",
+      "ROG Phone 6",
+      "ROG 6"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 5",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Phone 5",
+      "ROG Phone 5",
+      "ROG 5"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "ROG Phone 3",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS ROG Phone 3",
+      "ROG Phone 3",
+      "ROG 3"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "Zenfone 11 Ultra",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenfone 11 Ultra",
+      "Zenfone 11 Ultra",
+      "Zenfone 11"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "Zenfone 10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenfone 10",
+      "Zenfone 10"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "Zenfone 9",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenfone 9",
+      "Zenfone 9"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "Zenfone 8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenfone 8",
+      "Zenfone 8"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "Zenfone 7 Pro",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS Zenfone 7 Pro",
+      "Zenfone 7 Pro",
+      "Zenfone 7"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOBILE_PHONE",
+    "name": "Zenfone 6",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS Zenfone 6",
+      "Zenfone 6"
+    ]
+  }
+]

@@ -1,0 +1,788 @@
+[
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Micra",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Micra (2017–2022, K14)",
+        "engines": [
+          {
+            "name": "1.0 IG-T",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna",
+          "Design Pack"
+        ]
+      },
+      {
+        "name": "Micra (2010–2017, K13)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 DIG-S",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna",
+          "Match"
+        ]
+      },
+      {
+        "name": "Micra (2002–2010, K12)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna",
+          "Mood"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Note",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Note (2013–2017, E12)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 DIG-S",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna"
+        ]
+      },
+      {
+        "name": "Note (2006–2013, E11)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Almera Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Almera Sedan (2000–2006, N16)",
+        "engines": [
+          {
+            "name": "1.5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Luxury"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Almera Hatchback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Almera Hatchback (2000–2006, N16)",
+        "engines": [
+          {
+            "name": "1.5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Luxury"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Primera",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Primera (2002–2008, P12)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna"
+        ]
+      },
+      {
+        "name": "Primera (1999–2002, P11)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Sunny",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Sunny (1995–2000, B15)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "EX",
+          "Super Saloon"
+        ]
+      },
+      {
+        "name": "Sunny (1991–1995, N14)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "LX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Tiida",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Tiida (2004–2012, C11)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Juke",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Juke (2019–, F16)",
+        "engines": [
+          {
+            "name": "1.0 DIG-T",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Tekna",
+          "Skypack",
+          "Platinum",
+          "Platinum Premium"
+        ]
+      },
+      {
+        "name": "Juke (2010–2019, F15)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 DIG-T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 DIG-T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna",
+          "Special Edition",
+          "Black Edition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Qashqai",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Qashqai (2021–, J12)",
+        "trims": [
+          "Tekna",
+          "Skypack",
+          "Platinum",
+          "Platinum Premium"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2021,
+        "versions": [
+          {
+            "name": "1.3 DIG-T 158 Mild Hybrid X-Tronic",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1332,
+            "horsePower": 158,
+            "torqueNm": 270,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.3 DIG-T 140 Mild Hybrid",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1332,
+            "horsePower": 140,
+            "torqueNm": 240,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "e-Power 190",
+            "fuelType": "HYBRID",
+            "engineCapacity": 1497,
+            "horsePower": 190,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Qashqai (2014–2021, J11)",
+        "engines": [
+          {
+            "name": "1.2 DIG-T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 DIG-T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 dCi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna",
+          "Skypack",
+          "Platinum",
+          "Platinum Premium",
+          "N-Connecta"
+        ]
+      },
+      {
+        "name": "Qashqai (2007–2013, J10)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna",
+          "Executive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Qashqai+2",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Qashqai+2 (2008–2013, J10)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Tekna"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "X-Trail",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "X-Trail (2022–, T33)",
+        "engines": [
+          {
+            "name": "1.5 DIG-T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "e-Power",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Skypack",
+          "Platinum"
+        ]
+      },
+      {
+        "name": "X-Trail (2014–2021, T32)",
+        "engines": [
+          {
+            "name": "1.6 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 dCi 4x4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.3 DIG-T",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Skypack",
+          "Platinum",
+          "Design Pack"
+        ]
+      },
+      {
+        "name": "X-Trail (2007–2013, T31)",
+        "engines": [
+          {
+            "name": "2.0 dCi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Sport",
+          "Platinum"
+        ]
+      },
+      {
+        "name": "X-Trail (2001–2007, T30)",
+        "engines": [
+          {
+            "name": "2.0 4x4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Luxury"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Pathfinder",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Pathfinder (2005–2012, R51)",
+        "engines": [
+          {
+            "name": "2.5 dCi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "LE"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Murano",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Murano (2008–2014, Z51)",
+        "engines": [
+          {
+            "name": "2.5 dCi 4x4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.5 V6 4x4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "LE"
+        ]
+      },
+      {
+        "name": "Murano (2003–2008, Z50)",
+        "engines": [
+          {
+            "name": "3.5 V6 4x4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Terrano II",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Terrano II (1993–2006, R20)",
+        "engines": [
+          {
+            "name": "2.7 TDi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Luxury"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Evalia",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Evalia (2010–2021)",
+        "engines": [
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Tekna"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Leaf",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Leaf (2017–2024, ZE1)",
+        "engines": [
+          {
+            "name": "Leaf 110 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Tekna"
+        ]
+      },
+      {
+        "name": "Leaf (2010–2017, ZE0)",
+        "engines": [
+          {
+            "name": "Leaf 80 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Visia"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "Ariya",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Ariya (2021–)",
+        "engines": [
+          {
+            "name": "Ariya 160 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Ariya 178 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Advance",
+          "Evolve"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "350Z",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "350Z",
+        "engines": [
+          {
+            "name": "3.5 V6 350Z",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "370Z",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "370Z",
+        "engines": [
+          {
+            "name": "3.7 V6 370Z",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "CAR",
+    "name": "GT-R",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "GT-R",
+        "engines": [
+          {
+            "name": "3.8 V6 Twin Turbo",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Black Edition"
+        ]
+      }
+    ]
+  }
+]

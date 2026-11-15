@@ -1,0 +1,78 @@
+[
+  {
+    "brand": "BOSE",
+    "type": "HEADPHONES",
+    "name": "QuietComfort Ultra Headphones",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Bose QC Ultra",
+      "QC Ultra Over-Ear"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 24
+    }
+  },
+  {
+    "brand": "BOSE",
+    "type": "HEADPHONES",
+    "name": "QuietComfort 45",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Bose QC45",
+      "QuietComfort 45 ANC"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 24
+    }
+  },
+  {
+    "brand": "BOSE",
+    "type": "HEADPHONES",
+    "name": "QuietComfort Ultra Earbuds",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Bose QC Ultra Earbuds",
+      "QC Ultra TWS"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 6
+    }
+  },
+  {
+    "brand": "BOSE",
+    "type": "HEADPHONES",
+    "name": "Noise Cancelling Headphones 700",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Bose NC 700",
+      "Bose 700"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 20
+    }
+  }
+]

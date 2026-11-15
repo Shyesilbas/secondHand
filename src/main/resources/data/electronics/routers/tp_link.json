@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "TP_LINK",
+    "type": "ROUTER",
+    "name": "Archer AX55 AX3000",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "TP-Link AX55",
+      "Archer AX55"
+    ]
+  },
+  {
+    "brand": "TP_LINK",
+    "type": "ROUTER",
+    "name": "Archer AX73 AX5400",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "TP-Link AX73",
+      "Archer AX73"
+    ]
+  },
+  {
+    "brand": "TP_LINK",
+    "type": "ROUTER",
+    "name": "Archer AX12 AX1500",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "TP-Link AX12",
+      "Archer AX12"
+    ]
+  },
+  {
+    "brand": "TP_LINK",
+    "type": "ROUTER",
+    "name": "Deco X50 (3-Pack)",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "TP-Link Deco X50",
+      "Deco X50 Mesh"
+    ]
+  },
+  {
+    "brand": "TP_LINK",
+    "type": "ROUTER",
+    "name": "Deco X20 (2-Pack)",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "TP-Link Deco X20",
+      "Deco X20 Mesh"
+    ]
+  },
+  {
+    "brand": "TP_LINK",
+    "type": "ROUTER",
+    "name": "Deco M4 (3-Pack)",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "TP-Link Deco M4",
+      "Deco M4 Mesh"
+    ]
+  }
+]

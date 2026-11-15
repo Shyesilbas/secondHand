@@ -1,0 +1,150 @@
+[
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Robot Vacuum X20 Max",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Robot Vacuum X20 Max",
+      "Robot Vacuum X20 Max",
+      "X20 Max"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Robot Vacuum X20+",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Robot Vacuum X20+",
+      "Robot Vacuum X20+",
+      "X20+"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Robot Vacuum X10+",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Robot Vacuum X10+",
+      "Robot Vacuum X10+",
+      "X10+"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Robot Vacuum S20+",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Robot Vacuum S20+",
+      "Robot Vacuum S20+",
+      "S20+"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Robot Vacuum S20",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Robot Vacuum S20",
+      "Robot Vacuum S20",
+      "S20"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Robot Vacuum S10+",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Robot Vacuum S10+",
+      "Robot Vacuum S10+",
+      "S10+"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Robot Vacuum S10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Robot Vacuum S10",
+      "Robot Vacuum S10",
+      "S10"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Mi Robot Vacuum Mop 2 Pro",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Mi Robot Vacuum Mop 2 Pro",
+      "Mi Robot Vacuum Mop 2 Pro",
+      "Vacuum Mop 2 Pro",
+      "Mop 2 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Mi Robot Vacuum Mop 2",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Mi Robot Vacuum Mop 2",
+      "Mi Robot Vacuum Mop 2",
+      "Vacuum Mop 2",
+      "Mop 2"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Mi Robot Vacuum Mop Pro",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Xiaomi Mi Robot Vacuum Mop Pro",
+      "Mi Robot Vacuum Mop Pro",
+      "Vacuum Mop Pro",
+      "Mop Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Mi Robot Vacuum Mop Essential",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Xiaomi Mi Robot Vacuum Mop Essential",
+      "Mi Robot Vacuum Mop Essential",
+      "Vacuum Mop Essential",
+      "Mop Essential"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Mi Robot Vacuum",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "Xiaomi Mi Robot Vacuum",
+      "Mi Robot Vacuum",
+      "Mi Robot Vacuum 1"
+    ]
+  }
+]

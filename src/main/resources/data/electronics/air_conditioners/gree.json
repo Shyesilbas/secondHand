@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "GREE",
+    "type": "AIR_CONDITIONER",
+    "name": "Fairy 12000 BTU Inverter",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Gree Fairy 12000",
+      "Fairy A++"
+    ]
+  },
+  {
+    "brand": "GREE",
+    "type": "AIR_CONDITIONER",
+    "name": "Pular 18000 BTU Inverter",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Gree Pular 18000",
+      "Pular A++"
+    ]
+  },
+  {
+    "brand": "GREE",
+    "type": "AIR_CONDITIONER",
+    "name": "Lomo 12000 BTU Inverter",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Gree Lomo 12000",
+      "Lomo Inverter"
+    ]
+  }
+]

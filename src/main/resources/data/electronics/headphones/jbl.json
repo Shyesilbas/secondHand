@@ -1,0 +1,76 @@
+[
+  {
+    "brand": "JBL",
+    "type": "HEADPHONES",
+    "name": "Tour One M2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Tour One M2",
+      "Tour One 2"
+    ]
+  },
+  {
+    "brand": "JBL",
+    "type": "HEADPHONES",
+    "name": "Live 660NC",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Live 660NC",
+      "Live 660"
+    ]
+  },
+  {
+    "brand": "JBL",
+    "type": "HEADPHONES",
+    "name": "Tune 770NC",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Tune 770NC",
+      "Tune 770"
+    ]
+  },
+  {
+    "brand": "JBL",
+    "type": "HEADPHONES",
+    "name": "Tune 520BT",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Tune 520BT",
+      "Tune 520"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": false,
+      "hasMicrophone": true,
+      "batteryLifeHours": 57
+    }
+  },
+  {
+    "brand": "JBL",
+    "type": "HEADPHONES",
+    "name": "Wave Beam",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Wave Beam",
+      "Wave Beam TWS"
+    ]
+  },
+  {
+    "brand": "JBL",
+    "type": "HEADPHONES",
+    "name": "Tune Flex",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Tune Flex",
+      "Tune Flex TWS"
+    ]
+  }
+]

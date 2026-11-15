@@ -1,0 +1,28 @@
+[
+  {
+    "brand": "LENOVO",
+    "type": "GAME_CONSOLE",
+    "name": "Legion Go",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Go",
+      "Legion Go Z1 Extreme"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      }
+    ]
+  }
+]

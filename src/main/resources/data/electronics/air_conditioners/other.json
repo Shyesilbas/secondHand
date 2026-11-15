@@ -1,0 +1,15 @@
+[
+  {
+    "brand": "OTHER",
+    "type": "AIR_CONDITIONER",
+    "name": "Diğer Model",
+    "releaseYear": null,
+    "isLegacy": false,
+    "aliases": [
+      "Diğer",
+      "Other",
+      "Genel Model",
+      "Custom"
+    ]
+  }
+]

@@ -1,0 +1,170 @@
+[
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "ThinkCentre M70q Tiny",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkCentre M70q Tiny",
+      "ThinkCentre M70q Tiny",
+      "M70q Tiny",
+      "ThinkCentre M70q"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "ThinkCentre M75q Tiny",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkCentre M75q Tiny",
+      "ThinkCentre M75q Tiny",
+      "M75q Tiny",
+      "ThinkCentre M75q"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "ThinkCentre M80q Tiny",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkCentre M80q Tiny",
+      "ThinkCentre M80q Tiny",
+      "M80q Tiny",
+      "ThinkCentre M80q"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "ThinkCentre M90q Tiny",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkCentre M90q Tiny",
+      "ThinkCentre M90q Tiny",
+      "M90q Tiny",
+      "ThinkCentre M90q"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "ThinkCentre M720q Tiny",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkCentre M720q Tiny",
+      "ThinkCentre M720q Tiny",
+      "M720q Tiny",
+      "ThinkCentre M720q"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "ThinkCentre M920q Tiny",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkCentre M920q Tiny",
+      "ThinkCentre M920q Tiny",
+      "M920q Tiny",
+      "ThinkCentre M920q"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "IdeaCentre AIO 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaCentre AIO 3",
+      "IdeaCentre AIO 3",
+      "AIO 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "IdeaCentre AIO 5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaCentre AIO 5",
+      "IdeaCentre AIO 5",
+      "AIO 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "IdeaCentre Mini",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaCentre Mini",
+      "IdeaCentre Mini"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "IdeaCentre Gaming 5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaCentre Gaming 5",
+      "IdeaCentre Gaming 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "Legion Tower 7i",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Tower 7i",
+      "Legion Tower 7i"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "Legion Tower 5i",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Tower 5i",
+      "Legion Tower 5i"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "Legion Tower 5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Tower 5",
+      "Legion Tower 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "DESKTOP",
+    "name": "Legion T5",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Legion T5",
+      "Legion T5"
+    ]
+  }
+]

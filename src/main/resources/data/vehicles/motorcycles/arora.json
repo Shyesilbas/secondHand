@@ -1,0 +1,61 @@
+[
+  {
+    "brand": "ARORA",
+    "type": "MOTORCYCLE",
+    "name": "Cappucino",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Cappucino (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "50cc Tek Silindir (3.1 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 3,
+            "engineCapacity": 49
+          },
+          {
+            "name": "125cc Tek Silindir (8.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 9,
+            "engineCapacity": 125
+          }
+        ],
+        "trims": [
+          "50",
+          "125"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "ARORA",
+    "type": "MOTORCYCLE",
+    "name": "Beatrix 150",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Beatrix 150 (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "149.6cc Su Soğutmalı (14.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 15,
+            "engineCapacity": 150
+          }
+        ],
+        "trims": [
+          "Standart"
+        ]
+      }
+    ]
+  }
+]

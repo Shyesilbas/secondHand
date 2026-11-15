@@ -1,0 +1,15 @@
+[
+  {
+    "brand": "OTHER",
+    "type": "TRUCK",
+    "name": "Other Unlisted Model",
+    "supportedBodyTypes": [
+      "TRUCK",
+      "TRACTOR",
+      "TIPPER",
+      "BUS",
+      "OTHER"
+    ],
+    "generations": []
+  }
+]

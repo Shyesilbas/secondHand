@@ -1,0 +1,1156 @@
+[
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "106",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "106 (1996–2003, Phase II)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 GTI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "XR",
+          "XS",
+          "GTI"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "206",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "206+ (2009–2013)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Urban",
+          "Comfort"
+        ]
+      },
+      {
+        "name": "206 (1998–2009, T1)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 RC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "X-Line",
+          "XR",
+          "XS",
+          "Feline",
+          "Roland Garros"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "207",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "207 (2006–2012, A7)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trendy",
+          "Comfort",
+          "Premium",
+          "Dynamic",
+          "Outdoor",
+          "RC"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "208",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "208 (2019–, P21)",
+        "trims": [
+          "Active",
+          "Active Prime",
+          "Allure",
+          "GT"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "1.2 PureTech 75",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 75,
+            "torqueNm": 118,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 PureTech 100 EAT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 100,
+            "torqueNm": 205,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 PureTech 130 EAT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 BlueHDi 100",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 100,
+            "torqueNm": 250,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "e-208",
+            "fuelType": "ELECTRIC",
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "208 (2012–2019, A9)",
+        "engines": [
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Access",
+          "Active",
+          "Allure",
+          "Signature"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "301",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "301 (2012–2022)",
+        "trims": [
+          "Access",
+          "Active",
+          "Allure"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2012,
+        "endYear": 2022,
+        "versions": [
+          {
+            "name": "1.2 VTi",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 PureTech 82",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 82,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 VTi",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 HDi 92",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1560,
+            "horsePower": 92,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 BlueHDi 100",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 100,
+            "torqueNm": 250,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "306",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "306 (1997–2002)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 GTI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "XR",
+          "XT",
+          "GTI"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "307 Hatchback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "307 Hatchback (2001–2008, T5)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "XR",
+          "XS",
+          "Comfort",
+          "Premium",
+          "Feline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "307 Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "307 Sedan (2006–2011)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "308",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "308 (2021–, P5)",
+        "engines": [
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Active Prime",
+          "Allure",
+          "GT"
+        ]
+      },
+      {
+        "name": "308 (2013–2021, T9)",
+        "trims": [
+          "Access",
+          "Active",
+          "Style",
+          "Allure",
+          "GT Line",
+          "GT"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2013,
+        "endYear": 2021,
+        "versions": [
+          {
+            "name": "1.2 PureTech 130 EAT6",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 BlueHDi 120 EAT6",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1560,
+            "horsePower": 120,
+            "torqueNm": 300,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 BlueHDi 130 EAT8",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 130,
+            "torqueNm": 300,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "308 (2007–2013, T7)",
+        "engines": [
+          {
+            "name": "1.4 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Trendy",
+          "Premium",
+          "Sportium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "407",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "407 (2004–2011)",
+        "engines": [
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Executive",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "508 Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "508 Sedan (2018–, R8)",
+        "engines": [
+          {
+            "name": "1.6 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prime",
+          "Allure",
+          "GT Line",
+          "GT"
+        ]
+      },
+      {
+        "name": "508 Sedan (2011–2018, W2)",
+        "engines": [
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Access",
+          "Active",
+          "Allure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "508 SW",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "508 SW (2018–, R8)",
+        "engines": [
+          {
+            "name": "1.6 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "GT"
+        ]
+      },
+      {
+        "name": "508 SW (2011–2018, W2)",
+        "engines": [
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Allure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "2008",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "2008 (2019–, P24)",
+        "trims": [
+          "Active",
+          "Allure",
+          "GT Line",
+          "GT"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "1.2 PureTech 100",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 100,
+            "torqueNm": 205,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 PureTech 130 EAT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 BlueHDi 130 EAT8",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 130,
+            "torqueNm": 300,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.2 Hybrid 145 e-DCS6",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 145,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft",
+            "torqueNm": 230
+          }
+        ]
+      },
+      {
+        "name": "2008 (2013–2019, A94)",
+        "engines": [
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Access",
+          "Active",
+          "Allure",
+          "GT Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "3008",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "3008 (2024–, P64)",
+        "engines": [
+          {
+            "name": "1.2 PureTech Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Allure",
+          "GT"
+        ]
+      },
+      {
+        "name": "3008 (2016–2024, P84)",
+        "trims": [
+          "Active",
+          "Active Prime",
+          "Allure",
+          "GT Line",
+          "GT"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2016,
+        "endYear": 2024,
+        "versions": [
+          {
+            "name": "1.6 THP 165 EAT6",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 165,
+            "torqueNm": 240,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 PureTech 130 AT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 BlueHDi 120 EAT6",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1560,
+            "horsePower": 120,
+            "torqueNm": 300,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 BlueHDi 130 EAT8",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 130,
+            "torqueNm": 300,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 Hybrid4",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "3008 (2009–2016, T84)",
+        "engines": [
+          {
+            "name": "1.6 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Premium",
+          "Active",
+          "Allure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "5008",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "5008 (2017–, P87)",
+        "engines": [
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.2 PureTech Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Active",
+          "Allure",
+          "GT Line",
+          "GT"
+        ]
+      },
+      {
+        "name": "5008 (2009–2017, T87)",
+        "engines": [
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Allure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "4007",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "4007 (2007–2012)",
+        "engines": [
+          {
+            "name": "2.2 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "4008",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "4008 (2012–2017)",
+        "engines": [
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Allure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "Rifter",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Rifter (2018–, K9)",
+        "engines": [
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Active",
+          "Allure",
+          "GT Line",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "Traveller",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Traveller (2016–)",
+        "engines": [
+          {
+            "name": "2.0 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Allure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "e-208",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "e-208 (2019–)",
+        "engines": [
+          {
+            "name": "e-208 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "e-2008",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "e-2008 (2019–)",
+        "engines": [
+          {
+            "name": "e-2008 100 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "e-2008 115 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "e-308",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "e-308 (2023–)",
+        "engines": [
+          {
+            "name": "e-308 115 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "e-Rifter",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "e-Rifter (2021–)",
+        "engines": [
+          {
+            "name": "e-Rifter 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Allure",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "208 GTi",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "208 GTi",
+        "engines": [
+          {
+            "name": "1.6 THP GTi",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GTi"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "308 GTi",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "308 GTi",
+        "engines": [
+          {
+            "name": "1.6 THP GTi",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GTi"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "CAR",
+    "name": "508 PSE",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "508 PSE",
+        "engines": [
+          {
+            "name": "1.6 Hybrid PSE",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "PSE"
+        ]
+      }
+    ]
+  }
+]

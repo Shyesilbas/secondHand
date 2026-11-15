@@ -1,0 +1,2799 @@
+{
+ "source": "claude-draft",
+ "priceDate": "2026-11",
+ "note": "Estimated Turkish second-hand asking prices (TRY). Vehicles: anchorYear example with average mileage. Electronics: cheapest variant in good condition.",
+ "vehicles": [
+  {
+   "brand": "RENAULT",
+   "model": "Clio",
+   "generation": "Clio (2012–2019, Clio 4)",
+   "anchorYear": 2017,
+   "priceTry": [
+    750000,
+    900000
+   ]
+  },
+  {
+   "brand": "RENAULT",
+   "model": "Clio",
+   "generation": "Clio (2019–, Clio 5)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1250000,
+    1500000
+   ]
+  },
+  {
+   "brand": "RENAULT",
+   "model": "Symbol",
+   "generation": "Symbol (2013–2021, Symbol 3)",
+   "anchorYear": 2018,
+   "priceTry": [
+    650000,
+    780000
+   ]
+  },
+  {
+   "brand": "RENAULT",
+   "model": "Megane Sedan",
+   "generation": "Megane Sedan (2016–2024, Megane 4)",
+   "anchorYear": 2020,
+   "priceTry": [
+    1150000,
+    1350000
+   ]
+  },
+  {
+   "brand": "RENAULT",
+   "model": "Megane Hatchback",
+   "generation": "Megane Hatchback (2016–2024, Megane 4)",
+   "anchorYear": 2020,
+   "priceTry": [
+    1200000,
+    1400000
+   ]
+  },
+  {
+   "brand": "RENAULT",
+   "model": "Fluence",
+   "generation": "Fluence (2009–2016, Fluence)",
+   "anchorYear": 2014,
+   "priceTry": [
+    600000,
+    720000
+   ]
+  },
+  {
+   "brand": "RENAULT",
+   "model": "Captur",
+   "generation": "Captur (2019–, Captur 2)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1450000,
+    1700000
+   ]
+  },
+  {
+   "brand": "FIAT",
+   "model": "Egea Sedan",
+   "generation": "Egea Sedan (2015–, Type 356)",
+   "anchorYear": 2021,
+   "priceTry": [
+    950000,
+    1150000
+   ]
+  },
+  {
+   "brand": "FIAT",
+   "model": "Egea Hatchback",
+   "generation": "Egea Hatchback (2016–, Type 356)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1000000,
+    1200000
+   ]
+  },
+  {
+   "brand": "FIAT",
+   "model": "Egea Cross",
+   "generation": "Egea Cross (2020–, Type 356)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1200000,
+    1400000
+   ]
+  },
+  {
+   "brand": "TOYOTA",
+   "model": "Corolla Sedan",
+   "generation": "Corolla Sedan (2019–, E210)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1500000,
+    1750000
+   ]
+  },
+  {
+   "brand": "TOYOTA",
+   "model": "Corolla Sedan",
+   "generation": "Corolla Sedan (2013–2019, E170)",
+   "anchorYear": 2016,
+   "priceTry": [
+    950000,
+    1100000
+   ]
+  },
+  {
+   "brand": "TOYOTA",
+   "model": "C-HR",
+   "generation": "C-HR (2016–2023, AX10)",
+   "anchorYear": 2019,
+   "priceTry": [
+    1350000,
+    1550000
+   ]
+  },
+  {
+   "brand": "TOYOTA",
+   "model": "Yaris Cross",
+   "generation": "Yaris Cross (2021–, XP210)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1350000,
+    1550000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "Golf",
+   "generation": "Golf (2012–2020, Mk7)",
+   "anchorYear": 2016,
+   "priceTry": [
+    1150000,
+    1350000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "Golf",
+   "generation": "Golf (2020–, Mk8)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1900000,
+    2200000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "Polo",
+   "generation": "Polo (2009–2017, Mk5/6R)",
+   "anchorYear": 2014,
+   "priceTry": [
+    700000,
+    820000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "Polo",
+   "generation": "Polo (2017–, Mk6/AW)",
+   "anchorYear": 2020,
+   "priceTry": [
+    1150000,
+    1350000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "Passat",
+   "generation": "Passat (2014–2023, B8)",
+   "anchorYear": 2018,
+   "priceTry": [
+    1700000,
+    2000000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "Jetta",
+   "generation": "Jetta (2011–2018, Mk6)",
+   "anchorYear": 2014,
+   "priceTry": [
+    750000,
+    880000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "Tiguan",
+   "generation": "Tiguan (2016–2023, AD/BW)",
+   "anchorYear": 2019,
+   "priceTry": [
+    2100000,
+    2450000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "T-Roc",
+   "generation": "T-Roc (2017–, A11)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1800000,
+    2100000
+   ]
+  },
+  {
+   "brand": "SKODA",
+   "model": "Octavia Sedan",
+   "generation": "Octavia Sedan (2013–2020, Mk3)",
+   "anchorYear": 2017,
+   "priceTry": [
+    1050000,
+    1250000
+   ]
+  },
+  {
+   "brand": "SKODA",
+   "model": "Octavia Sedan",
+   "generation": "Octavia Sedan (2020–, Mk4)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1750000,
+    2050000
+   ]
+  },
+  {
+   "brand": "SKODA",
+   "model": "Superb",
+   "generation": "Superb (2015–2024, B8)",
+   "anchorYear": 2019,
+   "priceTry": [
+    1800000,
+    2100000
+   ]
+  },
+  {
+   "brand": "SKODA",
+   "model": "Fabia",
+   "generation": "Fabia (2014–2021, Mk3)",
+   "anchorYear": 2017,
+   "priceTry": [
+    700000,
+    830000
+   ]
+  },
+  {
+   "brand": "SKODA",
+   "model": "Kamiq",
+   "generation": "Kamiq (2019–)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1350000,
+    1550000
+   ]
+  },
+  {
+   "brand": "FORD",
+   "model": "Focus Sedan",
+   "generation": "Focus Sedan (2011–2018, Mk3)",
+   "anchorYear": 2016,
+   "priceTry": [
+    750000,
+    880000
+   ]
+  },
+  {
+   "brand": "FORD",
+   "model": "Focus Sedan",
+   "generation": "Focus Sedan (2018–, Mk4)",
+   "anchorYear": 2020,
+   "priceTry": [
+    1150000,
+    1350000
+   ]
+  },
+  {
+   "brand": "FORD",
+   "model": "Focus Hatchback",
+   "generation": "Focus Hatchback (2018–, Mk4)",
+   "anchorYear": 2020,
+   "priceTry": [
+    1200000,
+    1400000
+   ]
+  },
+  {
+   "brand": "FORD",
+   "model": "Kuga",
+   "generation": "Kuga (2019–, Mk3)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1650000,
+    1900000
+   ]
+  },
+  {
+   "brand": "FORD",
+   "model": "Puma",
+   "generation": "Puma (2020–)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1500000,
+    1750000
+   ]
+  },
+  {
+   "brand": "OPEL",
+   "model": "Astra Sedan",
+   "generation": "Astra Sedan (2012–2018, Astra J)",
+   "anchorYear": 2015,
+   "priceTry": [
+    650000,
+    770000
+   ]
+  },
+  {
+   "brand": "OPEL",
+   "model": "Astra Hatchback",
+   "generation": "Astra Hatchback (2015–2021, Astra K)",
+   "anchorYear": 2018,
+   "priceTry": [
+    900000,
+    1050000
+   ]
+  },
+  {
+   "brand": "OPEL",
+   "model": "Corsa",
+   "generation": "Corsa (2014–2019, Corsa E)",
+   "anchorYear": 2016,
+   "priceTry": [
+    600000,
+    710000
+   ]
+  },
+  {
+   "brand": "OPEL",
+   "model": "Corsa",
+   "generation": "Corsa (2019–, Corsa F)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1000000,
+    1180000
+   ]
+  },
+  {
+   "brand": "HYUNDAI",
+   "model": "i20",
+   "generation": "i20 (2014–2020, GB)",
+   "anchorYear": 2017,
+   "priceTry": [
+    700000,
+    830000
+   ]
+  },
+  {
+   "brand": "HYUNDAI",
+   "model": "i20",
+   "generation": "i20 (2020–, BC3)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1050000,
+    1250000
+   ]
+  },
+  {
+   "brand": "HYUNDAI",
+   "model": "Accent",
+   "generation": "Accent Blue (2011–2018, RB)",
+   "anchorYear": 2016,
+   "priceTry": [
+    600000,
+    720000
+   ]
+  },
+  {
+   "brand": "HYUNDAI",
+   "model": "Tucson",
+   "generation": "Tucson (2015–2020, TL)",
+   "anchorYear": 2018,
+   "priceTry": [
+    1300000,
+    1500000
+   ]
+  },
+  {
+   "brand": "HYUNDAI",
+   "model": "Tucson",
+   "generation": "Tucson (2020–, NX4)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1900000,
+    2200000
+   ]
+  },
+  {
+   "brand": "HYUNDAI",
+   "model": "Bayon",
+   "generation": "Bayon (2021–)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1150000,
+    1350000
+   ]
+  },
+  {
+   "brand": "KIA",
+   "model": "Sportage",
+   "generation": "Sportage (2015–2021, QL)",
+   "anchorYear": 2018,
+   "priceTry": [
+    1350000,
+    1550000
+   ]
+  },
+  {
+   "brand": "KIA",
+   "model": "Sportage",
+   "generation": "Sportage (2021–, NQ5)",
+   "anchorYear": 2022,
+   "priceTry": [
+    2000000,
+    2300000
+   ]
+  },
+  {
+   "brand": "NISSAN",
+   "model": "Qashqai",
+   "generation": "Qashqai (2014–2021, J11)",
+   "anchorYear": 2018,
+   "priceTry": [
+    1250000,
+    1450000
+   ]
+  },
+  {
+   "brand": "NISSAN",
+   "model": "Qashqai",
+   "generation": "Qashqai (2021–, J12)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1800000,
+    2100000
+   ]
+  },
+  {
+   "brand": "DACIA",
+   "model": "Duster",
+   "generation": "Duster (2017–2024, HM)",
+   "anchorYear": 2020,
+   "priceTry": [
+    950000,
+    1120000
+   ]
+  },
+  {
+   "brand": "DACIA",
+   "model": "Sandero",
+   "generation": "Sandero (2020–, BJI)",
+   "anchorYear": 2022,
+   "priceTry": [
+    850000,
+    1000000
+   ]
+  },
+  {
+   "brand": "PEUGEOT",
+   "model": "208",
+   "generation": "208 (2019–, P21)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1050000,
+    1250000
+   ]
+  },
+  {
+   "brand": "PEUGEOT",
+   "model": "2008",
+   "generation": "2008 (2019–, P24)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1300000,
+    1500000
+   ]
+  },
+  {
+   "brand": "PEUGEOT",
+   "model": "3008",
+   "generation": "3008 (2016–2024, P84)",
+   "anchorYear": 2019,
+   "priceTry": [
+    1600000,
+    1850000
+   ]
+  },
+  {
+   "brand": "PEUGEOT",
+   "model": "308",
+   "generation": "308 (2013–2021, T9)",
+   "anchorYear": 2016,
+   "priceTry": [
+    750000,
+    880000
+   ]
+  },
+  {
+   "brand": "HONDA",
+   "model": "Civic Sedan",
+   "generation": "Civic Sedan (2016–2021, FC)",
+   "anchorYear": 2019,
+   "priceTry": [
+    1250000,
+    1450000
+   ]
+  },
+  {
+   "brand": "HONDA",
+   "model": "Civic Sedan",
+   "generation": "Civic Sedan (2021–, FE)",
+   "anchorYear": 2022,
+   "priceTry": [
+    1800000,
+    2050000
+   ]
+  },
+  {
+   "brand": "SEAT",
+   "model": "Leon",
+   "generation": "Leon (2012–2020, Mk3/5F)",
+   "anchorYear": 2017,
+   "priceTry": [
+    900000,
+    1050000
+   ]
+  },
+  {
+   "brand": "BMW",
+   "model": "3 Series",
+   "generation": "3 Series (2012–2019, F30)",
+   "anchorYear": 2016,
+   "priceTry": [
+    1500000,
+    1750000
+   ]
+  },
+  {
+   "brand": "BMW",
+   "model": "3 Series",
+   "generation": "3 Series (2019–, G20)",
+   "anchorYear": 2021,
+   "priceTry": [
+    2600000,
+    3000000
+   ]
+  },
+  {
+   "brand": "BMW",
+   "model": "X1",
+   "generation": "X1 (2015–2022, F48)",
+   "anchorYear": 2018,
+   "priceTry": [
+    1600000,
+    1850000
+   ]
+  },
+  {
+   "brand": "MERCEDES_BENZ",
+   "model": "C-Class",
+   "generation": "C-Class (2014–2021, W205)",
+   "anchorYear": 2017,
+   "priceTry": [
+    1750000,
+    2050000
+   ]
+  },
+  {
+   "brand": "MERCEDES_BENZ",
+   "model": "C-Class",
+   "generation": "C-Class (2021–, W206)",
+   "anchorYear": 2022,
+   "priceTry": [
+    3200000,
+    3700000
+   ]
+  },
+  {
+   "brand": "FIAT",
+   "model": "Doblo",
+   "generation": "Doblo (2010–2022, Doblo II)",
+   "anchorYear": 2018,
+   "priceTry": [
+    700000,
+    830000
+   ]
+  },
+  {
+   "brand": "FIAT",
+   "model": "Doblo Cargo",
+   "generation": "Doblo Cargo (2010–2022, Doblo II)",
+   "anchorYear": 2018,
+   "priceTry": [
+    600000,
+    720000
+   ]
+  },
+  {
+   "brand": "FIAT",
+   "model": "Fiorino",
+   "generation": "Fiorino (2008–2022, Fiorino III)",
+   "anchorYear": 2018,
+   "priceTry": [
+    500000,
+    600000
+   ]
+  },
+  {
+   "brand": "FORD",
+   "model": "Transit Connect",
+   "generation": "Transit Connect (2013–2021, Mk2)",
+   "anchorYear": 2018,
+   "priceTry": [
+    800000,
+    950000
+   ]
+  },
+  {
+   "brand": "FORD",
+   "model": "Transit Courier",
+   "generation": "Transit Courier (2014–2023, Mk1)",
+   "anchorYear": 2019,
+   "priceTry": [
+    650000,
+    780000
+   ]
+  },
+  {
+   "brand": "FORD",
+   "model": "Transit Custom",
+   "generation": "Transit Custom (2012–2023, V362)",
+   "anchorYear": 2019,
+   "priceTry": [
+    1300000,
+    1550000
+   ]
+  },
+  {
+   "brand": "Volkswagen",
+   "model": "Caddy",
+   "generation": "Caddy (2020–, SB)",
+   "anchorYear": 2021,
+   "priceTry": [
+    1300000,
+    1500000
+   ]
+  },
+  {
+   "brand": "RENAULT",
+   "model": "Kangoo",
+   "generation": "Kangoo (2008–2021, Kangoo 2)",
+   "anchorYear": 2016,
+   "priceTry": [
+    550000,
+    660000
+   ]
+  },
+  {
+   "brand": "CITROEN",
+   "model": "Berlingo",
+   "generation": "Berlingo (2018–, K9)",
+   "anchorYear": 2020,
+   "priceTry": [
+    950000,
+    1100000
+   ]
+  },
+  {
+   "brand": "HONDA",
+   "model": "PCX 125",
+   "generation": "PCX 125 (2021–)",
+   "anchorYear": 2022,
+   "priceTry": [
+    150000,
+    180000
+   ]
+  },
+  {
+   "brand": "YAMAHA",
+   "model": "MT-07",
+   "generation": "MT-07 (2021–)",
+   "anchorYear": 2022,
+   "priceTry": [
+    420000,
+    500000
+   ]
+  },
+  {
+   "brand": "HONDA",
+   "model": "CBR 500R",
+   "generation": "CBR 500R (2019–)",
+   "anchorYear": 2021,
+   "priceTry": [
+    300000,
+    360000
+   ]
+  }
+ ],
+ "electronics": [
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 13 Mini",
+   "priceTry": [
+    17000,
+    20000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 13",
+   "priceTry": [
+    20000,
+    23000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 13 Pro",
+   "priceTry": [
+    26000,
+    30000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 13 Pro Max",
+   "priceTry": [
+    30000,
+    34000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 14",
+   "priceTry": [
+    25000,
+    28000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 14 Plus",
+   "priceTry": [
+    28000,
+    31000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 14 Pro",
+   "priceTry": [
+    33000,
+    37000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 14 Pro Max",
+   "priceTry": [
+    38000,
+    42000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 15",
+   "priceTry": [
+    34000,
+    38000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 15 Plus",
+   "priceTry": [
+    37000,
+    41000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 15 Pro",
+   "priceTry": [
+    45000,
+    50000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 15 Pro Max",
+   "priceTry": [
+    52000,
+    57000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 16",
+   "priceTry": [
+    44000,
+    48000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 16 Plus",
+   "priceTry": [
+    48000,
+    52000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 16 Pro",
+   "priceTry": [
+    58000,
+    63000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 16 Pro Max",
+   "priceTry": [
+    66000,
+    72000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 17",
+   "priceTry": [
+    62000,
+    68000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 17 Air",
+   "priceTry": [
+    72000,
+    78000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 17 Pro",
+   "priceTry": [
+    85000,
+    92000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Apple",
+   "model": "iPhone 17 Pro Max",
+   "priceTry": [
+    98000,
+    106000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S23",
+   "priceTry": [
+    18000,
+    21000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S23+",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S23 Ultra",
+   "priceTry": [
+    30000,
+    34000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S24",
+   "priceTry": [
+    24000,
+    27000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S24+",
+   "priceTry": [
+    28000,
+    31000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S24 Ultra",
+   "priceTry": [
+    40000,
+    44000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S25",
+   "priceTry": [
+    33000,
+    36000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S25+",
+   "priceTry": [
+    38000,
+    42000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy S25 Ultra",
+   "priceTry": [
+    52000,
+    57000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy A34",
+   "priceTry": [
+    9000,
+    10500
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy A35",
+   "priceTry": [
+    11000,
+    12500
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy A54",
+   "priceTry": [
+    11000,
+    12500
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy A55",
+   "priceTry": [
+    13500,
+    15000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "Samsung",
+   "model": "Galaxy A56",
+   "priceTry": [
+    16000,
+    18000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "GOOGLE",
+   "model": "Pixel 6",
+   "priceTry": [
+    9000,
+    11000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "GOOGLE",
+   "model": "Pixel 6 Pro",
+   "priceTry": [
+    12000,
+    14000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "GOOGLE",
+   "model": "Pixel 7",
+   "priceTry": [
+    12000,
+    14000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "GOOGLE",
+   "model": "Pixel 7 Pro",
+   "priceTry": [
+    16000,
+    18000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "GOOGLE",
+   "model": "Pixel 7a",
+   "priceTry": [
+    11000,
+    12500
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "GOOGLE",
+   "model": "Pixel 8",
+   "priceTry": [
+    18000,
+    20000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "GOOGLE",
+   "model": "Pixel 8 Pro",
+   "priceTry": [
+    24000,
+    27000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "XIAOMI",
+   "model": "13",
+   "priceTry": [
+    16000,
+    18000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "XIAOMI",
+   "model": "14",
+   "priceTry": [
+    24000,
+    27000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "XIAOMI",
+   "model": "14 Ultra",
+   "priceTry": [
+    36000,
+    40000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "XIAOMI",
+   "model": "15",
+   "priceTry": [
+    34000,
+    38000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "XIAOMI",
+   "model": "POCO F6",
+   "priceTry": [
+    15000,
+    17000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "XIAOMI",
+   "model": "POCO F6 Pro",
+   "priceTry": [
+    18000,
+    20000
+   ]
+  },
+  {
+   "type": "MOBILE_PHONE",
+   "brand": "XIAOMI",
+   "model": "POCO X6 Pro",
+   "priceTry": [
+    12000,
+    14000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad Pro 13 (M4)",
+   "priceTry": [
+    55000,
+    60000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad Pro 11 (M4)",
+   "priceTry": [
+    42000,
+    46000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad Pro 12.9 (M2)",
+   "priceTry": [
+    38000,
+    42000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad Pro 11 (M2)",
+   "priceTry": [
+    30000,
+    33000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad Air 13 (M2)",
+   "priceTry": [
+    32000,
+    35000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad Air 11 (M2)",
+   "priceTry": [
+    25000,
+    28000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad Mini (A17 Pro)",
+   "priceTry": [
+    20000,
+    22000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad Mini (6th Gen)",
+   "priceTry": [
+    14000,
+    16000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Apple",
+   "model": "iPad 10.9 (10th Gen)",
+   "priceTry": [
+    13000,
+    15000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S10 Ultra",
+   "priceTry": [
+    45000,
+    50000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S10+",
+   "priceTry": [
+    36000,
+    40000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S9 Ultra",
+   "priceTry": [
+    36000,
+    40000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S9+",
+   "priceTry": [
+    28000,
+    31000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S9",
+   "priceTry": [
+    20000,
+    23000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S9 FE+",
+   "priceTry": [
+    15000,
+    17000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S9 FE",
+   "priceTry": [
+    11000,
+    13000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S8 Ultra",
+   "priceTry": [
+    26000,
+    29000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S8+",
+   "priceTry": [
+    19000,
+    21000
+   ]
+  },
+  {
+   "type": "TABLET",
+   "brand": "Samsung",
+   "model": "Galaxy Tab S8",
+   "priceTry": [
+    14000,
+    16000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Air 13 (M1)",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Air 13 (M2)",
+   "priceTry": [
+    30000,
+    34000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Air 15 (M2)",
+   "priceTry": [
+    37000,
+    41000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Air 13 (M3)",
+   "priceTry": [
+    38000,
+    42000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Air 15 (M3)",
+   "priceTry": [
+    45000,
+    49000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 14 (M3)",
+   "priceTry": [
+    50000,
+    55000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 14 (M3 Pro)",
+   "priceTry": [
+    70000,
+    77000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 16 (M3 Pro)",
+   "priceTry": [
+    85000,
+    93000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 14 (M3 Max)",
+   "priceTry": [
+    105000,
+    115000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 16 (M3 Max)",
+   "priceTry": [
+    120000,
+    130000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 14 (M4)",
+   "priceTry": [
+    62000,
+    68000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 14 (M4 Pro)",
+   "priceTry": [
+    88000,
+    95000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 16 (M4 Pro)",
+   "priceTry": [
+    105000,
+    115000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 14 (M4 Max)",
+   "priceTry": [
+    135000,
+    145000
+   ]
+  },
+  {
+   "type": "LAPTOP",
+   "brand": "Apple",
+   "model": "MacBook Pro 16 (M4 Max)",
+   "priceTry": [
+    150000,
+    162000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "Sony",
+   "model": "PlayStation 5",
+   "priceTry": [
+    18000,
+    21000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "Sony",
+   "model": "PlayStation 5 Slim",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "Sony",
+   "model": "PlayStation 5 Pro",
+   "priceTry": [
+    32000,
+    36000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "MICROSOFT",
+   "model": "Xbox Series X",
+   "priceTry": [
+    18000,
+    21000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "MICROSOFT",
+   "model": "Xbox Series S",
+   "priceTry": [
+    10000,
+    12000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "NINTENDO",
+   "model": "Switch OLED",
+   "priceTry": [
+    10000,
+    12000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "NINTENDO",
+   "model": "Switch Lite",
+   "priceTry": [
+    6000,
+    7000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "NINTENDO",
+   "model": "Switch 2",
+   "priceTry": [
+    18000,
+    20000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "VALVE",
+   "model": "Steam Deck OLED",
+   "priceTry": [
+    20000,
+    23000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "VALVE",
+   "model": "Steam Deck LCD",
+   "priceTry": [
+    12000,
+    15000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "ASUS",
+   "model": "ROG Ally X",
+   "priceTry": [
+    25000,
+    28000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "ASUS",
+   "model": "ROG Ally",
+   "priceTry": [
+    17000,
+    20000
+   ]
+  },
+  {
+   "type": "GAME_CONSOLE",
+   "brand": "LENOVO",
+   "model": "Legion Go",
+   "priceTry": [
+    18000,
+    21000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Apple",
+   "model": "AirPods Pro (2nd Gen)",
+   "priceTry": [
+    5500,
+    6500
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Apple",
+   "model": "AirPods (3rd Gen)",
+   "priceTry": [
+    3500,
+    4200
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Apple",
+   "model": "AirPods Max",
+   "priceTry": [
+    14000,
+    16000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Apple",
+   "model": "AirPods (4th Gen)",
+   "priceTry": [
+    4200,
+    5000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Sony",
+   "model": "WH-1000XM6",
+   "priceTry": [
+    13000,
+    15000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Sony",
+   "model": "WH-1000XM5",
+   "priceTry": [
+    9000,
+    10500
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Sony",
+   "model": "WH-1000XM4",
+   "priceTry": [
+    6000,
+    7000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Sony",
+   "model": "WF-1000XM5",
+   "priceTry": [
+    7000,
+    8000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Sony",
+   "model": "WF-1000XM4",
+   "priceTry": [
+    4500,
+    5200
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Sony",
+   "model": "WH-CH720N",
+   "priceTry": [
+    3000,
+    3600
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Sony",
+   "model": "WH-CH520",
+   "priceTry": [
+    1400,
+    1800
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "BOSE",
+   "model": "QuietComfort Ultra Headphones",
+   "priceTry": [
+    11000,
+    13000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "BOSE",
+   "model": "QuietComfort 45",
+   "priceTry": [
+    6500,
+    7500
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "BOSE",
+   "model": "QuietComfort Ultra Earbuds",
+   "priceTry": [
+    7500,
+    8500
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "BOSE",
+   "model": "Noise Cancelling Headphones 700",
+   "priceTry": [
+    6000,
+    7000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Samsung",
+   "model": "Galaxy Buds3 Pro",
+   "priceTry": [
+    6000,
+    7000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Samsung",
+   "model": "Galaxy Buds2 Pro",
+   "priceTry": [
+    3500,
+    4200
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Samsung",
+   "model": "Galaxy Buds2",
+   "priceTry": [
+    2200,
+    2700
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "Samsung",
+   "model": "Galaxy Buds FE",
+   "priceTry": [
+    2000,
+    2500
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "SENNHEISER",
+   "model": "Momentum 4 Wireless",
+   "priceTry": [
+    9000,
+    10500
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "SENNHEISER",
+   "model": "HD 660S2",
+   "priceTry": [
+    14000,
+    16000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "SENNHEISER",
+   "model": "HD 560S",
+   "priceTry": [
+    5000,
+    6000
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "JBL",
+   "model": "Tune 520BT",
+   "priceTry": [
+    1200,
+    1500
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "MARSHALL",
+   "model": "Major IV",
+   "priceTry": [
+    2800,
+    3300
+   ]
+  },
+  {
+   "type": "HEADPHONES",
+   "brand": "MARSHALL",
+   "model": "Major V",
+   "priceTry": [
+    3800,
+    4400
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Apple",
+   "model": "Watch Ultra 2",
+   "priceTry": [
+    28000,
+    31000
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Apple",
+   "model": "Watch Series 10",
+   "priceTry": [
+    16000,
+    18000
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Apple",
+   "model": "Watch Series 9",
+   "priceTry": [
+    13000,
+    15000
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Apple",
+   "model": "Watch SE (2nd Gen)",
+   "priceTry": [
+    7000,
+    8500
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Samsung",
+   "model": "Galaxy Watch Ultra",
+   "priceTry": [
+    14000,
+    16000
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Samsung",
+   "model": "Galaxy Watch7",
+   "priceTry": [
+    8000,
+    9500
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Samsung",
+   "model": "Galaxy Watch6",
+   "priceTry": [
+    6000,
+    7000
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Samsung",
+   "model": "Galaxy Watch6 Classic",
+   "priceTry": [
+    8000,
+    9000
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Samsung",
+   "model": "Galaxy Watch5",
+   "priceTry": [
+    4500,
+    5500
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Samsung",
+   "model": "Galaxy Watch5 Pro",
+   "priceTry": [
+    6000,
+    7000
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Samsung",
+   "model": "Galaxy Watch4",
+   "priceTry": [
+    3500,
+    4200
+   ]
+  },
+  {
+   "type": "SMARTWATCH",
+   "brand": "Samsung",
+   "model": "Galaxy Watch4 Classic",
+   "priceTry": [
+    4500,
+    5200
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS R5",
+   "priceTry": [
+    95000,
+    105000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS R6 Mark II",
+   "priceTry": [
+    75000,
+    82000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS R7",
+   "priceTry": [
+    45000,
+    50000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS R8",
+   "priceTry": [
+    48000,
+    53000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS R10",
+   "priceTry": [
+    28000,
+    31000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS R50",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS 5D Mark IV",
+   "priceTry": [
+    50000,
+    55000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS 6D Mark II",
+   "priceTry": [
+    30000,
+    34000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS 90D",
+   "priceTry": [
+    32000,
+    36000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "CANON",
+   "model": "EOS 250D",
+   "priceTry": [
+    15000,
+    17000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "Z8",
+   "priceTry": [
+    140000,
+    150000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "Z9",
+   "priceTry": [
+    170000,
+    185000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "Z6 III",
+   "priceTry": [
+    85000,
+    92000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "Z6 II",
+   "priceTry": [
+    55000,
+    60000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "Zf",
+   "priceTry": [
+    65000,
+    70000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "Z50",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "Zfc",
+   "priceTry": [
+    25000,
+    28000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "D850",
+   "priceTry": [
+    70000,
+    77000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "NIKON",
+   "model": "D7500",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A1 II",
+   "priceTry": [
+    230000,
+    250000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A1",
+   "priceTry": [
+    170000,
+    185000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A9 III",
+   "priceTry": [
+    190000,
+    205000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A9 II",
+   "priceTry": [
+    80000,
+    88000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A7R V",
+   "priceTry": [
+    115000,
+    125000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A7R IV",
+   "priceTry": [
+    75000,
+    82000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A7 IV",
+   "priceTry": [
+    70000,
+    76000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A7 III",
+   "priceTry": [
+    42000,
+    47000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A7C II",
+   "priceTry": [
+    70000,
+    76000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A7C",
+   "priceTry": [
+    45000,
+    50000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A7S III",
+   "priceTry": [
+    100000,
+    110000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A6700",
+   "priceTry": [
+    45000,
+    50000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A6600",
+   "priceTry": [
+    32000,
+    36000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A6400",
+   "priceTry": [
+    25000,
+    28000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "A6100",
+   "priceTry": [
+    18000,
+    21000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "ZV-E1",
+   "priceTry": [
+    70000,
+    76000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "ZV-E10 II",
+   "priceTry": [
+    30000,
+    33000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "ZV-E10",
+   "priceTry": [
+    20000,
+    23000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "ZV-1 II",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "ZV-1",
+   "priceTry": [
+    17000,
+    20000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "RX100 VII",
+   "priceTry": [
+    35000,
+    39000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "RX100 VI",
+   "priceTry": [
+    26000,
+    29000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "RX100 V",
+   "priceTry": [
+    20000,
+    23000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "FX3",
+   "priceTry": [
+    125000,
+    135000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "Sony",
+   "model": "FX30",
+   "priceTry": [
+    55000,
+    60000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "FUJIFILM",
+   "model": "X100VI",
+   "priceTry": [
+    75000,
+    82000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "FUJIFILM",
+   "model": "X100V",
+   "priceTry": [
+    55000,
+    60000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "FUJIFILM",
+   "model": "X-T5",
+   "priceTry": [
+    60000,
+    66000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "FUJIFILM",
+   "model": "X-T4",
+   "priceTry": [
+    40000,
+    45000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "FUJIFILM",
+   "model": "X-S20",
+   "priceTry": [
+    42000,
+    46000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "FUJIFILM",
+   "model": "X-T30 II",
+   "priceTry": [
+    28000,
+    31000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "FUJIFILM",
+   "model": "GFX 100 II",
+   "priceTry": [
+    230000,
+    250000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "GOPRO",
+   "model": "Hero 13 Black",
+   "priceTry": [
+    14000,
+    16000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "GOPRO",
+   "model": "Hero 12 Black",
+   "priceTry": [
+    11000,
+    12500
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "GOPRO",
+   "model": "Hero 11 Black",
+   "priceTry": [
+    8500,
+    10000
+   ]
+  },
+  {
+   "type": "CAMERA",
+   "brand": "GOPRO",
+   "model": "Hero 10 Black",
+   "priceTry": [
+    6500,
+    7500
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "LG",
+   "model": "OLED C1",
+   "priceTry": [
+    22000,
+    26000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "LG",
+   "model": "OLED C2",
+   "priceTry": [
+    28000,
+    32000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "LG",
+   "model": "OLED C3",
+   "priceTry": [
+    34000,
+    38000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "LG",
+   "model": "OLED C4",
+   "priceTry": [
+    42000,
+    47000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "LG",
+   "model": "OLED G3",
+   "priceTry": [
+    45000,
+    50000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "LG",
+   "model": "OLED G4",
+   "priceTry": [
+    58000,
+    64000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "LG",
+   "model": "OLED B3",
+   "priceTry": [
+    28000,
+    32000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "LG",
+   "model": "OLED B4",
+   "priceTry": [
+    33000,
+    37000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "Samsung",
+   "model": "OLED S90C",
+   "priceTry": [
+    32000,
+    36000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "Samsung",
+   "model": "OLED S95C",
+   "priceTry": [
+    42000,
+    47000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "Samsung",
+   "model": "OLED S95D",
+   "priceTry": [
+    55000,
+    60000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "Sony",
+   "model": "A80L",
+   "priceTry": [
+    38000,
+    42000
+   ]
+  },
+  {
+   "type": "TV",
+   "brand": "Sony",
+   "model": "A95L",
+   "priceTry": [
+    60000,
+    66000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "UltraSharp U2723QE",
+   "priceTry": [
+    16000,
+    18000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "UltraSharp U3223QE",
+   "priceTry": [
+    24000,
+    27000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "UltraSharp U2720Q",
+   "priceTry": [
+    11000,
+    13000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "UltraSharp U2719D",
+   "priceTry": [
+    7000,
+    8000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "UltraSharp U2419H",
+   "priceTry": [
+    4500,
+    5200
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "UltraSharp U2422H",
+   "priceTry": [
+    5500,
+    6300
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "UltraSharp U3423WE",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "Alienware AW3423DWF",
+   "priceTry": [
+    24000,
+    27000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "Alienware AW3423DW",
+   "priceTry": [
+    27000,
+    30000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "DELL",
+   "model": "Alienware AW3225QF",
+   "priceTry": [
+    38000,
+    42000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "LG",
+   "model": "27GR95QE",
+   "priceTry": [
+    22000,
+    25000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "LG",
+   "model": "45GR95QE",
+   "priceTry": [
+    38000,
+    42000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "LG",
+   "model": "27GS95QE",
+   "priceTry": [
+    28000,
+    31000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "LG",
+   "model": "32GS95UE",
+   "priceTry": [
+    42000,
+    46000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "LG",
+   "model": "45GS95QE",
+   "priceTry": [
+    48000,
+    53000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "LG",
+   "model": "27UK850",
+   "priceTry": [
+    8000,
+    9500
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "LG",
+   "model": "32UN880",
+   "priceTry": [
+    12000,
+    14000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "LG",
+   "model": "27GN950",
+   "priceTry": [
+    14000,
+    16000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "Apple",
+   "model": "Studio Display",
+   "priceTry": [
+    45000,
+    50000
+   ]
+  },
+  {
+   "type": "MONITOR",
+   "brand": "Apple",
+   "model": "Pro Display XDR",
+   "priceTry": [
+    140000,
+    155000
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "JBL",
+   "model": "Flip 6",
+   "priceTry": [
+    2800,
+    3300
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "JBL",
+   "model": "Charge 5",
+   "priceTry": [
+    4000,
+    4600
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "JBL",
+   "model": "Boombox 3",
+   "priceTry": [
+    11000,
+    12500
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "JBL",
+   "model": "GO 3",
+   "priceTry": [
+    1100,
+    1400
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "JBL",
+   "model": "Clip 4",
+   "priceTry": [
+    1600,
+    1900
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "JBL",
+   "model": "Xtreme 3",
+   "priceTry": [
+    7000,
+    8000
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "JBL",
+   "model": "PartyBox 310",
+   "priceTry": [
+    13000,
+    15000
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "JBL",
+   "model": "PartyBox 110",
+   "priceTry": [
+    8000,
+    9000
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "BOSE",
+   "model": "SoundLink Flex",
+   "priceTry": [
+    3200,
+    3700
+   ]
+  },
+  {
+   "type": "SPEAKER",
+   "brand": "BOSE",
+   "model": "SoundLink Revolve+ II",
+   "priceTry": [
+    7000,
+    8000
+   ]
+  }
+ ]
+}

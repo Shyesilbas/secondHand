@@ -1,0 +1,1528 @@
+[
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Polo",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Polo (2017–, Mk6/AW)",
+        "trims": [
+          "Impression",
+          "Life",
+          "Style",
+          "R-Line"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2017,
+        "versions": [
+          {
+            "name": "1.0 MPI 80",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 80,
+            "torqueNm": 93,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TSI 95",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 95,
+            "torqueNm": 175,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TSI 95 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 95,
+            "torqueNm": 175,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Polo GTI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Polo (2009–2017, Mk5/6R)",
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Highline",
+          "Chrome Edition"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2009,
+        "endYear": 2017,
+        "versions": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 TSI 90 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1197,
+            "horsePower": 90,
+            "torqueNm": 160,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI BlueGT",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TDI 90 DSG",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1422,
+            "horsePower": 90,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Polo GTI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Polo (2001–2009, Mk4/9N)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Sportline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Golf",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Golf (2020–, Mk8)",
+        "trims": [
+          "Impression",
+          "Life",
+          "Style",
+          "R-Line"
+        ],
+        "startYear": 2020,
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "1.0 eTSI 110 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 110,
+            "torqueNm": 200,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 eTSI 116 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 116,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 eTSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "Golf GTI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1984,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Golf R",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1984,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Golf (2012–2020, Mk7)",
+        "trims": [
+          "Midline Plus",
+          "Comfortline",
+          "Highline",
+          "R-Line"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2012,
+        "endYear": 2020,
+        "versions": [
+          {
+            "name": "1.2 TSI 105",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1197,
+            "horsePower": 105,
+            "torqueNm": 175,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI ACT 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 TDI 110 DSG",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 110,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Golf GTI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Golf GTD",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Golf R",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Golf (2008–2012, Mk6)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "Golf GTI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "Golf R",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Highline"
+        ]
+      },
+      {
+        "name": "Golf (2003–2008, Mk5)",
+        "engines": [
+          {
+            "name": "1.6 FSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "Golf GTI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Midline",
+          "Comfortline",
+          "Sportline",
+          "Goal"
+        ]
+      },
+      {
+        "name": "Golf (1997–2003, Mk4)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Basic",
+          "Comfortline",
+          "Highline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Golf Variant",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Golf Variant (2020–, Mk8)",
+        "engines": [
+          {
+            "name": "1.5 eTSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Life",
+          "Style",
+          "R-Line"
+        ]
+      },
+      {
+        "name": "Golf Variant (2013–2020, Mk7)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Jetta",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Jetta (2018–, Mk7)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Highline"
+        ]
+      },
+      {
+        "name": "Jetta (2011–2018, Mk6)",
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Highline"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2011,
+        "endYear": 2018,
+        "versions": [
+          {
+            "name": "1.2 TSI 105 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1197,
+            "horsePower": 105,
+            "torqueNm": 175,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI 125 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 125,
+            "torqueNm": 200,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 TDI 105",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 105,
+            "torqueNm": 250,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Jetta (2005–2011, Mk5)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 FSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Primeline",
+          "Midline",
+          "Comfortline"
+        ]
+      },
+      {
+        "name": "Jetta (1998–2005, Bora/Mk4)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Bora",
+          "Comfortline",
+          "Highline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Passat",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Passat (2014–2023, B8)",
+        "trims": [
+          "Trendline",
+          "Impression",
+          "Comfortline",
+          "Business",
+          "Highline",
+          "Elegance"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2014,
+        "endYear": 2023,
+        "versions": [
+          {
+            "name": "1.4 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 TDI 120 DSG",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 120,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "2.0 TDI 150 DSG",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1968,
+            "horsePower": 150,
+            "torqueNm": 340,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TDI 4Motion",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI GTE",
+            "fuelType": "HYBRID",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Passat (2010–2014, B7)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Highline",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "Passat (2005–2010, B6)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 FSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 FSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Highline",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "Passat (1996–2005, B5/B5.5)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Basic",
+          "Trendline",
+          "Comfortline",
+          "Highline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Passat Variant",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Passat Variant (2024–, B9)",
+        "engines": [
+          {
+            "name": "1.5 eTSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 TSI eHybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Business",
+          "Elegance",
+          "R-Line"
+        ]
+      },
+      {
+        "name": "Passat Variant (2014–2023, B8)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Business",
+          "Highline",
+          "Elegance",
+          "Alltrack"
+        ]
+      },
+      {
+        "name": "Passat Variant (2010–2014, B7)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline"
+        ]
+      },
+      {
+        "name": "Passat Variant (2005–2010, B6)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Arteon",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Arteon (2017–2023, 3H7)",
+        "engines": [
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI 4Motion",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "Arteon R",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "R-Line"
+        ]
+      },
+      {
+        "name": "Arteon Shooting Brake (2020–2023, 3H9)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "Arteon R",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "R-Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "CC",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "CC (2012–2017, B7)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Sportline",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "Passat CC (2008–2012, B6)",
+        "engines": [
+          {
+            "name": "1.8 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Scirocco",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "Scirocco (2008–2017, Mk3)",
+        "engines": [
+          {
+            "name": "1.4 TSI 122 PS",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI 160 PS",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "Scirocco R 2.0 TSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Sportline",
+          "White Edition",
+          "GTS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Beetle",
+    "supportedBodyTypes": [
+      "HATCHBACK",
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "Beetle (2011–2019, A5)",
+        "engines": [
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Design",
+          "R-Line"
+        ]
+      },
+      {
+        "name": "New Beetle (1998–2010, 9C)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "T-Roc",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "T-Roc (2017–, A11)",
+        "trims": [
+          "Highline",
+          "Life",
+          "Style",
+          "R-Line"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2017,
+        "versions": [
+          {
+            "name": "1.5 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "T-Roc R 2.0 TSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1984,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "T-Cross",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "T-Cross (2019–, C1)",
+        "engines": [
+          {
+            "name": "1.0 TSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Life",
+          "Style"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Taigo",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Taigo (2021–, CS)",
+        "trims": [
+          "Life",
+          "Style",
+          "R-Line"
+        ],
+        "startYear": 2021,
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "1.0 TSI 110 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 110,
+            "torqueNm": 200,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Tiguan",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Tiguan (2024–, MQB Evo)",
+        "engines": [
+          {
+            "name": "1.5 eTSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI 4Motion",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 TSI eHybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Life",
+          "Elegance",
+          "R-Line"
+        ]
+      },
+      {
+        "name": "Tiguan (2016–2023, AD/BW)",
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Highline",
+          "Life",
+          "Elegance",
+          "R-Line"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2016,
+        "endYear": 2023,
+        "versions": [
+          {
+            "name": "1.4 TSI 125",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 125,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI ACT 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TDI 4Motion",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Tiguan (2007–2016, 5N)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI 4Motion",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend & Fun",
+          "Sport & Style",
+          "Chrome Edition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Tiguan Allspace",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Tiguan Allspace (2017–2024, BW)",
+        "engines": [
+          {
+            "name": "1.5 TSI Allspace",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI 4Motion",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline",
+          "Elegance",
+          "R-Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Touareg",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Touareg (2018–, CR)",
+        "engines": [
+          {
+            "name": "3.0 TDI 4Motion",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "R-Line"
+        ]
+      },
+      {
+        "name": "Touareg (2010–2018, 7P)",
+        "engines": [
+          {
+            "name": "3.0 TDI V6",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Premium",
+          "R-Line"
+        ]
+      },
+      {
+        "name": "Touareg (2002–2010, 7L)",
+        "engines": [
+          {
+            "name": "2.5 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Touran",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Touran (2015–, 5T)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline"
+        ]
+      },
+      {
+        "name": "Touran (2003–2015, 1T)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Comfortline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "Sharan",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Sharan (2010–2022, 7N)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline"
+        ]
+      },
+      {
+        "name": "Sharan (1995–2010, 7M)",
+        "engines": [
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "ID.3",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "ID.3 (2019–, MEB)",
+        "engines": [
+          {
+            "name": "Pro 58 kWh",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Pro S 77 kWh",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Pure",
+          "Pro",
+          "Pro S"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "ID.4",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "ID.4 (2020–, MEB)",
+        "engines": [
+          {
+            "name": "Pure 52 kWh",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Pro 77 kWh",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Pure",
+          "Pro",
+          "GTX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "ID.5",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "ID.5 (2021–, MEB)",
+        "engines": [
+          {
+            "name": "Pro 77 kWh",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Pro",
+          "GTX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "CAR",
+    "name": "ID. Buzz",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "ID. Buzz (2022–, MEB)",
+        "engines": [
+          {
+            "name": "Pro 77 kWh",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Cargo",
+          "Pro"
+        ]
+      }
+    ]
+  }
+]

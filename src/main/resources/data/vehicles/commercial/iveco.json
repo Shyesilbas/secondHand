@@ -1,0 +1,52 @@
+[
+  {
+    "brand": "IVECO",
+    "type": "COMMERCIAL",
+    "name": "Daily",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS",
+      "LIGHT_TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "Daily (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.3 F1A 140 HP",
+            "fuelType": "DIESEL",
+            "horsePower": 140,
+            "engineCapacity": 2287
+          },
+          {
+            "name": "2.3 F1A 160 HP",
+            "fuelType": "DIESEL",
+            "horsePower": 160,
+            "engineCapacity": 2287
+          },
+          {
+            "name": "3.0 F1C 180 HP",
+            "fuelType": "DIESEL",
+            "horsePower": 180,
+            "engineCapacity": 2998
+          },
+          {
+            "name": "3.0 F1C 210 HP",
+            "fuelType": "DIESEL",
+            "horsePower": 210,
+            "engineCapacity": 2998
+          }
+        ],
+        "trims": [
+          "35S",
+          "50C",
+          "70C",
+          "Panelvan",
+          "Şasi"
+        ]
+      }
+    ]
+  }
+]

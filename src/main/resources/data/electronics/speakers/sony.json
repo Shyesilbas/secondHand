@@ -1,0 +1,122 @@
+[
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "SRS-XV900",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony SRS-XV900",
+      "SRS-XV900",
+      "XV900"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "SRS-XG500",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony SRS-XG500",
+      "SRS-XG500",
+      "XG500"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "SRS-XE300",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony SRS-XE300",
+      "SRS-XE300",
+      "XE300"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "SRS-XB43",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Sony SRS-XB43",
+      "SRS-XB43",
+      "XB43"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "SRS-XB33",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Sony SRS-XB33",
+      "SRS-XB33",
+      "XB33"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "SRS-XB23",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Sony SRS-XB23",
+      "SRS-XB23",
+      "XB23"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "HT-A7000",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony HT-A7000",
+      "HT-A7000",
+      "A7000 Soundbar"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "HT-A5000",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony HT-A5000",
+      "HT-A5000",
+      "A5000 Soundbar"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "HT-S400",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony HT-S400",
+      "HT-S400",
+      "S400 Soundbar"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "SPEAKER",
+    "name": "HT-G700",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Sony HT-G700",
+      "HT-G700",
+      "G700 Soundbar"
+    ]
+  }
+]

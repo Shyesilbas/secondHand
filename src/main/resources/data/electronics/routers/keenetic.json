@@ -1,0 +1,57 @@
+[
+  {
+    "brand": "KEENETIC",
+    "type": "ROUTER",
+    "name": "Hero DSL (KN-2410)",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Keenetic Hero DSL",
+      "KN-2410"
+    ]
+  },
+  {
+    "brand": "KEENETIC",
+    "type": "ROUTER",
+    "name": "Hopper (KN-3810)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Keenetic Hopper",
+      "KN-3810 AX1800"
+    ]
+  },
+  {
+    "brand": "KEENETIC",
+    "type": "ROUTER",
+    "name": "Titan (KN-1811)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Keenetic Titan",
+      "KN-1811 AX3200"
+    ]
+  },
+  {
+    "brand": "KEENETIC",
+    "type": "ROUTER",
+    "name": "Skipper (KN-1910)",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Keenetic Skipper",
+      "KN-1910 AC1300"
+    ]
+  },
+  {
+    "brand": "KEENETIC",
+    "type": "ROUTER",
+    "name": "Carrier (KN-1711)",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Keenetic Carrier",
+      "KN-1711 AC1200"
+    ]
+  }
+]

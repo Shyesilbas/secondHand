@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "GENERAL_MOBILE",
+    "type": "MOBILE_PHONE",
+    "name": "GM 24 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "General Mobile GM 24 Pro",
+      "GM 24 Pro"
+    ]
+  },
+  {
+    "brand": "GENERAL_MOBILE",
+    "type": "MOBILE_PHONE",
+    "name": "Era 50",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "General Mobile Era 50",
+      "Era 50"
+    ]
+  },
+  {
+    "brand": "GENERAL_MOBILE",
+    "type": "MOBILE_PHONE",
+    "name": "GM 23",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "General Mobile GM 23",
+      "GM 23"
+    ]
+  },
+  {
+    "brand": "GENERAL_MOBILE",
+    "type": "MOBILE_PHONE",
+    "name": "GM 22 Pro",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "General Mobile GM 22 Pro",
+      "GM 22 Pro 108MP"
+    ]
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "brand": "OTOKAR",
+    "type": "TRUCK",
+    "name": "Sultan",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTOKAR",
+    "type": "TRUCK",
+    "name": "Navigo",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTOKAR",
+    "type": "TRUCK",
+    "name": "Kent",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTOKAR",
+    "type": "TRUCK",
+    "name": "Doruk",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTOKAR",
+    "type": "TRUCK",
+    "name": "Vectio",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTOKAR",
+    "type": "TRUCK",
+    "name": "Territo",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  }
+]

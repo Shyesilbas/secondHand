@@ -1,0 +1,57 @@
+[
+  {
+    "brand": "MICROSOFT",
+    "type": "LAPTOP",
+    "name": "Surface Pro 11 Copilot+ PC",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Surface Pro 11",
+      "Pro 11 Snap"
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "LAPTOP",
+    "name": "Surface Pro 10 for Business",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Surface Pro 10",
+      "Pro 10"
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "LAPTOP",
+    "name": "Surface Pro 9",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Surface Pro 9 Intel",
+      "Pro 9 5G"
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "LAPTOP",
+    "name": "Surface Laptop 7 Copilot+ PC",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Surface Laptop 7",
+      "Laptop 7"
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "LAPTOP",
+    "name": "Surface Laptop Studio 2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Surface Laptop Studio 2",
+      "Laptop Studio 2"
+    ]
+  }
+]

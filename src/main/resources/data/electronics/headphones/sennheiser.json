@@ -1,0 +1,79 @@
+[
+  {
+    "brand": "SENNHEISER",
+    "type": "HEADPHONES",
+    "name": "Momentum 4 Wireless",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sennheiser Momentum 4",
+      "M4 Wireless"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 60
+    }
+  },
+  {
+    "brand": "SENNHEISER",
+    "type": "HEADPHONES",
+    "name": "Momentum True Wireless 4",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Sennheiser MTW4",
+      "Momentum TWS 4"
+    ]
+  },
+  {
+    "brand": "SENNHEISER",
+    "type": "HEADPHONES",
+    "name": "Accentum Plus Wireless",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Sennheiser Accentum Plus",
+      "Accentum Plus"
+    ]
+  },
+  {
+    "brand": "SENNHEISER",
+    "type": "HEADPHONES",
+    "name": "HD 660S2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sennheiser HD 660S2",
+      "HD660S2 Open-Back"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "WIRED",
+      "wireless": false,
+      "noiseCancelling": false,
+      "hasMicrophone": false
+    }
+  },
+  {
+    "brand": "SENNHEISER",
+    "type": "HEADPHONES",
+    "name": "HD 560S",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Sennheiser HD 560S",
+      "HD560S"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "WIRED",
+      "wireless": false,
+      "noiseCancelling": false,
+      "hasMicrophone": false
+    }
+  }
+]

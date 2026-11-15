@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "MSI",
+    "type": "DESKTOP",
+    "name": "MEG Trident X2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Trident X2",
+      "Trident X2 Gaming"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "DESKTOP",
+    "name": "MAG Infinite S3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Infinite S3",
+      "Infinite S3 13th"
+    ]
+  }
+]

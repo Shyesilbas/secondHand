@@ -1,0 +1,55 @@
+[
+  {
+    "brand": "DREAME",
+    "type": "ROBOT_VACUUM",
+    "name": "X40 Ultra",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Dreame X40",
+      "X40 Ultra Mop"
+    ]
+  },
+  {
+    "brand": "DREAME",
+    "type": "ROBOT_VACUUM",
+    "name": "L20 Ultra",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dreame L20 Ultra",
+      "L20 Ultra Complete"
+    ]
+  },
+  {
+    "brand": "DREAME",
+    "type": "ROBOT_VACUUM",
+    "name": "L10s Ultra",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dreame L10s Ultra",
+      "L10s Pro"
+    ]
+  },
+  {
+    "brand": "DREAME",
+    "type": "ROBOT_VACUUM",
+    "name": "D10 Plus",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dreame D10 Plus Gen 2"
+    ]
+  },
+  {
+    "brand": "DREAME",
+    "type": "ROBOT_VACUUM",
+    "name": "L10 Prime",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dreame L10 Prime Mop"
+    ]
+  }
+]

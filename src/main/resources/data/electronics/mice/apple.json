@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "MOUSE",
+    "name": "Magic Mouse 2",
+    "isLegacy": true,
+    "releaseYear": 2015,
+    "aliases": [
+      "Apple Magic Mouse 2",
+      "A1657"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOUSE",
+    "name": "Magic Trackpad 2",
+    "isLegacy": true,
+    "releaseYear": 2015,
+    "aliases": [
+      "Apple Magic Trackpad 2",
+      "A1535"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOUSE",
+    "name": "Magic Mouse (1st Gen)",
+    "isLegacy": true,
+    "releaseYear": 2009,
+    "aliases": [
+      "Apple Magic Mouse 1",
+      "A1296"
+    ]
+  }
+]

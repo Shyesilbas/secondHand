@@ -137,7 +137,7 @@ npm run dev
 ```
 
 ### Seeding Catalog Data
-Catalog seeds are idempotent upserts from `src/main/resources/data/**` (local copy required):
+Catalog seeds are idempotent upserts from `src/main/resources/data/**`:
 ```bash
 # Seed all verticals and agreements
 mvn spring-boot:run -Dspring-boot.run.arguments="--app.seed=all"

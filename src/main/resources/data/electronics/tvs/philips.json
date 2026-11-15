@@ -1,0 +1,55 @@
+[
+  {
+    "brand": "PHILIPS",
+    "type": "TV",
+    "name": "OLED+ 937 Series",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Philips OLED 937",
+      "OLED937"
+    ]
+  },
+  {
+    "brand": "PHILIPS",
+    "type": "TV",
+    "name": "OLED 807 Series",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Philips OLED 807",
+      "OLED807"
+    ]
+  },
+  {
+    "brand": "PHILIPS",
+    "type": "TV",
+    "name": "The One (PUS8507)",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Philips The One",
+      "PUS8507"
+    ]
+  },
+  {
+    "brand": "PHILIPS",
+    "type": "TV",
+    "name": "PML9507 MiniLED",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "PML9507 MiniLED"
+    ]
+  },
+  {
+    "brand": "PHILIPS",
+    "type": "TV",
+    "name": "PUS7906 Series",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "PUS7906 Series"
+    ]
+  }
+]

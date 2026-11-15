@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "REALME",
+    "type": "MOBILE_PHONE",
+    "name": "GT 6",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Realme GT 6",
+      "GT 6 Flagship Killer"
+    ]
+  },
+  {
+    "brand": "REALME",
+    "type": "MOBILE_PHONE",
+    "name": "GT 6T",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Realme GT 6T",
+      "GT 6T 5G"
+    ]
+  },
+  {
+    "brand": "REALME",
+    "type": "MOBILE_PHONE",
+    "name": "12 Pro+ 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Realme 12 Pro Plus",
+      "12 Pro+ Periscope"
+    ]
+  },
+  {
+    "brand": "REALME",
+    "type": "MOBILE_PHONE",
+    "name": "12 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Realme 12 5G",
+      "Realme 12"
+    ]
+  },
+  {
+    "brand": "REALME",
+    "type": "MOBILE_PHONE",
+    "name": "C67",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Realme C67",
+      "C67 108MP"
+    ]
+  },
+  {
+    "brand": "REALME",
+    "type": "MOBILE_PHONE",
+    "name": "C55",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Realme C55",
+      "C55 Sunshower"
+    ]
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "GIGABYTE",
+    "type": "MONITOR",
+    "name": "M27Q Rev 2.0",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Gigabyte M27Q",
+      "M27Q 170Hz KVM"
+    ]
+  },
+  {
+    "brand": "GIGABYTE",
+    "type": "MONITOR",
+    "name": "M32U 4K 144Hz",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Gigabyte M32U",
+      "M32U 4K KVM"
+    ]
+  },
+  {
+    "brand": "GIGABYTE",
+    "type": "MONITOR",
+    "name": "G27Q",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Gigabyte G27Q",
+      "G27Q 144Hz"
+    ]
+  },
+  {
+    "brand": "GIGABYTE",
+    "type": "MONITOR",
+    "name": "Aorus FO48U OLED",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Gigabyte FO48U",
+      "Aorus 48 OLED"
+    ]
+  }
+]

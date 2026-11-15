@@ -1,0 +1,41 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "TV_STB",
+    "name": "TV 4K (3rd Gen)",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Apple TV 4K (3rd Gen)",
+      "TV 4K (3rd Gen)",
+      "Apple TV 4K 2022",
+      "Apple TV 4K 3rd Gen"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "TV_STB",
+    "name": "TV 4K (2nd Gen)",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Apple TV 4K (2nd Gen)",
+      "TV 4K (2nd Gen)",
+      "Apple TV 4K 2021",
+      "Apple TV 4K 2nd Gen"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "TV_STB",
+    "name": "TV HD",
+    "isLegacy": true,
+    "releaseYear": 2015,
+    "aliases": [
+      "Apple TV HD",
+      "TV HD",
+      "Apple TV 4",
+      "Apple TV 4th Gen"
+    ]
+  }
+]

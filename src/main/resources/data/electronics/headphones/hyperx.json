@@ -1,0 +1,45 @@
+[
+  {
+    "brand": "HYPERX",
+    "type": "HEADPHONES",
+    "name": "Cloud III Wireless",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HyperX Cloud 3 Wireless",
+      "Cloud 3"
+    ]
+  },
+  {
+    "brand": "HYPERX",
+    "type": "HEADPHONES",
+    "name": "Cloud II Wireless",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "HyperX Cloud 2 Wireless",
+      "Cloud 2"
+    ]
+  },
+  {
+    "brand": "HYPERX",
+    "type": "HEADPHONES",
+    "name": "Cloud Alpha Wireless",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HyperX Cloud Alpha Wireless",
+      "Cloud Alpha 300h"
+    ]
+  },
+  {
+    "brand": "HYPERX",
+    "type": "HEADPHONES",
+    "name": "Cloud Stinger 2",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HyperX Cloud Stinger 2"
+    ]
+  }
+]

@@ -1,0 +1,45 @@
+[
+  {
+    "brand": "BEKO",
+    "type": "WASHING_MACHINE",
+    "name": "AquaTech 10kg",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Beko AquaTech",
+      "AquaTech 10"
+    ]
+  },
+  {
+    "brand": "BEKO",
+    "type": "WASHING_MACHINE",
+    "name": "ProSmart Inverter 9kg",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Beko ProSmart",
+      "ProSmart 9"
+    ]
+  },
+  {
+    "brand": "BEKO",
+    "type": "WASHING_MACHINE",
+    "name": "AutoDose 8kg",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Beko AutoDose",
+      "AutoDose 8"
+    ]
+  },
+  {
+    "brand": "BEKO",
+    "type": "WASHING_MACHINE",
+    "name": "SteamCure 7kg",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "SteamCure 7kg"
+    ]
+  }
+]

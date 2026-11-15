@@ -1,0 +1,34 @@
+[
+  {
+    "brand": "STEELSERIES",
+    "type": "HEADPHONES",
+    "name": "Arctis Nova Pro Wireless",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Nova Pro Wireless",
+      "Nova Pro"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "HEADPHONES",
+    "name": "Arctis Nova 7 Wireless",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Nova 7 Wireless",
+      "Nova 7"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "HEADPHONES",
+    "name": "Arctis Nova 3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Nova 3 RGB"
+    ]
+  }
+]

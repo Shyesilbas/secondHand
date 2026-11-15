@@ -1,0 +1,60 @@
+[
+  {
+    "brand": "VALVE",
+    "type": "GAME_CONSOLE",
+    "name": "Steam Deck OLED",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Deck OLED",
+      "SteamDeck OLED"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "VALVE",
+    "type": "GAME_CONSOLE",
+    "name": "Steam Deck LCD",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Deck LCD",
+      "SteamDeck"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "64 GB",
+        "storage": 64,
+        "storageType": "EMMC",
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      }
+    ]
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "brand": "RENAULT_TRUCKS",
+    "type": "TRUCK",
+    "name": "T",
+    "supportedBodyTypes": [
+      "TRACTOR"
+    ],
+    "generations": [
+      {
+        "name": "T (2013–)",
+        "startYear": 2013,
+        "versions": [
+          {
+            "name": "T 440",
+            "fuelType": "DIESEL",
+            "horsePower": 440,
+            "source": "claude-draft"
+          },
+          {
+            "name": "T 480",
+            "fuelType": "DIESEL",
+            "horsePower": 480,
+            "source": "claude-draft"
+          },
+          {
+            "name": "T 520",
+            "fuelType": "DIESEL",
+            "horsePower": 520,
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT_TRUCKS",
+    "type": "TRUCK",
+    "name": "C",
+    "supportedBodyTypes": [
+      "TIPPER",
+      "TRUCK",
+      "TRACTOR"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "RENAULT_TRUCKS",
+    "type": "TRUCK",
+    "name": "K",
+    "supportedBodyTypes": [
+      "TIPPER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "RENAULT_TRUCKS",
+    "type": "TRUCK",
+    "name": "D",
+    "supportedBodyTypes": [
+      "TRUCK"
+    ],
+    "generations": []
+  }
+]

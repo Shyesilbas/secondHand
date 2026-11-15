@@ -1,0 +1,89 @@
+[
+  {
+    "brand": "CARRARO",
+    "type": "BICYCLE",
+    "name": "Daytona",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Daytona MTB (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Daytona 727",
+          "Daytona 729",
+          "Daytona 927",
+          "Daytona 929"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CARRARO",
+    "type": "BICYCLE",
+    "name": "Force",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Force Dağ (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Force 420",
+          "Force 520",
+          "Force 720"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CARRARO",
+    "type": "BICYCLE",
+    "name": "Sportive",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Sportive Şehir/Tur (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Sportive 220",
+          "Sportive 224",
+          "Sportive 225",
+          "Sportive 227",
+          "Sportive 230"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CARRARO",
+    "type": "BICYCLE",
+    "name": "Gravel",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Gravel Serisi (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Gravel G0",
+          "Gravel G1",
+          "Gravel G2"
+        ]
+      }
+    ]
+  }
+]

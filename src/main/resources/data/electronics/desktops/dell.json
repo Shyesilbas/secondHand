@@ -1,0 +1,219 @@
+[
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "OptiPlex 3000 Micro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell OptiPlex 3000 Micro",
+      "OptiPlex 3000 Micro",
+      "3000 Micro"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "OptiPlex 5000 Micro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell OptiPlex 5000 Micro",
+      "OptiPlex 5000 Micro",
+      "5000 Micro"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "OptiPlex 7000 Micro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell OptiPlex 7000 Micro",
+      "OptiPlex 7000 Micro",
+      "7000 Micro"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "OptiPlex 7010",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell OptiPlex 7010",
+      "OptiPlex 7010"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "OptiPlex 7020",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Dell OptiPlex 7020",
+      "OptiPlex 7020"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "OptiPlex 7080",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Dell OptiPlex 7080",
+      "OptiPlex 7080"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "OptiPlex 7090",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell OptiPlex 7090",
+      "OptiPlex 7090"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "OptiPlex 9020",
+    "releaseYear": 2013,
+    "isLegacy": true,
+    "aliases": [
+      "Dell OptiPlex 9020",
+      "OptiPlex 9020"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Precision 3660 Tower",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Precision 3660 Tower",
+      "Precision 3660 Tower",
+      "Precision 3660"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Precision 3680 Tower",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Precision 3680 Tower",
+      "Precision 3680 Tower",
+      "Precision 3680"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Precision 5820 Tower",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Precision 5820 Tower",
+      "Precision 5820 Tower",
+      "Precision 5820"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Precision 7920 Tower",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Precision 7920 Tower",
+      "Precision 7920 Tower",
+      "Precision 7920"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Alienware Aurora R16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Aurora R16",
+      "Alienware R16"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Alienware Aurora R15",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Aurora R15",
+      "Alienware R15"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Alienware Aurora R13",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Aurora R13",
+      "Alienware R13"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Alienware Aurora R12",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Aurora R12",
+      "Alienware R12"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Inspiron Desktop 3030",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron Desktop 3030",
+      "Inspiron Desktop 3030",
+      "Inspiron 3030"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Inspiron AIO 24",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron AIO 24",
+      "Inspiron AIO 24"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "DESKTOP",
+    "name": "Inspiron AIO 27",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron AIO 27",
+      "Inspiron AIO 27"
+    ]
+  }
+]

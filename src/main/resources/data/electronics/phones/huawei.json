@@ -1,0 +1,358 @@
+[
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Pura 70 Ultra",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Pura 70 Ultra",
+      "Pura 70 Ultra",
+      "Pura 70U"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Pura 70 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Pura 70 Pro",
+      "Pura 70 Pro",
+      "Pura 70P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Pura 70",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Pura 70",
+      "Pura 70"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P60 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei P60 Pro",
+      "P60 Pro",
+      "P60P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P50 Pro",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei P50 Pro",
+      "P50 Pro",
+      "P50P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P50",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei P50",
+      "P50"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P40 Pro",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei P40 Pro",
+      "P40 Pro",
+      "P40P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P40",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei P40",
+      "P40"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P30 Pro",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei P30 Pro",
+      "P30 Pro",
+      "P30P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P30",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei P30",
+      "P30"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P20 Pro",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei P20 Pro",
+      "P20 Pro",
+      "P20P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "P20",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei P20",
+      "P20"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Mate 60 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Mate 60 Pro",
+      "Mate 60 Pro",
+      "Mate 60P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Mate 50 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Mate 50 Pro",
+      "Mate 50 Pro",
+      "Mate 50P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Mate 40 Pro",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Mate 40 Pro",
+      "Mate 40 Pro",
+      "Mate 40P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Mate 30 Pro",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Mate 30 Pro",
+      "Mate 30 Pro",
+      "Mate 30P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Mate 20 Pro",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Mate 20 Pro",
+      "Mate 20 Pro",
+      "Mate 20P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Mate 20",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Mate 20",
+      "Mate 20"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Mate 10 Pro",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Mate 10 Pro",
+      "Mate 10 Pro",
+      "Mate 10P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Nova 12s",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Nova 12s",
+      "Nova 12s",
+      "Nova 12"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Nova 11 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Nova 11 Pro",
+      "Nova 11 Pro",
+      "Nova 11P"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Nova 10",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Nova 10",
+      "Nova 10"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Nova 9",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Nova 9",
+      "Nova 9"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Nova 8i",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Nova 8i",
+      "Nova 8i"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Nova 7i",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Nova 7i",
+      "Nova 7i"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Nova 5T",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Nova 5T",
+      "Nova 5T"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Y9 Prime",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Y9 Prime",
+      "Y9 Prime"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Y9 2019",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Y9 2019",
+      "Y9 2019"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Y7 2019",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Y7 2019",
+      "Y7 2019"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Y6 2019",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Y6 2019",
+      "Y6 2019"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "MOBILE_PHONE",
+    "name": "Y5 2019",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Y5 2019",
+      "Y5 2019"
+    ]
+  }
+]

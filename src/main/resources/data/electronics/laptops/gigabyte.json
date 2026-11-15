@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "GIGABYTE",
+    "type": "LAPTOP",
+    "name": "Aorus 16X (2024)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Gigabyte Aorus 16X",
+      "Aorus 16X"
+    ]
+  },
+  {
+    "brand": "GIGABYTE",
+    "type": "LAPTOP",
+    "name": "Aero 16 OLED",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Gigabyte Aero 16",
+      "Aero 16 OLED"
+    ]
+  },
+  {
+    "brand": "GIGABYTE",
+    "type": "LAPTOP",
+    "name": "G5 KF (RTX 4060)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Gigabyte G5 KF",
+      "G5 4060"
+    ]
+  },
+  {
+    "brand": "GIGABYTE",
+    "type": "LAPTOP",
+    "name": "G6X (2024)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Gigabyte G6X",
+      "G6X 9KG"
+    ]
+  }
+]

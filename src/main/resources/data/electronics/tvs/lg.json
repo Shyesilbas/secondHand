@@ -1,0 +1,616 @@
+[
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED G5",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED G5",
+      "OLED G5",
+      "LG G5 OLED"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED G4",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED G4",
+      "OLED G4",
+      "LG G4 OLED"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "webOS",
+      "displayType": "OLED",
+      "refreshRateHz": 144
+    },
+    "variants": [
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "83\"",
+        "specs": {
+          "screenSize": 83
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "97\"",
+        "specs": {
+          "screenSize": 97
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED G3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED G3",
+      "OLED G3",
+      "LG G3 OLED"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "webOS",
+      "displayType": "OLED",
+      "refreshRateHz": 120
+    },
+    "variants": [
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "83\"",
+        "specs": {
+          "screenSize": 83
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED C5",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED C5",
+      "OLED C5",
+      "LG C5 OLED"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED C4",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED C4",
+      "OLED C4",
+      "LG C4 OLED"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "webOS",
+      "displayType": "OLED",
+      "refreshRateHz": 144
+    },
+    "variants": [
+      {
+        "name": "42\"",
+        "specs": {
+          "screenSize": 42
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "48\"",
+        "specs": {
+          "screenSize": 48
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "83\"",
+        "specs": {
+          "screenSize": 83
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED C3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED C3",
+      "OLED C3",
+      "LG C3 OLED"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "webOS",
+      "displayType": "OLED",
+      "refreshRateHz": 120
+    },
+    "variants": [
+      {
+        "name": "42\"",
+        "specs": {
+          "screenSize": 42
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "48\"",
+        "specs": {
+          "screenSize": 48
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "83\"",
+        "specs": {
+          "screenSize": 83
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED C2",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED C2",
+      "OLED C2",
+      "LG C2 OLED"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "webOS",
+      "displayType": "OLED",
+      "refreshRateHz": 120
+    },
+    "variants": [
+      {
+        "name": "42\"",
+        "specs": {
+          "screenSize": 42
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "48\"",
+        "specs": {
+          "screenSize": 48
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "83\"",
+        "specs": {
+          "screenSize": 83
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED C1",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED C1",
+      "OLED C1",
+      "LG C1 OLED"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "webOS",
+      "displayType": "OLED",
+      "refreshRateHz": 120
+    },
+    "variants": [
+      {
+        "name": "48\"",
+        "specs": {
+          "screenSize": 48
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "83\"",
+        "specs": {
+          "screenSize": 83
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED B4",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED B4",
+      "OLED B4",
+      "LG B4 OLED"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "webOS",
+      "displayType": "OLED",
+      "refreshRateHz": 120
+    },
+    "variants": [
+      {
+        "name": "48\"",
+        "specs": {
+          "screenSize": 48
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED B3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED B3",
+      "OLED B3",
+      "LG B3 OLED"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "webOS",
+      "displayType": "OLED",
+      "refreshRateHz": 120
+    },
+    "variants": [
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "OLED A2",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG OLED A2",
+      "OLED A2",
+      "LG A2 OLED"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "QNED90",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG QNED90",
+      "QNED90"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "QNED85",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG QNED85",
+      "QNED85"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "QNED80",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG QNED80",
+      "QNED80"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "QNED75",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG QNED75",
+      "QNED75"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "NanoCell NANO86",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG NanoCell NANO86",
+      "NANO86",
+      "NanoCell NANO86"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "NanoCell NANO80",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG NanoCell NANO80",
+      "NANO80",
+      "NanoCell NANO80"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "NanoCell NANO75",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG NanoCell NANO75",
+      "NANO75",
+      "NanoCell NANO75"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "UHD UR9100",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG UHD UR9100",
+      "UHD UR9100",
+      "UR9100",
+      "LG UR9100"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "UHD UR8000",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG UHD UR8000",
+      "UHD UR8000",
+      "UR8000",
+      "LG UR8000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "UHD UQ8000",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG UHD UQ8000",
+      "UHD UQ8000",
+      "UQ8000",
+      "LG UQ8000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "UHD UP8000",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG UHD UP8000",
+      "UHD UP8000",
+      "UP8000",
+      "LG UP8000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "TV",
+    "name": "UHD UN7400",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG UHD UN7400",
+      "UHD UN7400",
+      "UN7400",
+      "LG UN7400"
+    ]
+  }
+]

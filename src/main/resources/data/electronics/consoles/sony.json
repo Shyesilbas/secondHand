@@ -1,0 +1,261 @@
+[
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 5 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "PS5 Pro",
+      "PlayStation 5 Pro"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "2 TB",
+        "storage": 2048,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 5 Slim",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "PS5 Slim",
+      "PlayStation 5 Slim"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "Standard (disc)",
+        "storage": 1024,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Digital Edition",
+        "storage": 1024,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 5",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "PS5",
+      "PlayStation 5 Fat"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "Standard (disc)",
+        "storage": 825,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Digital Edition",
+        "storage": 825,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 4 Pro",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "PS4 Pro",
+      "PlayStation 4 Pro"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 4 Slim",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "PS4 Slim",
+      "PlayStation 4 Slim"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 4",
+    "releaseYear": 2013,
+    "isLegacy": true,
+    "aliases": [
+      "PS4",
+      "PlayStation 4 Fat"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 3 Super Slim",
+    "releaseYear": 2012,
+    "isLegacy": true,
+    "aliases": [
+      "PS3 Super Slim"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 3 Slim",
+    "releaseYear": 2009,
+    "isLegacy": true,
+    "aliases": [
+      "PS3 Slim"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 3",
+    "releaseYear": 2006,
+    "isLegacy": true,
+    "aliases": [
+      "PS3 Fat"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 2 Slim",
+    "releaseYear": 2004,
+    "isLegacy": true,
+    "aliases": [
+      "PS2 Slim"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation 2",
+    "releaseYear": 2000,
+    "isLegacy": true,
+    "aliases": [
+      "PS2 Fat"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation Classic",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "PS Classic"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation Portal",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "PS Portal",
+      "PlayStation Portal"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation Vita",
+    "releaseYear": 2011,
+    "isLegacy": true,
+    "aliases": [
+      "PS Vita",
+      "PSVita"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PSP Street",
+    "releaseYear": 2011,
+    "isLegacy": true,
+    "aliases": [
+      "PSP E1000"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PSP 3000",
+    "releaseYear": 2008,
+    "isLegacy": true,
+    "aliases": [
+      "PSP-3000"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PSP 2000",
+    "releaseYear": 2007,
+    "isLegacy": true,
+    "aliases": [
+      "PSP-2000"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PSP 1000",
+    "releaseYear": 2004,
+    "isLegacy": true,
+    "aliases": [
+      "PSP-1000"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PSP Go",
+    "releaseYear": 2009,
+    "isLegacy": true,
+    "aliases": [
+      "PSP Go"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation VR2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "PS VR2",
+      "PSVR2"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "GAME_CONSOLE",
+    "name": "PlayStation VR",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "PS VR",
+      "PSVR"
+    ]
+  }
+]

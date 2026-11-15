@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "BAYMAK",
+    "type": "AIR_CONDITIONER",
+    "name": "Elegant Plus 12 A++ Inverter",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Baymak Elegant Plus 12",
+      "Elegant Plus 12000"
+    ]
+  },
+  {
+    "brand": "BAYMAK",
+    "type": "AIR_CONDITIONER",
+    "name": "Elegant Prime 18 A++ Inverter",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Baymak Elegant Prime 18",
+      "Elegant Prime 18000"
+    ]
+  }
+]

@@ -61,7 +61,7 @@ Kategori validator'ları `listing/validation/<kategori>/` altındadır ve her se
 
 ## 4. Katalog JSON Verisi
 
-Referans veri [`src/main/resources/data/`](../src/main/resources/data/) altındadır (toplam 317 JSON dosyası). Dizin `.gitignore` ile repo dışında tutulur; seed için yerel kopya gerekir ve bu dizine verilen linkler GitHub'da açılmaz. Sayılar dosyalardan doğrulanmıştır:
+Referans veri [`src/main/resources/data/`](../src/main/resources/data/) altındadır (toplam 317 JSON dosyası). Sayılar dosyalardan doğrulanmıştır:
 
 | Yol | İçerik |
 | :--- | :--- |

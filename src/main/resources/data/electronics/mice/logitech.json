@@ -1,0 +1,90 @@
+[
+  {
+    "brand": "LOGITECH",
+    "type": "MOUSE",
+    "name": "MX Master 3S",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech MX Master 3S",
+      "Master 3S"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "MOUSE",
+    "name": "MX Anywhere 3S",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech MX Anywhere 3S",
+      "Anywhere 3S"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "MOUSE",
+    "name": "G Pro X Superlight 2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Superlight 2",
+      "GPX 2"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "MOUSE",
+    "name": "G Pro X Superlight",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Superlight 1",
+      "GPX"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "MOUSE",
+    "name": "G502 X PLUS",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech G502 X Plus",
+      "G502X"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "MOUSE",
+    "name": "G502 HERO",
+    "releaseYear": 2018,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech G502 Hero",
+      "G502"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "MOUSE",
+    "name": "G305 LIGHTSPEED",
+    "releaseYear": 2018,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech G305",
+      "G305"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "MOUSE",
+    "name": "Lift Vertical",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech Lift",
+      "Lift Ergonomic"
+    ]
+  }
+]

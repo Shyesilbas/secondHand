@@ -1,0 +1,50 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "MONITOR",
+    "name": "Studio Display",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Apple Studio Display",
+      "Studio Display 27"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 27,
+      "screenInches": 27.0,
+      "displayType": "Retina 5K (LCD)",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "APPLE",
+    "type": "MONITOR",
+    "name": "Pro Display XDR",
+    "isLegacy": true,
+    "releaseYear": 2019,
+    "aliases": [
+      "Apple Pro Display XDR",
+      "Pro Display"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 32,
+      "screenInches": 32.0,
+      "displayType": "Retina 6K (LCD, local dimming)",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "APPLE",
+    "type": "MONITOR",
+    "name": "Thunderbolt Display",
+    "isLegacy": true,
+    "releaseYear": 2011,
+    "aliases": [
+      "Apple Thunderbolt Display",
+      "Thunderbolt Display",
+      "Apple Display"
+    ]
+  }
+]

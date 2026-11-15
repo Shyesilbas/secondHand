@@ -1,0 +1,1238 @@
+[
+  {
+    "brand": "APPLE",
+    "displayName": "Apple",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/apple.json"
+      },
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/apple.json"
+      },
+      {
+        "type": "TABLET",
+        "dataFile": "tablets/apple.json"
+      },
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/apple.json"
+      },
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/apple.json"
+      },
+      {
+        "type": "TV_STB",
+        "dataFile": "tv_stb/apple.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/apple.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/apple.json"
+      },
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/apple.json"
+      },
+      {
+        "type": "MOUSE",
+        "dataFile": "mice/apple.json"
+      },
+      {
+        "type": "DESKTOP",
+        "dataFile": "desktops/apple.json"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "displayName": "Samsung",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/samsung.json"
+      },
+      {
+        "type": "TABLET",
+        "dataFile": "tablets/samsung.json"
+      },
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/samsung.json"
+      },
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/samsung.json"
+      },
+      {
+        "type": "TV",
+        "dataFile": "tvs/samsung.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/samsung.json"
+      },
+      {
+        "type": "TV_STB",
+        "dataFile": "tv_stb/samsung.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/samsung.json"
+      },
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/samsung.json"
+      },
+      {
+        "type": "WASHING_MACHINE",
+        "dataFile": "washing_machines/samsung.json"
+      },
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/samsung.json"
+      }
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "displayName": "Xiaomi",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/xiaomi.json"
+      },
+      {
+        "type": "TABLET",
+        "dataFile": "tablets/xiaomi.json"
+      },
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/xiaomi.json"
+      },
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/xiaomi.json"
+      },
+      {
+        "type": "TV",
+        "dataFile": "tvs/xiaomi.json"
+      },
+      {
+        "type": "TV_STB",
+        "dataFile": "tv_stb/xiaomi.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/xiaomi.json"
+      },
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/xiaomi.json"
+      }
+    ]
+  },
+  {
+    "brand": "SONY",
+    "displayName": "Sony",
+    "supportedTypes": [
+      {
+        "type": "GAME_CONSOLE",
+        "dataFile": "consoles/sony.json"
+      },
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/sony.json"
+      },
+      {
+        "type": "TV",
+        "dataFile": "tvs/sony.json"
+      },
+      {
+        "type": "CAMERA",
+        "dataFile": "cameras/sony.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/sony.json"
+      },
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/sony.json"
+      }
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "displayName": "Lenovo",
+    "supportedTypes": [
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/lenovo.json"
+      },
+      {
+        "type": "TABLET",
+        "dataFile": "tablets/lenovo.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/lenovo.json"
+      },
+      {
+        "type": "DESKTOP",
+        "dataFile": "desktops/lenovo.json"
+      },
+      {
+        "type": "GAME_CONSOLE",
+        "dataFile": "consoles/lenovo.json"
+      }
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "displayName": "ASUS",
+    "supportedTypes": [
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/asus.json"
+      },
+      {
+        "type": "DESKTOP",
+        "dataFile": "desktops/asus.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/asus.json"
+      },
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/asus.json"
+      },
+      {
+        "type": "GAME_CONSOLE",
+        "dataFile": "consoles/asus.json"
+      },
+      {
+        "type": "ROUTER",
+        "dataFile": "routers/asus.json"
+      },
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/asus.json"
+      },
+      {
+        "type": "MOUSE",
+        "dataFile": "mice/asus.json"
+      }
+    ]
+  },
+  {
+    "brand": "HP",
+    "displayName": "HP",
+    "supportedTypes": [
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/hp.json"
+      },
+      {
+        "type": "DESKTOP",
+        "dataFile": "desktops/hp.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/hp.json"
+      },
+      {
+        "type": "PRINTER",
+        "dataFile": "printers/hp.json"
+      }
+    ]
+  },
+  {
+    "brand": "DELL",
+    "displayName": "Dell",
+    "supportedTypes": [
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/dell.json"
+      },
+      {
+        "type": "DESKTOP",
+        "dataFile": "desktops/dell.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/dell.json"
+      }
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "displayName": "Huawei",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/huawei.json"
+      },
+      {
+        "type": "TABLET",
+        "dataFile": "tablets/huawei.json"
+      },
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/huawei.json"
+      },
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/huawei.json"
+      },
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/huawei.json"
+      },
+      {
+        "type": "ROUTER",
+        "dataFile": "routers/huawei.json"
+      }
+    ]
+  },
+  {
+    "brand": "LG",
+    "displayName": "LG",
+    "supportedTypes": [
+      {
+        "type": "TV",
+        "dataFile": "tvs/lg.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/lg.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/lg.json"
+      },
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/lg.json"
+      },
+      {
+        "type": "WASHING_MACHINE",
+        "dataFile": "washing_machines/lg.json"
+      },
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/lg.json"
+      },
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/lg.json"
+      }
+    ]
+  },
+  {
+    "brand": "BEKO",
+    "displayName": "Beko",
+    "supportedTypes": [
+      {
+        "type": "WASHING_MACHINE",
+        "dataFile": "washing_machines/beko.json"
+      },
+      {
+        "type": "TV",
+        "dataFile": "tvs/beko.json"
+      }
+    ]
+  },
+  {
+    "brand": "ARCELIK",
+    "displayName": "Arçelik",
+    "supportedTypes": [
+      {
+        "type": "WASHING_MACHINE",
+        "dataFile": "washing_machines/arcelik.json"
+      },
+      {
+        "type": "TV",
+        "dataFile": "tvs/arcelik.json"
+      }
+    ]
+  },
+  {
+    "brand": "DAIKIN",
+    "displayName": "Daikin",
+    "supportedTypes": [
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/daikin.json"
+      }
+    ]
+  },
+  {
+    "brand": "VESTEL",
+    "displayName": "Vestel",
+    "supportedTypes": [
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/vestel.json"
+      },
+      {
+        "type": "TV",
+        "dataFile": "tvs/vestel.json"
+      }
+    ]
+  },
+  {
+    "brand": "GOOGLE",
+    "displayName": "Google",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/google.json"
+      }
+    ]
+  },
+  {
+    "brand": "ONEPLUS",
+    "displayName": "OnePlus",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/oneplus.json"
+      }
+    ]
+  },
+  {
+    "brand": "MOTOROLA",
+    "displayName": "Motorola",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/motorola.json"
+      }
+    ]
+  },
+  {
+    "brand": "PHILIPS",
+    "displayName": "Philips",
+    "supportedTypes": [
+      {
+        "type": "TV",
+        "dataFile": "tvs/philips.json"
+      },
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/philips.json"
+      }
+    ]
+  },
+  {
+    "brand": "TCL",
+    "displayName": "TCL",
+    "supportedTypes": [
+      {
+        "type": "TV",
+        "dataFile": "tvs/tcl.json"
+      }
+    ]
+  },
+  {
+    "brand": "BAYMAK",
+    "displayName": "Baymak",
+    "supportedTypes": [
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/baymak.json"
+      }
+    ]
+  },
+  {
+    "brand": "BOSCH",
+    "displayName": "Bosch",
+    "supportedTypes": [
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/bosch.json"
+      },
+      {
+        "type": "WASHING_MACHINE",
+        "dataFile": "washing_machines/bosch.json"
+      }
+    ]
+  },
+  {
+    "brand": "GREE",
+    "displayName": "Gree",
+    "supportedTypes": [
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/gree.json"
+      }
+    ]
+  },
+  {
+    "brand": "MITSUBISHI_ELECTRIC",
+    "displayName": "Mitsubishi Electric",
+    "supportedTypes": [
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/mitsubishi_electric.json"
+      }
+    ]
+  },
+  {
+    "brand": "CANON",
+    "displayName": "Canon",
+    "supportedTypes": [
+      {
+        "type": "CAMERA",
+        "dataFile": "cameras/canon.json"
+      },
+      {
+        "type": "PRINTER",
+        "dataFile": "printers/canon.json"
+      }
+    ]
+  },
+  {
+    "brand": "DJI",
+    "displayName": "DJI",
+    "supportedTypes": [
+      {
+        "type": "CAMERA",
+        "dataFile": "cameras/dji.json"
+      }
+    ]
+  },
+  {
+    "brand": "FUJIFILM",
+    "displayName": "Fujifilm",
+    "supportedTypes": [
+      {
+        "type": "CAMERA",
+        "dataFile": "cameras/fujifilm.json"
+      }
+    ]
+  },
+  {
+    "brand": "GOPRO",
+    "displayName": "GoPro",
+    "supportedTypes": [
+      {
+        "type": "CAMERA",
+        "dataFile": "cameras/gopro.json"
+      }
+    ]
+  },
+  {
+    "brand": "INSTA360",
+    "displayName": "Insta360",
+    "supportedTypes": [
+      {
+        "type": "CAMERA",
+        "dataFile": "cameras/insta360.json"
+      }
+    ]
+  },
+  {
+    "brand": "NIKON",
+    "displayName": "Nikon",
+    "supportedTypes": [
+      {
+        "type": "CAMERA",
+        "dataFile": "cameras/nikon.json"
+      }
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "displayName": "Microsoft",
+    "supportedTypes": [
+      {
+        "type": "GAME_CONSOLE",
+        "dataFile": "consoles/microsoft.json"
+      },
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/microsoft.json"
+      },
+      {
+        "type": "TABLET",
+        "dataFile": "tablets/microsoft.json"
+      }
+    ]
+  },
+  {
+    "brand": "MSI",
+    "displayName": "MSI",
+    "supportedTypes": [
+      {
+        "type": "GAME_CONSOLE",
+        "dataFile": "consoles/msi.json"
+      },
+      {
+        "type": "DESKTOP",
+        "dataFile": "desktops/msi.json"
+      },
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/msi.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/msi.json"
+      }
+    ]
+  },
+  {
+    "brand": "NINTENDO",
+    "displayName": "Nintendo",
+    "supportedTypes": [
+      {
+        "type": "GAME_CONSOLE",
+        "dataFile": "consoles/nintendo.json"
+      }
+    ]
+  },
+  {
+    "brand": "VALVE",
+    "displayName": "Valve",
+    "supportedTypes": [
+      {
+        "type": "GAME_CONSOLE",
+        "dataFile": "consoles/valve.json"
+      }
+    ]
+  },
+  {
+    "brand": "CASPER",
+    "displayName": "Casper",
+    "supportedTypes": [
+      {
+        "type": "DESKTOP",
+        "dataFile": "desktops/casper.json"
+      },
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/casper.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/casper.json"
+      }
+    ]
+  },
+  {
+    "brand": "ANKER",
+    "displayName": "Anker",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/anker.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/anker.json"
+      }
+    ]
+  },
+  {
+    "brand": "BANG_OLUFSEN",
+    "displayName": "Bang & Olufsen",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/bang_olufsen.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/bang_olufsen.json"
+      }
+    ]
+  },
+  {
+    "brand": "BEATS",
+    "displayName": "Beats",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/beats.json"
+      }
+    ]
+  },
+  {
+    "brand": "BOSE",
+    "displayName": "Bose",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/bose.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/bose.json"
+      }
+    ]
+  },
+  {
+    "brand": "HYPERX",
+    "displayName": "HyperX",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/hyperx.json"
+      },
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/hyperx.json"
+      },
+      {
+        "type": "MOUSE",
+        "dataFile": "mice/hyperx.json"
+      }
+    ]
+  },
+  {
+    "brand": "JABRA",
+    "displayName": "Jabra",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/jabra.json"
+      }
+    ]
+  },
+  {
+    "brand": "JBL",
+    "displayName": "JBL",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/jbl.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/jbl.json"
+      }
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "displayName": "Logitech",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/logitech.json"
+      },
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/logitech.json"
+      },
+      {
+        "type": "MOUSE",
+        "dataFile": "mice/logitech.json"
+      }
+    ]
+  },
+  {
+    "brand": "MARSHALL",
+    "displayName": "Marshall",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/marshall.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/marshall.json"
+      }
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "displayName": "Razer",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/razer.json"
+      },
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/razer.json"
+      },
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/razer.json"
+      },
+      {
+        "type": "MOUSE",
+        "dataFile": "mice/razer.json"
+      }
+    ]
+  },
+  {
+    "brand": "SENNHEISER",
+    "displayName": "Sennheiser",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/sennheiser.json"
+      }
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "displayName": "SteelSeries",
+    "supportedTypes": [
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/steelseries.json"
+      },
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/steelseries.json"
+      },
+      {
+        "type": "MOUSE",
+        "dataFile": "mice/steelseries.json"
+      }
+    ]
+  },
+  {
+    "brand": "CORSAIR",
+    "displayName": "Corsair",
+    "supportedTypes": [
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/corsair.json"
+      },
+      {
+        "type": "MOUSE",
+        "dataFile": "mice/corsair.json"
+      }
+    ]
+  },
+  {
+    "brand": "KEYCHRON",
+    "displayName": "Keychron",
+    "supportedTypes": [
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/keychron.json"
+      }
+    ]
+  },
+  {
+    "brand": "ACER",
+    "displayName": "Acer",
+    "supportedTypes": [
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/acer.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/acer.json"
+      }
+    ]
+  },
+  {
+    "brand": "GIGABYTE",
+    "displayName": "Gigabyte",
+    "supportedTypes": [
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/gigabyte.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/gigabyte.json"
+      }
+    ]
+  },
+  {
+    "brand": "MONSTER",
+    "displayName": "Monster",
+    "supportedTypes": [
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/monster.json"
+      }
+    ]
+  },
+  {
+    "brand": "AOC",
+    "displayName": "AOC",
+    "supportedTypes": [
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/aoc.json"
+      }
+    ]
+  },
+  {
+    "brand": "BENQ",
+    "displayName": "BenQ",
+    "supportedTypes": [
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/benq.json"
+      }
+    ]
+  },
+  {
+    "brand": "VIEWSONIC",
+    "displayName": "ViewSonic",
+    "supportedTypes": [
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/viewsonic.json"
+      }
+    ]
+  },
+  {
+    "brand": "GENERAL_MOBILE",
+    "displayName": "General Mobile",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/general_mobile.json"
+      }
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "displayName": "Honor",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/honor.json"
+      },
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/honor.json"
+      }
+    ]
+  },
+  {
+    "brand": "INFINIX",
+    "displayName": "Infinix",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/infinix.json"
+      }
+    ]
+  },
+  {
+    "brand": "NOTHING",
+    "displayName": "Nothing",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/nothing.json"
+      },
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/nothing.json"
+      }
+    ]
+  },
+  {
+    "brand": "OPPO",
+    "displayName": "Oppo",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/oppo.json"
+      }
+    ]
+  },
+  {
+    "brand": "REALME",
+    "displayName": "Realme",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/realme.json"
+      }
+    ]
+  },
+  {
+    "brand": "TECNO",
+    "displayName": "Tecno",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/tecno.json"
+      }
+    ]
+  },
+  {
+    "brand": "VIVO",
+    "displayName": "Vivo",
+    "supportedTypes": [
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/vivo.json"
+      }
+    ]
+  },
+  {
+    "brand": "BROTHER",
+    "displayName": "Brother",
+    "supportedTypes": [
+      {
+        "type": "PRINTER",
+        "dataFile": "printers/brother.json"
+      }
+    ]
+  },
+  {
+    "brand": "EPSON",
+    "displayName": "Epson",
+    "supportedTypes": [
+      {
+        "type": "PRINTER",
+        "dataFile": "printers/epson.json"
+      }
+    ]
+  },
+  {
+    "brand": "DREAME",
+    "displayName": "Dreame",
+    "supportedTypes": [
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/dreame.json"
+      }
+    ]
+  },
+  {
+    "brand": "DYSON",
+    "displayName": "Dyson",
+    "supportedTypes": [
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/dyson.json"
+      }
+    ]
+  },
+  {
+    "brand": "ECOVACS",
+    "displayName": "Ecovacs",
+    "supportedTypes": [
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/ecovacs.json"
+      }
+    ]
+  },
+  {
+    "brand": "IROBOT",
+    "displayName": "iRobot",
+    "supportedTypes": [
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/irobot.json"
+      }
+    ]
+  },
+  {
+    "brand": "ROBOROCK",
+    "displayName": "Roborock",
+    "supportedTypes": [
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/roborock.json"
+      }
+    ]
+  },
+  {
+    "brand": "VIOMI",
+    "displayName": "Viomi",
+    "supportedTypes": [
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/viomi.json"
+      }
+    ]
+  },
+  {
+    "brand": "KEENETIC",
+    "displayName": "Keenetic",
+    "supportedTypes": [
+      {
+        "type": "ROUTER",
+        "dataFile": "routers/keenetic.json"
+      }
+    ]
+  },
+  {
+    "brand": "TP_LINK",
+    "displayName": "TP-Link",
+    "supportedTypes": [
+      {
+        "type": "ROUTER",
+        "dataFile": "routers/tp_link.json"
+      }
+    ]
+  },
+  {
+    "brand": "ZYXEL",
+    "displayName": "Zyxel",
+    "supportedTypes": [
+      {
+        "type": "ROUTER",
+        "dataFile": "routers/zyxel.json"
+      }
+    ]
+  },
+  {
+    "brand": "HARMAN_KARDON",
+    "displayName": "Harman Kardon",
+    "supportedTypes": [
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/harman_kardon.json"
+      }
+    ]
+  },
+  {
+    "brand": "PROFILO",
+    "displayName": "Profilo",
+    "supportedTypes": [
+      {
+        "type": "WASHING_MACHINE",
+        "dataFile": "washing_machines/profilo.json"
+      }
+    ]
+  },
+  {
+    "brand": "SIEMENS",
+    "displayName": "Siemens",
+    "supportedTypes": [
+      {
+        "type": "WASHING_MACHINE",
+        "dataFile": "washing_machines/siemens.json"
+      }
+    ]
+  },
+  {
+    "brand": "AMAZFIT",
+    "displayName": "Amazfit",
+    "supportedTypes": [
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/amazfit.json"
+      }
+    ]
+  },
+  {
+    "brand": "GARMIN",
+    "displayName": "Garmin",
+    "supportedTypes": [
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/garmin.json"
+      }
+    ]
+  },
+  {
+    "brand": "SUUNTO",
+    "displayName": "Suunto",
+    "supportedTypes": [
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/suunto.json"
+      }
+    ]
+  },
+  {
+    "brand": "OTHER",
+    "displayName": "Diğer / Other",
+    "supportedTypes": [
+      {
+        "type": "AIR_CONDITIONER",
+        "dataFile": "air_conditioners/other.json"
+      },
+      {
+        "type": "CAMERA",
+        "dataFile": "cameras/other.json"
+      },
+      {
+        "type": "GAME_CONSOLE",
+        "dataFile": "consoles/other.json"
+      },
+      {
+        "type": "DESKTOP",
+        "dataFile": "desktops/other.json"
+      },
+      {
+        "type": "HEADPHONES",
+        "dataFile": "headphones/other.json"
+      },
+      {
+        "type": "KEYBOARD",
+        "dataFile": "keyboards/other.json"
+      },
+      {
+        "type": "LAPTOP",
+        "dataFile": "laptops/other.json"
+      },
+      {
+        "type": "MOUSE",
+        "dataFile": "mice/other.json"
+      },
+      {
+        "type": "MONITOR",
+        "dataFile": "monitors/other.json"
+      },
+      {
+        "type": "MOBILE_PHONE",
+        "dataFile": "phones/other.json"
+      },
+      {
+        "type": "PRINTER",
+        "dataFile": "printers/other.json"
+      },
+      {
+        "type": "ROBOT_VACUUM",
+        "dataFile": "robot_vacuums/other.json"
+      },
+      {
+        "type": "ROUTER",
+        "dataFile": "routers/other.json"
+      },
+      {
+        "type": "SPEAKER",
+        "dataFile": "speakers/other.json"
+      },
+      {
+        "type": "TABLET",
+        "dataFile": "tablets/other.json"
+      },
+      {
+        "type": "TV_STB",
+        "dataFile": "tv_stb/other.json"
+      },
+      {
+        "type": "TV",
+        "dataFile": "tvs/other.json"
+      },
+      {
+        "type": "WASHING_MACHINE",
+        "dataFile": "washing_machines/other.json"
+      },
+      {
+        "type": "SMARTWATCH",
+        "dataFile": "watches/other.json"
+      }
+    ]
+  }
+]

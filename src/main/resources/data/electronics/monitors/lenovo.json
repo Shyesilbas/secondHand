@@ -1,0 +1,170 @@
+[
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "ThinkVision P32p-30",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkVision P32p-30",
+      "P32p-30",
+      "ThinkVision P32p-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "ThinkVision P27h-30",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkVision P27h-30",
+      "P27h-30",
+      "ThinkVision P27h-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "ThinkVision P27q-30",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkVision P27q-30",
+      "P27q-30",
+      "ThinkVision P27q-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "ThinkVision T27h-30",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkVision T27h-30",
+      "T27h-30",
+      "ThinkVision T27h-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "ThinkVision T24i-30",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkVision T24i-30",
+      "T24i-30",
+      "ThinkVision T24i-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "ThinkVision E24-30",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkVision E24-30",
+      "E24-30",
+      "ThinkVision E24-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "Legion Y34wz-30",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Y34wz-30",
+      "Y34wz-30",
+      "Legion Y34wz-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "Legion Y27qf-30",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Y27qf-30",
+      "Y27qf-30",
+      "Legion Y27qf-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "Legion R27q-30",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion R27q-30",
+      "R27q-30",
+      "Legion R27q-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "Legion R25f-30",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion R25f-30",
+      "R25f-30",
+      "Legion R25f-30"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "L27q-35",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo L27q-35",
+      "L27q-35",
+      "Lenovo L27q"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "L24i-40",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo L24i-40",
+      "L24i-40",
+      "Lenovo L24i"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "G27q-30",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo G27q-30",
+      "G27q-30",
+      "Lenovo G27q"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "MONITOR",
+    "name": "G24-20",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo G24-20",
+      "G24-20",
+      "Lenovo G24"
+    ]
+  }
+]

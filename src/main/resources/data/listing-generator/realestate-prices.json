@@ -1,0 +1,230 @@
+{
+ "source": "claude-draft",
+ "priceDate": "2026-11",
+ "note": "Average asking prices per gross m² (sale) and per gross m² per month (rent) for an average flat; district factors are relative to the city average. Estimates, not market data.",
+ "cities": [
+  {
+   "city": "ISTANBUL",
+   "weight": 30,
+   "saleM2": 62000,
+   "rentM2": 320,
+   "defaultDistrictFactor": 0.8,
+   "districtFactors": {
+    "ISTANBUL_BESIKTAS": 2.0,
+    "ISTANBUL_SARIYER": 1.9,
+    "ISTANBUL_KADIKOY": 1.8,
+    "ISTANBUL_BAKIRKOY": 1.6,
+    "ISTANBUL_SISLI": 1.5,
+    "ISTANBUL_USKUDAR": 1.4,
+    "ISTANBUL_BEYKOZ": 1.4,
+    "ISTANBUL_ADALAR": 1.4,
+    "ISTANBUL_ATASEHIR": 1.3,
+    "ISTANBUL_BEYOGLU": 1.2,
+    "ISTANBUL_FATIH": 1.1,
+    "ISTANBUL_MALTEPE": 1.1,
+    "ISTANBUL_UMRANIYE": 1.05,
+    "ISTANBUL_KARTAL": 1.0,
+    "ISTANBUL_KAGITHANE": 1.0,
+    "ISTANBUL_ZEYTINBURNU": 1.0,
+    "ISTANBUL_BASAKSEHIR": 0.95,
+    "ISTANBUL_CEKMEKOY": 0.95,
+    "ISTANBUL_EYUPSULTAN": 0.95,
+    "ISTANBUL_SILE": 0.9,
+    "ISTANBUL_PENDIK": 0.85,
+    "ISTANBUL_TUZLA": 0.85,
+    "ISTANBUL_BAHCELIEVLER": 0.85,
+    "ISTANBUL_BEYLIKDUZU": 0.8,
+    "ISTANBUL_KUCUKCEKMECE": 0.8,
+    "ISTANBUL_BAYRAMPASA": 0.8,
+    "ISTANBUL_GUNGOREN": 0.75,
+    "ISTANBUL_SANCAKTEPE": 0.75,
+    "ISTANBUL_BUYUKCEKMECE": 0.75,
+    "ISTANBUL_AVCILAR": 0.7,
+    "ISTANBUL_BAGCILAR": 0.7,
+    "ISTANBUL_GAZIOSMANPASA": 0.65,
+    "ISTANBUL_ESENLER": 0.6,
+    "ISTANBUL_ARNAVUTKOY": 0.6,
+    "ISTANBUL_SILIVRI": 0.65,
+    "ISTANBUL_CATALCA": 0.6,
+    "ISTANBUL_SULTANBEYLI": 0.55,
+    "ISTANBUL_SULTANGAZI": 0.55,
+    "ISTANBUL_ESENYURT": 0.5
+   }
+  },
+  {
+   "city": "ANKARA",
+   "weight": 12,
+   "saleM2": 38000,
+   "rentM2": 200,
+   "defaultDistrictFactor": 0.6,
+   "districtFactors": {
+    "ANKARA_CANKAYA": 1.5,
+    "ANKARA_GOLBASI": 1.1,
+    "ANKARA_YENIMAHALLE": 1.0,
+    "ANKARA_ETIMESGUT": 0.95,
+    "ANKARA_KECIOREN": 0.75,
+    "ANKARA_PURSAKLAR": 0.7,
+    "ANKARA_MAMAK": 0.65,
+    "ANKARA_SINCAN": 0.65,
+    "ANKARA_ALTINDAG": 0.6
+   }
+  },
+  {
+   "city": "IZMIR",
+   "weight": 10,
+   "saleM2": 50000,
+   "rentM2": 260,
+   "defaultDistrictFactor": 0.7,
+   "districtFactors": {
+    "IZMIR_CESME": 2.2,
+    "IZMIR_URLA": 1.6,
+    "IZMIR_GUZELBAHCE": 1.5,
+    "IZMIR_KARSIYAKA": 1.3,
+    "IZMIR_NARLIDERE": 1.3,
+    "IZMIR_BALCOVA": 1.2,
+    "IZMIR_BORNOVA": 1.1,
+    "IZMIR_BAYRAKLI": 1.1,
+    "IZMIR_KONAK": 1.0,
+    "IZMIR_GAZIEMIR": 0.9,
+    "IZMIR_BUCA": 0.85,
+    "IZMIR_CIGLI": 0.85,
+    "IZMIR_KARABAGLAR": 0.75,
+    "IZMIR_MENEMEN": 0.6,
+    "IZMIR_TORBALI": 0.6
+   }
+  },
+  {
+   "city": "BURSA",
+   "weight": 6,
+   "saleM2": 35000,
+   "rentM2": 180,
+   "defaultDistrictFactor": 0.7,
+   "districtFactors": {
+    "BURSA_NILUFER": 1.3,
+    "BURSA_MUDANYA": 1.2,
+    "BURSA_OSMANGAZI": 0.95,
+    "BURSA_GEMLIK": 0.85,
+    "BURSA_YILDIRIM": 0.75
+   }
+  },
+  {
+   "city": "ANTALYA",
+   "weight": 6,
+   "saleM2": 55000,
+   "rentM2": 250,
+   "defaultDistrictFactor": 0.8,
+   "districtFactors": {
+    "ANTALYA_KAS": 1.6,
+    "ANTALYA_KONYAALTI": 1.4,
+    "ANTALYA_KEMER": 1.4,
+    "ANTALYA_MURATPASA": 1.2,
+    "ANTALYA_ALANYA": 1.1,
+    "ANTALYA_MANAVGAT": 0.9,
+    "ANTALYA_KEPEZ": 0.75
+   }
+  },
+  {
+   "city": "KOCAELI",
+   "weight": 4,
+   "saleM2": 38000,
+   "rentM2": 190,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "KONYA",
+   "weight": 3,
+   "saleM2": 28000,
+   "rentM2": 140,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "ADANA",
+   "weight": 3,
+   "saleM2": 25000,
+   "rentM2": 140,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "GAZIANTEP",
+   "weight": 3,
+   "saleM2": 23000,
+   "rentM2": 130,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "MERSIN",
+   "weight": 3,
+   "saleM2": 32000,
+   "rentM2": 160,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "KAYSERI",
+   "weight": 2,
+   "saleM2": 25000,
+   "rentM2": 130,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "ESKISEHIR",
+   "weight": 2,
+   "saleM2": 32000,
+   "rentM2": 160,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "SAMSUN",
+   "weight": 2,
+   "saleM2": 28000,
+   "rentM2": 140,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "TEKIRDAG",
+   "weight": 2,
+   "saleM2": 34000,
+   "rentM2": 170,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "MUGLA",
+   "weight": 3,
+   "saleM2": 75000,
+   "rentM2": 300,
+   "defaultDistrictFactor": 0.8,
+   "districtFactors": {
+    "MUGLA_BODRUM": 1.8,
+    "MUGLA_DATCA": 1.3,
+    "MUGLA_FETHIYE": 1.2,
+    "MUGLA_MARMARIS": 1.2,
+    "MUGLA_MENTESE": 0.7,
+    "MUGLA_MILAS": 0.6
+   }
+  },
+  {
+   "city": "TRABZON",
+   "weight": 2,
+   "saleM2": 32000,
+   "rentM2": 150,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  },
+  {
+   "city": "DENIZLI",
+   "weight": 2,
+   "saleM2": 28000,
+   "rentM2": 140,
+   "defaultDistrictFactor": 1.0,
+   "districtFactors": {}
+  }
+ ]
+}

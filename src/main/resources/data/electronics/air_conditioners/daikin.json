@@ -1,0 +1,45 @@
+[
+  {
+    "brand": "DAIKIN",
+    "type": "AIR_CONDITIONER",
+    "name": "Ururu Sarara",
+    "isLegacy": true,
+    "releaseYear": 2020,
+    "aliases": [
+      "Daikin Ururu Sarara",
+      "FTXZ"
+    ]
+  },
+  {
+    "brand": "DAIKIN",
+    "type": "AIR_CONDITIONER",
+    "name": "Sensira",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Daikin Sensira",
+      "FTXF"
+    ]
+  },
+  {
+    "brand": "DAIKIN",
+    "type": "AIR_CONDITIONER",
+    "name": "Comfora",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Daikin Comfora",
+      "FTXP"
+    ]
+  },
+  {
+    "brand": "DAIKIN",
+    "type": "AIR_CONDITIONER",
+    "name": "Perfera",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Perfera"
+    ]
+  }
+]

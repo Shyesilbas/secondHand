@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "VIVO",
+    "type": "MOBILE_PHONE",
+    "name": "X100 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Vivo X100 Pro",
+      "X100 Pro Zeiss"
+    ]
+  },
+  {
+    "brand": "VIVO",
+    "type": "MOBILE_PHONE",
+    "name": "X100",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Vivo X100",
+      "X100 5G"
+    ]
+  },
+  {
+    "brand": "VIVO",
+    "type": "MOBILE_PHONE",
+    "name": "V30 Pro 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Vivo V30 Pro",
+      "V30 Pro Zeiss"
+    ]
+  },
+  {
+    "brand": "VIVO",
+    "type": "MOBILE_PHONE",
+    "name": "V30 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Vivo V30",
+      "V30 Aura Light"
+    ]
+  },
+  {
+    "brand": "VIVO",
+    "type": "MOBILE_PHONE",
+    "name": "V30 Lite 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Vivo V30 Lite",
+      "V30 Lite"
+    ]
+  },
+  {
+    "brand": "VIVO",
+    "type": "MOBILE_PHONE",
+    "name": "Y36",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Vivo Y36",
+      "Y36 8GB/256GB"
+    ]
+  }
+]

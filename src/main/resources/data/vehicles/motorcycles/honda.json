@@ -1,0 +1,346 @@
+[
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "CBR 600RR",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "CBR 600RR (2021–)",
+        "engines": [
+          {
+            "name": "599cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "HRC Tricolor"
+        ]
+      },
+      {
+        "name": "CBR 600RR (2013–2020)",
+        "engines": [
+          {
+            "name": "599cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "CBR 1000RR-R Fireblade",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "CBR 1000RR-R Fireblade (2020–)",
+        "engines": [
+          {
+            "name": "999cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "SP"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "CBR 500R",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "CBR 500R (2019–)",
+        "engines": [
+          {
+            "name": "471cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "CB 650R",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "CB 650R (2019–)",
+        "trims": [
+          "Standard",
+          "E-Clutch"
+        ],
+        "versions": [
+          {
+            "name": "649cc Inline-4",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 649,
+            "horsePower": 95,
+            "powerKw": 70,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "CB 500F",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "CB 500F (2019–)",
+        "engines": [
+          {
+            "name": "471cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "CB 300R Neo Sports Cafe",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "CB 300R (2018–)",
+        "engines": [
+          {
+            "name": "286cc Single",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "Africa Twin",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "Africa Twin CRF1100L (2020–)",
+        "trims": [
+          "Standard",
+          "Adventure Sports",
+          "Adventure Sports ES"
+        ],
+        "versions": [
+          {
+            "name": "1084cc Parallel-Twin",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1084,
+            "horsePower": 102,
+            "powerKw": 75,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "source": "claude-draft"
+          },
+          {
+            "name": "1084cc Parallel-Twin DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1084,
+            "horsePower": 102,
+            "powerKw": 75,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Africa Twin CRF1000L (2016–2019)",
+        "engines": [
+          {
+            "name": "998cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "DCT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "NC 750X",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "NC 750X (2021–)",
+        "trims": [
+          "Standard"
+        ],
+        "versions": [
+          {
+            "name": "745cc Parallel-Twin",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 745,
+            "horsePower": 59,
+            "torqueNm": 69,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "source": "claude-draft"
+          },
+          {
+            "name": "745cc Parallel-Twin DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 745,
+            "horsePower": 59,
+            "torqueNm": 69,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "Forza 750",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Forza 750 (2021–)",
+        "engines": [
+          {
+            "name": "745cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "Forza 350",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Forza 350 (2021–)",
+        "trims": [
+          "Standard"
+        ],
+        "versions": [
+          {
+            "name": "330cc Single",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 330,
+            "horsePower": 29,
+            "torqueNm": 32,
+            "gearbox": "CVT",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "PCX 125",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "PCX 125 (2021–)",
+        "trims": [
+          "Standard",
+          "e:HEV"
+        ],
+        "versions": [
+          {
+            "name": "125cc Single",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 125,
+            "torqueNm": 12,
+            "gearbox": "CVT",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "MOTORCYCLE",
+    "name": "Gold Wing",
+    "supportedBodyTypes": [
+      "TOURING"
+    ],
+    "generations": [
+      {
+        "name": "Gold Wing GL1800 (2018–)",
+        "engines": [
+          {
+            "name": "1833cc Flat-Six",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Tour",
+          "Tour Airbag",
+          "DCT"
+        ]
+      }
+    ]
+  }
+]

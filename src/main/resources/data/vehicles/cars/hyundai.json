@@ -1,0 +1,1175 @@
+[
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "i10",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "i10 (2019–, AC3)",
+        "engines": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 T-GDI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Jump",
+          "Style",
+          "Elite"
+        ]
+      },
+      {
+        "name": "i10 (2013–2019, IA)",
+        "engines": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Jump",
+          "Style",
+          "Elite"
+        ]
+      },
+      {
+        "name": "i10 (2008–2013, PA)",
+        "engines": [
+          {
+            "name": "1.1 Epsilon",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 Kappa",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.1 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Team",
+          "Select",
+          "Mode"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "i20",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "i20 (2020–, BC3)",
+        "trims": [
+          "Jump",
+          "Style",
+          "Style Plus",
+          "Elite",
+          "Elite Plus"
+        ],
+        "startYear": 2020,
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "1.2 MPI 84",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1197,
+            "horsePower": 84,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 MPI 79",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1197,
+            "horsePower": 79,
+            "torqueNm": 118,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 MPI 100 AT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1368,
+            "horsePower": 100,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 T-GDI 100 DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 998,
+            "horsePower": 100,
+            "torqueNm": 172,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "i20 (2014–2020, GB)",
+        "trims": [
+          "Jump",
+          "Style",
+          "Style Plus",
+          "Elite",
+          "Elite Smart"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2014,
+        "endYear": 2020,
+        "versions": [
+          {
+            "name": "1.2 MPI 84",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1248,
+            "horsePower": 84,
+            "torqueNm": 122,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 MPI 100 AT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1368,
+            "horsePower": 100,
+            "torqueNm": 134,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 T-GDI 100",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 998,
+            "horsePower": 100,
+            "torqueNm": 172,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 CRDi 90",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1396,
+            "horsePower": 90,
+            "torqueNm": 240,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "i20 (2008–2014, PB)",
+        "engines": [
+          {
+            "name": "1.2 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Team",
+          "Select",
+          "Mode",
+          "Sense"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Getz",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Getz (2002–2011, TB)",
+        "engines": [
+          {
+            "name": "1.3",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Cool",
+          "GL",
+          "GLS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Accent",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Accent Blue (2011–2018, RB)",
+        "trims": [
+          "Biz",
+          "Mode",
+          "Mode Plus",
+          "Elite"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2011,
+        "endYear": 2018,
+        "versions": [
+          {
+            "name": "1.4 D-CVVT 100",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1396,
+            "horsePower": 100,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 CRDi 128",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1582,
+            "horsePower": 128,
+            "torqueNm": 258,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 CRDi 136",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1582,
+            "horsePower": 136,
+            "torqueNm": 260,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 CRDi 136 DCT",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1582,
+            "horsePower": 136,
+            "torqueNm": 300,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Accent Era (2006–2012, MC)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Team",
+          "Select",
+          "Style"
+        ]
+      },
+      {
+        "name": "Accent (1999–2005, LC)",
+        "engines": [
+          {
+            "name": "1.3",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "LX",
+          "GLS",
+          "Admire"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Elantra",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Elantra (2020–, CN7)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Style Comfort",
+          "Elite",
+          "Elite Plus"
+        ]
+      },
+      {
+        "name": "Elantra (2016–2020, AD)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Style Plus",
+          "Elite",
+          "Elite Plus"
+        ]
+      },
+      {
+        "name": "Elantra (2011–2016, MD/UD)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Mode",
+          "Tune",
+          "Elite"
+        ]
+      },
+      {
+        "name": "Elantra (2006–2010, HD)",
+        "engines": [
+          {
+            "name": "1.6 CVVT",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Mode",
+          "Team",
+          "Select"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "i30",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "i30 (2017–, PD)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Elite",
+          "Smart"
+        ]
+      },
+      {
+        "name": "i30 (2012–2017, GD)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Style",
+          "Elite"
+        ]
+      },
+      {
+        "name": "i30 (2007–2012, FD)",
+        "engines": [
+          {
+            "name": "1.4 CVVT",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CVVT",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Team",
+          "Mode",
+          "Select",
+          "Style"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "i40 Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "i40 Sedan (2011–2019, VF)",
+        "engines": [
+          {
+            "name": "1.6 GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.7 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Executive",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "i40 Wagon",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "i40 Wagon (2011–2019, VF)",
+        "engines": [
+          {
+            "name": "1.7 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Executive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Sonata",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Sonata (2014–2019, LF)",
+        "engines": [
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Elite"
+        ]
+      },
+      {
+        "name": "Sonata (2010–2014, YF)",
+        "engines": [
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Elite"
+        ]
+      },
+      {
+        "name": "Sonata (2005–2010, NF)",
+        "engines": [
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Style"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Bayon",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Bayon (2021–)",
+        "trims": [
+          "Jump",
+          "Style",
+          "Elite"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2021,
+        "versions": [
+          {
+            "name": "1.4 MPI 100",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1368,
+            "horsePower": 100,
+            "torqueNm": 134,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.4 MPI 100 AT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1368,
+            "horsePower": 100,
+            "torqueNm": 134,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 T-GDI 100 iMT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 998,
+            "horsePower": 100,
+            "torqueNm": 172,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 T-GDI 100 DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 998,
+            "horsePower": 100,
+            "torqueNm": 172,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.2 MPI 79",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1197,
+            "horsePower": 79,
+            "torqueNm": 118,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Kona",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Kona (2023–, SX2)",
+        "engines": [
+          {
+            "name": "1.0 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Elite",
+          "N Line"
+        ]
+      },
+      {
+        "name": "Kona (2017–2023, OS)",
+        "engines": [
+          {
+            "name": "1.0 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Smart",
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Tucson",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Tucson (2020–, NX4)",
+        "trims": [
+          "Comfort",
+          "Prime",
+          "Elite",
+          "Elite Plus"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "1.6 T-GDI 150",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 150,
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 T-GDI 180 MHEV DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 180,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "source": "verified",
+            "torqueNm": 265
+          },
+          {
+            "name": "1.6 CRDi 136 MHEV DCT",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 136,
+            "torqueNm": 320,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "source": "verified"
+          },
+          {
+            "name": "1.6 T-GDI Hybrid 230",
+            "fuelType": "HYBRID",
+            "engineCapacity": 1598,
+            "horsePower": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Tucson (2015–2020, TL)",
+        "trims": [
+          "Style",
+          "Elite",
+          "Elite Plus"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2015,
+        "endYear": 2020,
+        "versions": [
+          {
+            "name": "1.6 GDI 132",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1591,
+            "horsePower": 132,
+            "torqueNm": 161,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 T-GDI 177 DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1591,
+            "horsePower": 177,
+            "torqueNm": 265,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 CRDi 136",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 136,
+            "torqueNm": 320,
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Tucson (2004–2009, JM)",
+        "engines": [
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "ix35",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "ix35 (2009–2015, LM)",
+        "engines": [
+          {
+            "name": "1.6 GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Style Plus",
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Santa Fe",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Santa Fe (2023–, MX5)",
+        "engines": [
+          {
+            "name": "1.6 T-GDI Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Elite"
+        ]
+      },
+      {
+        "name": "Santa Fe (2018–2023, TM)",
+        "engines": [
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 T-GDI Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Elite"
+        ]
+      },
+      {
+        "name": "Santa Fe (2012–2018, DM)",
+        "engines": [
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Elite"
+        ]
+      },
+      {
+        "name": "Santa Fe (2006–2012, CM)",
+        "engines": [
+          {
+            "name": "2.2 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Executive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Ioniq Hybrid",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Ioniq Hybrid (2016–2022, AE)",
+        "engines": [
+          {
+            "name": "1.6 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Ioniq Electric",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Ioniq Electric (2016–2022, AE)",
+        "engines": [
+          {
+            "name": "Ioniq 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Ioniq 5",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Ioniq 5 (2021–, NE)",
+        "engines": [
+          {
+            "name": "Ioniq 5 125 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Ioniq 5 225 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Progressive",
+          "Advanced"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Ioniq 6",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Ioniq 6 (2022–, CE)",
+        "engines": [
+          {
+            "name": "Ioniq 6 111 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Ioniq 6 239 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Progressive",
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Kona Electric",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Kona Electric (2023–, SX2)",
+        "engines": [
+          {
+            "name": "Kona EV 115 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Kona EV 160 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Elite"
+        ]
+      },
+      {
+        "name": "Kona Electric (2018–2023, OS)",
+        "engines": [
+          {
+            "name": "Kona EV 100 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Kona EV 150 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "i20 N",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "i20 N",
+        "engines": [
+          {
+            "name": "1.6 T-GDI N",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "N"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "i30 N",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "i30 N",
+        "engines": [
+          {
+            "name": "2.0 T-GDI N",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "N"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "CAR",
+    "name": "Kona N",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Kona N",
+        "engines": [
+          {
+            "name": "2.0 T-GDI N",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "N"
+        ]
+      }
+    ]
+  }
+]

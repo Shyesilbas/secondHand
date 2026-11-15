@@ -1,0 +1,74 @@
+[
+  {
+    "brand": "HUAWEI",
+    "type": "ROUTER",
+    "name": "WiFi AX3 Pro",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei WiFi AX3 Pro",
+      "WiFi AX3 Pro",
+      "AX3 Pro"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "ROUTER",
+    "name": "WiFi AX3",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei WiFi AX3",
+      "WiFi AX3",
+      "AX3"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "ROUTER",
+    "name": "WiFi BE3",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei WiFi BE3",
+      "WiFi BE3",
+      "BE3"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "ROUTER",
+    "name": "5G CPE Pro 2",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei 5G CPE Pro 2",
+      "5G CPE Pro 2",
+      "CPE Pro 2"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "ROUTER",
+    "name": "Mobile WiFi E5785",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Mobile WiFi E5785",
+      "E5785",
+      "Mobile WiFi E5785"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "ROUTER",
+    "name": "Mobile WiFi E5577",
+    "releaseYear": 2015,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Mobile WiFi E5577",
+      "E5577",
+      "Mobile WiFi E5577"
+    ]
+  }
+]

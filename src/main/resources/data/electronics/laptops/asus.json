@@ -1,0 +1,449 @@
+[
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Zephyrus G16 (2026)",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Zephyrus G16 (2026)",
+      "ROG Zephyrus G16 (2026)",
+      "ROG Zephyrus G16 2026",
+      "Zephyrus G16 2026"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Strix Scar 18 (2026)",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Strix Scar 18 (2026)",
+      "ROG Strix Scar 18 (2026)",
+      "Strix Scar 18 2026",
+      "ROG Strix Scar 18 2026"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "TUF Gaming A15 (2026)",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS TUF Gaming A15 (2026)",
+      "TUF Gaming A15 (2026)",
+      "TUF A15 2026",
+      "TUF Gaming A15 2026"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Zephyrus G16",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Zephyrus G16",
+      "ROG Zephyrus G16",
+      "Zephyrus G16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Zephyrus G14",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Zephyrus G14",
+      "ROG Zephyrus G14",
+      "Zephyrus G14"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Zephyrus M16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Zephyrus M16",
+      "ROG Zephyrus M16",
+      "Zephyrus M16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Zephyrus Duo 16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Zephyrus Duo 16",
+      "ROG Zephyrus Duo 16",
+      "Zephyrus Duo 16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Zephyrus S17",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Zephyrus S17",
+      "ROG Zephyrus S17",
+      "Zephyrus S17"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Strix Scar 18",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Strix Scar 18",
+      "Strix Scar 18",
+      "ROG Strix Scar 18"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Strix Scar 16",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Strix Scar 16",
+      "Strix Scar 16",
+      "ROG Strix Scar 16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Strix G18",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Strix G18",
+      "Strix G18",
+      "ROG Strix G18"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Strix G16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Strix G16",
+      "Strix G16",
+      "ROG Strix G16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Strix G17",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Strix G17",
+      "Strix G17",
+      "ROG Strix G17"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Strix G15",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Strix G15",
+      "Strix G15",
+      "ROG Strix G15"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Flow Z13",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Flow Z13",
+      "ROG Flow Z13",
+      "Flow Z13"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Flow X13",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Flow X13",
+      "ROG Flow X13",
+      "Flow X13"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG Flow X16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Flow X16",
+      "ROG Flow X16",
+      "Flow X16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "TUF Gaming A15",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS TUF Gaming A15",
+      "TUF A15",
+      "TUF Gaming A15"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "TUF Gaming A16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS TUF Gaming A16",
+      "TUF A16",
+      "TUF Gaming A16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "TUF Gaming F15",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS TUF Gaming F15",
+      "TUF F15",
+      "TUF Gaming F15"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "TUF Gaming F17",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS TUF Gaming F17",
+      "TUF F17",
+      "TUF Gaming F17"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "TUF Dash F15",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS TUF Dash F15",
+      "TUF Dash F15",
+      "Dash F15"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Zenbook Duo",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenbook Duo",
+      "Zenbook Duo"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Zenbook Pro 14",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenbook Pro 14",
+      "Zenbook Pro 14"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Zenbook 14 OLED",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenbook 14 OLED",
+      "Zenbook 14 OLED"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Zenbook S13 OLED",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenbook S13 OLED",
+      "Zenbook S13 OLED"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Zenbook Flip 14",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Zenbook Flip 14",
+      "Zenbook Flip 14"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Vivobook Pro 15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Vivobook Pro 15",
+      "Vivobook Pro 15"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Vivobook 15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Vivobook 15",
+      "Vivobook 15"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Vivobook 16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Vivobook 16",
+      "Vivobook 16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Vivobook Go 15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Vivobook Go 15",
+      "Vivobook Go 15"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "Vivobook S14",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS Vivobook S14",
+      "Vivobook S14"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ProArt Studiobook 16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ProArt Studiobook 16",
+      "ProArt Studiobook 16"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ProArt PX13",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ProArt PX13",
+      "ProArt PX13"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG G551",
+    "releaseYear": 2014,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS ROG G551",
+      "ROG G551",
+      "G551"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "ROG GL553VD",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS ROG GL553VD",
+      "ROG GL553VD",
+      "GL553VD"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "N550JV",
+    "releaseYear": 2013,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS N550JV",
+      "N550JV",
+      "Asus N550"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "LAPTOP",
+    "name": "X550VX",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS X550VX",
+      "X550VX",
+      "Asus X550"
+    ]
+  }
+]

@@ -1,0 +1,91 @@
+[
+  {
+    "brand": "SCOTT",
+    "type": "BICYCLE",
+    "name": "Aspect",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Aspect Serisi (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Aspect 930",
+          "Aspect 940",
+          "Aspect 950",
+          "Aspect 960",
+          "Aspect 970"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SCOTT",
+    "type": "BICYCLE",
+    "name": "Scale",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Scale Hardtail (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Scale 965",
+          "Scale 970",
+          "Scale 980"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SCOTT",
+    "type": "BICYCLE",
+    "name": "Speedster",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Speedster (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Speedster 10",
+          "Speedster 20",
+          "Speedster 30",
+          "Speedster 40",
+          "Gravel 30"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SCOTT",
+    "type": "BICYCLE",
+    "name": "Sub Cross",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Sub Cross Şehir (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Sub Cross 10",
+          "Sub Cross 20",
+          "Sub Cross 30",
+          "Sub Cross 40"
+        ]
+      }
+    ]
+  }
+]

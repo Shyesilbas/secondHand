@@ -1,0 +1,57 @@
+[
+  {
+    "brand": "BENQ",
+    "type": "MONITOR",
+    "name": "ZOWIE XL2546K",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "BenQ Zowie XL2546K",
+      "XL2546K 240Hz"
+    ]
+  },
+  {
+    "brand": "BENQ",
+    "type": "MONITOR",
+    "name": "ZOWIE XL2566K",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "BenQ Zowie XL2566K",
+      "XL2566K 360Hz"
+    ]
+  },
+  {
+    "brand": "BENQ",
+    "type": "MONITOR",
+    "name": "MOBIUZ EX2710Q",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "BenQ EX2710Q",
+      "MOBIUZ 27 165Hz"
+    ]
+  },
+  {
+    "brand": "BENQ",
+    "type": "MONITOR",
+    "name": "MOBIUZ EX3210U",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "BenQ EX3210U",
+      "MOBIUZ 32 4K 144Hz"
+    ]
+  },
+  {
+    "brand": "BENQ",
+    "type": "MONITOR",
+    "name": "DesignVue PD2705U",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "BenQ PD2705U",
+      "PD2705U 4K Designer"
+    ]
+  }
+]

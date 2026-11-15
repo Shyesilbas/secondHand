@@ -1,0 +1,165 @@
+[
+  {
+    "brand": "CFMOTO",
+    "type": "MOTORCYCLE",
+    "name": "250 NK",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "250 NK (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "249cc Single (26 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 26,
+            "engineCapacity": 249
+          }
+        ],
+        "trims": [
+          "ABS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CFMOTO",
+    "type": "MOTORCYCLE",
+    "name": "250 SR",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "250 SR (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "249cc Single (27.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 28,
+            "engineCapacity": 249
+          }
+        ],
+        "trims": [
+          "Standart",
+          "Fun",
+          "S"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CFMOTO",
+    "type": "MOTORCYCLE",
+    "name": "450 SR",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "450 SR (2023–)",
+        "startYear": 2023,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "449cc Parallel-Twin (47 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 47,
+            "engineCapacity": 449
+          }
+        ],
+        "trims": [
+          "Standart",
+          "S"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CFMOTO",
+    "type": "MOTORCYCLE",
+    "name": "450 MT",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "450 MT (2024–)",
+        "startYear": 2024,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "449cc Parallel-Twin (44 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 44,
+            "engineCapacity": 449
+          }
+        ],
+        "trims": [
+          "Standart"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CFMOTO",
+    "type": "MOTORCYCLE",
+    "name": "700 CL-X",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "700 CL-X (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "693cc Parallel-Twin (70 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 70,
+            "engineCapacity": 693
+          }
+        ],
+        "trims": [
+          "Heritage",
+          "Sport",
+          "Adventure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CFMOTO",
+    "type": "MOTORCYCLE",
+    "name": "800 MT",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "800 MT (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "799cc Parallel-Twin (95 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 95,
+            "engineCapacity": 799
+          }
+        ],
+        "trims": [
+          "Sport",
+          "Touring",
+          "Explore"
+        ]
+      }
+    ]
+  }
+]

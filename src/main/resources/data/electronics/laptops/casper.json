@@ -1,0 +1,57 @@
+[
+  {
+    "brand": "CASPER",
+    "type": "LAPTOP",
+    "name": "Excalibur G870",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Casper Excalibur G870",
+      "G870"
+    ]
+  },
+  {
+    "brand": "CASPER",
+    "type": "LAPTOP",
+    "name": "Excalibur G911",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Casper Excalibur G911",
+      "G911"
+    ]
+  },
+  {
+    "brand": "CASPER",
+    "type": "LAPTOP",
+    "name": "Excalibur G770",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Casper Excalibur G770",
+      "G770"
+    ]
+  },
+  {
+    "brand": "CASPER",
+    "type": "LAPTOP",
+    "name": "Nirvana C500",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Casper Nirvana C500",
+      "C500"
+    ]
+  },
+  {
+    "brand": "CASPER",
+    "type": "LAPTOP",
+    "name": "Nirvana C650",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Casper Nirvana C650",
+      "C650"
+    ]
+  }
+]

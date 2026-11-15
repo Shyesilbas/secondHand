@@ -1,0 +1,45 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "AIR_CONDITIONER",
+    "name": "WindFree Premium Plus",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Samsung WindFree Premium Plus",
+      "WindFree Plus"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "AIR_CONDITIONER",
+    "name": "WindFree Elite",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Samsung WindFree Elite",
+      "WindFree Elite"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "AIR_CONDITIONER",
+    "name": "AR35 Inverter",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Samsung AR35",
+      "AR35"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "AIR_CONDITIONER",
+    "name": "AR5000H",
+    "isLegacy": true,
+    "releaseYear": 2020,
+    "aliases": [
+      "AR5000H"
+    ]
+  }
+]

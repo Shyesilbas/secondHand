@@ -1,0 +1,178 @@
+[
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab P12",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Tab P12",
+      "Tab P12",
+      "Lenovo P12"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab P11 Pro Gen 2",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Tab P11 Pro Gen 2",
+      "Tab P11 Pro Gen 2",
+      "P11 Pro Gen 2"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab P11",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Tab P11",
+      "Tab P11",
+      "Lenovo P11"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab P11 Plus",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Tab P11 Plus",
+      "Tab P11 Plus"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab P10",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Tab P10",
+      "Tab P10",
+      "Lenovo P10"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab M11",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Tab M11",
+      "Tab M11",
+      "Lenovo M11"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab M10 Plus Gen 3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Tab M10 Plus Gen 3",
+      "Tab M10 Plus Gen 3",
+      "M10 Plus Gen 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab M10 HD Gen 2",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Tab M10 HD Gen 2",
+      "Tab M10 HD Gen 2",
+      "M10 HD Gen 2"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab M9",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Tab M9",
+      "Tab M9",
+      "Lenovo M9"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab M8",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Tab M8",
+      "Tab M8",
+      "Lenovo M8"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Tab M7",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Tab M7",
+      "Tab M7",
+      "Lenovo M7"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Yoga Tab 13",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Yoga Tab 13",
+      "Yoga Tab 13"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Yoga Smart Tab",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Yoga Smart Tab",
+      "Yoga Smart Tab"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Legion Tab Gen 3",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Tab Gen 3",
+      "Legion Tab Gen 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "TABLET",
+    "name": "Legion Y700",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Y700",
+      "Legion Y700",
+      "Y700 Tab"
+    ]
+  }
+]

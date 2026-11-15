@@ -1,0 +1,1376 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 17 Pro Max",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 17 Pro Max",
+      "17 Pro Max",
+      "Apple 17 Pro Max"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A19 Pro",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 18,
+      "screenInches": 6.9,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68"
+    },
+    "colors": [
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Cosmic Orange",
+        "color": "ORANGE"
+      },
+      {
+        "name": "Deep Blue",
+        "color": "BLUE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      },
+      {
+        "name": "2 TB",
+        "storage": 2048,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 17 Pro",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 17 Pro",
+      "17 Pro",
+      "Apple 17 Pro"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A19 Pro",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 18,
+      "screenInches": 6.3,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68"
+    },
+    "colors": [
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Cosmic Orange",
+        "color": "ORANGE"
+      },
+      {
+        "name": "Deep Blue",
+        "color": "BLUE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 17 Air",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 17 Air",
+      "17 Air",
+      "Apple 17 Air"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A19 Pro",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 18,
+      "screenInches": 6.5,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68"
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Cloud White",
+        "color": "WHITE"
+      },
+      {
+        "name": "Light Gold",
+        "color": "GOLD"
+      },
+      {
+        "name": "Sky Blue",
+        "color": "BLUE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 17",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 17",
+      "17",
+      "Apple 17"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A19",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 18,
+      "screenInches": 6.3,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68"
+    },
+    "colors": [
+      {
+        "name": "Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "White",
+        "color": "WHITE"
+      },
+      {
+        "name": "Mist Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Sage",
+        "color": "GREEN"
+      },
+      {
+        "name": "Lavender",
+        "color": "PURPLE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 16 Pro Max",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 16 Pro Max",
+      "16 Pro Max",
+      "Apple 16 Pro Max"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A18 Pro",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.9,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Black Titanium",
+        "color": "BLACK"
+      },
+      {
+        "name": "White Titanium",
+        "color": "WHITE"
+      },
+      {
+        "name": "Natural Titanium",
+        "color": "GRAY"
+      },
+      {
+        "name": "Desert Titanium",
+        "color": "BEIGE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 16 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 16 Pro",
+      "16 Pro",
+      "Apple 16 Pro"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A18 Pro",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.3,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Black Titanium",
+        "color": "BLACK"
+      },
+      {
+        "name": "White Titanium",
+        "color": "WHITE"
+      },
+      {
+        "name": "Natural Titanium",
+        "color": "GRAY"
+      },
+      {
+        "name": "Desert Titanium",
+        "color": "BEIGE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 16 Plus",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 16 Plus",
+      "16 Plus",
+      "Apple 16 Plus"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A18",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.7,
+      "displayType": "OLED",
+      "refreshRateHz": 60,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "White",
+        "color": "WHITE"
+      },
+      {
+        "name": "Pink",
+        "color": "PINK"
+      },
+      {
+        "name": "Teal",
+        "color": "GREEN"
+      },
+      {
+        "name": "Ultramarine",
+        "color": "BLUE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 16",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 16",
+      "16",
+      "Apple 16"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A18",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.1,
+      "displayType": "OLED",
+      "refreshRateHz": 60,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "White",
+        "color": "WHITE"
+      },
+      {
+        "name": "Pink",
+        "color": "PINK"
+      },
+      {
+        "name": "Teal",
+        "color": "GREEN"
+      },
+      {
+        "name": "Ultramarine",
+        "color": "BLUE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 15 Pro Max",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 15 Pro Max",
+      "15 Pro Max",
+      "Apple 15 Pro Max"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A17 Pro",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.7,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Black Titanium",
+        "color": "BLACK"
+      },
+      {
+        "name": "White Titanium",
+        "color": "WHITE"
+      },
+      {
+        "name": "Blue Titanium",
+        "color": "BLUE"
+      },
+      {
+        "name": "Natural Titanium",
+        "color": "GRAY"
+      }
+    ],
+    "variants": [
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 15 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 15 Pro",
+      "15 Pro",
+      "Apple 15 Pro"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A17 Pro",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.1,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Black Titanium",
+        "color": "BLACK"
+      },
+      {
+        "name": "White Titanium",
+        "color": "WHITE"
+      },
+      {
+        "name": "Blue Titanium",
+        "color": "BLUE"
+      },
+      {
+        "name": "Natural Titanium",
+        "color": "GRAY"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 15 Plus",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 15 Plus",
+      "15 Plus",
+      "Apple 15 Plus"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A16 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.7,
+      "displayType": "OLED",
+      "refreshRateHz": 60,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Green",
+        "color": "GREEN"
+      },
+      {
+        "name": "Yellow",
+        "color": "YELLOW"
+      },
+      {
+        "name": "Pink",
+        "color": "PINK"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "iPhone 15",
+      "15",
+      "Apple 15"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A16 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.1,
+      "displayType": "OLED",
+      "refreshRateHz": 60,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Green",
+        "color": "GREEN"
+      },
+      {
+        "name": "Yellow",
+        "color": "YELLOW"
+      },
+      {
+        "name": "Pink",
+        "color": "PINK"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 14 Pro Max",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 14 Pro Max",
+      "14 Pro Max"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A16 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.7,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Gold",
+        "color": "GOLD"
+      },
+      {
+        "name": "Deep Purple",
+        "color": "PURPLE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 14 Pro",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 14 Pro",
+      "14 Pro"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A16 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 48,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.1,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Gold",
+        "color": "GOLD"
+      },
+      {
+        "name": "Deep Purple",
+        "color": "PURPLE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 14 Plus",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 14 Plus",
+      "14 Plus"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A15 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.7,
+      "displayType": "OLED",
+      "refreshRateHz": 60,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Midnight",
+        "color": "BLACK"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Purple",
+        "color": "PURPLE"
+      },
+      {
+        "name": "(PRODUCT)RED",
+        "color": "RED"
+      },
+      {
+        "name": "Yellow",
+        "color": "YELLOW"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 14",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 14",
+      "14"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A15 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.1,
+      "displayType": "OLED",
+      "refreshRateHz": 60,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Midnight",
+        "color": "BLACK"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Purple",
+        "color": "PURPLE"
+      },
+      {
+        "name": "(PRODUCT)RED",
+        "color": "RED"
+      },
+      {
+        "name": "Yellow",
+        "color": "YELLOW"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 13 Pro Max",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 13 Pro Max",
+      "13 Pro Max"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A15 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.7,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Gold",
+        "color": "GOLD"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Sierra Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Alpine Green",
+        "color": "GREEN"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 13 Pro",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 13 Pro",
+      "13 Pro"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A15 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.1,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Gold",
+        "color": "GOLD"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Sierra Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Alpine Green",
+        "color": "GREEN"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 13 Mini",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 13 Mini",
+      "13 Mini"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A15 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 5.4,
+      "displayType": "OLED",
+      "refreshRateHz": 60,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Midnight",
+        "color": "BLACK"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Pink",
+        "color": "PINK"
+      },
+      {
+        "name": "(PRODUCT)RED",
+        "color": "RED"
+      },
+      {
+        "name": "Green",
+        "color": "GREEN"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 13",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 13",
+      "13"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "chipset": "A15 Bionic",
+      "operatingSystem": "iOS",
+      "supports5g": true,
+      "hasNfc": true,
+      "cameraMegapixels": 12,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.1,
+      "displayType": "OLED",
+      "refreshRateHz": 60,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "dualSim": true
+    },
+    "colors": [
+      {
+        "name": "Midnight",
+        "color": "BLACK"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      },
+      {
+        "name": "Blue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Pink",
+        "color": "PINK"
+      },
+      {
+        "name": "(PRODUCT)RED",
+        "color": "RED"
+      },
+      {
+        "name": "Green",
+        "color": "GREEN"
+      }
+    ],
+    "variants": [
+      {
+        "name": "128 GB",
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "256 GB",
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 12 Pro Max",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 12 Pro Max",
+      "12 Pro Max"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 12 Pro",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 12 Pro",
+      "12 Pro"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 12",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 12",
+      "12"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "MOBILE_PHONE",
+    "name": "iPhone 11",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "iPhone 11",
+      "11"
+    ]
+  }
+]

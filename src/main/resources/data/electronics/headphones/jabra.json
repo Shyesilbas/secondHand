@@ -1,0 +1,44 @@
+[
+  {
+    "brand": "JABRA",
+    "type": "HEADPHONES",
+    "name": "Elite 10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Jabra Elite 10",
+      "Elite 10 Dolby Atmos"
+    ]
+  },
+  {
+    "brand": "JABRA",
+    "type": "HEADPHONES",
+    "name": "Elite 8 Active",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Jabra Elite 8 Active",
+      "Elite 8"
+    ]
+  },
+  {
+    "brand": "JABRA",
+    "type": "HEADPHONES",
+    "name": "Elite 85t",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Jabra Elite 85t ANC"
+    ]
+  },
+  {
+    "brand": "JABRA",
+    "type": "HEADPHONES",
+    "name": "Evolve2 65",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Jabra Evolve2 65 Wireless"
+    ]
+  }
+]

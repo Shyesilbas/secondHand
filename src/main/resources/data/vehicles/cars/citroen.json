@@ -1,0 +1,870 @@
+[
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C1",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "C1 (2014–2022, B4)",
+        "engines": [
+          {
+            "name": "1.0 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Feel",
+          "Shine"
+        ]
+      },
+      {
+        "name": "C1 (2005–2014, B0)",
+        "engines": [
+          {
+            "name": "1.0",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C2",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "C2 (2003–2009)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 VTR",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "SX",
+          "VTR",
+          "VTS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C3",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "C3 (2024–, CC21)",
+        "engines": [
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "You",
+          "Max"
+        ]
+      },
+      {
+        "name": "C3 (2016–2024, B618)",
+        "engines": [
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Live",
+          "Feel",
+          "Feel Bold",
+          "Shine"
+        ]
+      },
+      {
+        "name": "C3 (2009–2016, SC)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Attraction",
+          "Confort",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "C3 (2002–2009, FC/FN)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "X",
+          "SX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C3 Picasso",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "C3 Picasso (2008–2017)",
+        "engines": [
+          {
+            "name": "1.4 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Confort",
+          "Exclusive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C3 Aircross",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "C3 Aircross (2024–)",
+        "engines": [
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 PureTech Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "You",
+          "Max"
+        ]
+      },
+      {
+        "name": "C3 Aircross (2017–2024, A88)",
+        "engines": [
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Feel",
+          "Feel Bold",
+          "Shine",
+          "Shine Bold"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C4",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "C4 (2020–, C41)",
+        "trims": [
+          "Feel",
+          "Feel Bold",
+          "Shine",
+          "Shine Bold"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "1.2 PureTech 100",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 100,
+            "torqueNm": 205,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 PureTech 130 EAT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 PureTech 155 EAT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 155,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 BlueHDi 130 EAT8",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 130,
+            "torqueNm": 300,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "C4 Hatchback (2010–2018, B7)",
+        "engines": [
+          {
+            "name": "1.4 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Attraction",
+          "Confort",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "C4 Hatchback (2004–2010, B5)",
+        "engines": [
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SX",
+          "SX Pack",
+          "VTR",
+          "VTS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C4 Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "C4 Sedan (2006–2013)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SX",
+          "SX Pack"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C4 Cactus",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "C4 Cactus (2014–2020, E3)",
+        "engines": [
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Feel",
+          "Shine"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C4 Picasso",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "C4 Picasso (2013–2022, B78)",
+        "engines": [
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Intensive",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "C4 Picasso (2006–2013, B58)",
+        "engines": [
+          {
+            "name": "1.6 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Confort",
+          "Exclusive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "Grand C4 Picasso",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Grand C4 Picasso / SpaceTourer (2013–2022, B78)",
+        "engines": [
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Intensive",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "Grand C4 Picasso (2006–2013, B58)",
+        "engines": [
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Confort",
+          "Exclusive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C-Elysee",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "C-Elysee (2012–2020)",
+        "engines": [
+          {
+            "name": "1.2 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 VTi",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Attraction",
+          "Confort",
+          "Feel",
+          "Shine"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C5 Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "C5 Sedan (2008–2017, X7)",
+        "engines": [
+          {
+            "name": "1.6 THP",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SX",
+          "SX PK",
+          "Confort",
+          "Executive"
+        ]
+      },
+      {
+        "name": "C5 Sedan (2001–2008, X4)",
+        "engines": [
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C5 Tourer",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "C5 Tourer (2008–2017, X7)",
+        "engines": [
+          {
+            "name": "1.6 e-HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Confort",
+          "Executive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C5 Aircross",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "C5 Aircross (2018–, C84)",
+        "engines": [
+          {
+            "name": "1.6 PureTech",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 BlueHDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.2 PureTech Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Feel",
+          "Feel Bold",
+          "Shine",
+          "Shine Bold"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "C6",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "C6 (2005–2012)",
+        "engines": [
+          {
+            "name": "2.7 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Exclusive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "Xsara",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Xsara (1997–2006)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 D",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SX",
+          "Exclusive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "Xsara Picasso",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Xsara Picasso (1999–2010)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "Saxo",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Saxo (1996–2003)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 VTS",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 D",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SX",
+          "VTS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "SpaceTourer",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "SpaceTourer (2016–)",
+        "engines": [
+          {
+            "name": "2.0 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Feel",
+          "Business"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "e-C3",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "e-C3 (2024–)",
+        "engines": [
+          {
+            "name": "e-C3 83 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "You",
+          "Max"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "e-C4",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "e-C4 (2020–)",
+        "engines": [
+          {
+            "name": "e-C4 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Shine Bold"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "type": "CAR",
+    "name": "Ami",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Ami (2020–)",
+        "engines": [
+          {
+            "name": "Ami 6 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Ami",
+          "Pop",
+          "Tonic"
+        ]
+      }
+    ]
+  }
+]

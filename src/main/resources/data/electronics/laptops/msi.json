@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "MSI",
+    "type": "LAPTOP",
+    "name": "Raider GE78 HX",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Raider GE78",
+      "GE78 HX"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "LAPTOP",
+    "name": "Stealth 16 AI Studio",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Stealth 16",
+      "Stealth 16"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "LAPTOP",
+    "name": "Titan 18 HX",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Titan 18 HX",
+      "Titan 18"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "LAPTOP",
+    "name": "Katana 17 B13V",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Katana 17",
+      "Katana 17"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "LAPTOP",
+    "name": "Cyborg 15 A12V",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Cyborg 15",
+      "Cyborg 15"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "LAPTOP",
+    "name": "Thin GF63",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "MSI GF63 Thin",
+      "Thin GF63"
+    ]
+  }
+]

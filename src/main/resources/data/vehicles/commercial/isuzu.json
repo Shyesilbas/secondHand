@@ -1,0 +1,65 @@
+[
+  {
+    "brand": "ISUZU",
+    "type": "COMMERCIAL",
+    "name": "D-Max",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "D-Max (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.9 Ddi 163 HP",
+            "fuelType": "DIESEL",
+            "horsePower": 163,
+            "engineCapacity": 1898
+          }
+        ],
+        "trims": [
+          "V-Cross",
+          "V-Life",
+          "V-Go",
+          "Double Cab"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "ISUZU",
+    "type": "COMMERCIAL",
+    "name": "NPR",
+    "supportedBodyTypes": [
+      "LIGHT_TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "NPR Kamyonet (2015–)",
+        "startYear": 2015,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "3.0 D 150 HP",
+            "fuelType": "DIESEL",
+            "horsePower": 150,
+            "engineCapacity": 2999
+          },
+          {
+            "name": "5.2 D 190 HP",
+            "fuelType": "DIESEL",
+            "horsePower": 190,
+            "engineCapacity": 5193
+          }
+        ],
+        "trims": [
+          "NPR 10 Long",
+          "NPR 3D",
+          "NPR 8"
+        ]
+      }
+    ]
+  }
+]

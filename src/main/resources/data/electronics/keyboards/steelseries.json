@@ -1,0 +1,43 @@
+[
+  {
+    "brand": "STEELSERIES",
+    "type": "KEYBOARD",
+    "name": "Apex Pro TKL (2023)",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Apex Pro TKL",
+      "Apex Pro TKL"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "KEYBOARD",
+    "name": "Apex Pro",
+    "releaseYear": 2019,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Apex Pro"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "KEYBOARD",
+    "name": "Apex 7 TKL",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "SteelSeries Apex 7 TKL"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "KEYBOARD",
+    "name": "Apex 3 TKL",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Apex 3 TKL"
+    ]
+  }
+]

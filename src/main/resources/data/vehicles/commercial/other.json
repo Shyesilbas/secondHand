@@ -1,0 +1,16 @@
+[
+  {
+    "brand": "OTHER",
+    "type": "COMMERCIAL",
+    "name": "Other Unlisted Model",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI",
+      "MINIBUS",
+      "PICKUP",
+      "LIGHT_TRUCK",
+      "OTHER"
+    ],
+    "generations": []
+  }
+]

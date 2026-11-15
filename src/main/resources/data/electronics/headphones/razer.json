@@ -1,0 +1,34 @@
+[
+  {
+    "brand": "RAZER",
+    "type": "HEADPHONES",
+    "name": "BlackShark V2 Pro (2023)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Razer BlackShark V2 Pro",
+      "BlackShark V2"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "HEADPHONES",
+    "name": "Kraken V3 Pro",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Kraken V3 Pro",
+      "Kraken V3"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "HEADPHONES",
+    "name": "Barracuda Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Barracuda Pro ANC"
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "BEKO",
+    "type": "TV",
+    "name": "B55 OLED A 970 B 4K Smart TV",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Beko 55 OLED",
+      "B55 OLED"
+    ]
+  },
+  {
+    "brand": "BEKO",
+    "type": "TV",
+    "name": "B50 A 860 B 4K UHD Smart TV",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Beko 50 4K",
+      "B50 A 860"
+    ]
+  }
+]

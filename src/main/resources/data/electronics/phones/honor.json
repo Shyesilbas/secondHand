@@ -1,0 +1,79 @@
+[
+  {
+    "brand": "HONOR",
+    "type": "MOBILE_PHONE",
+    "name": "Magic 6 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Honor Magic 6 Pro",
+      "Magic 6P"
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "type": "MOBILE_PHONE",
+    "name": "Magic V2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Honor Magic V2 Fold",
+      "Magic V2"
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "type": "MOBILE_PHONE",
+    "name": "Honor 200 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Honor 200 Pro 5G",
+      "200 Pro"
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "type": "MOBILE_PHONE",
+    "name": "Honor 200",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Honor 200 5G",
+      "Honor 200"
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "type": "MOBILE_PHONE",
+    "name": "Honor 90",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Honor 90 5G",
+      "Honor 90 200MP"
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "type": "MOBILE_PHONE",
+    "name": "Honor X9b",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Honor X9b 5G",
+      "X9b"
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "type": "MOBILE_PHONE",
+    "name": "Magic 5 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Honor Magic 5 Pro",
+      "Magic 5P"
+    ]
+  }
+]

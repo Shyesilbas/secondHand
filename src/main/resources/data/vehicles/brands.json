@@ -1,0 +1,822 @@
+[
+  {
+    "brand": "AUDI",
+    "displayName": "Audi",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/audi.json"
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "displayName": "BMW",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/bmw.json"
+      },
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/bmw.json"
+      }
+    ]
+  },
+  {
+    "brand": "CITROEN",
+    "displayName": "Citroën",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/citroen.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/citroen.json"
+      }
+    ]
+  },
+  {
+    "brand": "DACIA",
+    "displayName": "Dacia",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/dacia.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/dacia.json"
+      }
+    ]
+  },
+  {
+    "brand": "FIAT",
+    "displayName": "Fiat",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/fiat.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/fiat.json"
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "displayName": "Ford",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/ford.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/ford.json"
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "displayName": "Honda",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/honda.json"
+      },
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/honda.json"
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "displayName": "Hyundai",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/hyundai.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/hyundai.json"
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "displayName": "Kia",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/kia.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/kia.json"
+      }
+    ]
+  },
+  {
+    "brand": "MAZDA",
+    "displayName": "Mazda",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/mazda.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/mazda.json"
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "displayName": "Mercedes-Benz",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/mercedes-benz.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/mercedes.json"
+      },
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/mercedes.json"
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "displayName": "Nissan",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/nissan.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/nissan.json"
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "displayName": "Opel",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/opel.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/opel.json"
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "displayName": "Peugeot",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/peugeot.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/peugeot.json"
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "displayName": "Renault",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/renault.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/renault.json"
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "displayName": "Seat",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/seat.json"
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "displayName": "Skoda",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/skoda.json"
+      }
+    ]
+  },
+  {
+    "brand": "TOYOTA",
+    "displayName": "Toyota",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/toyota.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/toyota.json"
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "displayName": "Volkswagen",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/volkswagen.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/volkswagen.json"
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "displayName": "Volvo",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/volvo.json"
+      },
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/volvo.json"
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "displayName": "Yamaha",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/yamaha.json"
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "displayName": "Kawasaki",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/kawasaki.json"
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "displayName": "KTM",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/ktm.json"
+      }
+    ]
+  },
+  {
+    "brand": "DUCATI",
+    "displayName": "Ducati",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/ducati.json"
+      }
+    ]
+  },
+  {
+    "brand": "TRIUMPH",
+    "displayName": "Triumph",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/triumph.json"
+      }
+    ]
+  },
+  {
+    "brand": "PORSCHE",
+    "displayName": "Porsche",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/porsche.json"
+      }
+    ]
+  },
+  {
+    "brand": "LEXUS",
+    "displayName": "Lexus",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/lexus.json"
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "displayName": "Suzuki",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/suzuki.json"
+      },
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/suzuki.json"
+      }
+    ]
+  },
+  {
+    "brand": "ALFA_ROMEO",
+    "displayName": "Alfa Romeo",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/alfa_romeo.json"
+      }
+    ]
+  },
+  {
+    "brand": "MITSUBISHI",
+    "displayName": "Mitsubishi",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/mitsubishi.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/mitsubishi.json"
+      }
+    ]
+  },
+  {
+    "brand": "SUBARU",
+    "displayName": "Subaru",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/subaru.json"
+      }
+    ]
+  },
+  {
+    "brand": "JEEP",
+    "displayName": "Jeep",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/jeep.json"
+      }
+    ]
+  },
+  {
+    "brand": "LAND_ROVER",
+    "displayName": "Land Rover",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/land_rover.json"
+      }
+    ]
+  },
+  {
+    "brand": "CHEVROLET",
+    "displayName": "Chevrolet",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/chevrolet.json"
+      }
+    ]
+  },
+  {
+    "brand": "BYD",
+    "displayName": "BYD",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/byd.json"
+      }
+    ]
+  },
+  {
+    "brand": "CHERY",
+    "displayName": "Chery",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/chery.json"
+      }
+    ]
+  },
+  {
+    "brand": "CUPRA",
+    "displayName": "Cupra",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/cupra.json"
+      }
+    ]
+  },
+  {
+    "brand": "DS",
+    "displayName": "DS Automobiles",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/ds.json"
+      }
+    ]
+  },
+  {
+    "brand": "JAGUAR",
+    "displayName": "Jaguar",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/jaguar.json"
+      }
+    ]
+  },
+  {
+    "brand": "MASERATI",
+    "displayName": "Maserati",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/maserati.json"
+      }
+    ]
+  },
+  {
+    "brand": "MG",
+    "displayName": "MG",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/mg.json"
+      }
+    ]
+  },
+  {
+    "brand": "MINI",
+    "displayName": "Mini",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/mini.json"
+      }
+    ]
+  },
+  {
+    "brand": "SSANGYONG",
+    "displayName": "SsangYong / KGM",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/ssangyong.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/ssangyong.json"
+      }
+    ]
+  },
+  {
+    "brand": "TESLA",
+    "displayName": "Tesla",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/tesla.json"
+      }
+    ]
+  },
+  {
+    "brand": "TOGG",
+    "displayName": "TOGG",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/togg.json"
+      }
+    ]
+  },
+  {
+    "brand": "ISUZU",
+    "displayName": "Isuzu",
+    "supportedTypes": [
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/isuzu.json"
+      },
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/isuzu.json"
+      }
+    ]
+  },
+  {
+    "brand": "IVECO",
+    "displayName": "Iveco",
+    "supportedTypes": [
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/iveco.json"
+      },
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/iveco.json"
+      }
+    ]
+  },
+  {
+    "brand": "APRILIA",
+    "displayName": "Aprilia",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/aprilia.json"
+      }
+    ]
+  },
+  {
+    "brand": "ARORA",
+    "displayName": "Arora",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/arora.json"
+      }
+    ]
+  },
+  {
+    "brand": "BAJAJ",
+    "displayName": "Bajaj",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/bajaj.json"
+      }
+    ]
+  },
+  {
+    "brand": "BENELLI",
+    "displayName": "Benelli",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/benelli.json"
+      }
+    ]
+  },
+  {
+    "brand": "CFMOTO",
+    "displayName": "CFMoto",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/cfmoto.json"
+      }
+    ]
+  },
+  {
+    "brand": "HARLEY_DAVIDSON",
+    "displayName": "Harley-Davidson",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/harley_davidson.json"
+      }
+    ]
+  },
+  {
+    "brand": "HUSQVARNA",
+    "displayName": "Husqvarna",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/husqvarna.json"
+      }
+    ]
+  },
+  {
+    "brand": "KUBA",
+    "displayName": "Kuba",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/kuba.json"
+      }
+    ]
+  },
+  {
+    "brand": "KYMCO",
+    "displayName": "Kymco",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/kymco.json"
+      }
+    ]
+  },
+  {
+    "brand": "MONDIAL",
+    "displayName": "Mondial",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/mondial.json"
+      }
+    ]
+  },
+  {
+    "brand": "PIAGGIO",
+    "displayName": "Piaggio",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/piaggio.json"
+      }
+    ]
+  },
+  {
+    "brand": "RKS",
+    "displayName": "RKS",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/rks.json"
+      }
+    ]
+  },
+  {
+    "brand": "ROYAL_ENFIELD",
+    "displayName": "Royal Enfield",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/royal_enfield.json"
+      }
+    ]
+  },
+  {
+    "brand": "SYM",
+    "displayName": "SYM",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/sym.json"
+      }
+    ]
+  },
+  {
+    "brand": "VESPA",
+    "displayName": "Vespa",
+    "supportedTypes": [
+      {
+        "type": "MOTORCYCLE",
+        "dataFile": "motorcycles/vespa.json"
+      }
+    ]
+  },
+  {
+    "brand": "FORD_TRUCKS",
+    "displayName": "Ford Trucks",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/ford-trucks.json"
+      }
+    ]
+  },
+  {
+    "brand": "MAN",
+    "displayName": "MAN",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/man.json"
+      }
+    ]
+  },
+  {
+    "brand": "SCANIA",
+    "displayName": "Scania",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/scania.json"
+      }
+    ]
+  },
+  {
+    "brand": "DAF",
+    "displayName": "DAF",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/daf.json"
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT_TRUCKS",
+    "displayName": "Renault Trucks",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/renault-trucks.json"
+      }
+    ]
+  },
+  {
+    "brand": "BMC",
+    "displayName": "BMC",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/bmc.json"
+      }
+    ]
+  },
+  {
+    "brand": "OTOKAR",
+    "displayName": "Otokar",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/otokar.json"
+      }
+    ]
+  },
+  {
+    "brand": "TEMSA",
+    "displayName": "Temsa",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/temsa.json"
+      }
+    ]
+  },
+  {
+    "brand": "KARSAN",
+    "displayName": "Karsan",
+    "supportedTypes": [
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/karsan.json"
+      }
+    ]
+  },
+  {
+    "brand": "OTHER",
+    "displayName": "Other",
+    "supportedTypes": [
+      {
+        "type": "CAR",
+        "dataFile": "cars/other.json"
+      },
+      {
+        "type": "COMMERCIAL",
+        "dataFile": "commercial/other.json"
+      },
+      {
+        "type": "TRUCK",
+        "dataFile": "trucks/other.json"
+      }
+    ]
+  }
+]

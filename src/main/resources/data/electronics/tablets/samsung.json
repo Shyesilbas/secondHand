@@ -1,0 +1,662 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S10 Ultra",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S10 Ultra",
+      "S10 Ultra"
+    ],
+    "specs": {
+      "chipset": "Dimensity 9300+",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 11200,
+      "screenInches": 14.6,
+      "processor": "MEDIATEK",
+      "refreshRateHz": 120,
+      "displayType": "Dynamic AMOLED 2X"
+    },
+    "colors": [
+      {
+        "name": "Moonstone Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Platinum Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S10+",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S10+",
+      "S10+"
+    ],
+    "specs": {
+      "chipset": "Dimensity 9300+",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 10090,
+      "screenInches": 12.4,
+      "processor": "MEDIATEK",
+      "refreshRateHz": 120,
+      "displayType": "Dynamic AMOLED 2X"
+    },
+    "colors": [
+      {
+        "name": "Moonstone Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Platinum Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S9 Ultra",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S9 Ultra",
+      "S9 Ultra"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 2 for Galaxy",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 11200,
+      "screenInches": 14.6,
+      "processor": "QUALCOMM",
+      "refreshRateHz": 120,
+      "displayType": "Dynamic AMOLED 2X"
+    },
+    "colors": [
+      {
+        "name": "Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Beige",
+        "color": "BEIGE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S9+",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S9+",
+      "S9+"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 2 for Galaxy",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 10090,
+      "screenInches": 12.4,
+      "processor": "QUALCOMM",
+      "refreshRateHz": 120,
+      "displayType": "Dynamic AMOLED 2X"
+    },
+    "colors": [
+      {
+        "name": "Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Beige",
+        "color": "BEIGE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S9",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S9",
+      "S9"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 2 for Galaxy",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 8400,
+      "screenInches": 11.0,
+      "processor": "QUALCOMM",
+      "refreshRateHz": 120,
+      "displayType": "Dynamic AMOLED 2X"
+    },
+    "colors": [
+      {
+        "name": "Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Beige",
+        "color": "BEIGE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S9 FE+",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S9 FE+",
+      "S9 FE+"
+    ],
+    "specs": {
+      "chipset": "Exynos 1380",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 10090,
+      "screenInches": 12.4,
+      "refreshRateHz": 90,
+      "displayType": "LCD"
+    },
+    "colors": [
+      {
+        "name": "Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Mint",
+        "color": "GREEN"
+      },
+      {
+        "name": "Lavender",
+        "color": "PURPLE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S9 FE",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S9 FE",
+      "S9 FE"
+    ],
+    "specs": {
+      "chipset": "Exynos 1380",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 8000,
+      "screenInches": 10.9,
+      "refreshRateHz": 90,
+      "displayType": "LCD"
+    },
+    "colors": [
+      {
+        "name": "Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Mint",
+        "color": "GREEN"
+      },
+      {
+        "name": "Lavender",
+        "color": "PURPLE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "6 GB / 128 GB",
+        "ram": 6,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S8 Ultra",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S8 Ultra",
+      "S8 Ultra"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 1",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 11200,
+      "screenInches": 14.6,
+      "processor": "QUALCOMM",
+      "refreshRateHz": 120,
+      "displayType": "Super AMOLED"
+    },
+    "colors": [
+      {
+        "name": "Graphite",
+        "color": "GRAY"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "16 GB / 512 GB",
+        "ram": 16,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S8+",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S8+",
+      "S8+"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 1",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 10090,
+      "screenInches": 12.4,
+      "processor": "QUALCOMM",
+      "refreshRateHz": 120,
+      "displayType": "Super AMOLED"
+    },
+    "colors": [
+      {
+        "name": "Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Pink Gold",
+        "color": "PINK"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S8",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S8",
+      "S8"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 1",
+      "operatingSystem": "Android",
+      "batteryCapacityMah": 8000,
+      "screenInches": 11.0,
+      "processor": "QUALCOMM",
+      "refreshRateHz": 120,
+      "displayType": "LCD"
+    },
+    "colors": [
+      {
+        "name": "Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Pink Gold",
+        "color": "PINK"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S7+",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Tab S7+",
+      "S7+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S7",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Tab S7",
+      "S7"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S7 FE",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Tab S7 FE",
+      "S7 FE"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S6",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Tab S6",
+      "S6"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S6 Lite",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Tab S6 Lite",
+      "S6 Lite"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab S5e",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Tab S5e",
+      "S5e"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab A9+",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Tab A9+",
+      "A9+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab A9",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Tab A9",
+      "A9"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab A8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Tab A8",
+      "A8"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab A7",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Tab A7",
+      "A7"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab A7 Lite",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Tab A7 Lite",
+      "A7 Lite"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab A 10.1",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Tab A 10.1"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab A 8.0",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Tab A 8.0"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab Active5",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Tab Active 5",
+      "Active 5"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab Active4 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Tab Active 4 Pro",
+      "Active 4 Pro"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TABLET",
+    "name": "Galaxy Tab Active3",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Tab Active 3",
+      "Active 3"
+    ]
+  }
+]

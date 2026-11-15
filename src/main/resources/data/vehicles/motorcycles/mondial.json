@@ -1,0 +1,80 @@
+[
+  {
+    "brand": "MONDIAL",
+    "type": "MOTORCYCLE",
+    "name": "Drift 125 L",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Drift 125 L (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "124cc Tek Silindir (10.7 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 11,
+            "engineCapacity": 124
+          }
+        ],
+        "trims": [
+          "CBS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MONDIAL",
+    "type": "MOTORCYCLE",
+    "name": "Turismo 50",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Turismo 50 (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "49.6cc Tek Silindir (3.2 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 3,
+            "engineCapacity": 50
+          }
+        ],
+        "trims": [
+          "Standart"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MONDIAL",
+    "type": "MOTORCYCLE",
+    "name": "100 SFC",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "100 SFC Snappy (2015–)",
+        "startYear": 2015,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "97cc Cup (6.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 7,
+            "engineCapacity": 97
+          }
+        ],
+        "trims": [
+          "Snappy X"
+        ]
+      }
+    ]
+  }
+]

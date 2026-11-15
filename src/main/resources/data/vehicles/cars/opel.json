@@ -1,0 +1,1123 @@
+[
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Corsa",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Corsa (2019–, Corsa F)",
+        "trims": [
+          "Edition",
+          "Elegance",
+          "GS Line",
+          "Ultimate"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "1.2 75",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 75,
+            "torqueNm": 118,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.2 Turbo 100 AT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 100,
+            "torqueNm": 205,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.2 Turbo 130 AT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 Dizel 102",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 102,
+            "torqueNm": 250,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 Hybrid 145",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 145,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Corsa (2014–2019, Corsa E)",
+        "trims": [
+          "Essentia",
+          "Enjoy",
+          "Color Edition",
+          "Sport"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2014,
+        "endYear": 2019,
+        "versions": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 90",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1398,
+            "horsePower": 90,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 Turbo",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 CDTI 95 Easytronic",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1248,
+            "horsePower": 95,
+            "torqueNm": 190,
+            "gearbox": "SEMI_AUTOMATIC",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Corsa (2006–2014, Corsa D)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Essentia",
+          "Enjoy",
+          "Cosmo",
+          "Sport"
+        ]
+      },
+      {
+        "name": "Corsa (2000–2006, Corsa C)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.7 CDTI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.3 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Enjoy",
+          "Essentia",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Astra Hatchback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Astra Hatchback (2021–, Astra L)",
+        "trims": [
+          "Edition",
+          "Elegance",
+          "GS"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2021,
+        "versions": [
+          {
+            "name": "1.2 Turbo 130 AT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 BlueHDi 130 AT8",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 130,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "verified",
+            "torqueNm": 300
+          }
+        ]
+      },
+      {
+        "name": "Astra Hatchback (2015–2021, Astra K)",
+        "trims": [
+          "Edition",
+          "Enjoy",
+          "Dynamic",
+          "Excellence",
+          "Elite"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2015,
+        "endYear": 2021,
+        "versions": [
+          {
+            "name": "1.2 Turbo",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 Turbo 150",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1399,
+            "horsePower": 150,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 CDTI 136 AT",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 136,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Astra Hatchback (2009–2015, Astra J)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 CDTI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Edition",
+          "Enjoy",
+          "Sport",
+          "Cosmo"
+        ]
+      },
+      {
+        "name": "Astra Hatchback (2004–2010, Astra H)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Essentia",
+          "Enjoy",
+          "Cosmo"
+        ]
+      },
+      {
+        "name": "Astra Hatchback (1998–2004, Astra G)",
+        "engines": [
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GL",
+          "CD",
+          "Comfort",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Astra Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Astra Sedan (2012–2018, Astra J)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 CDTI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Edition",
+          "Enjoy",
+          "Sport",
+          "Cosmo",
+          "Design"
+        ]
+      },
+      {
+        "name": "Astra Sedan (2007–2012, Astra H)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Essentia",
+          "Enjoy",
+          "Cosmo"
+        ]
+      },
+      {
+        "name": "Astra Sedan (1998–2004, Astra G)",
+        "engines": [
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GL",
+          "CD",
+          "Comfort",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Astra Sports Tourer",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Astra Sports Tourer (2021–, Astra L)",
+        "engines": [
+          {
+            "name": "1.2 Turbo",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GS"
+        ]
+      },
+      {
+        "name": "Astra Sports Tourer (2015–2021, Astra K)",
+        "engines": [
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Excellence"
+        ]
+      },
+      {
+        "name": "Astra Sports Tourer (2010–2015, Astra J)",
+        "engines": [
+          {
+            "name": "1.4 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Sport",
+          "Cosmo"
+        ]
+      },
+      {
+        "name": "Astra Sports Tourer (2004–2010, Astra H)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Cosmo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Vectra",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Vectra (2002–2008, Vectra C)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elegant",
+          "Cosmo"
+        ]
+      },
+      {
+        "name": "Vectra (1995–2002, Vectra B)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GL",
+          "CD",
+          "CDX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Insignia Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Insignia Sedan (2008–2017, Insignia A)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Edition",
+          "Edition Elegance",
+          "Cosmo",
+          "Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Insignia Grand Sport",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Insignia Grand Sport (2017–2022, Insignia B)",
+        "engines": [
+          {
+            "name": "1.5 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Excellence",
+          "Elite",
+          "GS Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Insignia Sports Tourer",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Insignia Sports Tourer (2017–2022, Insignia B)",
+        "engines": [
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Excellence"
+        ]
+      },
+      {
+        "name": "Insignia Sports Tourer (2009–2017, Insignia A)",
+        "engines": [
+          {
+            "name": "2.0 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Cosmo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Meriva",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Meriva (2010–2017, Meriva B)",
+        "engines": [
+          {
+            "name": "1.4 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Cosmo"
+        ]
+      },
+      {
+        "name": "Meriva (2003–2010, Meriva A)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Zafira",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Zafira Tourer (2011–2019, Zafira C)",
+        "engines": [
+          {
+            "name": "1.4 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Cosmo"
+        ]
+      },
+      {
+        "name": "Zafira (2005–2014, Zafira B)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Cosmo"
+        ]
+      },
+      {
+        "name": "Zafira (1999–2005, Zafira A)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Mokka",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Mokka (2020–, Mokka B)",
+        "trims": [
+          "Elegance",
+          "GS",
+          "GS Line",
+          "Ultimate"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "1.2 Turbo 130 AT8",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1199,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Mokka (2012–2019, Mokka A)",
+        "engines": [
+          {
+            "name": "1.4 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Cosmo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Crossland",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Crossland (2020–2024)",
+        "engines": [
+          {
+            "name": "1.2 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Essential",
+          "Edition",
+          "Elegance",
+          "Ultimate"
+        ]
+      },
+      {
+        "name": "Crossland X (2017–2020)",
+        "engines": [
+          {
+            "name": "1.2 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Excellence"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Grandland",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Grandland (2021–)",
+        "engines": [
+          {
+            "name": "1.2 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Edition",
+          "Elegance",
+          "Ultimate"
+        ]
+      },
+      {
+        "name": "Grandland X (2017–2021)",
+        "engines": [
+          {
+            "name": "1.2 Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CDTI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 D",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Enjoy",
+          "Excellence",
+          "Ultimate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Antara",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Antara (2006–2015)",
+        "engines": [
+          {
+            "name": "2.0 CDTI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Cosmo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Frontera",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Frontera (1998–2004, Frontera B)",
+        "engines": [
+          {
+            "name": "2.2 DTI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.2 V6",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Limited"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Combo Life",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Combo Life (2018–, Combo E)",
+        "engines": [
+          {
+            "name": "1.5 D",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Edition",
+          "Elegance",
+          "Ultimate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Corsa Electric",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Corsa Electric (2019–)",
+        "engines": [
+          {
+            "name": "Corsa EV 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "GS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Mokka Electric",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Mokka Electric (2020–)",
+        "engines": [
+          {
+            "name": "Mokka EV 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Ultimate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Astra Electric",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Astra Electric (2023–)",
+        "engines": [
+          {
+            "name": "Astra EV 115 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Ultimate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Combo Electric",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Combo Electric (2021–)",
+        "engines": [
+          {
+            "name": "Combo EV 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Ultimate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Corsa OPC",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Corsa OPC",
+        "engines": [
+          {
+            "name": "1.6 Turbo OPC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "OPC"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Astra OPC",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Astra OPC",
+        "engines": [
+          {
+            "name": "2.0 Turbo OPC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "OPC"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "OPEL",
+    "type": "CAR",
+    "name": "Insignia OPC",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Insignia OPC",
+        "engines": [
+          {
+            "name": "2.8 V6 Turbo OPC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "OPC"
+        ]
+      }
+    ]
+  }
+]

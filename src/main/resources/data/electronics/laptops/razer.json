@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "RAZER",
+    "type": "LAPTOP",
+    "name": "Blade 16 (2024)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Blade 16",
+      "Blade 16 OLED"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "LAPTOP",
+    "name": "Blade 14 (2024)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Blade 14",
+      "Blade 14 AMD"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "LAPTOP",
+    "name": "Blade 18 (2024)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Blade 18",
+      "Blade 18 4K"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "LAPTOP",
+    "name": "Blade 15 (2023)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Blade 15",
+      "Blade 15 QHD"
+    ]
+  }
+]

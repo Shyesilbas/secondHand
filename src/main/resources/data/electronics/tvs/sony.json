@@ -1,0 +1,272 @@
+[
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "BRAVIA 8 II",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "Sony BRAVIA 8 II",
+      "BRAVIA 8 II",
+      "Bravia 8 II"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "BRAVIA 8",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Sony BRAVIA 8",
+      "BRAVIA 8",
+      "Bravia 8"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "A95L",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony A95L",
+      "A95L",
+      "BRAVIA A95L"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "Google TV",
+      "displayType": "QD-OLED",
+      "refreshRateHz": 120
+    },
+    "variants": [
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "A90J",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony A90J",
+      "A90J",
+      "BRAVIA A90J"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "A80L",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony A80L",
+      "A80L",
+      "BRAVIA A80L"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "Google TV",
+      "displayType": "OLED",
+      "refreshRateHz": 120
+    },
+    "variants": [
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "83\"",
+        "specs": {
+          "screenSize": 83
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "A80J",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony A80J",
+      "A80J",
+      "BRAVIA A80J"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "BRAVIA 9",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Sony BRAVIA 9",
+      "BRAVIA 9",
+      "Bravia 9"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "BRAVIA 7",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Sony BRAVIA 7",
+      "BRAVIA 7",
+      "Bravia 7"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "X95L",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony X95L",
+      "X95L",
+      "BRAVIA X95L"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "X95K",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony X95K",
+      "X95K",
+      "BRAVIA X95K"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "X90L",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony X90L",
+      "X90L",
+      "BRAVIA X90L"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "X90K",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony X90K",
+      "X90K",
+      "BRAVIA X90K"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "X85L",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony X85L",
+      "X85L",
+      "BRAVIA X85L"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "X85K",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony X85K",
+      "X85K",
+      "BRAVIA X85K"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "X80L",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony X80L",
+      "X80L",
+      "BRAVIA X80L"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "X75WL",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony X75WL",
+      "X75WL",
+      "BRAVIA X75WL"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "TV",
+    "name": "BRAVIA XR Master Series Z9K",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony BRAVIA XR Master Series Z9K",
+      "BRAVIA XR Master Series Z9K",
+      "Z9K",
+      "BRAVIA Z9K"
+    ]
+  }
+]

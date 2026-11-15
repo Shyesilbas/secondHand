@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "HONOR",
+    "type": "SMARTWATCH",
+    "name": "Watch 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Honor Watch 4",
+      "Watch 4 eSIM"
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "type": "SMARTWATCH",
+    "name": "Watch GS 3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Honor Watch GS 3",
+      "GS 3 Classic"
+    ]
+  },
+  {
+    "brand": "HONOR",
+    "type": "SMARTWATCH",
+    "name": "Choice Watch",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Honor Choice Watch",
+      "Choice Watch AMOLED"
+    ]
+  }
+]

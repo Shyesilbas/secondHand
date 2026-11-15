@@ -1,0 +1,131 @@
+[
+  {
+    "brand": "ROYAL_ENFIELD",
+    "type": "MOTORCYCLE",
+    "name": "Hunter 350",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Hunter 350 (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "349cc J-Series (20.2 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 20,
+            "engineCapacity": 349
+          }
+        ],
+        "trims": [
+          "Retro",
+          "Metro"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "ROYAL_ENFIELD",
+    "type": "MOTORCYCLE",
+    "name": "Classic 350",
+    "supportedBodyTypes": [
+      "CRUISER"
+    ],
+    "generations": [
+      {
+        "name": "Classic 350 Reborn (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "349cc J-Series (20.2 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 20,
+            "engineCapacity": 349
+          }
+        ],
+        "trims": [
+          "Halcyon",
+          "Signals",
+          "Dark",
+          "Chrome"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "ROYAL_ENFIELD",
+    "type": "MOTORCYCLE",
+    "name": "Himalayan",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "Himalayan 450 (2023–)",
+        "startYear": 2023,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "452cc Sherpa Liquid-Cooled (40 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 40,
+            "engineCapacity": 452
+          }
+        ],
+        "trims": [
+          "Base",
+          "Pass",
+          "Summit"
+        ]
+      },
+      {
+        "name": "Himalayan 411 (2016–2023)",
+        "startYear": 2016,
+        "endYear": 2023,
+        "engines": [
+          {
+            "name": "411cc LS410 (24.3 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 24,
+            "engineCapacity": 411
+          }
+        ],
+        "trims": [
+          "Standart"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "ROYAL_ENFIELD",
+    "type": "MOTORCYCLE",
+    "name": "Interceptor 650",
+    "supportedBodyTypes": [
+      "CRUISER",
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Interceptor 650 (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "648cc Parallel-Twin (47 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 47,
+            "engineCapacity": 648
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Custom",
+          "Special"
+        ]
+      }
+    ]
+  }
+]

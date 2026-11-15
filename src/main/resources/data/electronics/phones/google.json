@@ -1,0 +1,410 @@
+[
+  {
+    "brand": "GOOGLE",
+    "type": "MOBILE_PHONE",
+    "name": "Pixel 8 Pro",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Google Pixel 8 Pro",
+      "Pixel 8P"
+    ],
+    "specs": {
+      "chipset": "Google Tensor G3",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5050,
+      "cameraMegapixels": 50,
+      "screenInches": 6.7,
+      "displayType": "LTPO OLED",
+      "refreshRateHz": 120,
+      "ipRating": "IP68",
+      "wirelessCharging": true
+    },
+    "variants": [
+      {
+        "name": "12 GB / 128 GB",
+        "ram": 12,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 1 TB",
+        "ram": 12,
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Obsidian",
+        "color": "BLACK"
+      },
+      {
+        "name": "Porcelain",
+        "color": "BEIGE"
+      },
+      {
+        "name": "Bay",
+        "color": "BLUE"
+      },
+      {
+        "name": "Mint",
+        "color": "GREEN"
+      }
+    ]
+  },
+  {
+    "brand": "GOOGLE",
+    "type": "MOBILE_PHONE",
+    "name": "Pixel 8",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Google Pixel 8",
+      "Pixel 8"
+    ],
+    "specs": {
+      "chipset": "Google Tensor G3",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4575,
+      "cameraMegapixels": 50,
+      "screenInches": 6.2,
+      "displayType": "OLED",
+      "refreshRateHz": 120,
+      "ipRating": "IP68",
+      "wirelessCharging": true
+    },
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Obsidian",
+        "color": "BLACK"
+      },
+      {
+        "name": "Hazel",
+        "color": "GREEN"
+      },
+      {
+        "name": "Rose",
+        "color": "PINK"
+      },
+      {
+        "name": "Mint",
+        "color": "GREEN"
+      }
+    ]
+  },
+  {
+    "brand": "GOOGLE",
+    "type": "MOBILE_PHONE",
+    "name": "Pixel 7 Pro",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Google Pixel 7 Pro",
+      "Pixel 7P"
+    ],
+    "specs": {
+      "chipset": "Google Tensor G2",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 50,
+      "screenInches": 6.7,
+      "displayType": "LTPO OLED",
+      "refreshRateHz": 120,
+      "ipRating": "IP68",
+      "wirelessCharging": true
+    },
+    "variants": [
+      {
+        "name": "12 GB / 128 GB",
+        "ram": 12,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Obsidian",
+        "color": "BLACK"
+      },
+      {
+        "name": "Snow",
+        "color": "WHITE"
+      },
+      {
+        "name": "Hazel",
+        "color": "GREEN"
+      }
+    ]
+  },
+  {
+    "brand": "GOOGLE",
+    "type": "MOBILE_PHONE",
+    "name": "Pixel 7",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Google Pixel 7",
+      "Pixel 7"
+    ],
+    "specs": {
+      "chipset": "Google Tensor G2",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4355,
+      "cameraMegapixels": 50,
+      "screenInches": 6.3,
+      "displayType": "OLED",
+      "refreshRateHz": 90,
+      "ipRating": "IP68",
+      "wirelessCharging": true
+    },
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Obsidian",
+        "color": "BLACK"
+      },
+      {
+        "name": "Snow",
+        "color": "WHITE"
+      },
+      {
+        "name": "Lemongrass",
+        "color": "GREEN"
+      }
+    ]
+  },
+  {
+    "brand": "GOOGLE",
+    "type": "MOBILE_PHONE",
+    "name": "Pixel 7a",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Google Pixel 7a",
+      "Pixel 7a"
+    ],
+    "specs": {
+      "chipset": "Google Tensor G2",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4385,
+      "cameraMegapixels": 64,
+      "screenInches": 6.1,
+      "displayType": "OLED",
+      "refreshRateHz": 90,
+      "frontCameraMegapixels": 13,
+      "ipRating": "IP67",
+      "wirelessCharging": true
+    },
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Charcoal",
+        "color": "BLACK"
+      },
+      {
+        "name": "Snow",
+        "color": "WHITE"
+      },
+      {
+        "name": "Sea",
+        "color": "BLUE"
+      },
+      {
+        "name": "Coral",
+        "color": "ORANGE"
+      }
+    ]
+  },
+  {
+    "brand": "GOOGLE",
+    "type": "MOBILE_PHONE",
+    "name": "Pixel 6 Pro",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Pixel 6 Pro"
+    ],
+    "specs": {
+      "chipset": "Google Tensor",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5003,
+      "cameraMegapixels": 50,
+      "screenInches": 6.7,
+      "displayType": "LTPO OLED",
+      "refreshRateHz": 120,
+      "ipRating": "IP68",
+      "wirelessCharging": true
+    },
+    "variants": [
+      {
+        "name": "12 GB / 128 GB",
+        "ram": 12,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Stormy Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Cloudy White",
+        "color": "WHITE"
+      },
+      {
+        "name": "Sorta Sunny",
+        "color": "YELLOW"
+      }
+    ]
+  },
+  {
+    "brand": "GOOGLE",
+    "type": "MOBILE_PHONE",
+    "name": "Pixel 6",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Pixel 6"
+    ],
+    "specs": {
+      "chipset": "Google Tensor",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4614,
+      "cameraMegapixels": 50,
+      "screenInches": 6.4,
+      "displayType": "OLED",
+      "refreshRateHz": 90,
+      "frontCameraMegapixels": 8,
+      "ipRating": "IP68",
+      "wirelessCharging": true
+    },
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Stormy Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Sorta Seafoam",
+        "color": "GREEN"
+      },
+      {
+        "name": "Kinda Coral",
+        "color": "ORANGE"
+      }
+    ]
+  }
+]

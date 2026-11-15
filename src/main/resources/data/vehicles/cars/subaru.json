@@ -1,0 +1,87 @@
+[
+  {
+    "brand": "SUBARU",
+    "type": "CAR",
+    "name": "Forester",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Forester (2018–, SK)",
+        "engines": [
+          { "name": "2.0i e-BOXER 150", "fuelType": "HYBRID" },
+          { "name": "2.0i 156", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Trend", "Premium", "Sport", "X-Break"]
+      }
+    ]
+  },
+  {
+    "brand": "SUBARU",
+    "type": "CAR",
+    "name": "Outback",
+    "supportedBodyTypes": ["WAGON"],
+    "generations": [
+      {
+        "name": "Outback (2020–, BT)",
+        "engines": [
+          { "name": "2.5i e-BOXER 169", "fuelType": "HYBRID" },
+          { "name": "2.4 Turbo 260", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Lineartronic", "Premium", "Field"]
+      }
+    ]
+  },
+  {
+    "brand": "SUBARU",
+    "type": "CAR",
+    "name": "XV / Crosstrek",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Crosstrek (2023–, GU)",
+        "engines": [
+          { "name": "2.0i e-BOXER 150", "fuelType": "HYBRID" }
+        ],
+        "trims": ["Trend", "Premium", "Sport"]
+      },
+      {
+        "name": "XV (2017–2023, GT)",
+        "engines": [
+          { "name": "2.0i e-BOXER 150", "fuelType": "HYBRID" },
+          { "name": "2.0i 156", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Trend", "Premium", "Sport"]
+      }
+    ]
+  },
+  {
+    "brand": "SUBARU",
+    "type": "CAR",
+    "name": "Impreza",
+    "supportedBodyTypes": ["SEDAN", "HATCHBACK"],
+    "generations": [
+      {
+        "name": "Impreza (2017–, GK/GT)",
+        "engines": [
+          { "name": "2.0i FB20 156", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Lineartronic", "Sport", "Premium"]
+      }
+    ]
+  },
+  {
+    "brand": "SUBARU",
+    "type": "CAR",
+    "name": "BRZ",
+    "supportedBodyTypes": ["COUPE"],
+    "generations": [
+      {
+        "name": "BRZ (2021–, ZD8)",
+        "engines": [
+          { "name": "2.4 FA24 234", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "Sport"]
+      }
+    ]
+  }
+]

@@ -1,0 +1,202 @@
+{
+  "listingType": "CLOTHING",
+  "definitions": [
+    {
+      "key": "defects",
+      "label": "Kusurlar",
+      "dataType": "MULTI_ENUM",
+      "level": "LISTING",
+      "filterable": false,
+      "options": [
+        {
+          "value": "STAIN",
+          "label": "Leke"
+        },
+        {
+          "value": "TEAR",
+          "label": "Yırtık / sökük"
+        },
+        {
+          "value": "PILLING",
+          "label": "Tüylenme"
+        },
+        {
+          "value": "FADING",
+          "label": "Solma"
+        },
+        {
+          "value": "MISSING_BUTTON",
+          "label": "Eksik düğme"
+        },
+        {
+          "value": "BROKEN_ZIPPER",
+          "label": "Bozuk fermuar"
+        },
+        {
+          "value": "WORN_SOLE",
+          "label": "Aşınmış taban"
+        },
+        {
+          "value": "SCRATCH",
+          "label": "Çizik"
+        }
+      ]
+    },
+    {
+      "scope": "APPAREL",
+      "key": "season",
+      "label": "Sezon",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "SUMMER",
+          "label": "Yaz"
+        },
+        {
+          "value": "WINTER",
+          "label": "Kış"
+        },
+        {
+          "value": "SPRING_AUTUMN",
+          "label": "İlkbahar / sonbahar"
+        },
+        {
+          "value": "ALL_SEASON",
+          "label": "Dört mevsim"
+        }
+      ]
+    },
+    {
+      "scope": "FOOTWEAR",
+      "key": "season",
+      "label": "Sezon",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "SUMMER",
+          "label": "Yaz"
+        },
+        {
+          "value": "WINTER",
+          "label": "Kış"
+        },
+        {
+          "value": "SPRING_AUTUMN",
+          "label": "İlkbahar / sonbahar"
+        },
+        {
+          "value": "ALL_SEASON",
+          "label": "Dört mevsim"
+        }
+      ]
+    },
+    {
+      "scope": "APPAREL",
+      "key": "chestCm",
+      "label": "Göğüs genişliği",
+      "unit": "cm",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 5,
+      "max": 250,
+      "filterable": false
+    },
+    {
+      "scope": "APPAREL",
+      "key": "waistCm",
+      "label": "Bel genişliği",
+      "unit": "cm",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 5,
+      "max": 250,
+      "filterable": false
+    },
+    {
+      "scope": "APPAREL",
+      "key": "lengthCm",
+      "label": "Boy",
+      "unit": "cm",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 5,
+      "max": 250,
+      "filterable": false
+    },
+    {
+      "scope": "APPAREL",
+      "key": "inseamCm",
+      "label": "İç bacak boyu",
+      "unit": "cm",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 5,
+      "max": 250,
+      "filterable": false
+    },
+    {
+      "scope": "FOOTWEAR",
+      "key": "authenticity",
+      "label": "Orijinallik belgeleri",
+      "dataType": "MULTI_ENUM",
+      "level": "LISTING",
+      "filterable": false,
+      "options": [
+        {
+          "value": "INVOICE",
+          "label": "Fatura"
+        },
+        {
+          "value": "BOX",
+          "label": "Orijinal kutu"
+        },
+        {
+          "value": "DUST_BAG",
+          "label": "Toz torbası"
+        },
+        {
+          "value": "TAGS",
+          "label": "Orijinal etiket"
+        },
+        {
+          "value": "CERTIFICATE",
+          "label": "Orijinallik kartı"
+        }
+      ]
+    },
+    {
+      "scope": "ACCESSORY",
+      "key": "authenticity",
+      "label": "Orijinallik belgeleri",
+      "dataType": "MULTI_ENUM",
+      "level": "LISTING",
+      "filterable": false,
+      "options": [
+        {
+          "value": "INVOICE",
+          "label": "Fatura"
+        },
+        {
+          "value": "BOX",
+          "label": "Orijinal kutu"
+        },
+        {
+          "value": "DUST_BAG",
+          "label": "Toz torbası"
+        },
+        {
+          "value": "TAGS",
+          "label": "Orijinal etiket"
+        },
+        {
+          "value": "CERTIFICATE",
+          "label": "Orijinallik kartı"
+        }
+      ]
+    }
+  ]
+}

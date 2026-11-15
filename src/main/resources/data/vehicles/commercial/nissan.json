@@ -1,0 +1,88 @@
+[
+  {
+    "brand": "NISSAN",
+    "type": "COMMERCIAL",
+    "name": "Navara",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "Navara (2015–2021, D23)",
+        "engines": [
+          {
+            "name": "2.3 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.3 dCi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Visia",
+          "Tekna",
+          "Platinum"
+        ]
+      },
+      {
+        "name": "Navara (2005–2015, D40)",
+        "engines": [
+          {
+            "name": "2.5 dCi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "SE",
+          "LE"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "COMMERCIAL",
+    "name": "Pickup",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "Pickup (1997–2005, D22)",
+        "engines": [
+          {
+            "name": "2.5 Di 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "NISSAN",
+    "type": "COMMERCIAL",
+    "name": "NV200",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "NV200 (2009–2021)",
+        "engines": [
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Combi"
+        ]
+      }
+    ]
+  }
+]

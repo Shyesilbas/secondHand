@@ -1,0 +1,108 @@
+[
+  {
+    "brand": "PORSCHE",
+    "type": "CAR",
+    "name": "911",
+    "supportedBodyTypes": ["COUPE", "CONVERTIBLE"],
+    "generations": [
+      {
+        "name": "911 (2019–, 992)",
+        "engines": [
+          { "name": "Carrera (385 PS)", "fuelType": "GASOLINE" },
+          { "name": "Carrera S (450 PS)", "fuelType": "GASOLINE" },
+          { "name": "Carrera 4 (385 PS)", "fuelType": "GASOLINE" },
+          { "name": "Carrera 4S (450 PS)", "fuelType": "GASOLINE" },
+          { "name": "Turbo (580 PS)", "fuelType": "GASOLINE" },
+          { "name": "Turbo S (650 PS)", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "Cabriolet", "Targa 4", "Targa 4S"]
+      },
+      {
+        "name": "911 (2011–2019, 991)",
+        "engines": [
+          { "name": "Carrera 3.0 (370 PS)", "fuelType": "GASOLINE" },
+          { "name": "Carrera S 3.0 (420 PS)", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "Cabriolet"]
+      }
+    ]
+  },
+  {
+    "brand": "PORSCHE",
+    "type": "CAR",
+    "name": "Cayenne",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Cayenne (2018–, 9YA)",
+        "engines": [
+          { "name": "3.0 V6 (340 PS)", "fuelType": "GASOLINE" },
+          { "name": "3.0 V6 e-Hybrid (462 PS)", "fuelType": "HYBRID" },
+          { "name": "4.0 V8 Turbo (550 PS)", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "S", "GTS", "Turbo", "Turbo S E-Hybrid", "Coupe"]
+      }
+    ]
+  },
+  {
+    "brand": "PORSCHE",
+    "type": "CAR",
+    "name": "Macan",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Macan Electric (2024–)",
+        "engines": [
+          { "name": "265kW Rear-Motor Electric", "fuelType": "ELECTRIC" },
+          { "name": "470kW Dual-Motor Electric", "fuelType": "ELECTRIC" }
+        ],
+        "trims": ["Standard", "4S", "Turbo"]
+      },
+      {
+        "name": "Macan (2014–2024, 95B)",
+        "engines": [
+          { "name": "2.0 TFSI (245 PS)", "fuelType": "GASOLINE" },
+          { "name": "3.0 V6 S (380 PS)", "fuelType": "GASOLINE" },
+          { "name": "2.0 TDI (211 PS)", "fuelType": "DIESEL" }
+        ],
+        "trims": ["Standard", "S", "GTS", "Turbo"]
+      }
+    ]
+  },
+  {
+    "brand": "PORSCHE",
+    "type": "CAR",
+    "name": "Panamera",
+    "supportedBodyTypes": ["SEDAN"],
+    "generations": [
+      {
+        "name": "Panamera (2016–, 971)",
+        "engines": [
+          { "name": "2.9 V6 (330 PS)", "fuelType": "GASOLINE" },
+          { "name": "2.9 V6 4S (440 PS)", "fuelType": "GASOLINE" },
+          { "name": "4.0 V8 Turbo (550 PS)", "fuelType": "GASOLINE" },
+          { "name": "4.0 V8 Turbo S E-Hybrid (700 PS)", "fuelType": "HYBRID" }
+        ],
+        "trims": ["Standard", "4 E-Hybrid", "4S", "Turbo", "Turbo S E-Hybrid"]
+      }
+    ]
+  },
+  {
+    "brand": "PORSCHE",
+    "type": "CAR",
+    "name": "Taycan",
+    "supportedBodyTypes": ["SEDAN"],
+    "generations": [
+      {
+        "name": "Taycan (2019–)",
+        "engines": [
+          { "name": "Taycan (320 kW)", "fuelType": "ELECTRIC" },
+          { "name": "Taycan 4S (390 kW)", "fuelType": "ELECTRIC" },
+          { "name": "Turbo (460 kW)", "fuelType": "ELECTRIC" },
+          { "name": "Turbo S (560 kW)", "fuelType": "ELECTRIC" }
+        ],
+        "trims": ["Standard", "Sport Turismo", "Cross Turismo"]
+      }
+    ]
+  }
+]

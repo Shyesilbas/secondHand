@@ -1,0 +1,49 @@
+[
+  {
+    "brand": "BOSE",
+    "type": "SPEAKER",
+    "name": "SoundLink Revolve+ II",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Bose Revolve+ 2",
+      "SoundLink Revolve Plus 2"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 17
+    }
+  },
+  {
+    "brand": "BOSE",
+    "type": "SPEAKER",
+    "name": "SoundLink Flex",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Bose SoundLink Flex",
+      "Flex Bluetooth"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 12
+    }
+  },
+  {
+    "brand": "BOSE",
+    "type": "SPEAKER",
+    "name": "SoundLink Mini II Special Edition",
+    "releaseYear": 2019,
+    "isLegacy": false,
+    "aliases": [
+      "Bose SoundLink Mini 2 SE",
+      "Mini II SE"
+    ]
+  }
+]

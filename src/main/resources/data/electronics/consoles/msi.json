@@ -1,0 +1,23 @@
+[
+  {
+    "brand": "MSI",
+    "type": "GAME_CONSOLE",
+    "name": "Claw A1M",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Claw",
+      "Claw 7M"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "GAME_CONSOLE",
+    "name": "Claw 8 AI+",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "MSI Claw 8"
+    ]
+  }
+]

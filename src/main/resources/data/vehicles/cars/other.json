@@ -1,0 +1,72 @@
+[
+  {
+    "brand": "OTHER",
+    "type": "CAR",
+    "name": "Classic Car",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "COUPE",
+      "CONVERTIBLE",
+      "WAGON"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTHER",
+    "type": "CAR",
+    "name": "Modified Car",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "HATCHBACK",
+      "COUPE"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTHER",
+    "type": "CAR",
+    "name": "Electric Conversion",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "HATCHBACK",
+      "SUV"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTHER",
+    "type": "CAR",
+    "name": "Kit Car",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE",
+      "OTHER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTHER",
+    "type": "CAR",
+    "name": "Buggy / Dune Buggy",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "OTHER",
+    "type": "CAR",
+    "name": "Other Unlisted Model",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "HATCHBACK",
+      "SUV",
+      "COUPE",
+      "CONVERTIBLE",
+      "WAGON",
+      "MPV",
+      "OTHER"
+    ],
+    "generations": []
+  }
+]

@@ -1,0 +1,360 @@
+[
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "COMMERCIAL",
+    "name": "Crafter",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS",
+      "LIGHT_TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "Crafter (2017–, SY/SX)",
+        "engines": [
+          {
+            "name": "2.0 TDI 102",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI 140",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI 177",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Combi",
+          "Autotronic"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "COMMERCIAL",
+    "name": "Transporter",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Transporter (2019–, T6.1)",
+        "trims": [
+          "City Van",
+          "Panel Van",
+          "Pikap",
+          "Standard",
+          "Comfortline",
+          "Highline"
+        ],
+        "versions": [
+          {
+            "name": "2.0 TDI 110",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 110,
+            "torqueNm": 250,
+            "gearbox": "MANUAL",
+            "gearCount": 5
+          },
+          {
+            "name": "2.0 TDI 150",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 150,
+            "torqueNm": 340
+          }
+        ]
+      },
+      {
+        "name": "Transporter (2015–2019, T6)",
+        "engines": [
+          {
+            "name": "2.0 TDI 102",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI 150",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "City Van",
+          "Panel Van",
+          "Pikap",
+          "Standard",
+          "Comfortline"
+        ]
+      },
+      {
+        "name": "Transporter (2003–2015, T5)",
+        "engines": [
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.5 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "City Van",
+          "Panel Van"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "COMMERCIAL",
+    "name": "Caddy",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Caddy (2020–, SB)",
+        "trims": [
+          "Impression",
+          "Life",
+          "Style",
+          "Standard"
+        ],
+        "versions": [
+          {
+            "name": "1.5 TSI 114",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TDI 102",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 102
+          },
+          {
+            "name": "2.0 TDI 122 DSG",
+            "fuelType": "DIESEL",
+            "source": "verified",
+            "horsePower": 122,
+            "torqueNm": 320,
+            "gearbox": "AUTOMATIC"
+          }
+        ]
+      },
+      {
+        "name": "Caddy (2015–2020, 2K Facelift)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "Caddy (2004–2015, 2K)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Life",
+          "Trendline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "COMMERCIAL",
+    "name": "Amarok",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "Amarok (2022–, NF)",
+        "engines": [
+          {
+            "name": "3.0 TDI 240",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI 4Motion",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 V6 TDI 4Motion",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Life",
+          "Style",
+          "PanAmericana",
+          "Aventura",
+          "Pan Americana"
+        ]
+      },
+      {
+        "name": "Amarok (2010–2022, 2H)",
+        "engines": [
+          {
+            "name": "2.0 TDI 140",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 V6 TDI 224",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI 4Motion",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 BiTDI 4Motion",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 V6 TDI 4Motion",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trendline",
+          "Comfortline",
+          "Highline",
+          "Canyon",
+          "Aventura"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "COMMERCIAL",
+    "name": "Caravelle",
+    "supportedBodyTypes": [
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Caravelle (2019–, T6.1)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline"
+        ]
+      },
+      {
+        "name": "Caravelle (2015–2019, T6)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline"
+        ]
+      },
+      {
+        "name": "Caravelle (2003–2015, T5)",
+        "engines": [
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.5 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfortline",
+          "Highline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLKSWAGEN",
+    "type": "COMMERCIAL",
+    "name": "Multivan",
+    "supportedBodyTypes": [
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Multivan (2021–, T7)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.4 TSI eHybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Life",
+          "Style"
+        ]
+      },
+      {
+        "name": "Multivan (2015–2021, T6)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Highline"
+        ]
+      }
+    ]
+  }
+]

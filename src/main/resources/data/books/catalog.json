@@ -1,0 +1,3630 @@
+{
+ "publishers": [
+  {
+   "key": "3D_YAYINLARI",
+   "label": "3D Yayınları"
+  },
+  {
+   "key": "ADAM_YAYINCILIK",
+   "label": "Adam Yayıncılık"
+  },
+  {
+   "key": "AD_YAYINCILIK",
+   "label": "AD Yayıncılık"
+  },
+  {
+   "key": "AKCAG_YAYINLARI",
+   "label": "Akçağ Yayınları"
+  },
+  {
+   "key": "ALFA_YAYINLARI",
+   "label": "Alfa Yayınları"
+  },
+  {
+   "key": "ALKIM_YAYINEVI",
+   "label": "Alkım Yayınevi"
+  },
+  {
+   "key": "ALTIKIRKBES_YAYINLARI",
+   "label": "Altıkırkbeş Yayınları"
+  },
+  {
+   "key": "ALTIN_KITAPLAR",
+   "label": "Altın Kitaplar"
+  },
+  {
+   "key": "APOTEMI_YAYINLARI",
+   "label": "Apotemi Yayınları"
+  },
+  {
+   "key": "BILGI_SARMAL_YAYINLARI",
+   "label": "Bilgi Sarmal Yayınları"
+  },
+  {
+   "key": "BILGI_YAYINEVI",
+   "label": "Bilgi Yayınevi"
+  },
+  {
+   "key": "CAN_YAYINLARI",
+   "label": "Can Yayınları"
+  },
+  {
+   "key": "CEM_YAYINEVI",
+   "label": "Cem Yayınevi"
+  },
+  {
+   "key": "DOGAN_KITAP",
+   "label": "Doğan Kitap"
+  },
+  {
+   "key": "DOGU_BATI_YAYINLARI",
+   "label": "Doğu Batı Yayınları"
+  },
+  {
+   "key": "DOMINGO_YAYINEVI",
+   "label": "Domingo Yayınevi"
+  },
+  {
+   "key": "EPSILON_YAYINEVI",
+   "label": "Epsilon Yayınevi"
+  },
+  {
+   "key": "EVEREST_YAYINLARI",
+   "label": "Everest Yayınları"
+  },
+  {
+   "key": "HIZ_VE_RENK_YAYINLARI",
+   "label": "Hız ve Renk Yayınları"
+  },
+  {
+   "key": "ILETISIM_YAYINLARI",
+   "label": "İletişim Yayınları"
+  },
+  {
+   "key": "INDIGO_KITAP",
+   "label": "İndigo Kitap"
+  },
+  {
+   "key": "INKILAP_KITABEVI",
+   "label": "İnkılâp Kitabevi"
+  },
+  {
+   "key": "ITHAKI_YAYINLARI",
+   "label": "İthaki Yayınları"
+  },
+  {
+   "key": "KAREKOK_YAYINLARI",
+   "label": "Karekök Yayınları"
+  },
+  {
+   "key": "KETEBE_YAYINLARI",
+   "label": "Ketebe Yayınları"
+  },
+  {
+   "key": "KIYI_YAYINLARI",
+   "label": "Kıyı Yayınları"
+  },
+  {
+   "key": "KULTUR_BAKANLIGI_YAYINLARI",
+   "label": "Kültür Bakanlığı Yayınları"
+  },
+  {
+   "key": "LIMIT_YAYINLARI",
+   "label": "Limit Yayınları"
+  },
+  {
+   "key": "MARTI_YAYINLARI",
+   "label": "Martı Yayınları"
+  },
+  {
+   "key": "MAVI_YELKEN_YAYINCILIK",
+   "label": "Mavi Yelken Yayıncılık"
+  },
+  {
+   "key": "METIS_YAYINLARI",
+   "label": "Metis Yayınları"
+  },
+  {
+   "key": "NORA_KITAP",
+   "label": "Nora Kitap"
+  },
+  {
+   "key": "ODA_YAYINLARI",
+   "label": "Oda Yayınları"
+  },
+  {
+   "key": "OGLAK_YAYINCILIK",
+   "label": "Oğlak Yayıncılık"
+  },
+  {
+   "key": "OM_YAYINEVI",
+   "label": "Om Yayınevi"
+  },
+  {
+   "key": "OTUKEN_NESRIYAT",
+   "label": "Ötüken Neşriyat"
+  },
+  {
+   "key": "OZGUR_YAYINLARI",
+   "label": "Özgür Yayınları"
+  },
+  {
+   "key": "PALME_YAYINCILIK",
+   "label": "Palme Yayıncılık"
+  },
+  {
+   "key": "PEGEM_AKADEMI",
+   "label": "Pegem Akademi"
+  },
+  {
+   "key": "REMZI_KITABEVI",
+   "label": "Remzi Kitabevi"
+  },
+  {
+   "key": "SARMAL_YAYINEVI",
+   "label": "Sarmal Yayınevi"
+  },
+  {
+   "key": "SEL_YAYINCILIK",
+   "label": "Sel Yayıncılık"
+  },
+  {
+   "key": "TURKIYE_IS_BANKASI_KULTUR_YAYINLARI",
+   "label": "Türkiye İş Bankası Kültür Yayınları"
+  },
+  {
+   "key": "VARLIK_YAYINLARI",
+   "label": "Varlık Yayınları"
+  },
+  {
+   "key": "YAPI_KREDI_YAYINLARI",
+   "label": "Yapı Kredi Yayınları"
+  },
+  {
+   "key": "YEDIIKLIM_YAYINLARI",
+   "label": "Yediiklim Yayınları"
+  },
+  {
+   "key": "YORDAM_KITAP",
+   "label": "Yordam Kitap"
+  }
+ ],
+ "authors": [
+  {
+   "key": "ADALET_AGAOGLU",
+   "label": "Adalet Ağaoğlu"
+  },
+  {
+   "key": "AHMET_UMIT",
+   "label": "Ahmet Ümit"
+  },
+  {
+   "key": "ALDOUS_HUXLEY",
+   "label": "Aldous Huxley"
+  },
+  {
+   "key": "ALEXANDRE_DUMAS",
+   "label": "Alexandre Dumas"
+  },
+  {
+   "key": "ALEX_MICHAELIDES",
+   "label": "Alex Michaelides"
+  },
+  {
+   "key": "ANTHONY_BURGESS",
+   "label": "Anthony Burgess"
+  },
+  {
+   "key": "ANTOINE_DE_SAINT_EXUPERY",
+   "label": "Antoine de Saint-Exupéry"
+  },
+  {
+   "key": "ARTHUR_CONAN_DOYLE",
+   "label": "Arthur Conan Doyle"
+  },
+  {
+   "key": "AZIZ_NESIN",
+   "label": "Aziz Nesin"
+  },
+  {
+   "key": "CENGIZ_AYTMATOV",
+   "label": "Cengiz Aytmatov"
+  },
+  {
+   "key": "DAN_BROWN",
+   "label": "Dan Brown"
+  },
+  {
+   "key": "DOUGLAS_ADAMS",
+   "label": "Douglas Adams"
+  },
+  {
+   "key": "ELIF_SAFAK",
+   "label": "Elif Şafak"
+  },
+  {
+   "key": "EMILE_ZOLA",
+   "label": "Émile Zola"
+  },
+  {
+   "key": "FRANK_HERBERT",
+   "label": "Frank Herbert"
+  },
+  {
+   "key": "FRANZ_KAFKA",
+   "label": "Franz Kafka"
+  },
+  {
+   "key": "GEORGE_R_R_MARTIN",
+   "label": "George R. R. Martin"
+  },
+  {
+   "key": "HALDUN_TANER",
+   "label": "Haldun Taner"
+  },
+  {
+   "key": "HALIDE_EDIB_ADIVAR",
+   "label": "Halide Edib Adıvar"
+  },
+  {
+   "key": "HARPER_LEE",
+   "label": "Harper Lee"
+  },
+  {
+   "key": "HERMANN_HESSE",
+   "label": "Hermann Hesse"
+  },
+  {
+   "key": "HUSEYIN_RAHMI_GURPINAR",
+   "label": "Hüseyin Rahmi Gürpınar"
+  },
+  {
+   "key": "IHSAN_OKTAY_ANAR",
+   "label": "İhsan Oktay Anar"
+  },
+  {
+   "key": "ISAAC_ASIMOV",
+   "label": "Isaac Asimov"
+  },
+  {
+   "key": "IVAN_TURGENYEV",
+   "label": "İvan Turgenyev"
+  },
+  {
+   "key": "JACK_KEROUAC",
+   "label": "Jack Kerouac"
+  },
+  {
+   "key": "JOHANN_WOLFGANG_VON_GOETHE",
+   "label": "Johann Wolfgang von Goethe"
+  },
+  {
+   "key": "JOHN_STEINBECK",
+   "label": "John Steinbeck"
+  },
+  {
+   "key": "JONATHAN_SWIFT",
+   "label": "Jonathan Swift"
+  },
+  {
+   "key": "J_D_SALINGER",
+   "label": "J. D. Salinger"
+  },
+  {
+   "key": "J_K_ROWLING",
+   "label": "J. K. Rowling"
+  },
+  {
+   "key": "J_R_R_TOLKIEN",
+   "label": "J. R. R. Tolkien"
+  },
+  {
+   "key": "KHALED_HOSSEINI",
+   "label": "Khaled Hosseini"
+  },
+  {
+   "key": "KOMISYON",
+   "label": "Komisyon"
+  },
+  {
+   "key": "MARGARET_ATWOOD",
+   "label": "Margaret Atwood"
+  },
+  {
+   "key": "MARK_TWAIN",
+   "label": "Mark Twain"
+  },
+  {
+   "key": "MATT_HAIG",
+   "label": "Matt Haig"
+  },
+  {
+   "key": "MIGUEL_DE_CERVANTES",
+   "label": "Miguel de Cervantes"
+  },
+  {
+   "key": "OGUZ_ATAY",
+   "label": "Oğuz Atay"
+  },
+  {
+   "key": "ORHAN_PAMUK",
+   "label": "Orhan Pamuk"
+  },
+  {
+   "key": "PATRICK_ROTHFUSS",
+   "label": "Patrick Rothfuss"
+  },
+  {
+   "key": "PATRICK_SUSKIND",
+   "label": "Patrick Süskind"
+  },
+  {
+   "key": "PAULO_COELHO",
+   "label": "Paulo Coelho"
+  },
+  {
+   "key": "PEYAMI_SAFA",
+   "label": "Peyami Safa"
+  },
+  {
+   "key": "PHILIP_K_DICK",
+   "label": "Philip K. Dick"
+  },
+  {
+   "key": "RAY_BRADBURY",
+   "label": "Ray Bradbury"
+  },
+  {
+   "key": "RESAT_NURI_GUNTEKIN",
+   "label": "Reşat Nuri Güntekin"
+  },
+  {
+   "key": "SABAHATTIN_ALI",
+   "label": "Sabahattin Ali"
+  },
+  {
+   "key": "SAIT_FAIK_ABASIYANIK",
+   "label": "Sait Faik Abasıyanık"
+  },
+  {
+   "key": "STEFAN_ZWEIG",
+   "label": "Stefan Zweig"
+  },
+  {
+   "key": "STENDHAL",
+   "label": "Stendhal"
+  },
+  {
+   "key": "STEPHEN_KING",
+   "label": "Stephen King"
+  },
+  {
+   "key": "TURGUT_UYAR",
+   "label": "Turgut Uyar"
+  },
+  {
+   "key": "WILLIAM_SHAKESPEARE",
+   "label": "William Shakespeare"
+  },
+  {
+   "key": "YAHYA_KEMAL_BEYATLI",
+   "label": "Yahya Kemal Beyatlı"
+  },
+  {
+   "key": "YANN_MARTEL",
+   "label": "Yann Martel"
+  },
+  {
+   "key": "ZULFU_LIVANELI",
+   "label": "Zülfü Livaneli"
+  }
+ ],
+ "works": [
+  {
+   "key": "AMAT",
+   "title": "Amat",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "IHSAN_OKTAY_ANAR"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750503726",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 2005,
+     "pages": 235,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "AMOK_KOSUCUSU",
+   "title": "Amok Koşucusu",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "STEFAN_ZWEIG"
+   ],
+   "originalLanguage": "GERMAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786052361207",
+     "publisher": "INDIGO_KITAP",
+     "year": 2017,
+     "pages": 88,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12359062-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "ANDROIDLER_ELEKTRIKLI_KOYUN_DUSLER_MI",
+   "title": "Androidler Elektrikli Koyun Düşler mi?",
+   "type": "OKUMA_KITABI",
+   "genre": "BILIMKURGU",
+   "authors": [
+    "PHILIP_K_DICK"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752790582",
+     "publisher": "ALTIKIRKBES_YAYINLARI",
+     "year": 2014,
+     "pages": 289,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/7335045-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "ASK",
+   "title": "Aşk",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ELIF_SAFAK"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786051111070",
+     "publisher": "DOGAN_KITAP",
+     "year": 2009,
+     "pages": 420,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10848933-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "BABALAR_VE_OGULLAR",
+   "title": "Babalar ve Oğullar",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "IVAN_TURGENYEV"
+   ],
+   "originalLanguage": "RUSSIAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789753386944",
+     "publisher": "AKCAG_YAYINLARI",
+     "year": 2000,
+     "pages": 248,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10852768-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "BEN_ROBOT",
+   "title": "Ben, Robot",
+   "type": "OKUMA_KITABI",
+   "genre": "BILIMKURGU",
+   "authors": [
+    "ISAAC_ASIMOV"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786053756040",
+     "publisher": "ITHAKI_YAYINLARI",
+     "year": 2016,
+     "pages": 248,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12126245-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "BENIM_ADIM_KIRMIZI",
+   "title": "Benim Adım Kırmızı",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ORHAN_PAMUK"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754707113",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 2010,
+     "pages": 470,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12630674-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "BEYAZ_KALE",
+   "title": "Beyaz Kale",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ORHAN_PAMUK"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754704549",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 1995,
+     "pages": 199,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/14104548-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "BIN_MUHTESEM_GUNES",
+   "title": "Bin Muhteşem Güneş",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "KHALED_HOSSEINI"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786051853383",
+     "publisher": "EVEREST_YAYINLARI",
+     "year": 2018,
+     "pages": 430,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10848792-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "BIR_DUGUN_GECESI",
+   "title": "Bir Düğün Gecesi",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ADALET_AGAOGLU"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789753633420",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 1994,
+     "pages": 299,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "BIR_KEDI_BIR_ADAM_BIR_OLUM",
+   "title": "Bir Kedi, Bir Adam, Bir Ölüm",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ZULFU_LIVANELI"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786050905441",
+     "publisher": "DOGAN_KITAP",
+     "year": 2016,
+     "pages": 212,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12201183-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "BULBULU_OLDURMEK",
+   "title": "Bülbülü Öldürmek",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "HARPER_LEE"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752107724",
+     "publisher": "ALTIN_KITAPLAR",
+     "year": 2011,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15153566-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": "9789753850643",
+     "publisher": "ODA_YAYINLARI",
+     "year": 2003,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12907431-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "CALIKUSU",
+   "title": "Çalıkuşu",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "RESAT_NURI_GUNTEKIN"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789751000125",
+     "publisher": "INKILAP_KITABEVI",
+     "year": 1992,
+     "pages": 408,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12958080-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789751708328",
+     "publisher": "KULTUR_BAKANLIGI_YAYINLARI",
+     "year": 1991,
+     "pages": 113,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "CAVDAR_TARLASINDA_COCUKLAR",
+   "title": "Çavdar Tarlasında Çocuklar",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "J_D_SALINGER"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789753636360",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2007,
+     "pages": 200,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10461189-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "CEMILE",
+   "title": "Cemile",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "CENGIZ_AYTMATOV"
+   ],
+   "originalLanguage": "OTHER",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752473010",
+     "publisher": "NORA_KITAP",
+     "year": 2017,
+     "pages": 80,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12276568-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "CESUR_YENI_DUNYA",
+   "title": "Cesur Yeni Dünya",
+   "type": "OKUMA_KITABI",
+   "genre": "DISTOPYA",
+   "authors": [
+    "ALDOUS_HUXLEY"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789756902165",
+     "publisher": "ITHAKI_YAYINLARI",
+     "year": 2021,
+     "pages": 272,
+     "format": "HARDCOVER",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15267107-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "DA_VINCI_SIFRESI",
+   "title": "Da Vinci Şifresi",
+   "type": "OKUMA_KITABI",
+   "genre": "POLISIYE_VE_MACERA",
+   "authors": [
+    "DAN_BROWN"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752104037",
+     "publisher": "ALTIN_KITAPLAR",
+     "year": 2004,
+     "pages": 495,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12722386-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "DAMIZLIK_KIZIN_OYKUSU",
+   "title": "Damızlık Kızın Öyküsü",
+   "type": "OKUMA_KITABI",
+   "genre": "DISTOPYA",
+   "authors": [
+    "MARGARET_ATWOOD"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786050940596",
+     "publisher": "DOGAN_KITAP",
+     "year": 2017,
+     "pages": 384,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10848888-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "DAVA",
+   "title": "Dava",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "FRANZ_KAFKA"
+   ],
+   "originalLanguage": "GERMAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789755109251",
+     "publisher": "CAN_YAYINLARI",
+     "year": 2013,
+     "pages": 244,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "DEMIAN",
+   "title": "Demian",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "HERMANN_HESSE"
+   ],
+   "originalLanguage": "GERMAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750703195",
+     "publisher": "CAN_YAYINLARI",
+     "year": 2003,
+     "pages": 211,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "DOKUZUNCU_HARICIYE_KOGUSU",
+   "title": "Dokuzuncu Hariciye Koğuşu",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "PEYAMI_SAFA"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754370485",
+     "publisher": "OTUKEN_NESRIYAT",
+     "year": 2021,
+     "pages": 112,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/11988775-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789756363829",
+     "publisher": "ALKIM_YAYINEVI",
+     "year": 2005,
+     "pages": 128,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "DON_KISOT",
+   "title": "Don Kişot",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "MIGUEL_DE_CERVANTES"
+   ],
+   "originalLanguage": "SPANISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789178977451",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2019,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/14565537-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "DONUSUM",
+   "title": "Dönüşüm",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "FRANZ_KAFKA"
+   ],
+   "originalLanguage": "GERMAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789755100210",
+     "publisher": "CAN_YAYINLARI",
+     "year": 2012,
+     "pages": 102,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15119291-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "DUNE",
+   "title": "Dune",
+   "type": "OKUMA_KITABI",
+   "genre": "BILIMKURGU",
+   "authors": [
+    "FRANK_HERBERT"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786053754794",
+     "publisher": "ITHAKI_YAYINLARI",
+     "year": 2015,
+     "pages": 712,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12227029-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "FAHRENHEIT_451",
+   "title": "Fahrenheit 451",
+   "type": "OKUMA_KITABI",
+   "genre": "DISTOPYA",
+   "authors": [
+    "RAY_BRADBURY"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786053757818",
+     "publisher": "ITHAKI_YAYINLARI",
+     "year": 2018,
+     "pages": 202,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15266212-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789756902219",
+     "publisher": "ITHAKI_YAYINLARI",
+     "year": 2007,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/8151231-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "FARELER_VE_INSANLAR",
+   "title": "Fareler ve İnsanlar",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "JOHN_STEINBECK"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789755705859",
+     "publisher": "SEL_YAYINCILIK",
+     "year": 2017,
+     "pages": 126,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12902969-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789753252256",
+     "publisher": "AD_YAYINCILIK",
+     "year": 1996,
+     "pages": 104,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "FAUST",
+   "title": "Faust",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "JOHANN_WOLFGANG_VON_GOETHE"
+   ],
+   "originalLanguage": "GERMAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789758717774",
+     "publisher": "DOGU_BATI_YAYINLARI",
+     "year": 2011,
+     "pages": 575,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12353407-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "FIKRIMIN_INCE_GULU",
+   "title": "Fikrimin İnce Gülü",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ADALET_AGAOGLU"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750800818",
+     "publisher": "OGLAK_YAYINCILIK",
+     "year": 1999,
+     "pages": 261,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789753290258",
+     "publisher": "OGLAK_YAYINCILIK",
+     "year": 1994,
+     "pages": 319,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "GAZAP_UZUMLERI",
+   "title": "Gazap Üzümleri",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "JOHN_STEINBECK"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750531170",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 2021,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12295233-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "GECE_YARISI_KUTUPHANESI",
+   "title": "Gece Yarısı Kütüphanesi",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "MATT_HAIG"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786051981833",
+     "publisher": "DOMINGO_YAYINEVI",
+     "year": 2021,
+     "pages": 296,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/13768503-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "GENC_WERTHER_IN_ACILARI",
+   "title": "Genç Werther'in Acıları",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "JOHANN_WOLFGANG_VON_GOETHE"
+   ],
+   "originalLanguage": "GERMAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750708299",
+     "publisher": "CAN_YAYINLARI",
+     "year": 2013,
+     "pages": 163,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789756684054",
+     "publisher": "MAVI_YELKEN_YAYINCILIK",
+     "year": 2000,
+     "pages": 143,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "GERMINAL",
+   "title": "Germinal",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "EMILE_ZOLA"
+   ],
+   "originalLanguage": "FRENCH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786054836628",
+     "publisher": "YORDAM_KITAP",
+     "year": 2014,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/7285251-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "GOGE_BAKMA_DURAGI",
+   "title": "Göğe Bakma Durağı",
+   "type": "OKUMA_KITABI",
+   "genre": "SIIR",
+   "authors": [
+    "TURGUT_UYAR"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750813870",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2017,
+     "pages": 112,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10840483-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "GULLIVER_IN_GEZILERI",
+   "title": "Gulliver'in Gezileri",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "JONATHAN_SWIFT"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789751707277",
+     "publisher": "KULTUR_BAKANLIGI_YAYINLARI",
+     "year": 1990,
+     "pages": 140,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "GUN_OLUR_ASRA_BEDEL",
+   "title": "Gün Olur Asra Bedel",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "CENGIZ_AYTMATOV"
+   ],
+   "originalLanguage": "OTHER",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786257303866",
+     "publisher": "KETEBE_YAYINLARI",
+     "year": 2021,
+     "pages": 444,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/11988824-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789754370539",
+     "publisher": "OTUKEN_NESRIYAT",
+     "year": 1995,
+     "pages": 413,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/11073746-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "HARRY_POTTER_VE_ATES_KADEHI",
+   "title": "Harry Potter ve Ateş Kadehi",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "J_K_ROWLING"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750803314",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2001,
+     "pages": 859,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15159921-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "HARRY_POTTER_VE_AZKABAN_TUTSAGI",
+   "title": "Harry Potter ve Azkaban Tutsağı",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "J_K_ROWLING"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750803116",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2001,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15159923-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "HARRY_POTTER_VE_FELSEFE_TASI",
+   "title": "Harry Potter ve Felsefe Taşı",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "J_K_ROWLING"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750802942",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2002,
+     "pages": 351,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15163706-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "HARRY_POTTER_VE_MELEZ_PRENS",
+   "title": "Harry Potter ve Melez Prens",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "J_K_ROWLING"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750809958",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2005,
+     "pages": 594,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15157257-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "HARRY_POTTER_VE_ZUMRUDUANKA_YOLDASLIGI",
+   "title": "Harry Potter ve Zümrüdüanka Yoldaşlığı",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "J_K_ROWLING"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750806452",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2019,
+     "pages": 975,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/14419346-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "HOBBIT",
+   "title": "Hobbit",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "J_R_R_TOLKIEN"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789756902271",
+     "publisher": "ITHAKI_YAYINLARI",
+     "year": 2000,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12283424-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "HUCKLEBERRY_FINN_IN_MACERALARI",
+   "title": "Huckleberry Finn'in Maceraları",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "MARK_TWAIN"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754940398",
+     "publisher": "BILGI_YAYINEVI",
+     "year": 2006,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15180270-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "ILK_ASK",
+   "title": "İlk Aşk",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "IVAN_TURGENYEV"
+   ],
+   "originalLanguage": "RUSSIAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754340327",
+     "publisher": "VARLIK_YAYINLARI",
+     "year": 2000,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12360128-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "ISKENDER",
+   "title": "İskender",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ELIF_SAFAK"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786050902518",
+     "publisher": "DOGAN_KITAP",
+     "year": 2011,
+     "pages": 443,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/7390653-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "ISTANBUL_HATIRASI",
+   "title": "İstanbul Hatırası",
+   "type": "OKUMA_KITABI",
+   "genre": "POLISIYE_VE_MACERA",
+   "authors": [
+    "AHMET_UMIT"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752897458",
+     "publisher": "EVEREST_YAYINLARI",
+     "year": 2010,
+     "pages": 565,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KARDESIMIN_HIKAYESI",
+   "title": "Kardeşimin Hikayesi",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ZULFU_LIVANELI"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786050914443",
+     "publisher": "DOGAN_KITAP",
+     "year": 2013,
+     "pages": 330,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10149546-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KAVIM",
+   "title": "Kavim",
+   "type": "OKUMA_KITABI",
+   "genre": "POLISIYE_VE_MACERA",
+   "authors": [
+    "AHMET_UMIT"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752934436",
+     "publisher": "DOGAN_KITAP",
+     "year": 2006,
+     "pages": 382,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KENDI_GOK_KUBBEMIZ",
+   "title": "Kendi Gök Kubbemiz",
+   "type": "OKUMA_KITABI",
+   "genre": "SIIR",
+   "authors": [
+    "YAHYA_KEMAL_BEYATLI"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789751706010",
+     "publisher": "KULTUR_BAKANLIGI_YAYINLARI",
+     "year": 1990,
+     "pages": 166,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KESANLI_ALI_DESTANI",
+   "title": "Keşanlı Ali Destanı",
+   "type": "OKUMA_KITABI",
+   "genre": "TIYATRO_VE_DRAMA",
+   "authors": [
+    "HALDUN_TANER"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750831522",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2018,
+     "pages": 160,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15264931-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KIRMIZI_VE_SIYAH",
+   "title": "Kırmızı ve Siyah",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "STENDHAL"
+   ],
+   "originalLanguage": "FRENCH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789751401472",
+     "publisher": "REMZI_KITABEVI",
+     "year": 1993,
+     "pages": 619,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KIZIL_DOSYA",
+   "title": "Kızıl Dosya",
+   "type": "OKUMA_KITABI",
+   "genre": "POLISIYE_VE_MACERA",
+   "authors": [
+    "ARTHUR_CONAN_DOYLE"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786051868936",
+     "publisher": "MARTI_YAYINLARI",
+     "year": 2019,
+     "pages": 208,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12211203-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KOKU",
+   "title": "Koku",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "PATRICK_SUSKIND"
+   ],
+   "originalLanguage": "GERMAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789755100593",
+     "publisher": "CAN_YAYINLARI",
+     "year": 2003,
+     "pages": 294,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12317600-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KUCUK_PRENS",
+   "title": "Küçük Prens",
+   "type": "COCUK_KITAPLARI",
+   "genre": "MASAL_VE_HIKAYELER",
+   "authors": [
+    "ANTOINE_DE_SAINT_EXUPERY"
+   ],
+   "originalLanguage": "FRENCH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754061369",
+     "publisher": "CEM_YAYINEVI",
+     "year": 1991,
+     "pages": 120,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789755100555",
+     "publisher": "CAN_YAYINLARI",
+     "year": 1990,
+     "pages": 112,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KURK_MANTOLU_MADONNA",
+   "title": "Kürk Mantolu Madonna",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "SABAHATTIN_ALI"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789753638029",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2022,
+     "pages": 160,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/13315465-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "KUYRUKLU_YILDIZ_ALTINDA_BIR_IZDIVAC",
+   "title": "Kuyruklu Yıldız Altında Bir İzdivaç",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "HUSEYIN_RAHMI_GURPINAR"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750527579",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 2019,
+     "pages": 313,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12272877-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "MASUMIYET_MUZESI",
+   "title": "Masumiyet Müzesi",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ORHAN_PAMUK"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750506093",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 2008,
+     "pages": 592,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/14657080-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "MISERY",
+   "title": "Misery",
+   "type": "OKUMA_KITABI",
+   "genre": "KORKU_VE_GERILIM",
+   "authors": [
+    "STEPHEN_KING"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754050134",
+     "publisher": "ALTIN_KITAPLAR",
+     "year": 2007,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "MUTLULUK",
+   "title": "Mutluluk",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ZULFU_LIVANELI"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789751409003",
+     "publisher": "REMZI_KITABEVI",
+     "year": 2007,
+     "pages": 343,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/13342762-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "O",
+   "title": "O",
+   "type": "OKUMA_KITABI",
+   "genre": "KORKU_VE_GERILIM",
+   "authors": [
+    "STEPHEN_KING"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752119277",
+     "publisher": "ALTIN_KITAPLAR",
+     "year": 2015,
+     "pages": 1216,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12275783-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789752121768",
+     "publisher": "ALTIN_KITAPLAR",
+     "year": 2000,
+     "pages": 1064,
+     "format": "HARDCOVER",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/14418083-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "OLMEYE_YATMAK",
+   "title": "Ölmeye Yatmak",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ADALET_AGAOGLU"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789753633369",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 1994,
+     "pages": 317,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "OTOMATIK_PORTAKAL",
+   "title": "Otomatik Portakal",
+   "type": "OKUMA_KITABI",
+   "genre": "DISTOPYA",
+   "authors": [
+    "ANTHONY_BURGESS"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786052957929",
+     "publisher": "TURKIYE_IS_BANKASI_KULTUR_YAYINLARI",
+     "year": 2016,
+     "pages": 176,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/11943379-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "OTOSTOPCUNUN_GALAKSI_REHBERI",
+   "title": "Otostopçunun Galaksi Rehberi",
+   "type": "OKUMA_KITABI",
+   "genre": "BILIMKURGU",
+   "authors": [
+    "DOUGLAS_ADAMS"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786051715124",
+     "publisher": "ALFA_YAYINLARI",
+     "year": 2018,
+     "pages": 229,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/13149878-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789757380719",
+     "publisher": "SARMAL_YAYINEVI",
+     "year": 1996,
+     "pages": 220,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "PATASANA",
+   "title": "Patasana",
+   "type": "OKUMA_KITABI",
+   "genre": "POLISIYE_VE_MACERA",
+   "authors": [
+    "AHMET_UMIT"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789759914585",
+     "publisher": "DOGAN_KITAP",
+     "year": 2009,
+     "pages": 402,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/11391765-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789756827369",
+     "publisher": "OM_YAYINEVI",
+     "year": 2000,
+     "pages": 477,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "PI_NIN_YASAMI",
+   "title": "Pi'nin Yaşamı",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "YANN_MARTEL"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789751020109",
+     "publisher": "INKILAP_KITABEVI",
+     "year": 2003,
+     "pages": 343,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "PUSLU_KITALAR_ATLASI",
+   "title": "Puslu Kıtalar Atlası",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "IHSAN_OKTAY_ANAR"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754704723",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 1995,
+     "pages": 238,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "ROMEO_VE_JULIET",
+   "title": "Romeo ve Juliet",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "WILLIAM_SHAKESPEARE"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786053484080",
+     "publisher": "MARTI_YAYINLARI",
+     "year": 2014,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12225000-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "RUZGARIN_ADI",
+   "title": "Rüzgarın Adı",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "PATRICK_ROTHFUSS"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786053751342",
+     "publisher": "ITHAKI_YAYINLARI",
+     "year": 2011,
+     "pages": 736,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/8774673-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "SATRANC",
+   "title": "Satranç",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "STEFAN_ZWEIG"
+   ],
+   "originalLanguage": "GERMAN",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789755103556",
+     "publisher": "CAN_YAYINLARI",
+     "year": 2008,
+     "pages": 81,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "SESSIZ_HASTA",
+   "title": "Sessiz Hasta",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ALEX_MICHAELIDES"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786051981482",
+     "publisher": "DOMINGO_YAYINEVI",
+     "year": 2021,
+     "pages": 320,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10850814-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "SIMYACI",
+   "title": "Simyacı",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "PAULO_COELHO"
+   ],
+   "originalLanguage": "OTHER",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750726439",
+     "publisher": "CAN_YAYINLARI",
+     "year": 2016,
+     "pages": 184,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15271245-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "SINEKLI_BAKKAL",
+   "title": "Sinekli Bakkal",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "HALIDE_EDIB_ADIVAR"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754471144",
+     "publisher": "OZGUR_YAYINLARI",
+     "year": 2001,
+     "pages": 458,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12957633-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "SON_KUSLAR",
+   "title": "Son Kuşlar",
+   "type": "OKUMA_KITABI",
+   "genre": "HIKAYE_VE_OYKU",
+   "authors": [
+    "SAIT_FAIK_ABASIYANIK"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754940015",
+     "publisher": "BILGI_YAYINEVI",
+     "year": 1997,
+     "pages": 228,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "SULTANI_OLDURMEK",
+   "title": "Sultanı Öldürmek",
+   "type": "OKUMA_KITABI",
+   "genre": "POLISIYE_VE_MACERA",
+   "authors": [
+    "AHMET_UMIT"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9786051410135",
+     "publisher": "EVEREST_YAYINLARI",
+     "year": 2012,
+     "pages": 517,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/13212032-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "SUSKUNLAR",
+   "title": "Suskunlar",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "IHSAN_OKTAY_ANAR"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750505386",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 2007,
+     "pages": 269,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10849002-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "TAHT_OYUNLARI",
+   "title": "Taht Oyunları",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "GEORGE_R_R_MARTIN"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789944824354",
+     "publisher": "EPSILON_YAYINEVI",
+     "year": 2013,
+     "pages": 850,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15125422-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "TEHLIKELI_OYUNLAR",
+   "title": "Tehlikeli Oyunlar",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "OGUZ_ATAY"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754702095",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 1973,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "TUTUNAMAYANLAR",
+   "title": "Tutunamayanlar",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "OGUZ_ATAY"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754700114",
+     "publisher": "ILETISIM_YAYINLARI",
+     "year": 1992,
+     "pages": 736,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/8730101-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "UC_SILAHSORLER",
+   "title": "Üç Silahşörler",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ALEXANDRE_DUMAS"
+   ],
+   "originalLanguage": "FRENCH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754942378",
+     "publisher": "BILGI_YAYINEVI",
+     "year": 2014,
+     "pages": 136,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12315187-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "UCURTMA_AVCISI",
+   "title": "Uçurtma Avcısı",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "KHALED_HOSSEINI"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752895171",
+     "publisher": "EVEREST_YAYINLARI",
+     "year": 2009,
+     "pages": 440,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/15162771-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    },
+    {
+     "isbn": "9789752891456",
+     "publisher": "EVEREST_YAYINLARI",
+     "year": 2008,
+     "pages": 375,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/14345538-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "VAKIF",
+   "title": "Vakıf",
+   "type": "OKUMA_KITABI",
+   "genre": "BILIMKURGU",
+   "authors": [
+    "ISAAC_ASIMOV"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789752731455",
+     "publisher": "ITHAKI_YAYINLARI",
+     "year": 2005,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/12277290-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "VEBA_GECELERI",
+   "title": "Veba Geceleri",
+   "type": "OKUMA_KITABI",
+   "genre": "ROMAN",
+   "authors": [
+    "ORHAN_PAMUK"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789750849282",
+     "publisher": "YAPI_KREDI_YAYINLARI",
+     "year": 2021,
+     "pages": 544,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/10848796-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "YASAR_NE_YASAR_NE_YASAMAZ",
+   "title": "Yaşar Ne Yaşar Ne Yaşamaz",
+   "type": "OKUMA_KITABI",
+   "genre": "MIZAH",
+   "authors": [
+    "AZIZ_NESIN"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754180947",
+     "publisher": "ADAM_YAYINCILIK",
+     "year": 1992,
+     "pages": 343,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "YOLDA",
+   "title": "Yolda",
+   "type": "BIYOGRAFI_ANI_GEZI",
+   "genre": "GEZI",
+   "authors": [
+    "JACK_KEROUAC"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789754440072",
+     "publisher": "KIYI_YAYINLARI",
+     "year": 1993,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "YUZUKLERIN_EFENDISI_KRALIN_DONUSU",
+   "title": "Yüzüklerin Efendisi: Kralın Dönüşü",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "J_R_R_TOLKIEN"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789753422024",
+     "publisher": "METIS_YAYINLARI",
+     "year": 1999,
+     "pages": 400,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/14627083-M.jpg",
+     "examYear": null,
+     "source": "verified"
+    }
+   ]
+  },
+  {
+   "key": "YUZUKLERIN_EFENDISI_YUZUK_KARDESLIGI",
+   "title": "Yüzüklerin Efendisi: Yüzük Kardeşliği",
+   "type": "OKUMA_KITABI",
+   "genre": "FANTASTIK",
+   "authors": [
+    "J_R_R_TOLKIEN"
+   ],
+   "originalLanguage": "ENGLISH",
+   "source": "verified",
+   "editions": [
+    {
+     "isbn": "9789753421638",
+     "publisher": "METIS_YAYINLARI",
+     "year": 1996,
+     "pages": null,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": "https://covers.openlibrary.org/b/id/13128862-M.jpg",
+     "examYear": null,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "TYT_MATEMATIK_SORU_BANKASI_3D_YAYINLARI",
+   "title": "TYT Matematik Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "TYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "3D_YAYINLARI",
+     "year": 2024,
+     "pages": 560,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "3D_YAYINLARI",
+     "year": 2025,
+     "pages": 560,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "TYT_TURKCE_SORU_BANKASI_LIMIT_YAYINLARI",
+   "title": "TYT Türkçe Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "TYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "LIMIT_YAYINLARI",
+     "year": 2024,
+     "pages": 480,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "LIMIT_YAYINLARI",
+     "year": 2025,
+     "pages": 480,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "TYT_FIZIK_SORU_BANKASI_BILGI_SARMAL_YAYINLARI",
+   "title": "TYT Fizik Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "TYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "BILGI_SARMAL_YAYINLARI",
+     "year": 2024,
+     "pages": 400,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "BILGI_SARMAL_YAYINLARI",
+     "year": 2025,
+     "pages": 400,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "AYT_MATEMATIK_SORU_BANKASI_APOTEMI_YAYINLARI",
+   "title": "AYT Matematik Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "AYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "APOTEMI_YAYINLARI",
+     "year": 2024,
+     "pages": 640,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "APOTEMI_YAYINLARI",
+     "year": 2025,
+     "pages": 640,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "AYT_KIMYA_SORU_BANKASI_PALME_YAYINCILIK",
+   "title": "AYT Kimya Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "AYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "PALME_YAYINCILIK",
+     "year": 2024,
+     "pages": 520,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "PALME_YAYINCILIK",
+     "year": 2025,
+     "pages": 520,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "AYT_BIYOLOJI_SORU_BANKASI_BILGI_SARMAL_YAYINLARI",
+   "title": "AYT Biyoloji Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "AYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "BILGI_SARMAL_YAYINLARI",
+     "year": 2024,
+     "pages": 480,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "BILGI_SARMAL_YAYINLARI",
+     "year": 2025,
+     "pages": 480,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "AYT_EDEBIYAT_SORU_BANKASI_LIMIT_YAYINLARI",
+   "title": "AYT Edebiyat Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "AYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "LIMIT_YAYINLARI",
+     "year": 2024,
+     "pages": 450,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "LIMIT_YAYINLARI",
+     "year": 2025,
+     "pages": 450,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "AYT_TARIH_SORU_BANKASI_YEDIIKLIM_YAYINLARI",
+   "title": "AYT Tarih Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "AYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "YEDIIKLIM_YAYINLARI",
+     "year": 2024,
+     "pages": 420,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "YEDIIKLIM_YAYINLARI",
+     "year": 2025,
+     "pages": 420,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "LGS_MATEMATIK_SORU_BANKASI_KAREKOK_YAYINLARI",
+   "title": "LGS Matematik Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "LGS",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "KAREKOK_YAYINLARI",
+     "year": 2024,
+     "pages": 380,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "KAREKOK_YAYINLARI",
+     "year": 2025,
+     "pages": 380,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "LGS_FEN_BILIMLERI_SORU_BANKASI_PALME_YAYINCILIK",
+   "title": "LGS Fen Bilimleri Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "LGS",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "PALME_YAYINCILIK",
+     "year": 2024,
+     "pages": 360,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "PALME_YAYINCILIK",
+     "year": 2025,
+     "pages": 360,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "LGS_TURKCE_SORU_BANKASI_LIMIT_YAYINLARI",
+   "title": "LGS Türkçe Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "LGS",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "LIMIT_YAYINLARI",
+     "year": 2024,
+     "pages": 340,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "LIMIT_YAYINLARI",
+     "year": 2025,
+     "pages": 340,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "KPSS_GENEL_YETENEK_SORU_BANKASI_YEDIIKLIM_YAYINLARI",
+   "title": "KPSS Genel Yetenek Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "KPSS_GY_GK",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "YEDIIKLIM_YAYINLARI",
+     "year": 2024,
+     "pages": 600,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "YEDIIKLIM_YAYINLARI",
+     "year": 2025,
+     "pages": 600,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "KPSS_GENEL_KULTUR_TAMAMI_COZUMLU_SORU_BANKASI_PEGEM_AKADEMI",
+   "title": "KPSS Genel Kültür Tamamı Çözümlü Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "KPSS_GY_GK",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "PEGEM_AKADEMI",
+     "year": 2024,
+     "pages": 720,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "PEGEM_AKADEMI",
+     "year": 2025,
+     "pages": 720,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "KPSS_EGITIM_BILIMLERI_SORU_BANKASI_PEGEM_AKADEMI",
+   "title": "KPSS Eğitim Bilimleri Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "KPSS_EGITIM",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "PEGEM_AKADEMI",
+     "year": 2024,
+     "pages": 680,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "PEGEM_AKADEMI",
+     "year": 2025,
+     "pages": 680,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "ALES_SAYISAL_SOZEL_SORU_BANKASI_YEDIIKLIM_YAYINLARI",
+   "title": "ALES Sayısal Sözel Soru Bankası",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "ALES",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "YEDIIKLIM_YAYINLARI",
+     "year": 2024,
+     "pages": 520,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "YEDIIKLIM_YAYINLARI",
+     "year": 2025,
+     "pages": 520,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "TYT_10_FASIKUL_DENEME_3D_YAYINLARI",
+   "title": "TYT 10 Fasikül Deneme",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "TYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "3D_YAYINLARI",
+     "year": 2024,
+     "pages": 260,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "3D_YAYINLARI",
+     "year": 2025,
+     "pages": 260,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "AYT_SAYISAL_5_DENEME_APOTEMI_YAYINLARI",
+   "title": "AYT Sayısal 5 Deneme",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "AYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "APOTEMI_YAYINLARI",
+     "year": 2024,
+     "pages": 220,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "APOTEMI_YAYINLARI",
+     "year": 2025,
+     "pages": 220,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "YKS_CIKMIS_SORULAR_TAMAMI_COZUMLU_PEGEM_AKADEMI",
+   "title": "YKS Çıkmış Sorular Tamamı Çözümlü",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "OTHER",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "PEGEM_AKADEMI",
+     "year": 2024,
+     "pages": 480,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "PEGEM_AKADEMI",
+     "year": 2025,
+     "pages": 480,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "TYT_MATEMATIK_KONU_ANLATIMLI_KAREKOK_YAYINLARI",
+   "title": "TYT Matematik Konu Anlatımlı",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "TYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "KAREKOK_YAYINLARI",
+     "year": 2024,
+     "pages": 520,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "KAREKOK_YAYINLARI",
+     "year": 2025,
+     "pages": 520,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "AYT_FIZIK_KONU_ANLATIMLI_PALME_YAYINCILIK",
+   "title": "AYT Fizik Konu Anlatımlı",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "AYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "PALME_YAYINCILIK",
+     "year": 2024,
+     "pages": 560,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "PALME_YAYINCILIK",
+     "year": 2025,
+     "pages": 560,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "KPSS_TARIH_KONU_ANLATIMI_YEDIIKLIM_YAYINLARI",
+   "title": "KPSS Tarih Konu Anlatımı",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "KPSS_GY_GK",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "YEDIIKLIM_YAYINLARI",
+     "year": 2024,
+     "pages": 640,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "YEDIIKLIM_YAYINLARI",
+     "year": 2025,
+     "pages": 640,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "TYT_TURKCE_KONU_OZETLI_HIZ_VE_RENK_YAYINLARI",
+   "title": "TYT Türkçe Konu Özetli",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "TYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "HIZ_VE_RENK_YAYINLARI",
+     "year": 2024,
+     "pages": 280,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "HIZ_VE_RENK_YAYINLARI",
+     "year": 2025,
+     "pages": 280,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "AYT_BIYOLOJI_RENKLI_NOTLAR_HIZ_VE_RENK_YAYINLARI",
+   "title": "AYT Biyoloji Renkli Notlar",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "AYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "HIZ_VE_RENK_YAYINLARI",
+     "year": 2024,
+     "pages": 240,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "HIZ_VE_RENK_YAYINLARI",
+     "year": 2025,
+     "pages": 240,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "MATEMATIK_FORMUL_KITAPCIGI_BILGI_SARMAL_YAYINLARI",
+   "title": "Matematik Formül Kitapçığı",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "OTHER",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "BILGI_SARMAL_YAYINLARI",
+     "year": 2024,
+     "pages": 120,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "BILGI_SARMAL_YAYINLARI",
+     "year": 2025,
+     "pages": 120,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  },
+  {
+   "key": "TYT_MATEMATIK_YAPRAK_TEST_KAREKOK_YAYINLARI",
+   "title": "TYT Matematik Yaprak Test",
+   "type": "SINAV_HAZIRLIK",
+   "genre": "TYT",
+   "authors": [
+    "KOMISYON"
+   ],
+   "originalLanguage": "TURKISH",
+   "source": "claude-draft",
+   "editions": [
+    {
+     "isbn": null,
+     "publisher": "KAREKOK_YAYINLARI",
+     "year": 2024,
+     "pages": 300,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2025,
+     "source": "claude-draft"
+    },
+    {
+     "isbn": null,
+     "publisher": "KAREKOK_YAYINLARI",
+     "year": 2025,
+     "pages": 300,
+     "format": "PAPERBACK",
+     "language": "TURKISH",
+     "translator": null,
+     "cover": null,
+     "examYear": 2026,
+     "source": "claude-draft"
+    }
+   ]
+  }
+ ]
+}

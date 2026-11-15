@@ -72,8 +72,8 @@ public class GreatSellerEligibilitySyncService {
             String subject = emailConfig.getGreatSellerSubject();
             var data = GenericEmailData.builder()
                     .userName(user.getName())
-                    .headerTitle("Harika Satıcı Rozeti!")
-                    .message("Tebrikler — SecondHand'de Harika Satıcı rozeti kazandınız. Güvenilir satışlarınız ve harika yorumlarınız için teşekkür ederiz.")
+                    .headerTitle("Harika Satıcı Rozeti Kazandınız")
+                    .message("Güvenilir satışlarınız ve aldığınız olumlu değerlendirmeler sayesinde Harika Satıcı rozeti hesabınıza tanımlandı. Rozet profilinizde ve ilanlarınızda görünür.")
                     .build();
             emailEventPublisher.publish(new GreatSellerAchievementEmailEvent(user, subject, data));
         } catch (Exception e) {

@@ -1,0 +1,45 @@
+[
+  {
+    "brand": "VESTEL",
+    "type": "AIR_CONDITIONER",
+    "name": "Flora Doğa Inverter",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Vestel Flora Doğa",
+      "Flora Doğa"
+    ]
+  },
+  {
+    "brand": "VESTEL",
+    "type": "AIR_CONDITIONER",
+    "name": "Vega Plus Inverter",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Vestel Vega Plus",
+      "Vega Plus"
+    ]
+  },
+  {
+    "brand": "VESTEL",
+    "type": "AIR_CONDITIONER",
+    "name": "V-Fit Akıllı Klima",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Vestel V-Fit",
+      "V-Fit"
+    ]
+  },
+  {
+    "brand": "VESTEL",
+    "type": "AIR_CONDITIONER",
+    "name": "Sıfır Serisi",
+    "isLegacy": true,
+    "releaseYear": 2020,
+    "aliases": [
+      "Sıfır Serisi"
+    ]
+  }
+]

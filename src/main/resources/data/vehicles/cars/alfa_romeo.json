@@ -1,0 +1,74 @@
+[
+  {
+    "brand": "ALFA_ROMEO",
+    "type": "CAR",
+    "name": "Giulia",
+    "supportedBodyTypes": ["SEDAN"],
+    "generations": [
+      {
+        "name": "Giulia (2016–, 952)",
+        "engines": [
+          { "name": "2.0 Turbo 200", "fuelType": "GASOLINE" },
+          { "name": "2.0 Turbo 280", "fuelType": "GASOLINE" },
+          { "name": "2.2 JTD 160", "fuelType": "DIESEL" },
+          { "name": "2.2 JTD 210", "fuelType": "DIESEL" },
+          { "name": "2.9 V6 Biturbo Quadrifoglio 510", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Sprint", "Executive", "Ti", "Veloce", "Quadrifoglio"]
+      }
+    ]
+  },
+  {
+    "brand": "ALFA_ROMEO",
+    "type": "CAR",
+    "name": "Stelvio",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Stelvio (2017–, 949)",
+        "engines": [
+          { "name": "2.0 Turbo 200", "fuelType": "GASOLINE" },
+          { "name": "2.0 Turbo 280", "fuelType": "GASOLINE" },
+          { "name": "2.2 JTD 160", "fuelType": "DIESEL" },
+          { "name": "2.2 JTD 210", "fuelType": "DIESEL" },
+          { "name": "2.9 V6 Biturbo Quadrifoglio 510", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Sprint", "Executive", "Ti", "Veloce", "Quadrifoglio"]
+      }
+    ]
+  },
+  {
+    "brand": "ALFA_ROMEO",
+    "type": "CAR",
+    "name": "Tonale",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Tonale (2022–)",
+        "engines": [
+          { "name": "1.5 Mild Hybrid 160", "fuelType": "HYBRID" },
+          { "name": "1.3 Plug-in Hybrid Q4 280", "fuelType": "HYBRID" },
+          { "name": "1.6 JTD 130", "fuelType": "DIESEL" }
+        ],
+        "trims": ["Sprint", "Ti", "Veloce", "Edizione Speciale"]
+      }
+    ]
+  },
+  {
+    "brand": "ALFA_ROMEO",
+    "type": "CAR",
+    "name": "Mito",
+    "supportedBodyTypes": ["HATCHBACK"],
+    "generations": [
+      {
+        "name": "Mito (2008–2018, 955)",
+        "engines": [
+          { "name": "1.4 MultiAir 105", "fuelType": "GASOLINE" },
+          { "name": "1.4 TJet 155", "fuelType": "GASOLINE" },
+          { "name": "1.3 JTDM 95", "fuelType": "DIESEL" }
+        ],
+        "trims": ["Junior", "Distinctive", "Veloce", "QV"]
+      }
+    ]
+  }
+]

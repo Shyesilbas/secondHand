@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "BANG_OLUFSEN",
+    "type": "SPEAKER",
+    "name": "Beosound Explore",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "B&O Explore",
+      "Beosound Explore Portable"
+    ]
+  },
+  {
+    "brand": "BANG_OLUFSEN",
+    "type": "SPEAKER",
+    "name": "Beosound A1 2nd Gen",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "B&O A1 2nd Gen",
+      "Beosound A1 2"
+    ]
+  },
+  {
+    "brand": "BANG_OLUFSEN",
+    "type": "SPEAKER",
+    "name": "Beolit 20",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "B&O Beolit 20",
+      "Beolit 20 Qi"
+    ]
+  }
+]

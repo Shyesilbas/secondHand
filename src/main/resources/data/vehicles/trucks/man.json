@@ -1,0 +1,98 @@
+[
+  {
+    "brand": "MAN",
+    "type": "TRUCK",
+    "name": "TGX",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "TGX (2020–)",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "TGX 18.470",
+            "fuelType": "DIESEL",
+            "horsePower": 470,
+            "source": "claude-draft"
+          },
+          {
+            "name": "TGX 18.510",
+            "fuelType": "DIESEL",
+            "horsePower": 510,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "TGX (2007–2020)",
+        "startYear": 2007,
+        "versions": [
+          {
+            "name": "TGX 18.440",
+            "fuelType": "DIESEL",
+            "horsePower": 440,
+            "source": "claude-draft"
+          },
+          {
+            "name": "TGX 18.480",
+            "fuelType": "DIESEL",
+            "horsePower": 480,
+            "source": "claude-draft"
+          }
+        ],
+        "endYear": 2020
+      }
+    ]
+  },
+  {
+    "brand": "MAN",
+    "type": "TRUCK",
+    "name": "TGS",
+    "supportedBodyTypes": [
+      "TRUCK",
+      "TIPPER",
+      "TRACTOR"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MAN",
+    "type": "TRUCK",
+    "name": "TGM",
+    "supportedBodyTypes": [
+      "TRUCK",
+      "TIPPER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MAN",
+    "type": "TRUCK",
+    "name": "TGL",
+    "supportedBodyTypes": [
+      "TRUCK"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MAN",
+    "type": "TRUCK",
+    "name": "Lion's Coach",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MAN",
+    "type": "TRUCK",
+    "name": "Lion's City",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  }
+]

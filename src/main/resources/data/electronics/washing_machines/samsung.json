@@ -1,0 +1,45 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "WASHING_MACHINE",
+    "name": "Bespoke AI",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Samsung Bespoke AI",
+      "Bespoke Çamaşır"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "WASHING_MACHINE",
+    "name": "EcoBubble 11kg",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Samsung EcoBubble",
+      "EcoBubble 11"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "WASHING_MACHINE",
+    "name": "QuickDrive 9kg",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Samsung QuickDrive",
+      "QuickDrive 9"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "WASHING_MACHINE",
+    "name": "AddWash 10kg",
+    "isLegacy": true,
+    "releaseYear": 2020,
+    "aliases": [
+      "AddWash 10kg"
+    ]
+  }
+]

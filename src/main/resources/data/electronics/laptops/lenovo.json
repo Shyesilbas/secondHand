@@ -1,0 +1,791 @@
+[
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Carbon Gen 13",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X1 Carbon Gen 13",
+      "ThinkPad X1 Carbon Gen 13",
+      "X1 Carbon Gen 13",
+      "X1C Gen 13"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Carbon Gen 12",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X1 Carbon Gen 12",
+      "ThinkPad X1 Carbon Gen 12",
+      "X1 Carbon Gen 12",
+      "X1C Gen 12"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Carbon Gen 11",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X1 Carbon Gen 11",
+      "ThinkPad X1 Carbon Gen 11",
+      "X1 Carbon Gen 11",
+      "X1C Gen 11"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Carbon Gen 10",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X1 Carbon Gen 10",
+      "ThinkPad X1 Carbon Gen 10",
+      "X1 Carbon Gen 10",
+      "X1C Gen 10"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Carbon Gen 9",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X1 Carbon Gen 9",
+      "ThinkPad X1 Carbon Gen 9",
+      "X1 Carbon Gen 9",
+      "X1C Gen 9"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Carbon Gen 8",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad X1 Carbon Gen 8",
+      "ThinkPad X1 Carbon Gen 8",
+      "X1 Carbon Gen 8",
+      "X1C Gen 8"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Yoga Gen 8",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X1 Yoga Gen 8",
+      "ThinkPad X1 Yoga Gen 8",
+      "X1 Yoga Gen 8"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Yoga Gen 7",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X1 Yoga Gen 7",
+      "ThinkPad X1 Yoga Gen 7",
+      "X1 Yoga Gen 7"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X1 Yoga Gen 6",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X1 Yoga Gen 6",
+      "ThinkPad X1 Yoga Gen 6",
+      "X1 Yoga Gen 6"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X13 Gen 5",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X13 Gen 5",
+      "ThinkPad X13 Gen 5",
+      "X13 Gen 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X13 Gen 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X13 Gen 4",
+      "ThinkPad X13 Gen 4",
+      "X13 Gen 4"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X13 Gen 3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad X13 Gen 3",
+      "ThinkPad X13 Gen 3",
+      "X13 Gen 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X280",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad X280",
+      "ThinkPad X280",
+      "X280"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad X270",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad X270",
+      "ThinkPad X270",
+      "X270"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T14 Gen 5",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad T14 Gen 5",
+      "ThinkPad T14 Gen 5",
+      "T14 Gen 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T14 Gen 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad T14 Gen 4",
+      "ThinkPad T14 Gen 4",
+      "T14 Gen 4"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T14 Gen 3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad T14 Gen 3",
+      "ThinkPad T14 Gen 3",
+      "T14 Gen 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T14 Gen 2",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad T14 Gen 2",
+      "ThinkPad T14 Gen 2",
+      "T14 Gen 2"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T14 Gen 1",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad T14 Gen 1",
+      "ThinkPad T14 Gen 1",
+      "T14 Gen 1"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T480",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad T480",
+      "ThinkPad T480",
+      "T480"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T470",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad T470",
+      "ThinkPad T470",
+      "T470"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T460",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad T460",
+      "ThinkPad T460",
+      "T460"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T15 Gen 2",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad T15 Gen 2",
+      "ThinkPad T15 Gen 2",
+      "T15 Gen 2"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T590",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad T590",
+      "ThinkPad T590",
+      "T590"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad T580",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad T580",
+      "ThinkPad T580",
+      "T580"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad E16 Gen 2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad E16 Gen 2",
+      "ThinkPad E16 Gen 2",
+      "E16 Gen 2"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad E16 Gen 1",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad E16 Gen 1",
+      "ThinkPad E16 Gen 1",
+      "E16 Gen 1"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad E15 Gen 4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad E15 Gen 4",
+      "ThinkPad E15 Gen 4",
+      "E15 Gen 4"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad E15 Gen 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad E15 Gen 3",
+      "ThinkPad E15 Gen 3",
+      "E15 Gen 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad E14 Gen 5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad E14 Gen 5",
+      "ThinkPad E14 Gen 5",
+      "E14 Gen 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad E14 Gen 4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad E14 Gen 4",
+      "ThinkPad E14 Gen 4",
+      "E14 Gen 4"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad E14 Gen 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad E14 Gen 3",
+      "ThinkPad E14 Gen 3",
+      "E14 Gen 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad E14 Gen 2",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo ThinkPad E14 Gen 2",
+      "ThinkPad E14 Gen 2",
+      "E14 Gen 2"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad L14 Gen 5",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad L14 Gen 5",
+      "ThinkPad L14 Gen 5",
+      "L14 Gen 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad L14 Gen 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad L14 Gen 4",
+      "ThinkPad L14 Gen 4",
+      "L14 Gen 4"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkPad L15 Gen 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkPad L15 Gen 4",
+      "ThinkPad L15 Gen 4",
+      "L15 Gen 4"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkBook 16 G7",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkBook 16 G7",
+      "ThinkBook 16 G7",
+      "ThinkBook 16 Gen 7"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkBook 16 G6",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkBook 16 G6",
+      "ThinkBook 16 G6",
+      "ThinkBook 16 Gen 6"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkBook 15 G4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkBook 15 G4",
+      "ThinkBook 15 G4",
+      "ThinkBook 15 Gen 4"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkBook 14 G6",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkBook 14 G6",
+      "ThinkBook 14 G6",
+      "ThinkBook 14 Gen 6"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkBook 14 G4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkBook 14 G4",
+      "ThinkBook 14 G4",
+      "ThinkBook 14 Gen 4"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "ThinkBook Plus Gen 5",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo ThinkBook Plus Gen 5",
+      "ThinkBook Plus Gen 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "IdeaPad Slim 5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaPad Slim 5",
+      "IdeaPad Slim 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "IdeaPad Slim 3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaPad Slim 3",
+      "IdeaPad Slim 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "IdeaPad 5",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaPad 5",
+      "IdeaPad 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "IdeaPad 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaPad 3",
+      "IdeaPad 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "IdeaPad Gaming 3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaPad Gaming 3",
+      "IdeaPad Gaming 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "IdeaPad Flex 5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaPad Flex 5",
+      "IdeaPad Flex 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "IdeaPad Flex 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo IdeaPad Flex 3",
+      "IdeaPad Flex 3"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Yoga Pro 9i",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Yoga Pro 9i",
+      "Yoga Pro 9i",
+      "Yoga Pro 9"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Yoga Pro 7",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Yoga Pro 7",
+      "Yoga Pro 7"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Yoga Slim 7",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Yoga Slim 7",
+      "Yoga Slim 7"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Yoga Slim 6",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Yoga Slim 6",
+      "Yoga Slim 6"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Yoga 7 2-in-1",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Yoga 7 2-in-1",
+      "Yoga 7 2-in-1"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Yoga 6",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Yoga 6",
+      "Yoga 6"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Yoga Book 9i",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Yoga Book 9i",
+      "Yoga Book 9i",
+      "Yoga Book 9"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Legion Pro 7i",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Pro 7i",
+      "Legion Pro 7i"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Legion Pro 5i",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Pro 5i",
+      "Legion Pro 5i"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Legion 7",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion 7",
+      "Legion 7"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Legion 5 Pro",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion 5 Pro",
+      "Legion 5 Pro"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Legion 5",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion 5",
+      "Legion 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Legion Slim 5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo Legion Slim 5",
+      "Legion Slim 5"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Legion Y540",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Legion Y540",
+      "Legion Y540",
+      "Y540"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "Legion Y530",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Lenovo Legion Y530",
+      "Legion Y530",
+      "Y530"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "LOQ 15IRX9",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo LOQ 15IRX9",
+      "LOQ 15IRX9",
+      "LOQ 15"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "LOQ 15APH8",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo LOQ 15APH8",
+      "LOQ 15APH8"
+    ]
+  },
+  {
+    "brand": "LENOVO",
+    "type": "LAPTOP",
+    "name": "LOQ 15IAX9",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Lenovo LOQ 15IAX9",
+      "LOQ 15IAX9"
+    ]
+  }
+]

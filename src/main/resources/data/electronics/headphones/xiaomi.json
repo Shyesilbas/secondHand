@@ -1,0 +1,188 @@
+[
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Buds 5 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Buds 5 Pro",
+      "Buds 5 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Buds 5",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Buds 5",
+      "Buds 5"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Buds 4 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Buds 4 Pro",
+      "Buds 4 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Buds 4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Buds 4",
+      "Buds 4"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Buds 3T Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Buds 3T Pro",
+      "Buds 3T Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Buds 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Buds 3",
+      "Buds 3"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi Buds 6 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Buds 6 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi Buds 6",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Buds 6"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi Buds 5 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Buds 5 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi Buds 5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Buds 5"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi Buds 4 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Buds 4 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi Buds 4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Buds 4"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi Buds 3 Pro",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Buds 3 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi Buds 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Buds 3"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi AirDots 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "AirDots 3"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Redmi AirDots 2",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "AirDots 2"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Mi True Wireless Earphones 2 Pro",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Mi True Wireless 2 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "HEADPHONES",
+    "name": "Mi True Wireless Earbuds Basic 2",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Mi True Wireless Basic 2"
+    ]
+  }
+]

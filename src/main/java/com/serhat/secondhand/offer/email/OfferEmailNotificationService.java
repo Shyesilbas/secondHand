@@ -70,7 +70,7 @@ public class OfferEmailNotificationService {
         if (recipient == null)
             return;
         sendOfferTemplate(recipient, emailConfig.getOffer().getAcceptedSubject(), "Teklifiniz Kabul Edildi", offer,
-                EmailType.OFFER_ACCEPTED, "Sıradaki Adım: Uygulama üzerinden ödemeyi tamamlayın.");
+                EmailType.OFFER_ACCEPTED, "Satın almayı tamamlamak için Tekliflerim sayfasından ödemeye geçin.");
 
         var request = notificationTemplateCatalog.offerAccepted(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
@@ -145,20 +145,17 @@ public class OfferEmailNotificationService {
         if (offer.getTotalPrice() != null && offer.getQuantity() != null && offer.getQuantity() > 0) {
             BigDecimal unit = offer.getTotalPrice().divide(BigDecimal.valueOf(offer.getQuantity()), 2,
                     RoundingMode.HALF_UP);
-            unitPrice = String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TL", unit);
+            unitPrice = formatMoney(unit);
         }
 
         var data = OfferEmailData.builder()
                 .userName(recipient.getName())
                 .headerTitle(headline)
-                .headline(headline)
                 .listingTitle(offer.getListing() != null ? offer.getListing().getTitle() : "Bilinmeyen İlan")
                 .quantity(offer.getQuantity() != null ? offer.getQuantity() : 0)
-                .totalPrice(offer.getTotalPrice() != null
-                        ? String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TL", offer.getTotalPrice())
-                        : "")
+                .totalPrice(offer.getTotalPrice() != null ? formatMoney(offer.getTotalPrice()) : "")
                 .unitPrice(unitPrice)
-                .expiresAt(offer.getExpiresAt() != null ? offer.getExpiresAt().toString() : "")
+                .expiresAt(offer.getExpiresAt() != null ? EXPIRY_FORMAT.format(offer.getExpiresAt()) : "")
                 .nextStep(nextStep)
                 .build();
 
@@ -173,6 +170,13 @@ public class OfferEmailNotificationService {
         };
 
         emailEventPublisher.publish(event);
+    }
+
+    private static final java.time.format.DateTimeFormatter EXPIRY_FORMAT =
+            java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
+    private String formatMoney(BigDecimal amount) {
+        return String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TRY", amount);
     }
 
     private User getCreator(Offer offer) {

@@ -1,0 +1,104 @@
+[
+  {
+    "brand": "MICROSOFT",
+    "type": "GAME_CONSOLE",
+    "name": "Xbox Series X",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Series X",
+      "XSX"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB Digital Edition",
+        "storage": 1024,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      },
+      {
+        "name": "2 TB Galaxy Black",
+        "storage": 2048,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "GAME_CONSOLE",
+    "name": "Xbox Series S",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Series S",
+      "XSS"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "512 GB",
+        "storage": 512,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      },
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "storageType": "SSD",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "GAME_CONSOLE",
+    "name": "Xbox One X",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "One X",
+      "XBOX ONE X"
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "GAME_CONSOLE",
+    "name": "Xbox One S",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "One S",
+      "XBOX ONE S"
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "GAME_CONSOLE",
+    "name": "Xbox One",
+    "releaseYear": 2013,
+    "isLegacy": true,
+    "aliases": [
+      "Fat One",
+      "XBOX ONE"
+    ]
+  },
+  {
+    "brand": "MICROSOFT",
+    "type": "GAME_CONSOLE",
+    "name": "Xbox 360",
+    "releaseYear": 2005,
+    "isLegacy": true,
+    "aliases": [
+      "360",
+      "X360"
+    ]
+  }
+]

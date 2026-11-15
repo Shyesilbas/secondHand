@@ -1,0 +1,206 @@
+[
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "SN4",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG SN4",
+      "SN4",
+      "LG SN4 Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "SN6Y",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG SN6Y",
+      "SN6Y",
+      "LG SN6Y Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "SN8YG",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG SN8YG",
+      "SN8YG",
+      "LG SN8YG Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "SN9YG",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG SN9YG",
+      "SN9YG",
+      "LG SN9YG Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "SP7Y",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG SP7Y",
+      "SP7Y",
+      "LG SP7Y Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "SP9YA",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG SP9YA",
+      "SP9YA",
+      "LG SP9YA Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "SP11RA",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG SP11RA",
+      "SP11RA",
+      "LG SP11RA Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S65Q",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG S65Q",
+      "S65Q",
+      "LG S65Q Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S75Q",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG S75Q",
+      "S75Q",
+      "LG S75Q Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S90QY",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG S90QY",
+      "S90QY",
+      "LG S90QY Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S95QR",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG S95QR",
+      "S95QR",
+      "LG S95QR Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S80QY",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG S80QY",
+      "S80QY",
+      "LG S80QY Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S60T",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG S60T",
+      "S60T",
+      "LG S60T Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S75TY",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG S75TY",
+      "S75TY",
+      "LG S75TY Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S90TY",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG S90TY",
+      "S90TY",
+      "LG S90TY Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S95TR",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG S95TR",
+      "S95TR",
+      "LG S95TR Soundbar"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "SPEAKER",
+    "name": "S90TY 2024",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG S90TY 2024",
+      "S90TY 2024",
+      "LG Soundbar 2024"
+    ]
+  }
+]

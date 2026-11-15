@@ -1,0 +1,109 @@
+[
+  {
+    "brand": "CHERY",
+    "type": "CAR",
+    "name": "Tiggo 8 Pro",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Tiggo 8 Pro (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "trims": [
+          "Luxury",
+          "Excellent",
+          "Avantgarde"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "SEVEN",
+        "versions": [
+          {
+            "name": "1.6 TGDI 183 DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 183,
+            "torqueNm": 275,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CHERY",
+    "type": "CAR",
+    "name": "Tiggo 7 Pro",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Tiggo 7 Pro (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "trims": [
+          "Comfort",
+          "Luxury",
+          "Excellent",
+          "Avantgarde"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "1.6 TGDI 183 DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 183,
+            "torqueNm": 275,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "CHERY",
+    "type": "CAR",
+    "name": "Omoda 5",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Omoda 5 (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.6 TGDI (183 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 183,
+            "engineCapacity": 1598
+          },
+          {
+            "name": "EV (204 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 204,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Luxury",
+          "Excellent"
+        ]
+      }
+    ]
+  }
+]

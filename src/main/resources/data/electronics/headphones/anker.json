@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "ANKER",
+    "type": "HEADPHONES",
+    "name": "Soundcore Space Q45",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Anker Q45",
+      "Space Q45 ANC"
+    ]
+  },
+  {
+    "brand": "ANKER",
+    "type": "HEADPHONES",
+    "name": "Soundcore Life Q30",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Anker Q30",
+      "Life Q30 ANC"
+    ]
+  },
+  {
+    "brand": "ANKER",
+    "type": "HEADPHONES",
+    "name": "Soundcore Liberty 4 NC",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Anker Liberty 4 NC",
+      "Liberty 4 NC TWS"
+    ]
+  },
+  {
+    "brand": "ANKER",
+    "type": "HEADPHONES",
+    "name": "Soundcore Space One",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Anker Space One",
+      "Space One ANC"
+    ]
+  }
+]

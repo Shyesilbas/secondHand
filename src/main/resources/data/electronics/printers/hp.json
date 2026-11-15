@@ -1,0 +1,269 @@
+[
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "LaserJet Pro M404dn",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP LaserJet Pro M404dn",
+      "LaserJet Pro M404dn",
+      "LaserJet M404dn",
+      "M404dn"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "LaserJet Pro M404dw",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP LaserJet Pro M404dw",
+      "LaserJet Pro M404dw",
+      "LaserJet M404dw",
+      "M404dw"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "LaserJet Pro MFP M428fdw",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP LaserJet Pro MFP M428fdw",
+      "LaserJet Pro MFP M428fdw",
+      "LaserJet M428fdw",
+      "M428fdw"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "LaserJet Pro MFP M227fdw",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "HP LaserJet Pro MFP M227fdw",
+      "LaserJet Pro MFP M227fdw",
+      "LaserJet M227fdw",
+      "M227fdw"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "LaserJet MFP M140w",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP LaserJet MFP M140w",
+      "LaserJet MFP M140w",
+      "LaserJet M140w",
+      "M140w"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Color LaserJet Pro MFP M283fdw",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP Color LaserJet Pro MFP M283fdw",
+      "Color LaserJet Pro MFP M283fdw",
+      "Color LaserJet M283fdw",
+      "M283fdw"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Color LaserJet Pro M255dw",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP Color LaserJet Pro M255dw",
+      "Color LaserJet Pro M255dw",
+      "Color LaserJet M255dw",
+      "M255dw"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Color LaserJet Pro MFP M479fdw",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP Color LaserJet Pro MFP M479fdw",
+      "Color LaserJet Pro MFP M479fdw",
+      "Color LaserJet M479fdw",
+      "M479fdw"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "OfficeJet Pro 9013",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP OfficeJet Pro 9013",
+      "OfficeJet Pro 9013",
+      "OfficeJet 9013"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "OfficeJet Pro 9023",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP OfficeJet Pro 9023",
+      "OfficeJet Pro 9023",
+      "OfficeJet 9023"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "OfficeJet Pro 7720",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "HP OfficeJet Pro 7720",
+      "OfficeJet Pro 7720",
+      "OfficeJet 7720"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "OfficeJet Pro 7740",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "HP OfficeJet Pro 7740",
+      "OfficeJet Pro 7740",
+      "OfficeJet 7740"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "DeskJet 2710",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP DeskJet 2710",
+      "DeskJet 2710"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "DeskJet 2720",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP DeskJet 2720",
+      "DeskJet 2720"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "DeskJet 3760",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "HP DeskJet 3760",
+      "DeskJet 3760"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "DeskJet Ink Advantage 5075",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "HP DeskJet Ink Advantage 5075",
+      "DeskJet Ink Advantage 5075",
+      "DeskJet 5075",
+      "Ink Advantage 5075"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Smart Tank 515",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP Smart Tank 515",
+      "Smart Tank 515"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Smart Tank 530",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP Smart Tank 530",
+      "Smart Tank 530"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Smart Tank 580",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP Smart Tank 580",
+      "Smart Tank 580"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Smart Tank 750",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP Smart Tank 750",
+      "Smart Tank 750"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Neverstop Laser 1000w",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP Neverstop Laser 1000w",
+      "Neverstop Laser 1000w",
+      "Neverstop 1000w"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "PRINTER",
+    "name": "Neverstop Laser MFP 1200w",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP Neverstop Laser MFP 1200w",
+      "Neverstop Laser MFP 1200w",
+      "Neverstop MFP 1200w",
+      "Neverstop 1200w"
+    ]
+  }
+]

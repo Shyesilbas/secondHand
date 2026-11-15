@@ -1,0 +1,118 @@
+[
+  {
+    "brand": "APRILIA",
+    "type": "MOTORCYCLE",
+    "name": "RS 660",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "RS 660 (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "659cc Parallel-Twin (100 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 100,
+            "engineCapacity": 659
+          }
+        ],
+        "trims": [
+          "Standart",
+          "Extrema",
+          "Stars & Stripes"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "APRILIA",
+    "type": "MOTORCYCLE",
+    "name": "Tuono 660",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Tuono 660 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "659cc Parallel-Twin (95 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 95,
+            "engineCapacity": 659
+          }
+        ],
+        "trims": [
+          "Standart",
+          "Factory"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "APRILIA",
+    "type": "MOTORCYCLE",
+    "name": "SR GT",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "SR GT (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "125cc i-get (15 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 15,
+            "engineCapacity": 125
+          },
+          {
+            "name": "200cc i-get (17.4 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 17,
+            "engineCapacity": 174
+          }
+        ],
+        "trims": [
+          "Standart",
+          "Sport",
+          "Replica"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "APRILIA",
+    "type": "MOTORCYCLE",
+    "name": "Tuareg 660",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "Tuareg 660 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "659cc Parallel-Twin (80 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 80,
+            "engineCapacity": 659
+          }
+        ],
+        "trims": [
+          "Standart",
+          "Dakar Podium"
+        ]
+      }
+    ]
+  }
+]

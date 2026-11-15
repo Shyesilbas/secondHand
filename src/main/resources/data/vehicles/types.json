@@ -1,0 +1,121 @@
+[
+  {
+    "type": "CAR",
+    "label": "Otomobil",
+    "sortOrder": 1,
+    "bodyTypes": [
+      "SEDAN",
+      "HATCHBACK",
+      "SUV",
+      "COUPE",
+      "CONVERTIBLE",
+      "WAGON",
+      "MPV",
+      "OTHER"
+    ],
+    "fields": {
+      "mileage": "REQUIRED",
+      "fuelType": "REQUIRED",
+      "gearbox": "REQUIRED",
+      "bodyType": "REQUIRED",
+      "engineCapacity": "OPTIONAL",
+      "horsePower": "OPTIONAL",
+      "drivetrain": "OPTIONAL",
+      "doors": "OPTIONAL",
+      "seatCount": "OPTIONAL",
+      "wheels": "OPTIONAL",
+      "fuelCapacity": "OPTIONAL",
+      "fuelConsumption": "OPTIONAL",
+      "kilometersPerLiter": "OPTIONAL",
+      "inspectionValidUntil": "OPTIONAL"
+    }
+  },
+  {
+    "type": "COMMERCIAL",
+    "label": "Hafif Ticari",
+    "sortOrder": 2,
+    "bodyTypes": [
+      "VAN",
+      "COMBI",
+      "MINIBUS",
+      "PICKUP",
+      "LIGHT_TRUCK",
+      "OTHER"
+    ],
+    "fields": {
+      "mileage": "REQUIRED",
+      "fuelType": "REQUIRED",
+      "gearbox": "REQUIRED",
+      "bodyType": "REQUIRED",
+      "engineCapacity": "OPTIONAL",
+      "horsePower": "OPTIONAL",
+      "drivetrain": "OPTIONAL",
+      "doors": "OPTIONAL",
+      "seatCount": "OPTIONAL",
+      "wheels": "OPTIONAL",
+      "fuelCapacity": "OPTIONAL",
+      "fuelConsumption": "OPTIONAL",
+      "kilometersPerLiter": "OPTIONAL",
+      "inspectionValidUntil": "OPTIONAL"
+    }
+  },
+  {
+    "type": "TRUCK",
+    "label": "Ağır Vasıta",
+    "sortOrder": 3,
+    "bodyTypes": [
+      "TRUCK",
+      "TRACTOR",
+      "TIPPER",
+      "BUS",
+      "OTHER"
+    ],
+    "fields": {
+      "mileage": "REQUIRED",
+      "fuelType": "REQUIRED",
+      "gearbox": "REQUIRED",
+      "bodyType": "REQUIRED",
+      "engineCapacity": "OPTIONAL",
+      "horsePower": "OPTIONAL",
+      "drivetrain": "OPTIONAL",
+      "doors": "HIDDEN",
+      "seatCount": "OPTIONAL",
+      "wheels": "OPTIONAL",
+      "fuelCapacity": "OPTIONAL",
+      "fuelConsumption": "OPTIONAL",
+      "kilometersPerLiter": "OPTIONAL",
+      "inspectionValidUntil": "OPTIONAL"
+    }
+  },
+  {
+    "type": "MOTORCYCLE",
+    "label": "Motosiklet",
+    "sortOrder": 4,
+    "bodyTypes": [
+      "SPORTBIKE",
+      "NAKED",
+      "SCOOTER",
+      "ADVENTURE",
+      "ENDURO",
+      "TOURING",
+      "CRUISER",
+      "OTHER"
+    ],
+    "fields": {
+      "mileage": "OPTIONAL",
+      "fuelType": "REQUIRED",
+      "gearbox": "OPTIONAL",
+      "bodyType": "REQUIRED",
+      "engineCapacity": "REQUIRED",
+      "horsePower": "OPTIONAL",
+      "drivetrain": "HIDDEN",
+      "doors": "HIDDEN",
+      "seatCount": "HIDDEN",
+      "wheels": "OPTIONAL",
+      "fuelCapacity": "HIDDEN",
+      "fuelConsumption": "HIDDEN",
+      "kilometersPerLiter": "HIDDEN",
+      "inspectionValidUntil": "HIDDEN"
+    }
+  }
+]

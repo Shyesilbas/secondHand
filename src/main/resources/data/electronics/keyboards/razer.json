@@ -1,0 +1,44 @@
+[
+  {
+    "brand": "RAZER",
+    "type": "KEYBOARD",
+    "name": "Huntsman V3 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Huntsman V3 Pro",
+      "Huntsman V3"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "KEYBOARD",
+    "name": "BlackWidow V4 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Razer BlackWidow V4 Pro",
+      "BlackWidow V4"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "KEYBOARD",
+    "name": "DeathStalker V2 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Razer DeathStalker V2 Pro"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "KEYBOARD",
+    "name": "Cynosa V2",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Razer Cynosa V2"
+    ]
+  }
+]

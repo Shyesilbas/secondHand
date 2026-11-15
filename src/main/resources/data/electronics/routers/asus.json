@@ -1,0 +1,110 @@
+[
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "ROG Rapture GT-BE98",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Rapture GT-BE98",
+      "GT-BE98",
+      "ROG Rapture GT-BE98"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "ROG Rapture GT-AXE16000",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Rapture GT-AXE16000",
+      "GT-AXE16000",
+      "ROG Rapture GT-AXE16000"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "ROG Rapture GT-AX11000 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Rapture GT-AX11000 Pro",
+      "GT-AX11000 Pro",
+      "ROG Rapture GT-AX11000 Pro"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "RT-BE88U",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS RT-BE88U",
+      "RT-BE88U",
+      "Asus RT-BE88U"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "RT-AX88U Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS RT-AX88U Pro",
+      "RT-AX88U Pro",
+      "Asus RT-AX88U Pro"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "RT-AX86U Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS RT-AX86U Pro",
+      "RT-AX86U Pro",
+      "Asus RT-AX86U Pro"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "RT-AX58U",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS RT-AX58U",
+      "RT-AX58U",
+      "Asus RT-AX58U"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "ZenWiFi Pro XT12",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ZenWiFi Pro XT12",
+      "ZenWiFi Pro XT12",
+      "ZenWiFi XT12"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "ROUTER",
+    "name": "ZenWiFi XD6",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ZenWiFi XD6",
+      "ZenWiFi XD6",
+      "Asus XD6"
+    ]
+  }
+]

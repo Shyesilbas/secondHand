@@ -1,0 +1,246 @@
+[
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "S 1000 RR",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "S 1000 RR (2019–)",
+        "engines": [
+          {
+            "name": "999cc Inline-4 ShiftCam",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "M Sport",
+          "M Package"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "M 1000 RR",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "M 1000 RR (2021–)",
+        "engines": [
+          {
+            "name": "999cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Competition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "S 1000 R",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "S 1000 R (2021–)",
+        "engines": [
+          {
+            "name": "999cc Inline-4 ShiftCam",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Pro",
+          "M Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "F 900 R",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "F 900 R (2020–)",
+        "engines": [
+          {
+            "name": "895cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "A2"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "R 1250 GS",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "R 1250 GS (2019–2024)",
+        "trims": [
+          "Standard",
+          "Adventure",
+          "Rallye",
+          "HP"
+        ],
+        "versions": [
+          {
+            "name": "1254cc Boxer-Twin ShiftCam",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1254,
+            "horsePower": 136,
+            "powerKw": 100,
+            "torqueNm": 143,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "R 1300 GS",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "R 1300 GS (2024–)",
+        "engines": [
+          {
+            "name": "1300cc Boxer-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Adventure",
+          "Triple Black"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "F 850 GS",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "F 850 GS (2018–)",
+        "engines": [
+          {
+            "name": "853cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Adventure",
+          "Pro"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "F 800 GS",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "F 800 GS (2013–2018)",
+        "engines": [
+          {
+            "name": "798cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Adventure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "G 310 R",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "G 310 R (2016–)",
+        "engines": [
+          {
+            "name": "313cc Single",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "type": "MOTORCYCLE",
+    "name": "R 18",
+    "supportedBodyTypes": [
+      "CRUISER"
+    ],
+    "generations": [
+      {
+        "name": "R 18 (2020–)",
+        "engines": [
+          {
+            "name": "1802cc Boxer-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Classic",
+          "Transcontinental",
+          "Roctane"
+        ]
+      }
+    ]
+  }
+]

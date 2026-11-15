@@ -1,0 +1,111 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "HEADPHONES",
+    "name": "AirPods Pro (2nd Gen)",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "AirPods Pro 2",
+      "AirPods Pro 2nd Generation",
+      "APP2"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 6
+    },
+    "colors": [
+      {
+        "name": "White",
+        "color": "WHITE"
+      }
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "HEADPHONES",
+    "name": "AirPods (4th Gen)",
+    "isLegacy": false,
+    "releaseYear": 2024,
+    "aliases": [
+      "AirPods 4",
+      "AirPods 4th Gen"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": true
+    },
+    "variants": [
+      {
+        "name": "Standard",
+        "specs": {
+          "noiseCancelling": false
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "Active Noise Cancellation",
+        "specs": {
+          "noiseCancelling": true
+        },
+        "source": "claude-draft"
+      }
+    ],
+    "colors": [
+      {
+        "name": "White",
+        "color": "WHITE"
+      }
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "HEADPHONES",
+    "name": "AirPods Max",
+    "isLegacy": true,
+    "releaseYear": 2020,
+    "aliases": [
+      "AirPods Max USB-C",
+      "AirPods Max Lightning"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 20
+    }
+  },
+  {
+    "brand": "APPLE",
+    "type": "HEADPHONES",
+    "name": "AirPods (3rd Gen)",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "AirPods 3",
+      "AirPods 3rd Gen"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": false,
+      "hasMicrophone": true,
+      "batteryLifeHours": 6
+    },
+    "colors": [
+      {
+        "name": "White",
+        "color": "WHITE"
+      }
+    ]
+  }
+]

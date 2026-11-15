@@ -1,0 +1,153 @@
+[
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS R5",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Canon R5",
+      "R5"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 45
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS R6 Mark II",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Canon R6 II",
+      "R6 II",
+      "R6 Mark 2"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 24
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS R7",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Canon R7",
+      "R7"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 32
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS R8",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Canon R8",
+      "R8"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 24
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS R10",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Canon R10",
+      "R10"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 24
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS R50",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Canon R50",
+      "R50"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 24
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS 5D Mark IV",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "5D Mark 4",
+      "5D IV"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 30
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS 6D Mark II",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "6D Mark 2",
+      "6D II"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 26
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS 90D",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Canon 90D",
+      "90D"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 32
+    }
+  },
+  {
+    "brand": "CANON",
+    "type": "CAMERA",
+    "name": "EOS 250D",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Rebel SL3",
+      "250D"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 24
+    }
+  }
+]

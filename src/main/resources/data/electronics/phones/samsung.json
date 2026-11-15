@@ -1,0 +1,1904 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S26 Ultra",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "S26 Ultra",
+      "Samsung S26 Ultra"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S26+",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "S26+",
+      "Samsung S26+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S26",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "S26",
+      "Samsung S26"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S25 Ultra",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "S25 Ultra",
+      "Samsung S25 Ultra"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Elite for Galaxy",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 200,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.9,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 45,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "processor": "QUALCOMM"
+    },
+    "colors": [
+      {
+        "name": "Titanium Silverblue",
+        "color": "SILVER"
+      },
+      {
+        "name": "Titanium Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Titanium Whitesilver",
+        "color": "WHITE"
+      },
+      {
+        "name": "Titanium Gray",
+        "color": "GRAY"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 1 TB",
+        "ram": 12,
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S25+",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "S25+",
+      "Samsung S25+"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Elite for Galaxy",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4900,
+      "cameraMegapixels": 50,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.7,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 45,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "processor": "QUALCOMM"
+    },
+    "colors": [
+      {
+        "name": "Navy",
+        "color": "MIDNIGHT_BLUE"
+      },
+      {
+        "name": "Icyblue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Mint",
+        "color": "GREEN"
+      },
+      {
+        "name": "Silver Shadow",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S25",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "S25",
+      "Samsung S25"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Elite for Galaxy",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4000,
+      "cameraMegapixels": 50,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.2,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 25,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "processor": "QUALCOMM"
+    },
+    "colors": [
+      {
+        "name": "Navy",
+        "color": "MIDNIGHT_BLUE"
+      },
+      {
+        "name": "Icyblue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Mint",
+        "color": "GREEN"
+      },
+      {
+        "name": "Silver Shadow",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 128 GB",
+        "ram": 12,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S24 Ultra",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "S24 Ultra",
+      "Samsung S24 Ultra"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 3 for Galaxy",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 200,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.8,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 45,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "processor": "QUALCOMM"
+    },
+    "colors": [
+      {
+        "name": "Titanium Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Titanium Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Titanium Violet",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Titanium Yellow",
+        "color": "YELLOW"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 1 TB",
+        "ram": 12,
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S24+",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "S24+",
+      "Samsung S24+"
+    ],
+    "specs": {
+      "chipset": "Exynos 2400",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4900,
+      "cameraMegapixels": 50,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.7,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 45,
+      "wirelessCharging": true,
+      "ipRating": "IP68"
+    },
+    "colors": [
+      {
+        "name": "Onyx Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Marble Grey",
+        "color": "GRAY"
+      },
+      {
+        "name": "Cobalt Violet",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Amber Yellow",
+        "color": "YELLOW"
+      }
+    ],
+    "variants": [
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S24",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "S24",
+      "Samsung S24"
+    ],
+    "specs": {
+      "chipset": "Exynos 2400",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4000,
+      "cameraMegapixels": 50,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.2,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 25,
+      "wirelessCharging": true,
+      "ipRating": "IP68"
+    },
+    "colors": [
+      {
+        "name": "Onyx Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Marble Grey",
+        "color": "GRAY"
+      },
+      {
+        "name": "Cobalt Violet",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Amber Yellow",
+        "color": "YELLOW"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S23 Ultra",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "S23 Ultra",
+      "Samsung S23 Ultra"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 2 for Galaxy",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 200,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.8,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 45,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "processor": "QUALCOMM"
+    },
+    "colors": [
+      {
+        "name": "Phantom Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Cream",
+        "color": "BEIGE"
+      },
+      {
+        "name": "Green",
+        "color": "GREEN"
+      },
+      {
+        "name": "Lavender",
+        "color": "PURPLE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 256 GB",
+        "ram": 12,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 512 GB",
+        "ram": 12,
+        "storage": 512,
+        "source": "claude-draft"
+      },
+      {
+        "name": "12 GB / 1 TB",
+        "ram": 12,
+        "storage": 1024,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S23+",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "S23+",
+      "Samsung S23+"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 2 for Galaxy",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 4700,
+      "cameraMegapixels": 50,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.6,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 45,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "processor": "QUALCOMM"
+    },
+    "colors": [
+      {
+        "name": "Phantom Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Cream",
+        "color": "BEIGE"
+      },
+      {
+        "name": "Green",
+        "color": "GREEN"
+      },
+      {
+        "name": "Lavender",
+        "color": "PURPLE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S23",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "S23",
+      "Samsung S23"
+    ],
+    "specs": {
+      "chipset": "Snapdragon 8 Gen 2 for Galaxy",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 3900,
+      "cameraMegapixels": 50,
+      "frontCameraMegapixels": 12,
+      "screenInches": 6.1,
+      "displayType": "Dynamic AMOLED 2X",
+      "refreshRateHz": 120,
+      "chargingWatts": 25,
+      "wirelessCharging": true,
+      "ipRating": "IP68",
+      "processor": "QUALCOMM"
+    },
+    "colors": [
+      {
+        "name": "Phantom Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Cream",
+        "color": "BEIGE"
+      },
+      {
+        "name": "Green",
+        "color": "GREEN"
+      },
+      {
+        "name": "Lavender",
+        "color": "PURPLE"
+      }
+    ],
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S22 Ultra",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "S22 Ultra",
+      "Samsung S22 Ultra"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S22+",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "S22+",
+      "Samsung S22+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S22",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "S22",
+      "Samsung S22"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S21 Ultra",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "S21 Ultra",
+      "Samsung S21 Ultra"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S21+",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "S21+",
+      "Samsung S21+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S21",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "S21",
+      "Samsung S21"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S20 Ultra",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "S20 Ultra",
+      "Samsung S20 Ultra"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S20+",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "S20+",
+      "Samsung S20+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S20",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "S20",
+      "Samsung S20"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S10+",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "S10+",
+      "Samsung S10+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S10",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "S10",
+      "Samsung S10"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S10e",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "S10e",
+      "Samsung S10e"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S9+",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "S9+",
+      "Samsung S9+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S9",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "S9",
+      "Samsung S9"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S8+",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "S8+",
+      "Samsung S8+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy S8",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "S8",
+      "Samsung S8"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Note20 Ultra",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Note 20 Ultra",
+      "Note20 Ultra"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Note20",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Note 20",
+      "Note20"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Note10+",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Note 10+",
+      "Note10+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Note10",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Note 10",
+      "Note10"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Note9",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Note 9",
+      "Note9"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Note8",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Note 8",
+      "Note8"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Fold6",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Z Fold 6",
+      "Fold 6"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Fold5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Z Fold 5",
+      "Fold 5"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Fold4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Z Fold 4",
+      "Fold 4"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Fold3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Z Fold 3",
+      "Fold 3"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Fold2",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Z Fold 2",
+      "Fold 2"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Fold",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Galaxy Fold 1",
+      "Fold 1"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Flip6",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Z Flip 6",
+      "Flip 6"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Flip5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Z Flip 5",
+      "Flip 5"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Flip4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Z Flip 4",
+      "Flip 4"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Flip3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Z Flip 3",
+      "Flip 3"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Flip",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Z Flip 1",
+      "Flip 1"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy Z Flip 5G",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Z Flip 5G"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A56",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "A56",
+      "Samsung A56"
+    ],
+    "specs": {
+      "chipset": "Exynos 1580",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 50,
+      "screenInches": 6.7,
+      "displayType": "Super AMOLED",
+      "refreshRateHz": 120,
+      "frontCameraMegapixels": 12,
+      "chargingWatts": 45,
+      "ipRating": "IP67",
+      "wirelessCharging": false
+    },
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Awesome Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Awesome Light Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Awesome Olive",
+        "color": "GREEN"
+      },
+      {
+        "name": "Awesome Pink",
+        "color": "PINK"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A55",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "A55",
+      "Samsung A55"
+    ],
+    "specs": {
+      "chipset": "Exynos 1480",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 50,
+      "screenInches": 6.6,
+      "displayType": "Super AMOLED",
+      "refreshRateHz": 120,
+      "frontCameraMegapixels": 32,
+      "chargingWatts": 25,
+      "ipRating": "IP67",
+      "wirelessCharging": false
+    },
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Awesome Iceblue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Awesome Lilac",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Awesome Navy",
+        "color": "MIDNIGHT_BLUE"
+      },
+      {
+        "name": "Awesome Lemon",
+        "color": "YELLOW"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A54",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A54",
+      "Samsung A54"
+    ],
+    "specs": {
+      "chipset": "Exynos 1380",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 50,
+      "screenInches": 6.4,
+      "displayType": "Super AMOLED",
+      "refreshRateHz": 120,
+      "frontCameraMegapixels": 32,
+      "chargingWatts": 25,
+      "ipRating": "IP67",
+      "wirelessCharging": false
+    },
+    "variants": [
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Awesome Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Awesome White",
+        "color": "WHITE"
+      },
+      {
+        "name": "Awesome Violet",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Awesome Lime",
+        "color": "GREEN"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A53",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "A53",
+      "Samsung A53"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A52",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "A52",
+      "Samsung A52"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A52s",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "A52s",
+      "Samsung A52s"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A51",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "A51",
+      "Samsung A51"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A50",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "A50",
+      "Samsung A50"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A36",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "A36",
+      "Samsung A36"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A35",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "A35",
+      "Samsung A35"
+    ],
+    "specs": {
+      "chipset": "Exynos 1380",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 50,
+      "screenInches": 6.6,
+      "displayType": "Super AMOLED",
+      "refreshRateHz": 120,
+      "frontCameraMegapixels": 13,
+      "chargingWatts": 25,
+      "ipRating": "IP67",
+      "wirelessCharging": false
+    },
+    "variants": [
+      {
+        "name": "6 GB / 128 GB",
+        "ram": 6,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Awesome Iceblue",
+        "color": "BLUE"
+      },
+      {
+        "name": "Awesome Lilac",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Awesome Navy",
+        "color": "MIDNIGHT_BLUE"
+      },
+      {
+        "name": "Awesome Lemon",
+        "color": "YELLOW"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A34",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A34",
+      "Samsung A34"
+    ],
+    "specs": {
+      "chipset": "Dimensity 1080",
+      "operatingSystem": "Android",
+      "supports5g": true,
+      "hasNfc": true,
+      "dualSim": true,
+      "batteryCapacityMah": 5000,
+      "cameraMegapixels": 48,
+      "screenInches": 6.6,
+      "displayType": "Super AMOLED",
+      "refreshRateHz": 120,
+      "processor": "MEDIATEK",
+      "frontCameraMegapixels": 13,
+      "chargingWatts": 25,
+      "ipRating": "IP67",
+      "wirelessCharging": false
+    },
+    "variants": [
+      {
+        "name": "6 GB / 128 GB",
+        "ram": 6,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 128 GB",
+        "ram": 8,
+        "storage": 128,
+        "source": "claude-draft"
+      },
+      {
+        "name": "8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft",
+    "colors": [
+      {
+        "name": "Awesome Graphite",
+        "color": "GRAY"
+      },
+      {
+        "name": "Awesome Silver",
+        "color": "SILVER"
+      },
+      {
+        "name": "Awesome Violet",
+        "color": "PURPLE"
+      },
+      {
+        "name": "Awesome Lime",
+        "color": "GREEN"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A33",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "A33",
+      "Samsung A33"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A32",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "A32",
+      "Samsung A32"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A31",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "A31",
+      "Samsung A31"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A30",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "A30",
+      "Samsung A30"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A26",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "A26",
+      "Samsung A26"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A25",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A25",
+      "Samsung A25"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A24",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A24",
+      "Samsung A24"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A23",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "A23",
+      "Samsung A23"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A22",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "A22",
+      "Samsung A22"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A21s",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "A21s",
+      "Samsung A21s"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A20",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "A20",
+      "Samsung A20"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A16",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "A16",
+      "Samsung A16"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A15",
+      "Samsung A15"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A14",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A14",
+      "Samsung A14"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A13",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "A13",
+      "Samsung A13"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A12",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "A12",
+      "Samsung A12"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A11",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "A11",
+      "Samsung A11"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy A10",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "A10",
+      "Samsung A10"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M56",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "M56",
+      "Samsung M56"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M55",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "M55",
+      "Samsung M55"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M54",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "M54",
+      "Samsung M54"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M53",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "M53",
+      "Samsung M53"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M52",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "M52",
+      "Samsung M52"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M51",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "M51",
+      "Samsung M51"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M34",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "M34",
+      "Samsung M34"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M33",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "M33",
+      "Samsung M33"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M32",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "M32",
+      "Samsung M32"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M31",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "M31",
+      "Samsung M31"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M23",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "M23",
+      "Samsung M23"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M22",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "M22",
+      "Samsung M22"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M21",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "M21",
+      "Samsung M21"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M20",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "M20",
+      "Samsung M20"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M15",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "M15",
+      "Samsung M15"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M14",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "M14",
+      "Samsung M14"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M13",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "M13",
+      "Samsung M13"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M12",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "M12",
+      "Samsung M12"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy M11",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "M11",
+      "Samsung M11"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J8",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "J8",
+      "Samsung J8"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J7 Prime",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "J7 Prime",
+      "Samsung J7 Prime"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J7 Pro",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "J7 Pro",
+      "Samsung J7 Pro"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J7",
+    "releaseYear": 2015,
+    "isLegacy": true,
+    "aliases": [
+      "J7",
+      "Samsung J7"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J6+",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "J6+",
+      "Samsung J6+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J6",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "J6",
+      "Samsung J6"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J5 Prime",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "J5 Prime",
+      "Samsung J5 Prime"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J5",
+    "releaseYear": 2015,
+    "isLegacy": true,
+    "aliases": [
+      "J5",
+      "Samsung J5"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J4+",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "J4+",
+      "Samsung J4+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J4",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "J4",
+      "Samsung J4"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MOBILE_PHONE",
+    "name": "Galaxy J3",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "J3",
+      "Samsung J3"
+    ]
+  }
+]

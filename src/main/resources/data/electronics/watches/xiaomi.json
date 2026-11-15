@@ -1,0 +1,228 @@
+[
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Watch S4",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Watch S4",
+      "Watch S4",
+      "Xiaomi S4"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Watch S3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Watch S3",
+      "Watch S3",
+      "Xiaomi S3"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Watch S1 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Watch S1 Pro",
+      "Watch S1 Pro",
+      "S1 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Watch S1",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Watch S1",
+      "Watch S1",
+      "S1"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Watch 2 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 2 Pro",
+      "Xiaomi Watch 2 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Watch 2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 2",
+      "Xiaomi Watch 2"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Mi Watch",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Xiaomi Mi Watch",
+      "Mi Watch"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Redmi Watch 5",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Watch 5"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Redmi Watch 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Watch 4"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Redmi Watch 3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Watch 3"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Redmi Watch 2 Lite",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Watch 2 Lite"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Smart Band 9 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Smart Band 9 Pro",
+      "Smart Band 9 Pro",
+      "Band 9 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Smart Band 9",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Smart Band 9",
+      "Smart Band 9",
+      "Mi Band 9"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Smart Band 8 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Smart Band 8 Pro",
+      "Smart Band 8 Pro",
+      "Band 8 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Smart Band 8",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Smart Band 8",
+      "Smart Band 8",
+      "Mi Band 8"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Smart Band 7 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Smart Band 7 Pro",
+      "Smart Band 7 Pro",
+      "Band 7 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Smart Band 7",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Smart Band 7",
+      "Smart Band 7",
+      "Mi Band 7"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Mi Band 6",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Mi Band 6",
+      "Band 6"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Mi Band 5",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Mi Band 5",
+      "Band 5"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SMARTWATCH",
+    "name": "Mi Band 4",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Mi Band 4",
+      "Band 4"
+    ]
+  }
+]

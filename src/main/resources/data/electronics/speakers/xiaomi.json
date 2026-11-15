@@ -1,0 +1,73 @@
+[
+  {
+    "brand": "XIAOMI",
+    "type": "SPEAKER",
+    "name": "Sound Outdoor",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Sound Outdoor",
+      "Sound Outdoor"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SPEAKER",
+    "name": "Sound Pocket",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Sound Pocket",
+      "Sound Pocket"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SPEAKER",
+    "name": "Smart Speaker IR Control",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Smart Speaker IR Control",
+      "Smart Speaker IR Control",
+      "Smart Speaker IR"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SPEAKER",
+    "name": "Mi Smart Speaker",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Xiaomi Mi Smart Speaker",
+      "Mi Smart Speaker",
+      "Smart Speaker"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SPEAKER",
+    "name": "Portable Bluetooth Speaker",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Portable Bluetooth Speaker",
+      "Portable Bluetooth Speaker",
+      "Mi Portable Speaker"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "SPEAKER",
+    "name": "Mi Compact Bluetooth Speaker 2",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Xiaomi Mi Compact Bluetooth Speaker 2",
+      "Mi Compact Bluetooth Speaker 2",
+      "Mi Compact Speaker 2",
+      "Compact Speaker 2"
+    ]
+  }
+]

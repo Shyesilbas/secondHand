@@ -1,0 +1,34 @@
+[
+  {
+    "brand": "ASUS",
+    "type": "KEYBOARD",
+    "name": "ROG Azoth",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Asus ROG Azoth",
+      "ROG Azoth 75%"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "KEYBOARD",
+    "name": "ROG Falchion RX Low Profile",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ROG Falchion RX",
+      "Falchion 65%"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "KEYBOARD",
+    "name": "ROG Strix Scope II 96 Wireless",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ROG Strix Scope II"
+    ]
+  }
+]

@@ -1,0 +1,492 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 8K QN900F",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 8K QN900F",
+      "Neo QLED 8K QN900F",
+      "QN900F",
+      "Neo QLED QN900F"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "OLED S95F",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "S95F",
+      "OLED S95F",
+      "Samsung OLED S95F"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "OLED S90F",
+    "releaseYear": 2026,
+    "isLegacy": false,
+    "aliases": [
+      "S90F",
+      "OLED S90F",
+      "Samsung OLED S90F"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 8K QN900D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 8K QN900D",
+      "Neo QLED 8K QN900D",
+      "QN900D",
+      "Neo QLED QN900D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 8K QN900C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 8K QN900C",
+      "Neo QLED 8K QN900C",
+      "QN900C",
+      "Neo QLED QN900C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 8K QN800D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 8K QN800D",
+      "Neo QLED 8K QN800D",
+      "QN800D",
+      "Neo QLED QN800D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 4K QN95D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 4K QN95D",
+      "Neo QLED 4K QN95D",
+      "QN95D",
+      "Neo QLED QN95D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 4K QN90D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 4K QN90D",
+      "Neo QLED 4K QN90D",
+      "QN90D",
+      "Neo QLED QN90D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 4K QN90C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 4K QN90C",
+      "Neo QLED 4K QN90C",
+      "QN90C",
+      "Neo QLED QN90C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 4K QN85D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 4K QN85D",
+      "Neo QLED 4K QN85D",
+      "QN85D",
+      "Neo QLED QN85D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Neo QLED 4K QN85C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Neo QLED 4K QN85C",
+      "Neo QLED 4K QN85C",
+      "QN85C",
+      "Neo QLED QN85C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "OLED S95D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "S95D",
+      "OLED S95D",
+      "Samsung OLED S95D"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "Tizen",
+      "displayType": "QD-OLED",
+      "refreshRateHz": 144
+    },
+    "variants": [
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "OLED S95C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "S95C",
+      "OLED S95C",
+      "Samsung OLED S95C"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "Tizen",
+      "displayType": "QD-OLED",
+      "refreshRateHz": 144
+    },
+    "variants": [
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "OLED S90D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "S90D",
+      "OLED S90D",
+      "Samsung OLED S90D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "OLED S90C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "S90C",
+      "OLED S90C",
+      "Samsung OLED S90C"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "operatingSystem": "Tizen",
+      "displayType": "QD-OLED",
+      "refreshRateHz": 144
+    },
+    "variants": [
+      {
+        "name": "55\"",
+        "specs": {
+          "screenSize": 55
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "65\"",
+        "specs": {
+          "screenSize": 65
+        },
+        "source": "claude-draft"
+      },
+      {
+        "name": "77\"",
+        "specs": {
+          "screenSize": 77
+        },
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "OLED S85D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "S85D",
+      "OLED S85D",
+      "Samsung OLED S85D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "QLED Q80D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Q80D",
+      "QLED Q80D",
+      "Samsung QLED Q80D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "QLED Q70D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Q70D",
+      "QLED Q70D",
+      "Samsung QLED Q70D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "QLED Q60D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Q60D",
+      "QLED Q60D",
+      "Samsung QLED Q60D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "QLED Q80C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Q80C",
+      "QLED Q80C",
+      "Samsung QLED Q80C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "QLED Q70C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Q70C",
+      "QLED Q70C",
+      "Samsung QLED Q70C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "QLED Q60C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Q60C",
+      "QLED Q60C",
+      "Samsung QLED Q60C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Crystal UHD DU8000",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Crystal UHD DU8000",
+      "DU8000",
+      "Crystal UHD DU8000"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Crystal UHD DU7000",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Crystal UHD DU7000",
+      "DU7000",
+      "Crystal UHD DU7000"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Crystal UHD CU8000",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Crystal UHD CU8000",
+      "CU8000",
+      "Crystal UHD CU8000"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Crystal UHD CU7000",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Crystal UHD CU7000",
+      "CU7000",
+      "Crystal UHD CU7000"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Crystal UHD AU8000",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Crystal UHD AU8000",
+      "AU8000",
+      "Crystal UHD AU8000"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Crystal UHD TU8000",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung Crystal UHD TU8000",
+      "TU8000",
+      "Crystal UHD TU8000"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "Crystal UHD TU7000",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung Crystal UHD TU7000",
+      "TU7000",
+      "Crystal UHD TU7000"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "The Frame LS03D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung The Frame LS03D",
+      "LS03D",
+      "The Frame LS03D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "The Frame LS03B",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung The Frame LS03B",
+      "LS03B",
+      "The Frame LS03B"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "The Serif",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung The Serif",
+      "The Serif"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV",
+    "name": "The Sero",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung The Sero",
+      "The Sero"
+    ]
+  }
+]

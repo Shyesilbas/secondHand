@@ -1,0 +1,136 @@
+[
+  {
+    "brand": "JAGUAR",
+    "type": "CAR",
+    "name": "F-Pace",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "F-Pace (2016–)",
+        "startYear": 2016,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.0 D200 MHEV (204 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 204,
+            "engineCapacity": 1997
+          },
+          {
+            "name": "2.0 P250 (250 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 250,
+            "engineCapacity": 1997
+          },
+          {
+            "name": "2.0 P400e PHEV (404 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 404,
+            "engineCapacity": 1997
+          }
+        ],
+        "trims": [
+          "R-Dynamic S",
+          "R-Dynamic SE",
+          "R-Dynamic HSE"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "JAGUAR",
+    "type": "CAR",
+    "name": "E-Pace",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "E-Pace (2017–)",
+        "startYear": 2017,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.0 D163 (163 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 163,
+            "engineCapacity": 1997
+          },
+          {
+            "name": "2.0 P200 (200 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 200,
+            "engineCapacity": 1997
+          }
+        ],
+        "trims": [
+          "S",
+          "SE",
+          "R-Dynamic"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "JAGUAR",
+    "type": "CAR",
+    "name": "I-Pace",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "I-Pace (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "EV400 AWD (400 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 400,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "SE",
+          "HSE"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "JAGUAR",
+    "type": "CAR",
+    "name": "XF",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "XF (2015–, X260)",
+        "startYear": 2015,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.0 D200 (204 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 204,
+            "engineCapacity": 1997
+          },
+          {
+            "name": "2.0 P250 (250 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 250,
+            "engineCapacity": 1997
+          }
+        ],
+        "trims": [
+          "R-Dynamic S",
+          "R-Dynamic SE"
+        ]
+      }
+    ]
+  }
+]

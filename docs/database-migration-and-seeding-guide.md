@@ -37,8 +37,6 @@ Veritabanı değişiklikleri yalnızca [`src/main/resources/db/migration/`](../s
 
 Marka, model, tip, il/ilçe ve teknik özellik verisi SQL'e satır satır yazılmaz; [`src/main/resources/data/`](../src/main/resources/data/) altındaki JSON dosyalarından yüklenir. Dosya haritası ve sayılar [catalog-and-category-polymorphism.md §4](catalog-and-category-polymorphism.md#4-katalog-json-verisi) içindedir.
 
-> `src/main/resources/data/` dizini [.gitignore](../.gitignore) ile repoya dahil edilmez. Seed çalıştırmak için dizinin yerel kopyası gerekir; bu dizine verilen linkler GitHub'da açılmaz.
-
 ### Seed çalıştırma
 Seed'ler uygulama açılışında kendiliğinden çalışmaz. [`CatalogSeedStartupRunner`](../src/main/java/com/serhat/secondhand/core/seed/CatalogSeedStartupRunner.java) yalnızca `app.seed` (veya `APP_SEED`) verildiğinde istenen `SeedTask`'leri çalıştırır:
 

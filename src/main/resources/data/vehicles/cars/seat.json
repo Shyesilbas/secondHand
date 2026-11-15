@@ -1,0 +1,681 @@
+[
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Ibiza",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Ibiza (2017–, Mk5/KJ)",
+        "engines": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Reference",
+          "Style",
+          "Excellence",
+          "FR"
+        ]
+      },
+      {
+        "name": "Ibiza (2008–2017, Mk4/6J)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Reference",
+          "Style",
+          "Copa",
+          "FR"
+        ]
+      },
+      {
+        "name": "Ibiza (2002–2008, Mk3/6L)",
+        "engines": [
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stella",
+          "Signo",
+          "Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Leon",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Leon (2020–, Mk4/KL)",
+        "trims": [
+          "Style",
+          "Style Plus",
+          "FR"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "1.0 eTSI 110 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 110,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified",
+            "torqueNm": 200
+          },
+          {
+            "name": "1.5 eTSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Leon (2012–2020, Mk3/5F)",
+        "engines": [
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Style Plus",
+          "FR",
+          "Xcellence"
+        ]
+      },
+      {
+        "name": "Leon (2005–2012, Mk2/1P)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Reference",
+          "Stylance",
+          "Sport",
+          "FR"
+        ]
+      },
+      {
+        "name": "Leon (1999–2005, Mk1/1M)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stella",
+          "Signo",
+          "Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Leon ST",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Leon ST (2013–2020, Mk3/5F)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "FR"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Leon Sportstourer",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Leon Sportstourer (2020–, Mk4/KL)",
+        "engines": [
+          {
+            "name": "1.5 TSI eTSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Style",
+          "FR"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Cordoba",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Cordoba (2002–2009, Mk2/6L)",
+        "engines": [
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stella",
+          "Signo",
+          "S elegance"
+        ]
+      },
+      {
+        "name": "Cordoba (1999–2002, Mk1 Facelift)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stella",
+          "Signo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Toledo",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Toledo (2012–2019, Mk4/NH)",
+        "engines": [
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Reference",
+          "Style"
+        ]
+      },
+      {
+        "name": "Toledo (2004–2009, Mk3/5P)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stylance",
+          "Sport"
+        ]
+      },
+      {
+        "name": "Toledo (1998–2004, Mk2/1M)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 20V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stella",
+          "Signo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Altea",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Altea (2004–2015, 5P)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stylance",
+          "Reference"
+        ]
+      },
+      {
+        "name": "Altea XL (2006–2015, 5P)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Stylance",
+          "I-Tech",
+          "Copa"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Exeo",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Exeo (2008–2013, 3R)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.8 TSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Reference",
+          "Style",
+          "Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Ateca",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Ateca (2016–, KH7)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Xcellence",
+          "FR"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Arona",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Arona (2017–, KJ7)",
+        "engines": [
+          {
+            "name": "1.0 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Xcellence",
+          "FR"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Tarraco",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Tarraco (2018–2024, KN2)",
+        "engines": [
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Xcellence",
+          "FR"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Mii",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Mii (2011–2021)",
+        "engines": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Chic"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Ibiza Cupra",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Ibiza Cupra",
+        "engines": [
+          {
+            "name": "1.4 TSI Cupra",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 TSI Cupra",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Cupra"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Leon Cupra",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Leon Cupra",
+        "engines": [
+          {
+            "name": "2.0 TSI Cupra",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Cupra"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "type": "CAR",
+    "name": "Leon FR",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Leon FR",
+        "engines": [
+          {
+            "name": "2.0 TFSI FR",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI FR",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "FR"
+        ]
+      }
+    ]
+  }
+]

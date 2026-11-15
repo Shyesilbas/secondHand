@@ -1,0 +1,546 @@
+[
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "XPS 13",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "XPS 13",
+      "Dell XPS 13"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "XPS 14",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "XPS 14",
+      "Dell XPS 14"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "XPS 15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "XPS 15",
+      "Dell XPS 15"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "XPS 16",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "XPS 16",
+      "Dell XPS 16"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "XPS 17",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "XPS 17",
+      "Dell XPS 17"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "XPS 13 Plus",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell XPS 13 Plus",
+      "XPS 13 Plus"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Inspiron 14",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron 14",
+      "Inspiron 14"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Inspiron 15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron 15",
+      "Inspiron 15"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Inspiron 16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron 16",
+      "Inspiron 16"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Inspiron 14 2-in-1",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron 14 2-in-1",
+      "Inspiron 14 2-in-1"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Inspiron 16 2-in-1",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron 16 2-in-1",
+      "Inspiron 16 2-in-1"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Inspiron 15 3000",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Inspiron 15 3000",
+      "Inspiron 15 3000",
+      "Inspiron 3500"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Inspiron 15 5000",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Inspiron 15 5000",
+      "Inspiron 15 5000",
+      "Inspiron 5500"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Inspiron 16 Plus",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Inspiron 16 Plus",
+      "Inspiron 16 Plus"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 9440",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Latitude 9440",
+      "Latitude 9440",
+      "9440"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 9450 2-in-1",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Latitude 9450 2-in-1",
+      "Latitude 9450 2-in-1",
+      "9450 2-in-1"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 7440",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Latitude 7440",
+      "Latitude 7440",
+      "7440"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 7450",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Latitude 7450",
+      "Latitude 7450",
+      "7450"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 7420",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Latitude 7420",
+      "Latitude 7420",
+      "7420"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 7410",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Latitude 7410",
+      "Latitude 7410",
+      "7410"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 5520",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Latitude 5520",
+      "Latitude 5520",
+      "5520"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 5420",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Latitude 5420",
+      "Latitude 5420",
+      "5420"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 5400",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Latitude 5400",
+      "Latitude 5400",
+      "5400"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 5490",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Latitude 5490",
+      "Latitude 5490",
+      "5490"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 7480",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Latitude 7480",
+      "Latitude 7480",
+      "7480"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Latitude 7490",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Latitude 7490",
+      "Latitude 7490",
+      "7490"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Precision 5690",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Precision 5690",
+      "Precision 5690"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Precision 5680",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Precision 5680",
+      "Precision 5680"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Precision 5570",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Precision 5570",
+      "Precision 5570"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Precision 3561",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Precision 3561",
+      "Precision 3561"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Precision 3551",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Precision 3551",
+      "Precision 3551"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Precision 7540",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Precision 7540",
+      "Precision 7540"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Precision 7530",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Precision 7530",
+      "Precision 7530"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Alienware m18 R2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Alienware m18 R2",
+      "m18 R2"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Alienware m16 R2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Alienware m16 R2",
+      "m16 R2"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Alienware x16 R2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Alienware x16 R2",
+      "x16 R2"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Alienware x14 R2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Alienware x14 R2",
+      "x14 R2"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Alienware m15 R7",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Alienware m15 R7",
+      "m15 R7"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Alienware m15 R6",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Alienware m15 R6",
+      "m15 R6"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "G16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell G16",
+      "G16"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "G15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell G15",
+      "G15"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "G5 15",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Dell G5 15",
+      "Dell G5",
+      "G5 15"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "G3 15",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Dell G3 15",
+      "Dell G3",
+      "G3 15"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Vostro 3520",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Vostro 3520",
+      "Vostro 3520"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Vostro 3510",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell Vostro 3510",
+      "Vostro 3510"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Vostro 3400",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Vostro 3400",
+      "Vostro 3400"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Vostro 3500",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Vostro 3500",
+      "Vostro 3500"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "LAPTOP",
+    "name": "Vostro 5481",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Dell Vostro 5481",
+      "Vostro 5481"
+    ]
+  }
+]

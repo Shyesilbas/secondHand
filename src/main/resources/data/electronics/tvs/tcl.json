@@ -1,0 +1,55 @@
+[
+  {
+    "brand": "TCL",
+    "type": "TV",
+    "name": "C845 MiniLED",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "TCL C845",
+      "C845"
+    ]
+  },
+  {
+    "brand": "TCL",
+    "type": "TV",
+    "name": "C745 QLED",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "TCL C745",
+      "C745"
+    ]
+  },
+  {
+    "brand": "TCL",
+    "type": "TV",
+    "name": "C645 QLED",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "TCL C645",
+      "C645"
+    ]
+  },
+  {
+    "brand": "TCL",
+    "type": "TV",
+    "name": "P745 4K UHD",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "P745 4K UHD"
+    ]
+  },
+  {
+    "brand": "TCL",
+    "type": "TV",
+    "name": "P615 Series",
+    "isLegacy": true,
+    "releaseYear": 2020,
+    "aliases": [
+      "P615 Series"
+    ]
+  }
+]

@@ -1,0 +1,115 @@
+[
+  {
+    "brand": "VESPA",
+    "type": "MOTORCYCLE",
+    "name": "Primavera",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Primavera (2014–)",
+        "startYear": 2014,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "50cc 4T 3V",
+            "fuelType": "GASOLINE",
+            "horsePower": 3,
+            "engineCapacity": 49
+          },
+          {
+            "name": "125cc i-get",
+            "fuelType": "GASOLINE",
+            "horsePower": 11,
+            "engineCapacity": 124
+          },
+          {
+            "name": "150cc i-get",
+            "fuelType": "GASOLINE",
+            "horsePower": 13,
+            "engineCapacity": 155
+          }
+        ],
+        "trims": [
+          "Standart",
+          "S",
+          "Touring",
+          "RED",
+          "Pic Nic"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VESPA",
+    "type": "MOTORCYCLE",
+    "name": "Sprint",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Sprint (2014–)",
+        "startYear": 2014,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "50cc i-get",
+            "fuelType": "GASOLINE",
+            "horsePower": 3,
+            "engineCapacity": 49
+          },
+          {
+            "name": "125cc i-get",
+            "fuelType": "GASOLINE",
+            "horsePower": 11,
+            "engineCapacity": 124
+          },
+          {
+            "name": "150cc i-get",
+            "fuelType": "GASOLINE",
+            "horsePower": 13,
+            "engineCapacity": 155
+          }
+        ],
+        "trims": [
+          "Standart",
+          "S",
+          "Racing Sixties",
+          "Justin Bieber"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VESPA",
+    "type": "MOTORCYCLE",
+    "name": "GTS 300",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "GTS 300 HPE (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "300 HPE (24 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 24,
+            "engineCapacity": 278
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Super",
+          "SuperSport",
+          "SuperTech",
+          "Sei Giorni"
+        ]
+      }
+    ]
+  }
+]

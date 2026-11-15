@@ -1,0 +1,37 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "TV_STB",
+    "name": "SmartThings Station",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung SmartThings Station",
+      "SmartThings Station"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV_STB",
+    "name": "Wireless Dex Pad",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung Wireless Dex Pad",
+      "Wireless Dex Pad",
+      "Dex Pad"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "TV_STB",
+    "name": "DeX Station",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung DeX Station",
+      "DeX Station",
+      "Dex Station"
+    ]
+  }
+]

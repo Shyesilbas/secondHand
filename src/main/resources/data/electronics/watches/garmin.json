@@ -1,0 +1,79 @@
+[
+  {
+    "brand": "GARMIN",
+    "type": "SMARTWATCH",
+    "name": "Fenix 8 AMOLED / Solar",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Garmin Fenix 8",
+      "Fenix 8"
+    ]
+  },
+  {
+    "brand": "GARMIN",
+    "type": "SMARTWATCH",
+    "name": "Fenix 7 Pro Solar",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Garmin Fenix 7 Pro",
+      "Fenix 7 Pro"
+    ]
+  },
+  {
+    "brand": "GARMIN",
+    "type": "SMARTWATCH",
+    "name": "Forerunner 965",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Garmin Forerunner 965",
+      "FR 965"
+    ]
+  },
+  {
+    "brand": "GARMIN",
+    "type": "SMARTWATCH",
+    "name": "Forerunner 265",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Garmin Forerunner 265",
+      "FR 265"
+    ]
+  },
+  {
+    "brand": "GARMIN",
+    "type": "SMARTWATCH",
+    "name": "Venu 3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Garmin Venu 3",
+      "Venu 3 AMOLED"
+    ]
+  },
+  {
+    "brand": "GARMIN",
+    "type": "SMARTWATCH",
+    "name": "Epix Pro (Gen 2)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Garmin Epix Pro Gen 2",
+      "Epix Pro"
+    ]
+  },
+  {
+    "brand": "GARMIN",
+    "type": "SMARTWATCH",
+    "name": "Instinct 2X Solar",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Garmin Instinct 2X",
+      "Instinct 2X"
+    ]
+  }
+]

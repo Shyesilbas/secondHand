@@ -1,0 +1,86 @@
+[
+  {
+    "brand": "SALCANO",
+    "type": "BICYCLE",
+    "name": "NG650",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "NG650 Serisi (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "NG650 26V",
+          "NG650 26MD",
+          "NG650 27.5 HD",
+          "NG650 29 HD"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SALCANO",
+    "type": "BICYCLE",
+    "name": "Hector",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Hector Çift Amortisör (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Hector 26V",
+          "Hector 27.5V"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SALCANO",
+    "type": "BICYCLE",
+    "name": "Sarajevo",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Sarajevo Şehir (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Sarajevo 700C",
+          "Sarajevo Lady"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SALCANO",
+    "type": "BICYCLE",
+    "name": "XRS",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "XRS Yol Bisikleti (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "XRS030",
+          "XRS040",
+          "XRS050",
+          "XRS060"
+        ]
+      }
+    ]
+  }
+]

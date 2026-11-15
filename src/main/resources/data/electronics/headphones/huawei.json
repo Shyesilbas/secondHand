@@ -1,0 +1,121 @@
+[
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds Pro 4",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds Pro 4",
+      "FreeBuds Pro 4",
+      "Pro 4"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds Pro 3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds Pro 3",
+      "FreeBuds Pro 3",
+      "Pro 3"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds Pro 2",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds Pro 2",
+      "FreeBuds Pro 2",
+      "Pro 2"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds 6i",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds 6i",
+      "FreeBuds 6i",
+      "6i"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds 5i",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds 5i",
+      "FreeBuds 5i",
+      "5i"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds 5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds 5",
+      "FreeBuds 5",
+      "5"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds 4i",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds 4i",
+      "FreeBuds 4i",
+      "4i"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds SE 2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds SE 2",
+      "FreeBuds SE 2",
+      "SE 2"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds SE",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei FreeBuds SE",
+      "FreeBuds SE"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "HEADPHONES",
+    "name": "FreeBuds Studio",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei FreeBuds Studio",
+      "FreeBuds Studio",
+      "Studio"
+    ]
+  }
+]

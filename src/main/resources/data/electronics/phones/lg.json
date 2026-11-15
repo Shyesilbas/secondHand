@@ -1,0 +1,267 @@
+[
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "G3",
+    "releaseYear": 2014,
+    "isLegacy": true,
+    "aliases": [
+      "LG G3",
+      "G3",
+      "LG D855"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "G4",
+    "releaseYear": 2015,
+    "isLegacy": true,
+    "aliases": [
+      "LG G4",
+      "G4",
+      "LG H815"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "V10",
+    "releaseYear": 2015,
+    "isLegacy": true,
+    "aliases": [
+      "LG V10",
+      "V10",
+      "LG H960"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "G5",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "LG G5",
+      "G5",
+      "LG H850"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "V20",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "LG V20",
+      "V20",
+      "LG H990"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "G6",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "LG G6",
+      "G6",
+      "LG H870"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "V30",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "LG V30",
+      "V30",
+      "LG H930"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "Q6",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "LG Q6",
+      "Q6",
+      "LG M700"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "G7 ThinQ",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG G7 ThinQ",
+      "G7",
+      "G7 ThinQ",
+      "LG G7"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "V40 ThinQ",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG V40 ThinQ",
+      "V40",
+      "V40 ThinQ"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "Q7",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG Q7",
+      "Q7",
+      "LG Q7+"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "G8 ThinQ",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG G8 ThinQ",
+      "G8",
+      "G8 ThinQ",
+      "LG G8"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "V50 ThinQ",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG V50 ThinQ",
+      "V50",
+      "V50 ThinQ",
+      "LG V50 5G"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "Q60",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Q60",
+      "LG Q60"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "K50S",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "K50S",
+      "LG K50S"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "V60 ThinQ",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG V60 ThinQ",
+      "V60",
+      "V60 ThinQ",
+      "LG V60 5G"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "Wing",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG Wing",
+      "Wing",
+      "LG Wing 5G"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "Velvet",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG Velvet",
+      "Velvet",
+      "LG Velvet 5G",
+      "LG G9"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "K42",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "K42",
+      "LG K42"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "K52",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "K52",
+      "LG K52"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "Velvet 2 Pro",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "LG Velvet 2 Pro",
+      "Velvet 2 Pro",
+      "LG Velvet 2"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "MOBILE_PHONE",
+    "name": "Rollable",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "LG Rollable",
+      "Rollable",
+      "LG Project Roll"
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "brand": "OTHER",
+    "type": "TABLET",
+    "name": "Diğer Model",
+    "releaseYear": null,
+    "isLegacy": false,
+    "aliases": [
+      "Diğer",
+      "Other",
+      "Genel Model",
+      "Custom"
+    ]
+  }
+]

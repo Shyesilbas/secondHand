@@ -1,0 +1,149 @@
+[
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ROG Swift OLED PG32UCDM",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Swift OLED PG32UCDM",
+      "ROG Swift OLED PG32UCDM",
+      "PG32UCDM",
+      "ROG Swift PG32UCDM"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ROG Swift PG27AQDM",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Swift PG27AQDM",
+      "PG27AQDM",
+      "ROG Swift PG27AQDM"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ROG Swift PG32UQX",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Swift PG32UQX",
+      "PG32UQX",
+      "ROG Swift PG32UQX"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ROG Swift PG279Q",
+    "releaseYear": 2015,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS ROG Swift PG279Q",
+      "PG279Q",
+      "ROG Swift PG279Q"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "TUF VG27AQ",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS TUF VG27AQ",
+      "VG27AQ",
+      "TUF VG27AQ"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "TUF VG249Q",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS TUF VG249Q",
+      "VG249Q",
+      "TUF VG249Q"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "TUF VG32VQ",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS TUF VG32VQ",
+      "VG32VQ",
+      "TUF VG32VQ"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ProArt PA32UCX",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS ProArt PA32UCX",
+      "PA32UCX",
+      "ProArt PA32UCX"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ProArt PA279CV",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS ProArt PA279CV",
+      "PA279CV",
+      "ProArt PA279CV"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ProArt Display OLED PA32DC",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ProArt Display OLED PA32DC",
+      "ProArt Display OLED PA32DC",
+      "PA32DC",
+      "ProArt PA32DC"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ZenScreen MB16AC",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "ASUS ZenScreen MB16AC",
+      "ZenScreen MB16AC",
+      "MB16AC"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MONITOR",
+    "name": "ZenScreen OLED MQ13AH",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ZenScreen OLED MQ13AH",
+      "ZenScreen OLED MQ13AH",
+      "ZenScreen MQ13AH",
+      "MQ13AH"
+    ]
+  }
+]

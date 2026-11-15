@@ -1,0 +1,59 @@
+[
+  {
+    "brand": "XIAOMI",
+    "type": "TV_STB",
+    "name": "TV Box S 3rd Gen",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi TV Box S 3rd Gen",
+      "TV Box S 3rd Gen",
+      "Xiaomi TV Box S 3"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV_STB",
+    "name": "TV Box S 2nd Gen",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi TV Box S 2nd Gen",
+      "TV Box S 2nd Gen",
+      "Xiaomi TV Box S 2"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV_STB",
+    "name": "Mi Box S",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Mi Box S",
+      "Mi Box 4"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV_STB",
+    "name": "Mi TV Stick 4K",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Mi TV Stick 4K",
+      "TV Stick 4K"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV_STB",
+    "name": "Mi TV Stick",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Mi TV Stick",
+      "TV Stick"
+    ]
+  }
+]

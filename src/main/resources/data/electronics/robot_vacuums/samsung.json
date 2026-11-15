@@ -1,0 +1,49 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "ROBOT_VACUUM",
+    "name": "Bespoke Jet Bot Combo AI",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Bespoke Jet Bot Combo AI",
+      "Bespoke Jet Bot Combo AI",
+      "Jet Bot Combo AI",
+      "Combo AI"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "ROBOT_VACUUM",
+    "name": "Jet Bot AI+",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Jet Bot AI+",
+      "Jet Bot AI+",
+      "AI+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "ROBOT_VACUUM",
+    "name": "Jet Bot+",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Jet Bot+",
+      "Jet Bot+"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "ROBOT_VACUUM",
+    "name": "Jet Bot",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Jet Bot",
+      "Jet Bot"
+    ]
+  }
+]

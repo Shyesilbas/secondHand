@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "ZYXEL",
+    "type": "ROUTER",
+    "name": "VMG3625-T50B VDSL/Fiber",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Zyxel VMG3625",
+      "T50B AC1200"
+    ]
+  },
+  {
+    "brand": "ZYXEL",
+    "type": "ROUTER",
+    "name": "DX3200 WiFi 6 VDSL/Fiber",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Zyxel DX3200",
+      "DX3200 AX1800"
+    ]
+  },
+  {
+    "brand": "ZYXEL",
+    "type": "ROUTER",
+    "name": "NBG7510 Dual-Band WiFi 6",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Zyxel NBG7510",
+      "NBG7510 AX1800"
+    ]
+  }
+]

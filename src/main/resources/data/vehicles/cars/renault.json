@@ -1,0 +1,1501 @@
+[
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Clio",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Clio (2025–, Clio 6)",
+        "startYear": 2025,
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "trims": [
+          "evolution",
+          "techno",
+          "esprit Alpine"
+        ],
+        "versions": [
+          {
+            "name": "1.2 TCe 115 EDC",
+            "fuelType": "GASOLINE",
+            "horsePower": 115,
+            "torqueNm": 190,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "startYear": 2026,
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Clio (2019–, Clio 5)",
+        "trims": [
+          "Joy",
+          "Touch",
+          "Icon",
+          "Equilibre",
+          "Techno",
+          "RS Line"
+        ],
+        "startYear": 2019,
+        "endYear": 2025,
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "1.0 SCe 65",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 65,
+            "torqueNm": 95,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 TCe 90",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 90,
+            "torqueNm": 160,
+            "gearbox": "MANUAL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TCe 90 X-Tronic",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 90,
+            "torqueNm": 142,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TCe 100",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 100,
+            "torqueNm": 160,
+            "gearbox": "MANUAL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe 130 EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "horsePower": 130,
+            "torqueNm": 240,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 Blue dCi 85",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 85,
+            "torqueNm": 220,
+            "gearbox": "MANUAL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 Blue dCi 100",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 100,
+            "torqueNm": 260,
+            "gearbox": "MANUAL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 Blue dCi 115",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 115,
+            "torqueNm": 260,
+            "gearbox": "MANUAL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 E-Tech Hybrid 140",
+            "fuelType": "HYBRID",
+            "engineCapacity": 1598,
+            "horsePower": 140,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 E-Tech Full Hybrid 145",
+            "fuelType": "HYBRID",
+            "engineCapacity": 1598,
+            "horsePower": 145,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Clio (2012–2019, Clio 4)",
+        "trims": [
+          "Joy",
+          "Touch",
+          "Icon",
+          "GT Line"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2012,
+        "endYear": 2019,
+        "versions": [
+          {
+            "name": "1.2 16V 75",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1149,
+            "horsePower": 75,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "0.9 TCe 90",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 898,
+            "horsePower": 90,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.2 TCe 120 EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1197,
+            "horsePower": 120,
+            "torqueNm": 190,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 75",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 75,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 90",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 90,
+            "torqueNm": 220,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 90 EDC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 90,
+            "torqueNm": 220,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Clio RS",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Clio (2005–2012, Clio 3)",
+        "engines": [
+          {
+            "name": "1.2 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Authentique",
+          "Expression",
+          "Dynamique",
+          "Extreme",
+          "Grand Tour"
+        ]
+      },
+      {
+        "name": "Clio (1998–2005, Clio 2)",
+        "engines": [
+          {
+            "name": "1.4 8V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "RTA",
+          "RTE",
+          "RXT",
+          "Alize",
+          "Authentique"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Clio Sport Tourer",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Clio Sport Tourer (2013–2019, Clio 4)",
+        "engines": [
+          {
+            "name": "0.9 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Joy",
+          "Touch",
+          "Icon"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Symbol",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Symbol (2013–2021, Symbol 3)",
+        "trims": [
+          "Joy",
+          "Touch"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2013,
+        "endYear": 2021,
+        "versions": [
+          {
+            "name": "1.2 16V 75",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1149,
+            "horsePower": 75,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "0.9 TCe 90",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 898,
+            "horsePower": 90,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 75",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 75,
+            "torqueNm": 200,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 90",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 90,
+            "torqueNm": 220,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 90 Easy-R",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 90,
+            "torqueNm": 220,
+            "gearbox": "SEMI_AUTOMATIC",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Symbol (2008–2012, Symbol 2)",
+        "engines": [
+          {
+            "name": "1.4 8V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Authentique",
+          "Expression"
+        ]
+      },
+      {
+        "name": "Symbol (1999–2008, Symbol 1)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Alize",
+          "Expression",
+          "Dynamique"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Megane Hatchback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Megane Hatchback (2016–2024, Megane 4)",
+        "trims": [
+          "Joy",
+          "Touch",
+          "Icon",
+          "GT Line",
+          "RS Line"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2016,
+        "endYear": 2024,
+        "versions": [
+          {
+            "name": "1.2 TCe",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe 140 EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "horsePower": 140,
+            "torqueNm": 240,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 dCi 110 EDC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 110,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 Blue dCi 115 EDC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 115,
+            "torqueNm": 260,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 dCi",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Megane RS",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Megane Hatchback (2009–2016, Megane 3)",
+        "engines": [
+          {
+            "name": "1.4 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "Megane RS",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Joy",
+          "Touch",
+          "Icon",
+          "GT Line"
+        ]
+      },
+      {
+        "name": "Megane Hatchback (2002–2009, Megane 2)",
+        "engines": [
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Authentique",
+          "Expression",
+          "Dynamique",
+          "Privilege"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Megane Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Megane Sedan (2016–2024, Megane 4)",
+        "trims": [
+          "Joy",
+          "Joy Plus",
+          "Touch",
+          "Touch Plus",
+          "Icon",
+          "Icon Plus"
+        ],
+        "startYear": 2016,
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "1.6 SCe 115 X-Tronic",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 115,
+            "torqueNm": 156,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 110",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 110,
+            "torqueNm": 250,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 110 EDC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 110,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe 140",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "horsePower": 140,
+            "torqueNm": 240,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.3 TCe 140 EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "horsePower": 140,
+            "torqueNm": 240,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 Blue dCi 115",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 115,
+            "torqueNm": 260,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 Blue dCi 115 EDC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 115,
+            "torqueNm": 260,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Megane Sedan (2009–2016, Megane 3)",
+        "trims": [
+          "Expression",
+          "Dynamique",
+          "Business",
+          "Privilege"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2009,
+        "endYear": 2016,
+        "versions": [
+          {
+            "name": "1.6 16V 110",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 110,
+            "torqueNm": 151,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 110 EDC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 110,
+            "torqueNm": 240,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Megane Sedan (2004–2009, Megane 2)",
+        "engines": [
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Authentique",
+          "Expression",
+          "Dynamique",
+          "Extreme",
+          "Privilege"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Megane Sport Tourer",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Megane Sport Tourer (2016–2024, Megane 4)",
+        "engines": [
+          {
+            "name": "1.3 TCe ST",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi ST",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Touch",
+          "Icon",
+          "GT Line"
+        ]
+      },
+      {
+        "name": "Megane Sport Tourer (2009–2016, Megane 3)",
+        "engines": [
+          {
+            "name": "1.5 dCi ST",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Expression",
+          "Dynamique",
+          "Privilege"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Fluence",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Fluence (2009–2016, Fluence)",
+        "trims": [
+          "Authentique",
+          "Extreme",
+          "Expression",
+          "Touch",
+          "Icon",
+          "Business",
+          "Privilege"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2009,
+        "endYear": 2016,
+        "versions": [
+          {
+            "name": "1.6 16V 110",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 110,
+            "torqueNm": 151,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 dCi 90",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 90,
+            "torqueNm": 200,
+            "gearbox": "MANUAL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 110",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 110,
+            "torqueNm": 240,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 dCi 110 EDC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1461,
+            "horsePower": 110,
+            "torqueNm": 240,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 dCi",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Talisman",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Talisman Sedan (2015–2022, Talisman)",
+        "engines": [
+          {
+            "name": "1.3 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Touch",
+          "Icon",
+          "Signature"
+        ]
+      },
+      {
+        "name": "Talisman Sport Tourer (2015–2022, Talisman)",
+        "engines": [
+          {
+            "name": "1.6 dCi ST",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Icon"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Laguna",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Laguna (2007–2015, Laguna 3)",
+        "engines": [
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 T",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Expression",
+          "Dynamique",
+          "Privilege"
+        ]
+      },
+      {
+        "name": "Laguna (2001–2007, Laguna 2)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Authentique",
+          "Expression",
+          "Dynamique",
+          "Privilege"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Latitude",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Latitude (2011–2015, Latitude)",
+        "engines": [
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Expression",
+          "Privilege",
+          "Executive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Captur",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Captur (2019–, Captur 2)",
+        "trims": [
+          "Touch",
+          "Icon",
+          "RS Line"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "1.0 TCe 100",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 100,
+            "gearbox": "MANUAL",
+            "gearCount": 5,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe 130 EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "horsePower": 130,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe 155 EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "horsePower": 155,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 Mild Hybrid 160 EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "horsePower": 160,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 E-Tech Full Hybrid 145",
+            "fuelType": "HYBRID",
+            "engineCapacity": 1598,
+            "horsePower": 145,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Captur (2013–2019, Captur 1)",
+        "engines": [
+          {
+            "name": "0.9 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Joy",
+          "Touch",
+          "Icon"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Kadjar",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Kadjar (2015–2022, Kadjar)",
+        "engines": [
+          {
+            "name": "1.2 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 dCi 4WD",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Touch",
+          "Icon",
+          "GT Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Austral",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Austral (2022–, Austral)",
+        "engines": [
+          {
+            "name": "1.3 TCe Mild Hybrid",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 E-Tech Full Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Techno",
+          "Esprit Alpine"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Arkana",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Arkana (2021–, Arkana)",
+        "engines": [
+          {
+            "name": "1.3 TCe Mild Hybrid",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 E-Tech Full Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Techno",
+          "Esprit Alpine"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Koleos",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Koleos (2016–2023, Koleos 2)",
+        "engines": [
+          {
+            "name": "1.6 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi 4WD",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Touch",
+          "Icon"
+        ]
+      },
+      {
+        "name": "Koleos (2008–2016, Koleos 1)",
+        "engines": [
+          {
+            "name": "2.0 dCi 4WD",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Expression",
+          "Privilege"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Scenic",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Scenic (2016–2022, Scenic 4)",
+        "engines": [
+          {
+            "name": "1.2 TCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Touch",
+          "Icon"
+        ]
+      },
+      {
+        "name": "Scenic (2009–2016, Scenic 3)",
+        "engines": [
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Expression",
+          "Privilege"
+        ]
+      },
+      {
+        "name": "Scenic (2003–2009, Scenic 2)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Authentique",
+          "Expression",
+          "Privilege"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Grand Scenic",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Grand Scenic (2016–2022, Grand Scenic 4)",
+        "engines": [
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Icon"
+        ]
+      },
+      {
+        "name": "Grand Scenic (2009–2016, Grand Scenic 3)",
+        "engines": [
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Privilege"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Espace",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Espace (2015–2023, Espace 5)",
+        "engines": [
+          {
+            "name": "1.6 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.8 TCe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Icon",
+          "Initiale Paris"
+        ]
+      },
+      {
+        "name": "Espace (2002–2014, Espace 4)",
+        "engines": [
+          {
+            "name": "2.0 dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Expression",
+          "Privilege"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Zoe",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Zoe (2012–2024, Zoe)",
+        "engines": [
+          {
+            "name": "Zoe 80 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Zoe 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Zen",
+          "Intens"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Megane E-Tech Electric",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Megane E-Tech Electric (2022–, Megane E-Tech)",
+        "engines": [
+          {
+            "name": "Megane 160 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Iconic",
+          "Techno"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Scenic E-Tech Electric",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Scenic E-Tech Electric (2024–, Scenic E-Tech)",
+        "engines": [
+          {
+            "name": "Scenic 160 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Techno",
+          "Esprit Alpine"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RENAULT",
+    "type": "CAR",
+    "name": "Duster",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Duster (2024–, 3. nesil)",
+        "startYear": 2024,
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "trims": [
+          "Evolution",
+          "Techno",
+          "Journey",
+          "Extreme"
+        ],
+        "versions": [
+          {
+            "name": "1.3 TCe 130 Mild Hybrid 4x4",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "horsePower": 130,
+            "torqueNm": 230,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FOUR_X_FOUR",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.3 TCe EDC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1333,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft",
+            "horsePower": 145
+          },
+          {
+            "name": "Full Hybrid",
+            "fuelType": "HYBRID",
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft",
+            "engineCapacity": 1798,
+            "horsePower": 160
+          },
+          {
+            "name": "1.2 TCe Eco-G",
+            "fuelType": "LPG",
+            "engineCapacity": 1199,
+            "gearbox": "MANUAL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  }
+]

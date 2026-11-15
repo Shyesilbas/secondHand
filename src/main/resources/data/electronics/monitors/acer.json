@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "ACER",
+    "type": "MONITOR",
+    "name": "Nitro XV272U Vbmiiprx",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Acer Nitro XV272U",
+      "XV272U 170Hz"
+    ]
+  },
+  {
+    "brand": "ACER",
+    "type": "MONITOR",
+    "name": "Predator XB273U V3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Acer Predator XB273U",
+      "XB273U"
+    ]
+  }
+]

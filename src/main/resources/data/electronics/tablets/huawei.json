@@ -1,0 +1,127 @@
+[
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MatePad Pro 13.2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MatePad Pro 13.2",
+      "MatePad Pro 13.2",
+      "MatePad 13.2"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MatePad Pro 12.2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MatePad Pro 12.2",
+      "MatePad Pro 12.2",
+      "MatePad 12.2"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MatePad Pro 11",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MatePad Pro 11",
+      "MatePad Pro 11",
+      "MatePad 11 Pro"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MatePad Air",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MatePad Air",
+      "MatePad Air"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MatePad 11.5S",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MatePad 11.5S",
+      "MatePad 11.5S",
+      "MatePad 11.5 S"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MatePad 11.5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MatePad 11.5",
+      "MatePad 11.5"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MatePad 11",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MatePad 11",
+      "MatePad 11"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MatePad 10.4",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei MatePad 10.4",
+      "MatePad 10.4"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MediaPad M6",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei MediaPad M6",
+      "MediaPad M6"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MediaPad M5 Lite",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei MediaPad M5 Lite",
+      "MediaPad M5 Lite"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "TABLET",
+    "name": "MediaPad T5",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei MediaPad T5",
+      "MediaPad T5"
+    ]
+  }
+]

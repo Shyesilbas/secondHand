@@ -1,0 +1,107 @@
+[
+  {
+    "brand": "LAND_ROVER",
+    "type": "CAR",
+    "name": "Defender",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Defender (2020–, L663)",
+        "engines": [
+          { "name": "D200 (200 PS)", "fuelType": "DIESEL" },
+          { "name": "D250 (250 PS)", "fuelType": "DIESEL" },
+          { "name": "D300 (300 PS)", "fuelType": "DIESEL" },
+          { "name": "P400e PHEV", "fuelType": "HYBRID" }
+        ],
+        "trims": ["90", "110", "130", "X-Dynamic", "X"]
+      }
+    ]
+  },
+  {
+    "brand": "LAND_ROVER",
+    "type": "CAR",
+    "name": "Discovery Sport",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Discovery Sport (2014–, L550)",
+        "engines": [
+          { "name": "D165 (163 PS)", "fuelType": "DIESEL" },
+          { "name": "D200 (204 PS)", "fuelType": "DIESEL" },
+          { "name": "P300e PHEV", "fuelType": "HYBRID" }
+        ],
+        "trims": ["S", "SE", "HSE", "R-Dynamic"]
+      }
+    ]
+  },
+  {
+    "brand": "LAND_ROVER",
+    "type": "CAR",
+    "name": "Range Rover Evoque",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Evoque (2018–, L538)",
+        "engines": [
+          { "name": "D165 (163 PS)", "fuelType": "DIESEL" },
+          { "name": "D200 (204 PS)", "fuelType": "DIESEL" },
+          { "name": "P300e PHEV", "fuelType": "HYBRID" }
+        ],
+        "trims": ["S", "SE", "HSE", "R-Dynamic"]
+      }
+    ]
+  },
+  {
+    "brand": "LAND_ROVER",
+    "type": "CAR",
+    "name": "Range Rover Velar",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Velar (2017–, L560)",
+        "engines": [
+          { "name": "D200 (204 PS)", "fuelType": "DIESEL" },
+          { "name": "D300 (300 PS)", "fuelType": "DIESEL" },
+          { "name": "P400e PHEV", "fuelType": "HYBRID" }
+        ],
+        "trims": ["S", "SE", "HSE", "R-Dynamic", "Autobiography"]
+      }
+    ]
+  },
+  {
+    "brand": "LAND_ROVER",
+    "type": "CAR",
+    "name": "Range Rover Sport",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Range Rover Sport (2022–, L461)",
+        "engines": [
+          { "name": "D250 (250 PS)", "fuelType": "DIESEL" },
+          { "name": "D300 (300 PS)", "fuelType": "DIESEL" },
+          { "name": "P460e PHEV", "fuelType": "HYBRID" },
+          { "name": "P510e PHEV", "fuelType": "HYBRID" }
+        ],
+        "trims": ["SE", "Dynamic SE", "Dynamic HSE", "Autobiography"]
+      }
+    ]
+  },
+  {
+    "brand": "LAND_ROVER",
+    "type": "CAR",
+    "name": "Range Rover",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Range Rover (2022–, L460)",
+        "engines": [
+          { "name": "D300 (300 PS)", "fuelType": "DIESEL" },
+          { "name": "D350 (350 PS)", "fuelType": "DIESEL" },
+          { "name": "P460e PHEV", "fuelType": "HYBRID" },
+          { "name": "P550e PHEV", "fuelType": "HYBRID" }
+        ],
+        "trims": ["SE", "HSE", "Autobiography", "SV"]
+      }
+    ]
+  }
+]

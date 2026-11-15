@@ -1,5 +1,7 @@
 package com.serhat.secondhand.email.application.event.model;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +17,5 @@ public class MembershipUpgradeEmailData {
     private String paymentId;
     private String date;
     private String expiryDate;
+    private List<String> benefits;
 }

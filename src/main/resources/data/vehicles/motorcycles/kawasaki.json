@@ -1,0 +1,217 @@
+[
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Ninja ZX-10R",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "Ninja ZX-10R (2021–)",
+        "engines": [
+          {
+            "name": "998cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "SE",
+          "KRT Edition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Ninja ZX-6R",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "Ninja ZX-6R (2019–)",
+        "engines": [
+          {
+            "name": "636cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "KRT Edition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Ninja 650",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "Ninja 650 (2020–)",
+        "engines": [
+          {
+            "name": "649cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "KRT Edition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Ninja 400",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "Ninja 400 (2018–)",
+        "engines": [
+          {
+            "name": "399cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "KRT Edition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Z900",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Z900 (2020–)",
+        "trims": [
+          "Standard",
+          "SE",
+          "Performance"
+        ],
+        "versions": [
+          {
+            "name": "948cc Inline-4",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 948,
+            "horsePower": 125,
+            "torqueNm": 99,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Z650",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Z650 (2020–)",
+        "engines": [
+          {
+            "name": "649cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Z400",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Z400 (2019–)",
+        "engines": [
+          {
+            "name": "399cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Versys 1000",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "Versys 1000 (2019–)",
+        "engines": [
+          {
+            "name": "1043cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "SE",
+          "Grand Tourer"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KAWASAKI",
+    "type": "MOTORCYCLE",
+    "name": "Versys 650",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "Versys 650 (2022–)",
+        "engines": [
+          {
+            "name": "649cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Grand Tourer"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,132 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds3 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Buds3 Pro",
+      "Buds 3 Pro"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 6
+    }
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds3",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Buds3",
+      "Buds 3"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds2 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Buds2 Pro",
+      "Buds 2 Pro"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 5
+    }
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds2",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Buds2",
+      "Buds 2"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 5
+    }
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds Pro",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Buds Pro",
+      "Buds Pro 1"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds Live",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Buds Live",
+      "Galaxy Buds Live"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds+",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Buds+",
+      "Buds Plus"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Galaxy Buds 1"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "HEADPHONES",
+    "name": "Galaxy Buds FE",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Buds FE",
+      "Galaxy Buds FE"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 6
+    }
+  }
+]

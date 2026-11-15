@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "ACER",
+    "type": "LAPTOP",
+    "name": "Predator Helios 16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Acer Predator Helios 16",
+      "Helios 16"
+    ]
+  },
+  {
+    "brand": "ACER",
+    "type": "LAPTOP",
+    "name": "Predator Helios 18",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Acer Predator Helios 18",
+      "Helios 18"
+    ]
+  },
+  {
+    "brand": "ACER",
+    "type": "LAPTOP",
+    "name": "Nitro 16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Acer Nitro 16 AMD/Intel",
+      "Nitro 16"
+    ]
+  },
+  {
+    "brand": "ACER",
+    "type": "LAPTOP",
+    "name": "Nitro 5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Acer Nitro 5 AN515",
+      "Nitro 5"
+    ]
+  },
+  {
+    "brand": "ACER",
+    "type": "LAPTOP",
+    "name": "Swift Go 14 OLED",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Acer Swift Go 14",
+      "Swift Go 14"
+    ]
+  },
+  {
+    "brand": "ACER",
+    "type": "LAPTOP",
+    "name": "Aspire 5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Acer Aspire 5 A515",
+      "Aspire 5"
+    ]
+  }
+]

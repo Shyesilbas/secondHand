@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="body">
+    <div class="code" th:if="${verificationCode != null}">
+        <div class="code-label" th:text="${codeLabel} ?: 'Doğrulama kodunuz'">Doğrulama kodunuz</div>
+        <div class="code-value" th:text="${verificationCode}">123456</div>
+        <div class="code-hint" th:if="${codeHint != null}" th:text="${codeHint}">Kod 15 dakika geçerlidir.</div>
+    </div>
+    <div class="message" th:if="${!#strings.isEmpty(message)}" th:utext="${message}">Mesaj</div>
+</section>
+</body>
+</html>

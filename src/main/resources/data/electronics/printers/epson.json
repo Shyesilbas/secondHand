@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "EPSON",
+    "type": "PRINTER",
+    "name": "EcoTank L3250 Wi-Fi",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Epson L3250",
+      "EcoTank L3250"
+    ]
+  },
+  {
+    "brand": "EPSON",
+    "type": "PRINTER",
+    "name": "EcoTank L3251 Wi-Fi",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Epson L3251",
+      "EcoTank L3251"
+    ]
+  },
+  {
+    "brand": "EPSON",
+    "type": "PRINTER",
+    "name": "EcoTank L3256 Beyaz Wi-Fi",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Epson L3256",
+      "EcoTank L3256"
+    ]
+  },
+  {
+    "brand": "EPSON",
+    "type": "PRINTER",
+    "name": "EcoTank L8050 6 Renkli Fotoğraf",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Epson L8050",
+      "EcoTank L8050 Photo"
+    ]
+  }
+]

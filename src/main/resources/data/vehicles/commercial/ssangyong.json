@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "SSANGYONG",
+    "type": "COMMERCIAL",
+    "name": "Musso Grand",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "Musso Grand (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.2 e-XDi (181 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 181,
+            "engineCapacity": 2157
+          },
+          {
+            "name": "2.2 e-XDi (202 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 202,
+            "engineCapacity": 2157
+          }
+        ],
+        "trims": [
+          "Platinum",
+          "Titanium"
+        ]
+      }
+    ]
+  }
+]

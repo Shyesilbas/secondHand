@@ -1,0 +1,29 @@
+[
+  {
+    "brand": "ISUZU",
+    "type": "TRUCK",
+    "name": "Novo",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "ISUZU",
+    "type": "TRUCK",
+    "name": "Turkuaz",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "ISUZU",
+    "type": "TRUCK",
+    "name": "Citibus",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  }
+]

@@ -1,0 +1,502 @@
+[
+ {
+  "key": "NIKE",
+  "label": "Nike",
+  "segment": "MID"
+ },
+ {
+  "key": "ADIDAS",
+  "label": "Adidas",
+  "segment": "MID"
+ },
+ {
+  "key": "PUMA",
+  "label": "Puma",
+  "segment": "MID"
+ },
+ {
+  "key": "UNDER_ARMOUR",
+  "label": "Under Armour",
+  "segment": "MID"
+ },
+ {
+  "key": "ZARA",
+  "label": "Zara",
+  "segment": "MID"
+ },
+ {
+  "key": "H_M",
+  "label": "H&M",
+  "segment": "MID"
+ },
+ {
+  "key": "MANGO",
+  "label": "Mango",
+  "segment": "MID"
+ },
+ {
+  "key": "PULL_BEAR",
+  "label": "Pull&Bear",
+  "segment": "MID"
+ },
+ {
+  "key": "BERSHKA",
+  "label": "Bershka",
+  "segment": "MID"
+ },
+ {
+  "key": "STRADIVARIUS",
+  "label": "Stradivarius",
+  "segment": "MID"
+ },
+ {
+  "key": "MASSIMO_DUTTI",
+  "label": "Massimo Dutti",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "LC_WAIKIKI",
+  "label": "LC Waikiki",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "KOTON",
+  "label": "Koton",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "DEFACTO",
+  "label": "DeFacto",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "MAVI",
+  "label": "Mavi",
+  "segment": "MID"
+ },
+ {
+  "key": "COLINS",
+  "label": "Colin's",
+  "segment": "MID"
+ },
+ {
+  "key": "LTB",
+  "label": "LTB",
+  "segment": "MID"
+ },
+ {
+  "key": "LEVIS",
+  "label": "Levi's",
+  "segment": "MID"
+ },
+ {
+  "key": "VANS",
+  "label": "Vans",
+  "segment": "MID"
+ },
+ {
+  "key": "CONVERSE",
+  "label": "Converse",
+  "segment": "MID"
+ },
+ {
+  "key": "NEW_BALANCE",
+  "label": "New Balance",
+  "segment": "MID"
+ },
+ {
+  "key": "SKECHERS",
+  "label": "Skechers",
+  "segment": "MID"
+ },
+ {
+  "key": "ASICS",
+  "label": "Asics",
+  "segment": "MID"
+ },
+ {
+  "key": "SALOMON",
+  "label": "Salomon",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "TIMBERLAND",
+  "label": "Timberland",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "THE_NORTH_FACE",
+  "label": "The North Face",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "COLUMBIA",
+  "label": "Columbia",
+  "segment": "MID"
+ },
+ {
+  "key": "PATAGONIA",
+  "label": "Patagonia",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "JACK_WOLFSKIN",
+  "label": "Jack Wolfskin",
+  "segment": "MID"
+ },
+ {
+  "key": "TOMMY_HILFIGER",
+  "label": "Tommy Hilfiger",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "CALVIN_KLEIN",
+  "label": "Calvin Klein",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "RALPH_LAUREN",
+  "label": "Ralph Lauren",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "LACOSTE",
+  "label": "Lacoste",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "GUESS",
+  "label": "Guess",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "HUGO_BOSS",
+  "label": "Hugo Boss",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "ARMANI",
+  "label": "Armani",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "GUCCI",
+  "label": "Gucci",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "PRADA",
+  "label": "Prada",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "LOUIS_VUITTON",
+  "label": "Louis Vuitton",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "BALENCIAGA",
+  "label": "Balenciaga",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "BURBERRY",
+  "label": "Burberry",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "DIOR",
+  "label": "Dior",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "CHANEL",
+  "label": "Chanel",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "HERMES",
+  "label": "Hermès",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "VERSACE",
+  "label": "Versace",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "DOLCE_GABBANA",
+  "label": "Dolce & Gabbana",
+  "segment": "LUXURY"
+ },
+ {
+  "key": "BEYMEN",
+  "label": "Beymen",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "VAKKO",
+  "label": "Vakko",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "NETWORK",
+  "label": "Network",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "IPEKYOL",
+  "label": "İpekyol",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "TWIST",
+  "label": "Twist",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "YARGICI",
+  "label": "Yargıcı",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "DERIMOD",
+  "label": "Derimod",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "KEMAL_TANCA",
+  "label": "Kemal Tanca",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "INCI",
+  "label": "İnci",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "HOTIC",
+  "label": "Hotiç",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "GREYDER",
+  "label": "Greyder",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "BETA",
+  "label": "Beta",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "KINETIX",
+  "label": "Kinetix",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "POLARIS",
+  "label": "Polaris",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "FLO",
+  "label": "Flo",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "DECATHLON",
+  "label": "Decathlon",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "QUECHUA",
+  "label": "Quechua",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "DOMYOS",
+  "label": "Domyos",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "KIPSTA",
+  "label": "Kipsta",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "TARMAK",
+  "label": "Tarmak",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "ARTENGO",
+  "label": "Artengo",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "KALENJI",
+  "label": "Kalenji",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "NABAIJI",
+  "label": "Nabaiji",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "WEDZE",
+  "label": "Wedze",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "SOLOGNAC",
+  "label": "Solognac",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "OYSHO",
+  "label": "Oysho",
+  "segment": "MID"
+ },
+ {
+  "key": "US_POLO_ASSN",
+  "label": "U.S. Polo Assn.",
+  "segment": "MID"
+ },
+ {
+  "key": "PIERRE_CARDIN",
+  "label": "Pierre Cardin",
+  "segment": "MID"
+ },
+ {
+  "key": "KIGILI",
+  "label": "Kiğılı",
+  "segment": "MID"
+ },
+ {
+  "key": "ALTINYILDIZ_CLASSICS",
+  "label": "Altınyıldız Classics",
+  "segment": "MID"
+ },
+ {
+  "key": "SARAR",
+  "label": "Sarar",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "DAMAT_TWEEN",
+  "label": "Damat Tween",
+  "segment": "MID"
+ },
+ {
+  "key": "AVVA",
+  "label": "Avva",
+  "segment": "MID"
+ },
+ {
+  "key": "LUFIAN",
+  "label": "Lufian",
+  "segment": "MID"
+ },
+ {
+  "key": "TUDORS",
+  "label": "Tudors",
+  "segment": "MID"
+ },
+ {
+  "key": "PENTI",
+  "label": "Penti",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "SUWEN",
+  "label": "Suwen",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "CROCS",
+  "label": "Crocs",
+  "segment": "MID"
+ },
+ {
+  "key": "BIRKENSTOCK",
+  "label": "Birkenstock",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "DR_MARTENS",
+  "label": "Dr. Martens",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "CAMPER",
+  "label": "Camper",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "REEBOK",
+  "label": "Reebok",
+  "segment": "MID"
+ },
+ {
+  "key": "FILA",
+  "label": "Fila",
+  "segment": "MID"
+ },
+ {
+  "key": "CHAMPION",
+  "label": "Champion",
+  "segment": "MID"
+ },
+ {
+  "key": "GANT",
+  "label": "Gant",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "NAUTICA",
+  "label": "Nautica",
+  "segment": "MID"
+ },
+ {
+  "key": "MICHAEL_KORS",
+  "label": "Michael Kors",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "COACH",
+  "label": "Coach",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "RAY_BAN",
+  "label": "Ray-Ban",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "CASIO",
+  "label": "Casio",
+  "segment": "BUDGET"
+ },
+ {
+  "key": "SEIKO",
+  "label": "Seiko",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "PANDORA",
+  "label": "Pandora",
+  "segment": "MID"
+ },
+ {
+  "key": "SWAROVSKI",
+  "label": "Swarovski",
+  "segment": "PREMIUM"
+ },
+ {
+  "key": "OTHER",
+  "label": "Other",
+  "segment": "BUDGET"
+ }
+]

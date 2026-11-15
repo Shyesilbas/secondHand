@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "AOC",
+    "type": "MONITOR",
+    "name": "24G2SP/BK",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "AOC 24G2SP",
+      "24G2SP 165Hz"
+    ]
+  },
+  {
+    "brand": "AOC",
+    "type": "MONITOR",
+    "name": "Q27G2S/EU",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "AOC Q27G2S",
+      "Q27G2S 2K 165Hz"
+    ]
+  },
+  {
+    "brand": "AOC",
+    "type": "MONITOR",
+    "name": "AGON PRO AG274QG",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "AOC AG274QG",
+      "AG274QG 240Hz G-Sync"
+    ]
+  },
+  {
+    "brand": "AOC",
+    "type": "MONITOR",
+    "name": "Gaming CU34G2X",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "AOC CU34G2X",
+      "CU34G2X 34 Ultrawide"
+    ]
+  }
+]

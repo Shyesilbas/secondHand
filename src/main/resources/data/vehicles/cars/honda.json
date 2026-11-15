@@ -1,0 +1,839 @@
+[
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Civic Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Civic Sedan (2021–, FE)",
+        "trims": [
+          "Premium",
+          "Elegance",
+          "Executive+",
+          "Eco Elegance",
+          "Eco Executive+"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2021,
+        "versions": [
+          {
+            "name": "1.5 VTEC Turbo 182 CVT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 182,
+            "torqueNm": 240,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 VTEC Turbo Eco 129 CVT",
+            "fuelType": "LPG",
+            "engineCapacity": 1498,
+            "horsePower": 129,
+            "torqueNm": 180,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Civic Sedan (2016–2021, FC)",
+        "trims": [
+          "Premium",
+          "Elegance",
+          "Executive",
+          "RS"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2016,
+        "endYear": 2021,
+        "versions": [
+          {
+            "name": "1.6 i-VTEC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 i-VTEC Eco 125 CVT",
+            "fuelType": "LPG",
+            "engineCapacity": 1597,
+            "horsePower": 125,
+            "torqueNm": 152,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 VTEC Turbo 182 CVT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 182,
+            "gearbox": "CVT",
+            "drivetrain": "FWD",
+            "source": "verified",
+            "torqueNm": 220
+          },
+          {
+            "name": "1.6 i-DTEC",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Civic Sedan (2012–2016, FB)",
+        "trims": [
+          "Dream",
+          "Elegance",
+          "Executive"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2012,
+        "endYear": 2016,
+        "versions": [
+          {
+            "name": "1.6 i-VTEC 125",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1597,
+            "horsePower": 125,
+            "torqueNm": 152,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Civic Sedan (2006–2012, FD)",
+        "engines": [
+          {
+            "name": "1.6 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Dream",
+          "Elegance",
+          "Executive",
+          "Premium"
+        ]
+      },
+      {
+        "name": "Civic Sedan (2001–2006, ES)",
+        "engines": [
+          {
+            "name": "1.6 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "LS",
+          "ES"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Civic Hatchback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Civic Hatchback (2021–, FL)",
+        "engines": [
+          {
+            "name": "1.5 VTEC Turbo",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Sport",
+          "Advance"
+        ]
+      },
+      {
+        "name": "Civic Hatchback (2017–2021, FK7/FK8)",
+        "engines": [
+          {
+            "name": "1.5 VTEC Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 VTEC Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 i-DTEC",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elegance",
+          "Sport",
+          "Sport Plus"
+        ]
+      },
+      {
+        "name": "Civic Hatchback (2012–2017, FK)",
+        "engines": [
+          {
+            "name": "1.4 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 i-DTEC",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Sport",
+          "Executive"
+        ]
+      },
+      {
+        "name": "Civic Hatchback (2006–2011, FN)",
+        "engines": [
+          {
+            "name": "1.4 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Sport"
+        ]
+      },
+      {
+        "name": "Civic Hatchback (2001–2005, EP)",
+        "engines": [
+          {
+            "name": "1.4 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "LS",
+          "ES"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "City",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "City (2021–, GN)",
+        "engines": [
+          {
+            "name": "1.5 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Executive"
+        ]
+      },
+      {
+        "name": "City (2008–2014, GM2)",
+        "engines": [
+          {
+            "name": "1.4 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elite"
+        ]
+      },
+      {
+        "name": "City (2002–2008, GD)",
+        "engines": [
+          {
+            "name": "1.4 i-DSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Jazz",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Jazz (2020–, GR)",
+        "engines": [
+          {
+            "name": "1.5 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Executive",
+          "Crosstar"
+        ]
+      },
+      {
+        "name": "Jazz (2015–2020, GK)",
+        "engines": [
+          {
+            "name": "1.3 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Comfort",
+          "Elegant",
+          "Dynamic"
+        ]
+      },
+      {
+        "name": "Jazz (2008–2015, GE)",
+        "engines": [
+          {
+            "name": "1.3 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Joy",
+          "Fun",
+          "Elite"
+        ]
+      },
+      {
+        "name": "Jazz (2001–2008, GD)",
+        "engines": [
+          {
+            "name": "1.4 i-DSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Cool",
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Accord",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Accord (2018–2022, CV)",
+        "engines": [
+          {
+            "name": "1.5 VTEC Turbo",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Executive",
+          "Executive+"
+        ]
+      },
+      {
+        "name": "Accord (2008–2015, CU)",
+        "engines": [
+          {
+            "name": "2.0 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.2 i-DTEC",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Executive",
+          "Executive Premium"
+        ]
+      },
+      {
+        "name": "Accord (2003–2008, CL/CM)",
+        "engines": [
+          {
+            "name": "2.0 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.2 i-CTDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Executive"
+        ]
+      },
+      {
+        "name": "Accord (1998–2002, CG)",
+        "engines": [
+          {
+            "name": "2.0 VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "ES",
+          "LS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "CR-V",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "CR-V (2023–, RS)",
+        "engines": [
+          {
+            "name": "1.5 VTEC Turbo",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Executive"
+        ]
+      },
+      {
+        "name": "CR-V (2017–2022, RW)",
+        "engines": [
+          {
+            "name": "1.5 VTEC Turbo",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Executive",
+          "Executive+"
+        ]
+      },
+      {
+        "name": "CR-V (2012–2016, RM)",
+        "engines": [
+          {
+            "name": "2.0 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 i-DTEC",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elegance",
+          "Executive",
+          "Premium"
+        ]
+      },
+      {
+        "name": "CR-V (2007–2011, RE)",
+        "engines": [
+          {
+            "name": "2.0 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.2 i-CTDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Executive"
+        ]
+      },
+      {
+        "name": "CR-V (2002–2006, RD)",
+        "engines": [
+          {
+            "name": "2.0 i-VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "ES",
+          "LS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "HR-V",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "HR-V (2021–, RV)",
+        "engines": [
+          {
+            "name": "1.5 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Style",
+          "Advance"
+        ]
+      },
+      {
+        "name": "HR-V (2015–2021, RU)",
+        "engines": [
+          {
+            "name": "1.5 i-VTEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 i-DTEC",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elegance",
+          "Executive"
+        ]
+      },
+      {
+        "name": "HR-V (1999–2006, GH)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "ZR-V",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "ZR-V (2023–, RZ)",
+        "engines": [
+          {
+            "name": "2.0 e:HEV",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Advance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "CR-Z",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "CR-Z (2010–2016, ZF)",
+        "engines": [
+          {
+            "name": "1.5 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Sport",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "S2000",
+    "supportedBodyTypes": [
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "S2000 (1999–2009, AP1/AP2)",
+        "engines": [
+          {
+            "name": "2.0 VTEC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "VSA"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "NSX",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "NSX (2016–2022, NC1)",
+        "engines": [
+          {
+            "name": "3.5 V6 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Honda e",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Honda e (2020–2023)",
+        "engines": [
+          {
+            "name": "Honda e 100 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Honda e 113 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Advance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Jazz e:HEV",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Jazz e:HEV (2020–)",
+        "engines": [
+          {
+            "name": "1.5 e:HEV",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Advance",
+          "Crosstar Advance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "HR-V e:HEV",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "HR-V e:HEV (2021–)",
+        "engines": [
+          {
+            "name": "1.5 e:HEV",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Advance",
+          "Style"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Civic e:HEV",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Civic e:HEV (2021–)",
+        "engines": [
+          {
+            "name": "2.0 e:HEV",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Advance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "CR-V e:HEV",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "CR-V e:HEV (2023–)",
+        "engines": [
+          {
+            "name": "2.0 e:HEV",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Advance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Civic Type R",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Civic Type R",
+        "engines": [
+          {
+            "name": "2.0 VTEC Turbo Type R",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Type R"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HONDA",
+    "type": "CAR",
+    "name": "Integra Type R",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "Integra Type R",
+        "engines": [
+          {
+            "name": "1.8 VTEC Type R",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Type R"
+        ]
+      }
+    ]
+  }
+]

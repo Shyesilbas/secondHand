@@ -1,0 +1,62 @@
+[
+  {
+    "brand": "MARSHALL",
+    "type": "HEADPHONES",
+    "name": "Major IV",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Major 4",
+      "Major IV Bluetooth"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": false,
+      "hasMicrophone": true,
+      "batteryLifeHours": 80
+    }
+  },
+  {
+    "brand": "MARSHALL",
+    "type": "HEADPHONES",
+    "name": "Major V",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Major 5",
+      "Major V Bluetooth"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": false,
+      "hasMicrophone": true,
+      "batteryLifeHours": 100
+    }
+  },
+  {
+    "brand": "MARSHALL",
+    "type": "HEADPHONES",
+    "name": "Monitor II A.N.C.",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Monitor 2 ANC",
+      "Monitor II ANC"
+    ]
+  },
+  {
+    "brand": "MARSHALL",
+    "type": "HEADPHONES",
+    "name": "Motif II A.N.C.",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Motif 2 ANC",
+      "Motif II"
+    ]
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "SSANGYONG",
+    "type": "CAR",
+    "name": "Torres",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Torres (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 GDI Turbo (163 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 163,
+            "engineCapacity": 1497
+          },
+          {
+            "name": "EVX Elektrik (207 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 207,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Limited",
+          "Titanium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SSANGYONG",
+    "type": "CAR",
+    "name": "Korando",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Korando (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 GDI Turbo (163 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 163,
+            "engineCapacity": 1497
+          },
+          {
+            "name": "1.6 e-XDi (136 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 136,
+            "engineCapacity": 1597
+          }
+        ],
+        "trims": [
+          "Limited",
+          "Titanium"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "BOSCH",
+    "type": "AIR_CONDITIONER",
+    "name": "Climate 5000i 12000 BTU Inverter",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Bosch Climate 5000i",
+      "Climate 5000i 12k"
+    ]
+  },
+  {
+    "brand": "BOSCH",
+    "type": "AIR_CONDITIONER",
+    "name": "Climate 3000i 18000 BTU Inverter",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Bosch Climate 3000i",
+      "Climate 3000i 18k"
+    ]
+  }
+]

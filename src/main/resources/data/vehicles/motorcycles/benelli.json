@@ -1,0 +1,82 @@
+[
+  {
+    "brand": "BENELLI",
+    "type": "MOTORCYCLE",
+    "name": "TRK 502",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "TRK 502 / 502X (2017–)",
+        "startYear": 2017,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "500cc Twin (47.6 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 48,
+            "engineCapacity": 500
+          }
+        ],
+        "trims": [
+          "502 Yol",
+          "502X Macera"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BENELLI",
+    "type": "MOTORCYCLE",
+    "name": "Leoncino 500",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Leoncino 500 (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "500cc Twin (47.6 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 48,
+            "engineCapacity": 500
+          }
+        ],
+        "trims": [
+          "Standart",
+          "Trail"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BENELLI",
+    "type": "MOTORCYCLE",
+    "name": "TNT 125",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "TNT 125 (2017–)",
+        "startYear": 2017,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "125cc Single (11 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 11,
+            "engineCapacity": 125
+          }
+        ],
+        "trims": [
+          "CBS"
+        ]
+      }
+    ]
+  }
+]

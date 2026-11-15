@@ -1,0 +1,116 @@
+[
+  {
+    "brand": "DS",
+    "type": "CAR",
+    "name": "DS 4",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "DS 4 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.2 PureTech (130 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 130,
+            "engineCapacity": 1199
+          },
+          {
+            "name": "1.5 BlueHDi (130 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 130,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "E-TENSE 225 PHEV",
+            "fuelType": "HYBRID",
+            "horsePower": 225,
+            "engineCapacity": 1598
+          }
+        ],
+        "trims": [
+          "Bastille",
+          "Trocadero",
+          "Rivoli",
+          "Performance Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DS",
+    "type": "CAR",
+    "name": "DS 7",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "DS 7 (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 BlueHDi (130 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 130,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "1.6 PureTech (225 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 225,
+            "engineCapacity": 1598
+          },
+          {
+            "name": "E-TENSE 4x4 (300 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 300,
+            "engineCapacity": 1598
+          }
+        ],
+        "trims": [
+          "Performance Line",
+          "Rivoli",
+          "Opera"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "DS",
+    "type": "CAR",
+    "name": "DS 9",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "DS 9 (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.6 PureTech (225 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 225,
+            "engineCapacity": 1598
+          },
+          {
+            "name": "E-TENSE 250 PHEV",
+            "fuelType": "HYBRID",
+            "horsePower": 250,
+            "engineCapacity": 1598
+          }
+        ],
+        "trims": [
+          "Rivoli+",
+          "Opera"
+        ]
+      }
+    ]
+  }
+]

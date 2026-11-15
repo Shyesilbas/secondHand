@@ -62,7 +62,7 @@ class PaymentVerificationMessageBuilderTest {
         String html = builder.buildPaymentDetails(user, PaymentTransactionType.SHOWCASE_PAYMENT,
                 request(PaymentTransactionType.SHOWCASE_PAYMENT, 7));
 
-        assertThat(html).contains("82,60 TL").contains("7 Gün");
+        assertThat(html).contains("82,60 TRY").contains("7 Gün");
     }
 
     @Test
@@ -80,7 +80,7 @@ class PaymentVerificationMessageBuilderTest {
         String html = builder.buildPaymentDetails(user, PaymentTransactionType.MEMBERSHIP_PAYMENT,
                 request(PaymentTransactionType.MEMBERSHIP_PAYMENT, null));
 
-        assertThat(html).contains("149,90 TL");
+        assertThat(html).contains("149,90 TRY");
     }
 
     @Test
@@ -90,6 +90,6 @@ class PaymentVerificationMessageBuilderTest {
         String html = builder.buildPaymentDetails(user, PaymentTransactionType.LISTING_CREATION,
                 request(PaymentTransactionType.LISTING_CREATION, null));
 
-        assertThat(html).contains("59,00 TL");
+        assertThat(html).contains("59,00 TRY");
     }
 }

@@ -1,0 +1,820 @@
+{
+  "listingType": "VEHICLE",
+  "definitions": [
+    {
+      "scope": "CAR",
+      "key": "damageMap",
+      "label": "Boya / Değişen",
+      "dataType": "ENUM_MAP",
+      "level": "LISTING",
+      "keys": [
+        {
+          "value": "frontBumper",
+          "label": "Ön tampon"
+        },
+        {
+          "value": "hood",
+          "label": "Motor kaputu"
+        },
+        {
+          "value": "roof",
+          "label": "Tavan"
+        },
+        {
+          "value": "frontLeftFender",
+          "label": "Sol ön çamurluk"
+        },
+        {
+          "value": "frontLeftDoor",
+          "label": "Sol ön kapı"
+        },
+        {
+          "value": "rearLeftDoor",
+          "label": "Sol arka kapı"
+        },
+        {
+          "value": "rearLeftFender",
+          "label": "Sol arka çamurluk"
+        },
+        {
+          "value": "frontRightFender",
+          "label": "Sağ ön çamurluk"
+        },
+        {
+          "value": "frontRightDoor",
+          "label": "Sağ ön kapı"
+        },
+        {
+          "value": "rearRightDoor",
+          "label": "Sağ arka kapı"
+        },
+        {
+          "value": "rearRightFender",
+          "label": "Sağ arka çamurluk"
+        },
+        {
+          "value": "trunkLid",
+          "label": "Bagaj kapağı"
+        },
+        {
+          "value": "rearBumper",
+          "label": "Arka tampon"
+        }
+      ],
+      "options": [
+        {
+          "value": "ORIGINAL",
+          "label": "Orijinal"
+        },
+        {
+          "value": "LOCAL_PAINTED",
+          "label": "Lokal boyalı"
+        },
+        {
+          "value": "PAINTED",
+          "label": "Boyalı"
+        },
+        {
+          "value": "CHANGED",
+          "label": "Değişmiş"
+        }
+      ]
+    },
+    {
+      "scope": "CAR",
+      "key": "tramerAmount",
+      "label": "Tramer kaydı tutarı",
+      "unit": "TRY",
+      "dataType": "DECIMAL",
+      "level": "LISTING",
+      "min": 0,
+      "max": 10000000,
+      "filterable": true
+    },
+    {
+      "scope": "CAR",
+      "key": "heavyDamageRecord",
+      "label": "Ağır hasar kayıtlı",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "key": "sellerKind",
+      "label": "Kimden",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "OWNER",
+          "label": "Sahibinden"
+        },
+        {
+          "value": "DEALER",
+          "label": "Galeriden"
+        },
+        {
+          "value": "AUTHORIZED_DEALER",
+          "label": "Yetkili bayiden"
+        }
+      ]
+    },
+    {
+      "scope": "CAR",
+      "key": "warranty",
+      "label": "Garanti",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "NONE",
+          "label": "Yok"
+        },
+        {
+          "value": "MANUFACTURER",
+          "label": "Üretici garantisi"
+        },
+        {
+          "value": "DEALER",
+          "label": "Satıcı garantisi"
+        }
+      ]
+    },
+    {
+      "scope": "CAR",
+      "key": "warrantyUntil",
+      "label": "Garanti bitişi",
+      "dataType": "DATE",
+      "level": "LISTING"
+    },
+    {
+      "scope": "CAR",
+      "key": "ownerCount",
+      "label": "Kaçıncı sahibi",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 20
+    },
+    {
+      "scope": "CAR",
+      "key": "serviceHistory",
+      "label": "Servis geçmişi",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "options": [
+        {
+          "value": "FULL_AUTHORIZED",
+          "label": "Tamamı yetkili serviste"
+        },
+        {
+          "value": "PARTIAL",
+          "label": "Kısmen belgeli"
+        },
+        {
+          "value": "NONE",
+          "label": "Belge yok"
+        }
+      ]
+    },
+    {
+      "scope": "CAR",
+      "key": "plateOrigin",
+      "label": "Plaka / Uyruk",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "TR",
+          "label": "Türkiye (TR) plakalı"
+        },
+        {
+          "value": "FOREIGN",
+          "label": "Yabancı plakalı"
+        },
+        {
+          "value": "BLUE_PLATE",
+          "label": "Mavi plakalı (MA)"
+        }
+      ]
+    },
+    {
+      "scope": "CAR",
+      "key": "options",
+      "label": "Donanım",
+      "dataType": "MULTI_ENUM",
+      "level": "LISTING",
+      "options": [
+        {
+          "value": "SUNROOF",
+          "label": "Sunroof"
+        },
+        {
+          "value": "PANORAMIC_ROOF",
+          "label": "Panoramik cam tavan"
+        },
+        {
+          "value": "LEATHER_SEATS",
+          "label": "Deri koltuk"
+        },
+        {
+          "value": "HEATED_SEATS",
+          "label": "Isıtmalı koltuk"
+        },
+        {
+          "value": "ELECTRIC_SEATS",
+          "label": "Elektrikli koltuk"
+        },
+        {
+          "value": "NAVIGATION",
+          "label": "Navigasyon"
+        },
+        {
+          "value": "APPLE_CARPLAY_ANDROID_AUTO",
+          "label": "Apple CarPlay / Android Auto"
+        },
+        {
+          "value": "REAR_CAMERA",
+          "label": "Geri görüş kamerası"
+        },
+        {
+          "value": "CAMERA_360",
+          "label": "360° kamera"
+        },
+        {
+          "value": "PARKING_SENSORS",
+          "label": "Park sensörü"
+        },
+        {
+          "value": "ADAPTIVE_CRUISE",
+          "label": "Adaptif hız sabitleyici"
+        },
+        {
+          "value": "LANE_ASSIST",
+          "label": "Şerit takip asistanı"
+        },
+        {
+          "value": "BLIND_SPOT",
+          "label": "Kör nokta uyarısı"
+        },
+        {
+          "value": "KEYLESS_ENTRY",
+          "label": "Anahtarsız giriş ve çalıştırma"
+        },
+        {
+          "value": "LED_HEADLIGHTS",
+          "label": "LED far"
+        },
+        {
+          "value": "DIGITAL_COCKPIT",
+          "label": "Dijital gösterge paneli"
+        },
+        {
+          "value": "AUTO_CLIMATE",
+          "label": "Otomatik klima"
+        },
+        {
+          "value": "TOW_HITCH",
+          "label": "Çeki demiri"
+        }
+      ]
+    },
+    {
+      "scope": "CAR",
+      "key": "trunkVolume",
+      "label": "Bagaj hacmi",
+      "unit": "L",
+      "dataType": "INTEGER",
+      "level": "CATALOG",
+      "min": 0,
+      "max": 3000
+    },
+    {
+      "scope": "CAR",
+      "key": "acceleration0to100",
+      "label": "0-100 km/s",
+      "unit": "s",
+      "dataType": "DECIMAL",
+      "level": "CATALOG",
+      "min": 1,
+      "max": 40
+    },
+    {
+      "scope": "CAR",
+      "key": "topSpeed",
+      "label": "Azami hız",
+      "unit": "km/s",
+      "dataType": "INTEGER",
+      "level": "CATALOG",
+      "min": 50,
+      "max": 450
+    },
+    {
+      "scope": "CAR",
+      "key": "combinedConsumption",
+      "label": "Ortalama tüketim",
+      "unit": "L/100 km",
+      "dataType": "DECIMAL",
+      "level": "CATALOG",
+      "min": 0,
+      "max": 40
+    },
+    {
+      "scope": "CAR",
+      "key": "co2Emission",
+      "label": "CO₂ emisyonu",
+      "unit": "g/km",
+      "dataType": "INTEGER",
+      "level": "CATALOG",
+      "min": 0,
+      "max": 600
+    },
+    {
+      "scope": "CAR",
+      "key": "curbWeight",
+      "label": "Boş ağırlık",
+      "unit": "kg",
+      "dataType": "INTEGER",
+      "level": "CATALOG",
+      "min": 300,
+      "max": 4000
+    },
+    {
+      "scope": "CAR",
+      "key": "fuelTankCapacity",
+      "label": "Yakıt deposu",
+      "unit": "L",
+      "dataType": "INTEGER",
+      "level": "CATALOG",
+      "min": 0,
+      "max": 150
+    },
+    {
+      "scope": "CAR",
+      "key": "batteryCapacity",
+      "label": "Batarya kapasitesi",
+      "unit": "kWh",
+      "dataType": "DECIMAL",
+      "level": "CATALOG",
+      "min": 0,
+      "max": 250
+    },
+    {
+      "scope": "CAR",
+      "key": "electricRange",
+      "label": "Elektrikli menzil (WLTP)",
+      "unit": "km",
+      "dataType": "INTEGER",
+      "level": "CATALOG",
+      "min": 0,
+      "max": 1000
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "damageMap",
+      "label": "Boya / Değişen",
+      "dataType": "ENUM_MAP",
+      "level": "LISTING",
+      "keys": [
+        {
+          "value": "frontBumper",
+          "label": "Ön tampon"
+        },
+        {
+          "value": "hood",
+          "label": "Motor kaputu"
+        },
+        {
+          "value": "roof",
+          "label": "Tavan"
+        },
+        {
+          "value": "frontLeftFender",
+          "label": "Sol ön çamurluk"
+        },
+        {
+          "value": "frontLeftDoor",
+          "label": "Sol ön kapı"
+        },
+        {
+          "value": "rearLeftDoor",
+          "label": "Sol arka kapı"
+        },
+        {
+          "value": "rearLeftFender",
+          "label": "Sol arka çamurluk"
+        },
+        {
+          "value": "frontRightFender",
+          "label": "Sağ ön çamurluk"
+        },
+        {
+          "value": "frontRightDoor",
+          "label": "Sağ ön kapı"
+        },
+        {
+          "value": "rearRightDoor",
+          "label": "Sağ arka kapı"
+        },
+        {
+          "value": "rearRightFender",
+          "label": "Sağ arka çamurluk"
+        },
+        {
+          "value": "trunkLid",
+          "label": "Bagaj kapağı"
+        },
+        {
+          "value": "rearBumper",
+          "label": "Arka tampon"
+        }
+      ],
+      "options": [
+        {
+          "value": "ORIGINAL",
+          "label": "Orijinal"
+        },
+        {
+          "value": "LOCAL_PAINTED",
+          "label": "Lokal boyalı"
+        },
+        {
+          "value": "PAINTED",
+          "label": "Boyalı"
+        },
+        {
+          "value": "CHANGED",
+          "label": "Değişmiş"
+        }
+      ]
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "tramerAmount",
+      "label": "Tramer kaydı tutarı",
+      "unit": "TRY",
+      "dataType": "DECIMAL",
+      "level": "LISTING",
+      "min": 0,
+      "max": 10000000,
+      "filterable": true
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "heavyDamageRecord",
+      "label": "Ağır hasar kayıtlı",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "warranty",
+      "label": "Garanti",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "NONE",
+          "label": "Yok"
+        },
+        {
+          "value": "MANUFACTURER",
+          "label": "Üretici garantisi"
+        },
+        {
+          "value": "DEALER",
+          "label": "Satıcı garantisi"
+        }
+      ]
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "warrantyUntil",
+      "label": "Garanti bitişi",
+      "dataType": "DATE",
+      "level": "LISTING"
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "ownerCount",
+      "label": "Kaçıncı sahibi",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 20
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "serviceHistory",
+      "label": "Servis geçmişi",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "options": [
+        {
+          "value": "FULL_AUTHORIZED",
+          "label": "Tamamı yetkili serviste"
+        },
+        {
+          "value": "PARTIAL",
+          "label": "Kısmen belgeli"
+        },
+        {
+          "value": "NONE",
+          "label": "Belge yok"
+        }
+      ]
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "plateOrigin",
+      "label": "Plaka / Uyruk",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "TR",
+          "label": "Türkiye (TR) plakalı"
+        },
+        {
+          "value": "FOREIGN",
+          "label": "Yabancı plakalı"
+        },
+        {
+          "value": "BLUE_PLATE",
+          "label": "Mavi plakalı (MA)"
+        }
+      ]
+    },
+    {
+      "key": "payloadCapacity",
+      "label": "Taşıma kapasitesi",
+      "unit": "kg",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 100,
+      "max": 5000,
+      "filterable": true,
+      "scope": "COMMERCIAL"
+    },
+    {
+      "scope": "TRUCK",
+      "key": "tramerAmount",
+      "label": "Tramer kaydı tutarı",
+      "unit": "TRY",
+      "dataType": "DECIMAL",
+      "level": "LISTING",
+      "min": 0,
+      "max": 10000000,
+      "filterable": true
+    },
+    {
+      "scope": "TRUCK",
+      "key": "heavyDamageRecord",
+      "label": "Ağır hasar kayıtlı",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "TRUCK",
+      "key": "warranty",
+      "label": "Garanti",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "NONE",
+          "label": "Yok"
+        },
+        {
+          "value": "MANUFACTURER",
+          "label": "Üretici garantisi"
+        },
+        {
+          "value": "DEALER",
+          "label": "Satıcı garantisi"
+        }
+      ]
+    },
+    {
+      "scope": "TRUCK",
+      "key": "warrantyUntil",
+      "label": "Garanti bitişi",
+      "dataType": "DATE",
+      "level": "LISTING"
+    },
+    {
+      "scope": "TRUCK",
+      "key": "ownerCount",
+      "label": "Kaçıncı sahibi",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 20
+    },
+    {
+      "scope": "TRUCK",
+      "key": "serviceHistory",
+      "label": "Servis geçmişi",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "options": [
+        {
+          "value": "FULL_AUTHORIZED",
+          "label": "Tamamı yetkili serviste"
+        },
+        {
+          "value": "PARTIAL",
+          "label": "Kısmen belgeli"
+        },
+        {
+          "value": "NONE",
+          "label": "Belge yok"
+        }
+      ]
+    },
+    {
+      "scope": "TRUCK",
+      "key": "plateOrigin",
+      "label": "Plaka / Uyruk",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "TR",
+          "label": "Türkiye (TR) plakalı"
+        },
+        {
+          "value": "FOREIGN",
+          "label": "Yabancı plakalı"
+        },
+        {
+          "value": "BLUE_PLATE",
+          "label": "Mavi plakalı (MA)"
+        }
+      ]
+    },
+    {
+      "key": "payloadCapacity",
+      "label": "Taşıma kapasitesi",
+      "unit": "kg",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 100,
+      "max": 60000,
+      "filterable": true,
+      "scope": "TRUCK"
+    },
+    {
+      "scope": "TRUCK",
+      "key": "axleConfiguration",
+      "label": "Aks / çekiş",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "4X2",
+          "label": "4x2"
+        },
+        {
+          "value": "4X4",
+          "label": "4x4"
+        },
+        {
+          "value": "6X2",
+          "label": "6x2"
+        },
+        {
+          "value": "6X4",
+          "label": "6x4"
+        },
+        {
+          "value": "6X6",
+          "label": "6x6"
+        },
+        {
+          "value": "8X2",
+          "label": "8x2"
+        },
+        {
+          "value": "8X4",
+          "label": "8x4"
+        }
+      ]
+    },
+    {
+      "scope": "TRUCK",
+      "key": "cabinType",
+      "label": "Kabin",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "options": [
+        {
+          "value": "DAY",
+          "label": "Normal kabin"
+        },
+        {
+          "value": "SLEEPER",
+          "label": "Yataklı kabin"
+        }
+      ]
+    },
+    {
+      "scope": "TRUCK",
+      "key": "passengerCapacity",
+      "label": "Yolcu kapasitesi",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 9,
+      "max": 120
+    },
+    {
+      "scope": "MOTORCYCLE",
+      "key": "tramerAmount",
+      "label": "Tramer kaydı tutarı",
+      "unit": "TRY",
+      "dataType": "DECIMAL",
+      "level": "LISTING",
+      "min": 0,
+      "max": 10000000,
+      "filterable": true
+    },
+    {
+      "scope": "MOTORCYCLE",
+      "key": "heavyDamageRecord",
+      "label": "Ağır hasar kayıtlı",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "MOTORCYCLE",
+      "key": "warranty",
+      "label": "Garanti",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "NONE",
+          "label": "Yok"
+        },
+        {
+          "value": "MANUFACTURER",
+          "label": "Üretici garantisi"
+        },
+        {
+          "value": "DEALER",
+          "label": "Satıcı garantisi"
+        }
+      ]
+    },
+    {
+      "scope": "MOTORCYCLE",
+      "key": "warrantyUntil",
+      "label": "Garanti bitişi",
+      "dataType": "DATE",
+      "level": "LISTING"
+    },
+    {
+      "scope": "MOTORCYCLE",
+      "key": "ownerCount",
+      "label": "Kaçıncı sahibi",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 20
+    },
+    {
+      "scope": "MOTORCYCLE",
+      "key": "plateOrigin",
+      "label": "Plaka / Uyruk",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "TR",
+          "label": "Türkiye (TR) plakalı"
+        },
+        {
+          "value": "FOREIGN",
+          "label": "Yabancı plakalı"
+        },
+        {
+          "value": "BLUE_PLATE",
+          "label": "Mavi plakalı (MA)"
+        }
+      ]
+    }
+  ]
+}

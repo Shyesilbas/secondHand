@@ -1,0 +1,1156 @@
+[
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "S40",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S40 (2004–2012, P1)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 D2",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Kinetic",
+          "Momentum",
+          "Premium",
+          "Dynamic",
+          "R-Design"
+        ]
+      },
+      {
+        "name": "S40 (1995–2004, P1)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 T4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 T",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Dynamic",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "S60",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S60 (2019–2024, SPA)",
+        "engines": [
+          {
+            "name": "B4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "T8 Twin Engine",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "T8 Recharge",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Inscription",
+          "R-Design",
+          "Plus",
+          "Ultimate"
+        ]
+      },
+      {
+        "name": "S60 (2010–2018, P3)",
+        "engines": [
+          {
+            "name": "1.6 D2",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 T3",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 T4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 D3",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 D4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Advance",
+          "Momentum",
+          "R-Design"
+        ]
+      },
+      {
+        "name": "S60 (2000–2009, P2)",
+        "engines": [
+          {
+            "name": "2.0 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.3 T5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.5 T",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Premium",
+          "Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "S80",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S80 (2006–2016, P3)",
+        "engines": [
+          {
+            "name": "1.6 D2",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 D3",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 D4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 T5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Momentum",
+          "Premium",
+          "Advance"
+        ]
+      },
+      {
+        "name": "S80 (1998–2006, P2)",
+        "engines": [
+          {
+            "name": "2.0 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.9 T6",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Elite",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "S90",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S90 (2016–, SPA)",
+        "engines": [
+          {
+            "name": "D4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "D5",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "B5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "T8 Twin Engine",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "T8 Recharge",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Momentum",
+          "Inscription",
+          "R-Design",
+          "Plus",
+          "Ultimate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "V40",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "V40 (2012–2019, P1)",
+        "engines": [
+          {
+            "name": "1.6 D2",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 T3",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 T4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 D3",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 D4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Kinetic",
+          "Momentum",
+          "Premium",
+          "Advance",
+          "R-Design",
+          "Cross Country"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "V50",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "V50 (2004–2012, P1)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 D2",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Kinetic",
+          "Momentum",
+          "R-Design"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "V60",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "V60 (2018–, SPA)",
+        "engines": [
+          {
+            "name": "B5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "T8 Twin Engine",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "T8 Recharge",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Momentum",
+          "Inscription",
+          "Cross Country"
+        ]
+      },
+      {
+        "name": "V60 (2010–2018, P3)",
+        "engines": [
+          {
+            "name": "1.6 D2",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 T3",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 D3",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 D4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Advance",
+          "Momentum",
+          "R-Design"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "V70",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "V70 (2007–2016, P3)",
+        "engines": [
+          {
+            "name": "1.6 D2",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 D3",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 D4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Momentum",
+          "Premium"
+        ]
+      },
+      {
+        "name": "V70 (2000–2007, P2)",
+        "engines": [
+          {
+            "name": "2.0 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "V90",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "V90 (2016–, SPA)",
+        "engines": [
+          {
+            "name": "D4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "D5",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "B5",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B6",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Cross Country",
+          "Cross Country Pro"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "C30",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "C30 (2006–2013, P1)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 D2",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Kinetic",
+          "Momentum",
+          "R-Design"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "C70",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "C70 Convertible (2006–2013, P1)",
+        "engines": [
+          {
+            "name": "2.0D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Momentum",
+          "Premium"
+        ]
+      },
+      {
+        "name": "C70 Convertible (1997–2005)",
+        "engines": [
+          {
+            "name": "2.0 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.3 T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base"
+        ]
+      },
+      {
+        "name": "C70 Coupe (1997–2002)",
+        "engines": [
+          {
+            "name": "2.0 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.3 T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "XC40",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "XC40 (2017–, CMA)",
+        "trims": [
+          "Momentum",
+          "Inscription",
+          "R-Design",
+          "Core",
+          "Plus",
+          "Ultimate"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2017,
+        "versions": [
+          {
+            "name": "T3",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1477,
+            "horsePower": 163,
+            "torqueNm": 265,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "T4",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "T5",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "B3",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "B4",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1969,
+            "horsePower": 197,
+            "torqueNm": 300,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "B5",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "D3",
+            "fuelType": "DIESEL",
+            "source": "claude-draft"
+          },
+          {
+            "name": "D4",
+            "fuelType": "DIESEL",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "XC60",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "XC60 (2017–, SPA)",
+        "trims": [
+          "Momentum",
+          "Inscription",
+          "R-Design",
+          "Plus",
+          "Ultimate"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2017,
+        "versions": [
+          {
+            "name": "D4",
+            "fuelType": "DIESEL",
+            "source": "claude-draft"
+          },
+          {
+            "name": "D5",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "B4",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1969,
+            "horsePower": 197,
+            "torqueNm": 420,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "B5",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "T8 Twin Engine",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "T8 Recharge",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "XC60 (2008–2017, P3)",
+        "engines": [
+          {
+            "name": "2.0 D3",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 D4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 T5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Momentum",
+          "Premium",
+          "Advance",
+          "R-Design"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "XC70",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "XC70 (2007–2016, P3)",
+        "engines": [
+          {
+            "name": "2.0 D4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Momentum",
+          "Premium"
+        ]
+      },
+      {
+        "name": "XC70 (2000–2007, P2)",
+        "engines": [
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.5 T",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "XC90",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "XC90 (2015–, SPA)",
+        "trims": [
+          "Momentum",
+          "Inscription",
+          "R-Design",
+          "Plus",
+          "Ultimate"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "SEVEN",
+        "startYear": 2015,
+        "versions": [
+          {
+            "name": "D5",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "B5",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1969,
+            "horsePower": 250,
+            "torqueNm": 350,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "B6",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "T8 Twin Engine",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "T8 Recharge",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "XC90 (2002–2014, P2)",
+        "engines": [
+          {
+            "name": "2.4 D5",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.5 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "3.2",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Base",
+          "Premium",
+          "Executive"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "EX30",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EX30 (2023–)",
+        "engines": [
+          {
+            "name": "Single Motor",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Single Motor Extended Range",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Twin Motor Performance",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Core",
+          "Plus",
+          "Ultra"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "EX40",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EX40 / XC40 Recharge (2020–)",
+        "engines": [
+          {
+            "name": "Single Motor",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Single Motor Extended Range",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Twin Motor",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Plus",
+          "Ultimate",
+          "Core"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "EC40",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EC40 / C40 Recharge (2021–)",
+        "engines": [
+          {
+            "name": "Single Motor",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Single Motor Extended Range",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Twin Motor",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Plus",
+          "Ultimate"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "EX90",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EX90 (2024–)",
+        "engines": [
+          {
+            "name": "Single Motor",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Twin Motor",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Twin Motor Performance",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Ultra"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "S60 Polestar",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S60 Polestar (2014–2018)",
+        "engines": [
+          {
+            "name": "2.0 T6 Polestar",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "3.0 T6 Polestar",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Polestar"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "V60 Polestar",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "V60 Polestar (2014–2018)",
+        "engines": [
+          {
+            "name": "2.0 T6 Polestar",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "3.0 T6 Polestar",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Polestar"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "XC60 Polestar Engineered",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "XC60 Polestar Engineered (2019–)",
+        "engines": [
+          {
+            "name": "T8 Recharge Polestar Engineered",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Polestar Engineered"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "CAR",
+    "name": "XC90 Excellence",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "XC90 Excellence (2016–2020)",
+        "engines": [
+          {
+            "name": "T8 Twin Engine Excellence",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Excellence"
+        ]
+      }
+    ]
+  }
+]

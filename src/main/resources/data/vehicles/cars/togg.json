@@ -1,0 +1,131 @@
+[
+  {
+    "brand": "TOGG",
+    "type": "CAR",
+    "name": "T10X",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "T10X (2023–)",
+        "startYear": 2023,
+        "endYear": null,
+        "trims": [
+          "V1 Standart Menzil",
+          "V2 Uzun Menzil",
+          "V2 Dört Çeker"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "RWD Standart Menzil 52,4 kWh",
+            "fuelType": "ELECTRIC",
+            "horsePower": 218,
+            "torqueNm": 350,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "RWD",
+            "source": "verified",
+            "specs": {
+              "batteryCapacity": 52.4,
+              "electricRange": 314
+            }
+          },
+          {
+            "name": "RWD Uzun Menzil 88,5 kWh",
+            "fuelType": "ELECTRIC",
+            "horsePower": 218,
+            "torqueNm": 350,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "RWD",
+            "source": "verified",
+            "specs": {
+              "batteryCapacity": 88.5,
+              "electricRange": 523
+            }
+          },
+          {
+            "name": "AWD Uzun Menzil 88,5 kWh",
+            "fuelType": "ELECTRIC",
+            "horsePower": 435,
+            "torqueNm": 700,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "AWD",
+            "source": "verified",
+            "specs": {
+              "batteryCapacity": 88.5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "TOGG",
+    "type": "CAR",
+    "name": "T10F",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "T10F Fastback (2025–)",
+        "startYear": 2025,
+        "endYear": null,
+        "trims": [
+          "Standart Menzil",
+          "Uzun Menzil",
+          "Dual Motor AWD"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "versions": [
+          {
+            "name": "RWD Standart Menzil",
+            "fuelType": "ELECTRIC",
+            "horsePower": 218,
+            "torqueNm": 350,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "RWD Uzun Menzil 88,5 kWh",
+            "fuelType": "ELECTRIC",
+            "horsePower": 218,
+            "torqueNm": 350,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "RWD",
+            "source": "verified",
+            "specs": {
+              "batteryCapacity": 88.5,
+              "electricRange": 610
+            }
+          },
+          {
+            "name": "AWD Uzun Menzil 88,5 kWh",
+            "fuelType": "ELECTRIC",
+            "horsePower": 435,
+            "torqueNm": 700,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "AWD",
+            "source": "verified",
+            "specs": {
+              "batteryCapacity": 88.5
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

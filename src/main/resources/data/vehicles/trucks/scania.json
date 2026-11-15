@@ -1,0 +1,111 @@
+[
+  {
+    "brand": "SCANIA",
+    "type": "TRUCK",
+    "name": "R Serisi",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "R Serisi (2016–)",
+        "startYear": 2016,
+        "versions": [
+          {
+            "name": "R 410",
+            "fuelType": "DIESEL",
+            "horsePower": 410,
+            "source": "claude-draft"
+          },
+          {
+            "name": "R 450",
+            "fuelType": "DIESEL",
+            "horsePower": 450,
+            "source": "claude-draft"
+          },
+          {
+            "name": "R 500",
+            "fuelType": "DIESEL",
+            "horsePower": 500,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "R Serisi (2004–2016)",
+        "startYear": 2004,
+        "versions": [
+          {
+            "name": "R 420",
+            "fuelType": "DIESEL",
+            "horsePower": 420,
+            "source": "claude-draft"
+          },
+          {
+            "name": "R 440",
+            "fuelType": "DIESEL",
+            "horsePower": 440,
+            "source": "claude-draft"
+          },
+          {
+            "name": "R 480",
+            "fuelType": "DIESEL",
+            "horsePower": 480,
+            "source": "claude-draft"
+          }
+        ],
+        "endYear": 2016
+      }
+    ]
+  },
+  {
+    "brand": "SCANIA",
+    "type": "TRUCK",
+    "name": "S Serisi",
+    "supportedBodyTypes": [
+      "TRACTOR"
+    ],
+    "generations": [
+      {
+        "name": "S Serisi (2016–)",
+        "startYear": 2016,
+        "versions": [
+          {
+            "name": "S 450",
+            "fuelType": "DIESEL",
+            "horsePower": 450,
+            "source": "claude-draft"
+          },
+          {
+            "name": "S 500",
+            "fuelType": "DIESEL",
+            "horsePower": 500,
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SCANIA",
+    "type": "TRUCK",
+    "name": "G Serisi",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK",
+      "TIPPER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "SCANIA",
+    "type": "TRUCK",
+    "name": "P Serisi",
+    "supportedBodyTypes": [
+      "TRUCK",
+      "TIPPER"
+    ],
+    "generations": []
+  }
+]

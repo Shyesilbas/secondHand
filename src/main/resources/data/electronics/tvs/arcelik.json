@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "ARCELIK",
+    "type": "TV",
+    "name": "Imperium 9 Serisi 65 inç OLED 4K",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Arçelik Imperium 9",
+      "Arçelik 65 OLED"
+    ]
+  },
+  {
+    "brand": "ARCELIK",
+    "type": "TV",
+    "name": "Imperium 8 Serisi 55 inç UHD 4K",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Arçelik Imperium 8",
+      "Arçelik 55 UHD"
+    ]
+  }
+]

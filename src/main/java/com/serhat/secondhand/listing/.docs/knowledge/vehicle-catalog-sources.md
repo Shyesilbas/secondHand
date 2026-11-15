@@ -1,6 +1,6 @@
 # Vehicle Catalog Data: Rules and Sources
 
-Seed files live in `src/main/resources/data/vehicles/` (git-ignored, kept locally). This note records how version data is filled so it can be checked and extended.
+Seed files live in `src/main/resources/data/vehicles/`. This note records how version data is filled so it can be checked and extended.
 
 ## Rules
 - A field is filled only when sources agree; otherwise it stays `null`. The snapshotter keeps the seller's value for a `null` catalog field, so an empty field never overwrites a listing with a guess.

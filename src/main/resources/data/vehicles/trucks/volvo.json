@@ -1,0 +1,72 @@
+[
+  {
+    "brand": "VOLVO",
+    "type": "TRUCK",
+    "name": "FH",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "FH (2020–, facelift)",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "FH 460",
+            "fuelType": "DIESEL",
+            "horsePower": 460,
+            "source": "claude-draft"
+          },
+          {
+            "name": "FH 500",
+            "fuelType": "DIESEL",
+            "horsePower": 500,
+            "source": "claude-draft"
+          }
+        ],
+        "facelift": true
+      },
+      {
+        "name": "FH (2012–2020)",
+        "startYear": 2012,
+        "versions": [
+          {
+            "name": "FH 460",
+            "fuelType": "DIESEL",
+            "horsePower": 460,
+            "source": "claude-draft"
+          },
+          {
+            "name": "FH 500",
+            "fuelType": "DIESEL",
+            "horsePower": 500,
+            "source": "claude-draft"
+          }
+        ],
+        "endYear": 2020
+      }
+    ]
+  },
+  {
+    "brand": "VOLVO",
+    "type": "TRUCK",
+    "name": "FM",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK",
+      "TIPPER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "VOLVO",
+    "type": "TRUCK",
+    "name": "FMX",
+    "supportedBodyTypes": [
+      "TIPPER",
+      "TRUCK"
+    ],
+    "generations": []
+  }
+]

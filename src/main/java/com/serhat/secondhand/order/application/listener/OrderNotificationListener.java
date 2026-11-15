@@ -44,11 +44,11 @@ public class OrderNotificationListener {
     private final TransactionTemplate readOnlyTx;
 
     public OrderNotificationListener(INotificationService notificationService,
-                                     NotificationTemplateCatalog notificationTemplateCatalog,
-                                     OrderMapper orderMapper,
-                                     OrderLogService orderLog,
-                                     OrderRepository orderRepository,
-                                     PlatformTransactionManager transactionManager) {
+            NotificationTemplateCatalog notificationTemplateCatalog,
+            OrderMapper orderMapper,
+            OrderLogService orderLog,
+            OrderRepository orderRepository,
+            PlatformTransactionManager transactionManager) {
         this.notificationService = notificationService;
         this.notificationTemplateCatalog = notificationTemplateCatalog;
         this.orderMapper = orderMapper;
@@ -65,9 +65,10 @@ public class OrderNotificationListener {
             return;
         }
         try {
-            OrderDto orderDto = readOnlyTx.execute(status -> orderRepository.findByIdWithFullDetails(event.order().getId())
-                    .map(orderMapper::toDto)
-                    .orElseGet(() -> orderMapper.toDto(event.order())));
+            OrderDto orderDto = readOnlyTx
+                    .execute(status -> orderRepository.findByIdWithFullDetails(event.order().getId())
+                            .map(orderMapper::toDto)
+                            .orElseGet(() -> orderMapper.toDto(event.order())));
             if (orderDto == null) {
                 return;
             }
@@ -97,9 +98,7 @@ public class OrderNotificationListener {
                             order.getOrderNumber(),
                             summary.listingId(),
                             summary.listingTitle(),
-                            summary.itemCount()
-                    )
-            );
+                            summary.itemCount()));
             if (result.isError()) {
                 orderLog.logNotificationFailed("orderCancelledInApp", order.getOrderNumber(), result.getMessage());
             }
@@ -114,11 +113,10 @@ public class OrderNotificationListener {
                                 order.getOrderNumber(),
                                 summary.listingId(),
                                 summary.listingTitle(),
-                                summary.itemCount()
-                        )
-                );
+                                summary.itemCount()));
                 if (cr.isError()) {
-                    orderLog.logNotificationFailed("orderCancelledCounterpartyInApp", order.getOrderNumber(), cr.getMessage());
+                    orderLog.logNotificationFailed("orderCancelledCounterpartyInApp", order.getOrderNumber(),
+                            cr.getMessage());
                 }
             }
         } catch (RuntimeException e) {
@@ -141,9 +139,7 @@ public class OrderNotificationListener {
                             summary.listingTitle(),
                             summary.itemCount(),
                             summary.totalAmount(),
-                            summary.currency()
-                    )
-            );
+                            summary.currency()));
             if (result.isError()) {
                 orderLog.logNotificationFailed("orderCompletedInApp", order.getOrderNumber(), result.getMessage());
             }
@@ -167,9 +163,7 @@ public class OrderNotificationListener {
                             summary.listingTitle(),
                             summary.itemCount(),
                             summary.totalAmount(),
-                            summary.currency()
-                    )
-            );
+                            summary.currency()));
             if (result.isError()) {
                 orderLog.logNotificationFailed("orderRefundedInApp", order.getOrderNumber(), result.getMessage());
             }
@@ -182,7 +176,8 @@ public class OrderNotificationListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderStatusChanged(OrderStatusChangedEvent event) {
         if ("COMPLETED".equalsIgnoreCase(event.newStatus())) {
-            // OrderCompletedEvent already dispatches the dedicated ORDER_COMPLETED notification.
+            // OrderCompletedEvent already dispatches the dedicated ORDER_COMPLETED
+            // notification.
             return;
         }
         try {
@@ -197,9 +192,7 @@ public class OrderNotificationListener {
                             event.newStatus(),
                             summary.listingId(),
                             summary.listingTitle(),
-                            summary.itemCount()
-                    )
-            );
+                            summary.itemCount()));
             if (result.isError()) {
                 orderLog.logNotificationFailed("orderStatusChangedInApp", order.getOrderNumber(), result.getMessage());
             }
@@ -210,7 +203,8 @@ public class OrderNotificationListener {
 
     // ── Private helpers ──────────────────────────────────────────────────────
 
-    // Nobody "cancelled" this order: the buyer is told about the refund, each seller about the cause.
+    // Nobody "cancelled" this order: the buyer is told about the refund, each
+    // seller about the cause.
     private void notifySystemCancellation(OrderCancelledEvent event) {
         String orderNumber = event.order().getOrderNumber();
         try {
@@ -255,7 +249,8 @@ public class OrderNotificationListener {
     private void sendBuyerInAppNotification(Long buyerId, OrderDto orderDto) {
         List<OrderItemDto> items = orderDto.getOrderItems();
         OrderItemDto firstItem = (items != null && !items.isEmpty()) ? items.get(0) : null;
-        String listingTitle = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getTitle() : null;
+        String listingTitle = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getTitle()
+                : null;
         UUID listingId = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getId() : null;
         Integer itemCount = items != null ? items.size() : null;
         String totalAmount = orderDto.getTotalAmount() != null ? orderDto.getTotalAmount().toPlainString() : null;
@@ -264,8 +259,7 @@ public class OrderNotificationListener {
         var result = notificationService.createAndSend(
                 notificationTemplateCatalog.orderCreated(
                         buyerId, orderDto.getId(), orderDto.getOrderNumber(),
-                        listingId, listingTitle, itemCount, totalAmount, currency)
-        );
+                        listingId, listingTitle, itemCount, totalAmount, currency));
         if (result.isError()) {
             orderLog.logNotificationFailed("buyerOrderCreatedInApp", orderDto.getOrderNumber(), result.getMessage());
         }
@@ -285,23 +279,28 @@ public class OrderNotificationListener {
             List<OrderItemDto> sellerItems = entry.getValue();
 
             OrderItemDto firstItem = sellerItems.isEmpty() ? null : sellerItems.get(0);
-            String listingTitle = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getTitle() : null;
-            UUID listingId = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getId() : null;
+            String listingTitle = firstItem != null && firstItem.getListing() != null
+                    ? firstItem.getListing().getTitle()
+                    : null;
+            UUID listingId = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getId()
+                    : null;
             String totalAmount = orderDto.getTotalAmount() != null ? orderDto.getTotalAmount().toPlainString() : null;
             String currency = orderDto.getCurrency() != null ? orderDto.getCurrency().name() : "TRY";
 
             var result = notificationService.createAndSend(
                     notificationTemplateCatalog.orderReceived(
                             sellerId, orderDto.getId(), orderDto.getOrderNumber(),
-                            listingId, listingTitle, sellerItems.size(), totalAmount, currency)
-            );
+                            listingId, listingTitle, sellerItems.size(), totalAmount, currency));
             if (result.isError()) {
-                orderLog.logNotificationFailed("sellerOrderReceivedInApp", orderDto.getOrderNumber(), result.getMessage());
+                orderLog.logNotificationFailed("sellerOrderReceivedInApp", orderDto.getOrderNumber(),
+                        result.getMessage());
             }
         }
     }
 
-    private record OrderItemSummary(UUID listingId, String listingTitle, Integer itemCount, String totalAmount, String currency) {}
+    private record OrderItemSummary(UUID listingId, String listingTitle, Integer itemCount, String totalAmount,
+            String currency) {
+    }
 
     private static OrderItemSummary summarizeOrder(Order order) {
         if (order == null) {

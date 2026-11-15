@@ -1,0 +1,194 @@
+[
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 1 VI",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 1 VI",
+      "Xperia 1 VI",
+      "Xperia 1 Mark 6"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 1 V",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 1 V",
+      "Xperia 1 V",
+      "Xperia 1 Mark 5"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 1 IV",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 1 IV",
+      "Xperia 1 IV",
+      "Xperia 1 Mark 4"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 1 III",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 1 III",
+      "Xperia 1 III",
+      "Xperia 1 Mark 3"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 5 V",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 5 V",
+      "Xperia 5 V",
+      "Xperia 5 Mark 5"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 5 IV",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 5 IV",
+      "Xperia 5 IV",
+      "Xperia 5 Mark 4"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 5 III",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 5 III",
+      "Xperia 5 III",
+      "Xperia 5 Mark 3"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 10 VI",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 10 VI",
+      "Xperia 10 VI",
+      "Xperia 10 Mark 6"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 10 V",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 10 V",
+      "Xperia 10 V",
+      "Xperia 10 Mark 5"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia 10 IV",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Xperia 10 IV",
+      "Xperia 10 IV",
+      "Xperia 10 Mark 4"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia XZ Premium",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Sony Xperia XZ Premium",
+      "Xperia XZ Premium",
+      "XZ Premium"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia XZ2",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Sony Xperia XZ2",
+      "Xperia XZ2",
+      "XZ2"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia XZ1",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Sony Xperia XZ1",
+      "Xperia XZ1",
+      "XZ1"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia XA2",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Sony Xperia XA2",
+      "Xperia XA2",
+      "XA2"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia Z5",
+    "releaseYear": 2015,
+    "isLegacy": true,
+    "aliases": [
+      "Sony Xperia Z5",
+      "Xperia Z5",
+      "Z5"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "MOBILE_PHONE",
+    "name": "Xperia Z3",
+    "releaseYear": 2014,
+    "isLegacy": true,
+    "aliases": [
+      "Sony Xperia Z3",
+      "Xperia Z3",
+      "Z3"
+    ]
+  }
+]

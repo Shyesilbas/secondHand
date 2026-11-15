@@ -1,0 +1,39 @@
+[
+  {
+    "brand": "DACIA",
+    "type": "COMMERCIAL",
+    "name": "Dokker",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Dokker (2012–2021, K67)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 SCe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 dCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 Blue dCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiance",
+          "Laureate",
+          "Stepway"
+        ]
+      }
+    ]
+  }
+]

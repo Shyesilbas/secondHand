@@ -1,0 +1,45 @@
+[
+  {
+    "brand": "ARCELIK",
+    "type": "WASHING_MACHINE",
+    "name": "Imperium 10kg",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Arçelik Imperium",
+      "Imperium 10"
+    ]
+  },
+  {
+    "brand": "ARCELIK",
+    "type": "WASHING_MACHINE",
+    "name": "ProSmart 9kg",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Arçelik ProSmart",
+      "ProSmart 9"
+    ]
+  },
+  {
+    "brand": "ARCELIK",
+    "type": "WASHING_MACHINE",
+    "name": "Aquafusion 8kg",
+    "isLegacy": true,
+    "releaseYear": 2020,
+    "aliases": [
+      "Arçelik Aquafusion",
+      "Aquafusion 8"
+    ]
+  },
+  {
+    "brand": "ARCELIK",
+    "type": "WASHING_MACHINE",
+    "name": "Leke Çıkarıcı 7kg",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Leke Çıkarıcı 7kg"
+    ]
+  }
+]

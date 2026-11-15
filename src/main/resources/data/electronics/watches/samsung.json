@@ -1,0 +1,365 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch Ultra",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Watch Ultra",
+      "Galaxy Watch Ultra"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Exynos W1000",
+      "operatingSystem": "Wear OS",
+      "hasNfc": true
+    },
+    "variants": [
+      {
+        "name": "47 mm LTE",
+        "storage": 32,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch7",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 7",
+      "Galaxy Watch 7"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Exynos W1000",
+      "operatingSystem": "Wear OS",
+      "hasNfc": true
+    },
+    "variants": [
+      {
+        "name": "40 mm Bluetooth",
+        "storage": 32,
+        "source": "claude-draft"
+      },
+      {
+        "name": "40 mm LTE",
+        "storage": 32,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm Bluetooth",
+        "storage": 32,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm LTE",
+        "storage": 32,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch6 Classic",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 6 Classic",
+      "Galaxy Watch 6 Classic"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Exynos W930",
+      "operatingSystem": "Wear OS",
+      "hasNfc": true
+    },
+    "variants": [
+      {
+        "name": "43 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "43 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "47 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "47 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch6",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 6",
+      "Galaxy Watch 6"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Exynos W930",
+      "operatingSystem": "Wear OS",
+      "hasNfc": true
+    },
+    "variants": [
+      {
+        "name": "40 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "40 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch5 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 5 Pro",
+      "Galaxy Watch 5 Pro"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Exynos W920",
+      "operatingSystem": "Wear OS",
+      "hasNfc": true
+    },
+    "variants": [
+      {
+        "name": "45 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "45 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 5",
+      "Galaxy Watch 5"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Exynos W920",
+      "operatingSystem": "Wear OS",
+      "hasNfc": true
+    },
+    "variants": [
+      {
+        "name": "40 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "40 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch4 Classic",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 4 Classic",
+      "Galaxy Watch 4 Classic"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Exynos W920",
+      "operatingSystem": "Wear OS",
+      "hasNfc": true
+    },
+    "variants": [
+      {
+        "name": "42 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "42 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "46 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "46 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch4",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 4",
+      "Galaxy Watch 4"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Exynos W920",
+      "operatingSystem": "Wear OS",
+      "hasNfc": true
+    },
+    "variants": [
+      {
+        "name": "40 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "40 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm Bluetooth",
+        "storage": 16,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm LTE",
+        "storage": 16,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch3",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Watch 3",
+      "Galaxy Watch 3"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch Active2",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Watch Active 2",
+      "Active 2"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch Active",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Watch Active",
+      "Active"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Watch",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Galaxy Watch 1"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Fit3",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Fit 3",
+      "Galaxy Fit 3"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Fit2",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Fit 2",
+      "Galaxy Fit 2"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SMARTWATCH",
+    "name": "Galaxy Fit e",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Fit e",
+      "Galaxy Fit e"
+    ]
+  }
+]

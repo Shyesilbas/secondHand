@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "LOGITECH",
+    "type": "HEADPHONES",
+    "name": "G Pro X 2 LIGHTSPEED",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech G Pro X 2",
+      "G Pro X 2 Wireless"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "HEADPHONES",
+    "name": "G733 LIGHTSPEED",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech G733",
+      "G733 RGB"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "HEADPHONES",
+    "name": "G435 LIGHTSPEED",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech G435",
+      "G435 Ultralight"
+    ]
+  }
+]

@@ -53,6 +53,12 @@ public class AuditLogService {
         });
     }
 
+    private void appendDetailRow(StringBuilder sb, String label, String value) {
+        sb.append("<tr><td class='label'>").append(label).append("</td><td class='value'>")
+                .append(org.springframework.web.util.HtmlUtils.htmlEscape(value == null ? "" : value, "UTF-8"))
+                .append("</td></tr>");
+    }
+
     private String formatIpAddress(String ip) {
         if (ip == null || ip.isBlank()) return "Bilinmiyor";
         if ("0:0:0:0:0:0:0:1".equals(ip) || "127.0.0.1".equals(ip)) {
@@ -92,49 +98,20 @@ public class AuditLogService {
         String formattedTime = formatTimestamp(timestamp);
         String formattedAgent = simplifyUserAgent(userAgent);
 
-        String statusColor = isWarning ? "#B91C1C" : "#0F766E";
-
         StringBuilder sb = new StringBuilder();
-        sb.append("<p style='font-size: 14px; color: #44403C; margin: 0 0 14px 0; line-height: 1.6;'>").append(description).append("</p>");
-
-        // Detail Box Card
-        sb.append("<div class='details-box' style='background-color: #FAF7F2; border: 1px solid #E8E2D8; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;'>");
-        sb.append("<div style='margin: 0 0 8px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6B645C;'>Erişim Detayları</div>");
-
-        sb.append("<table class='details-table' style='width: 100%; border-collapse: collapse; font-size: 13px;'>");
-
-        // Event Type row
-        sb.append("<tr>");
-        sb.append("<td class='detail-key' style='padding: 8px 0; border-bottom: 1px solid #E8E2D8; color: #6B645C; font-weight: 500;'>İşlem Türü</td>");
-        sb.append("<td class='detail-val' style='padding: 8px 0; border-bottom: 1px solid #E8E2D8; font-weight: 600; text-align: right; color: ").append(statusColor).append(";'>").append(eventTypeTitle).append("</td>");
-        sb.append("</tr>");
-
-        // IP Row
-        sb.append("<tr>");
-        sb.append("<td class='detail-key' style='padding: 8px 0; border-bottom: 1px solid #E8E2D8; color: #6B645C; font-weight: 500;'>IP Adresi</td>");
-        sb.append("<td class='detail-val' style='padding: 8px 0; border-bottom: 1px solid #E8E2D8; font-weight: 600; text-align: right; color: #1C1917; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;'>").append(formattedIp).append("</td>");
-        sb.append("</tr>");
-
-        // Device Row
-        sb.append("<tr>");
-        sb.append("<td class='detail-key' style='padding: 8px 0; border-bottom: 1px solid #E8E2D8; color: #6B645C; font-weight: 500;'>Cihaz / Tarayıcı</td>");
-        sb.append("<td class='detail-val' style='padding: 8px 0; border-bottom: 1px solid #E8E2D8; font-weight: 600; text-align: right; color: #1C1917;'>").append(formattedAgent).append("</td>");
-        sb.append("</tr>");
-
-        // Time Row
-        sb.append("<tr>");
-        sb.append("<td class='detail-key' style='padding: 8px 0; color: #6B645C; font-weight: 500;'>Tarih ve Saat</td>");
-        sb.append("<td class='detail-val' style='padding: 8px 0; font-weight: 600; text-align: right; color: #1C1917; font-variant-numeric: tabular-nums;'>").append(formattedTime).append("</td>");
-        sb.append("</tr>");
-
+        sb.append("<p>").append(description).append("</p>");
+        sb.append("<table class='details' role='presentation'>");
+        appendDetailRow(sb, "İşlem", eventTypeTitle);
+        appendDetailRow(sb, "IP Adresi", formattedIp);
+        appendDetailRow(sb, "Cihaz / Tarayıcı", formattedAgent);
+        appendDetailRow(sb, "Tarih ve Saat", formattedTime);
         sb.append("</table>");
-        sb.append("</div>");
 
-        // Warning callout box if present
         if (warningMessage != null && !warningMessage.isBlank()) {
-            sb.append("<div class='action-box' style='background-color: #FFFBEB; border: 1px solid #FDE68A; border-left: 3px solid #B45309; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; color: #44403C; font-size: 13px; line-height: 1.55;'>");
-            sb.append("<strong style='color: #B45309;'>Güvenlik Notu:</strong> ").append(warningMessage);
-            sb.append("</div>");
+            sb.append("<div class='note").append(isWarning ? " note-warning" : "").append("'>")
+                    .append("<div class='note-title'>Güvenlik Notu</div>")
+                    .append(warningMessage)
+                    .append("</div>");
         }
 
         return sb.toString();

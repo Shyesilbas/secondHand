@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "CASPER",
+    "type": "DESKTOP",
+    "name": "Excalibur E650",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Casper Excalibur E650 Desktop",
+      "E650"
+    ]
+  },
+  {
+    "brand": "CASPER",
+    "type": "DESKTOP",
+    "name": "Nirvana D300",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Casper Nirvana D300 Desktop",
+      "D300"
+    ]
+  }
+]

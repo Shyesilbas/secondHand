@@ -1,0 +1,23 @@
+[
+  {
+    "brand": "ASUS",
+    "type": "MOUSE",
+    "name": "ROG Harpe Ace Aim Lab Edition",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ROG Harpe Ace",
+      "Harpe Ace"
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "MOUSE",
+    "name": "ROG Gladius III Wireless AimPoint",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ROG Gladius III AimPoint"
+    ]
+  }
+]

@@ -1,0 +1,198 @@
+[
+  {
+    "brand": "KTM",
+    "type": "MOTORCYCLE",
+    "name": "RC 390",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "RC 390 (2022–)",
+        "engines": [
+          {
+            "name": "373cc Single",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "type": "MOTORCYCLE",
+    "name": "Duke 390",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Duke 390 (2024–)",
+        "trims": [
+          "Standard"
+        ],
+        "versions": [
+          {
+            "name": "399cc Single",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 399,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Duke 390 (2017–2023)",
+        "engines": [
+          {
+            "name": "373cc Single",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "type": "MOTORCYCLE",
+    "name": "Duke 790",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Duke 790 (2018–2022)",
+        "engines": [
+          {
+            "name": "799cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "type": "MOTORCYCLE",
+    "name": "Duke 890",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Duke 890 (2021–)",
+        "engines": [
+          {
+            "name": "889cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "R"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "type": "MOTORCYCLE",
+    "name": "Duke 1290 Super Duke R",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Duke 1290 Super Duke R (2020–)",
+        "engines": [
+          {
+            "name": "1301cc V-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "EVO"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "type": "MOTORCYCLE",
+    "name": "Adventure 890",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "890 Adventure (2021–)",
+        "engines": [
+          {
+            "name": "889cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "R",
+          "R Rally"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "type": "MOTORCYCLE",
+    "name": "Adventure 1290 Super Adventure S",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "1290 Super Adventure S (2021–)",
+        "engines": [
+          {
+            "name": "1301cc V-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "type": "MOTORCYCLE",
+    "name": "350 EXC-F",
+    "supportedBodyTypes": [
+      "ENDURO"
+    ],
+    "generations": [
+      {
+        "name": "350 EXC-F (2024)",
+        "engines": [
+          {
+            "name": "349cc Single",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  }
+]

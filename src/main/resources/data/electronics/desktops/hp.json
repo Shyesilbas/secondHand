@@ -1,0 +1,189 @@
+[
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "EliteDesk 800 G6",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP EliteDesk 800 G6",
+      "EliteDesk 800 G6",
+      "800 G6"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "EliteDesk 800 G5",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP EliteDesk 800 G5",
+      "EliteDesk 800 G5",
+      "800 G5"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "EliteDesk 705 G5",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP EliteDesk 705 G5",
+      "EliteDesk 705 G5",
+      "705 G5"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "ProDesk 400 G7",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP ProDesk 400 G7",
+      "ProDesk 400 G7",
+      "400 G7"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "ProDesk 400 G6",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP ProDesk 400 G6",
+      "ProDesk 400 G6",
+      "400 G6"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "ProDesk 600 G6",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP ProDesk 600 G6",
+      "ProDesk 600 G6",
+      "600 G6"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "OMEN 45L",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN 45L",
+      "OMEN 45L"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "OMEN 40L",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN 40L",
+      "OMEN 40L"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "OMEN 30L",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP OMEN 30L",
+      "OMEN 30L"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "OMEN 25L",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP OMEN 25L",
+      "OMEN 25L"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "Victus 15L",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP Victus 15L",
+      "Victus 15L"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "Pavilion All-in-One 24",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP Pavilion All-in-One 24",
+      "Pavilion AIO 24",
+      "Pavilion All-in-One 24"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "Pavilion All-in-One 27",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP Pavilion All-in-One 27",
+      "Pavilion AIO 27",
+      "Pavilion All-in-One 27"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "Envy All-in-One 34",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP Envy All-in-One 34",
+      "Envy AIO 34",
+      "Envy All-in-One 34"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "Elite Mini 800 G9",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP Elite Mini 800 G9",
+      "Elite Mini 800 G9",
+      "Elite Mini 800"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "DESKTOP",
+    "name": "Pro Mini 400 G9",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP Pro Mini 400 G9",
+      "Pro Mini 400 G9",
+      "Pro Mini 400"
+    ]
+  }
+]

@@ -1,0 +1,1002 @@
+[
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Fabia",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Fabia (2021–, Mk4)",
+        "trims": [
+          "Elite",
+          "Premium",
+          "Monte Carlo"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2021,
+        "versions": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TSI 95",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 95,
+            "gearbox": "MANUAL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TSI 110 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 110,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TSI 115",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 115,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Fabia (2014–2021, Mk3)",
+        "engines": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambition",
+          "Style"
+        ]
+      },
+      {
+        "name": "Fabia (2007–2014, Mk2)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Ambition",
+          "Elegance"
+        ]
+      },
+      {
+        "name": "Fabia (2000–2007, Mk1)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Choice",
+          "Comfort",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Scala",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Scala (2019–)",
+        "engines": [
+          {
+            "name": "1.0 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Elite",
+          "Premium",
+          "Monte Carlo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Rapid",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Rapid (2012–2019, NH)",
+        "engines": [
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Active",
+          "Ambition",
+          "Style",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Octavia Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Octavia Sedan (2020–, Mk4)",
+        "trims": [
+          "Elite",
+          "Premium",
+          "Sportline"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "1.0 TSI e-TEC 110 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 110,
+            "torqueNm": 200,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 TSI e-TEC 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Octavia Sedan (2013–2020, Mk3)",
+        "trims": [
+          "Ambition",
+          "Optimal",
+          "Style",
+          "Prestige"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2013,
+        "endYear": 2020,
+        "versions": [
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 TSI 115",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 115,
+            "torqueNm": 200,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 TDI 110 DSG",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 110,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Octavia Sedan (2004–2013, Mk2)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Ambient",
+          "Ambition",
+          "Elegance"
+        ]
+      },
+      {
+        "name": "Octavia Sedan (1998–2004, Mk1)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Ambiente",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Octavia Combi",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Octavia Combi (2020–, Mk4)",
+        "engines": [
+          {
+            "name": "1.5 TSI e-TEC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Scout"
+        ]
+      },
+      {
+        "name": "Octavia Combi (2013–2020, Mk3)",
+        "engines": [
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Prestige",
+          "Scout"
+        ]
+      },
+      {
+        "name": "Octavia Combi (2004–2013, Mk2)",
+        "engines": [
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambition",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Superb",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Superb (2024–, B9)",
+        "engines": [
+          {
+            "name": "1.5 TSI mHEV",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Elite",
+          "Premium",
+          "Laurin & Klement"
+        ]
+      },
+      {
+        "name": "Superb (2015–2024, B8)",
+        "trims": [
+          "Active",
+          "Ambition",
+          "Style",
+          "Prestige",
+          "Laurin & Klement",
+          "Sportline"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2015,
+        "endYear": 2024,
+        "versions": [
+          {
+            "name": "1.4 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 TSI ACT 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 TDI 120 DSG",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 120,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TSI iV",
+            "fuelType": "HYBRID",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Superb (2008–2015, B6)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Ambition",
+          "Elegance"
+        ]
+      },
+      {
+        "name": "Superb (2001–2008, B5)",
+        "engines": [
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.5 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Comfort",
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Superb Combi",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Superb Combi (2024–, B9)",
+        "engines": [
+          {
+            "name": "1.5 TSI mHEV",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Laurin & Klement"
+        ]
+      },
+      {
+        "name": "Superb Combi (2015–2024, B8)",
+        "engines": [
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige",
+          "Laurin & Klement"
+        ]
+      },
+      {
+        "name": "Superb Combi (2009–2015, B6)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Elegance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Kamiq",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Kamiq (2019–)",
+        "trims": [
+          "Elite",
+          "Premium",
+          "Monte Carlo"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "1.0 TSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 TSI 115 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 115,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified",
+            "torqueNm": 200
+          },
+          {
+            "name": "1.5 TSI 150 DSG",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Karoq",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Karoq (2017–)",
+        "engines": [
+          {
+            "name": "1.0 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambition",
+          "Style",
+          "Prestige",
+          "Sportline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Kodiaq",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Kodiaq (2024–, PS)",
+        "engines": [
+          {
+            "name": "1.5 TSI mHEV",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium",
+          "Sportline"
+        ]
+      },
+      {
+        "name": "Kodiaq (2016–2024, NS)",
+        "engines": [
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambition",
+          "Style",
+          "Prestige",
+          "Sportline",
+          "Laurin & Klement"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Yeti",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Yeti (2009–2017)",
+        "engines": [
+          {
+            "name": "1.2 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Active",
+          "Ambition",
+          "Elegance",
+          "GreenLine"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Roomster",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Roomster (2006–2015)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Active",
+          "Ambition",
+          "Panoramik"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Citigo",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Citigo (2012–2020)",
+        "engines": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Ambition",
+          "Style"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Enyaq iV",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Enyaq iV (2020–)",
+        "engines": [
+          {
+            "name": "Enyaq 60 132 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Enyaq 80 150 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Elite",
+          "Premium",
+          "Sportline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Enyaq Coupe iV",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Enyaq Coupe iV (2022–)",
+        "engines": [
+          {
+            "name": "Enyaq Coupe 80 150 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Enyaq Coupe RS 220 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Sportline",
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Octavia RS",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Octavia RS",
+        "engines": [
+          {
+            "name": "2.0 TSI RS",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI RS",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Superb Sportline",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Superb Sportline",
+        "engines": [
+          {
+            "name": "1.5 TSI Sportline",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI Sportline",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Sportline"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SKODA",
+    "type": "CAR",
+    "name": "Kodiaq RS",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Kodiaq RS",
+        "engines": [
+          {
+            "name": "2.0 TSI RS",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI RS",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  }
+]

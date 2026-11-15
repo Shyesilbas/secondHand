@@ -1,0 +1,146 @@
+[
+  {
+    "brand": "JBL",
+    "type": "SPEAKER",
+    "name": "Flip 6",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Flip 6",
+      "Flip 6 Bluetooth"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": false,
+      "batteryLifeHours": 12
+    }
+  },
+  {
+    "brand": "JBL",
+    "type": "SPEAKER",
+    "name": "Charge 5",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Charge 5",
+      "Charge 5 Bluetooth"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": false,
+      "batteryLifeHours": 20
+    }
+  },
+  {
+    "brand": "JBL",
+    "type": "SPEAKER",
+    "name": "Boombox 3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Boombox 3",
+      "Boombox 3 Wi-Fi"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": false,
+      "batteryLifeHours": 24
+    }
+  },
+  {
+    "brand": "JBL",
+    "type": "SPEAKER",
+    "name": "PartyBox 310",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "JBL PartyBox 310",
+      "PartyBox 310 Light"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": false,
+      "batteryLifeHours": 18
+    }
+  },
+  {
+    "brand": "JBL",
+    "type": "SPEAKER",
+    "name": "PartyBox 110",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "JBL PartyBox 110",
+      "PartyBox 110 Light"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": false,
+      "batteryLifeHours": 12
+    }
+  },
+  {
+    "brand": "JBL",
+    "type": "SPEAKER",
+    "name": "GO 3",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "JBL GO 3",
+      "GO3 Mini"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": false,
+      "batteryLifeHours": 5
+    }
+  },
+  {
+    "brand": "JBL",
+    "type": "SPEAKER",
+    "name": "Clip 4",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Clip 4",
+      "Clip 4 Bluetooth"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": false,
+      "batteryLifeHours": 10
+    }
+  },
+  {
+    "brand": "JBL",
+    "type": "SPEAKER",
+    "name": "Xtreme 3",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "JBL Xtreme 3",
+      "Xtreme 3 Bluetooth"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "hasMicrophone": false,
+      "batteryLifeHours": 15
+    }
+  }
+]

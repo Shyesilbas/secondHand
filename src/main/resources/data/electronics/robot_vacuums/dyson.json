@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "DYSON",
+    "type": "ROBOT_VACUUM",
+    "name": "360 Vis Nav",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dyson 360 Vis Nav",
+      "Dyson Robot"
+    ]
+  },
+  {
+    "brand": "DYSON",
+    "type": "ROBOT_VACUUM",
+    "name": "V15 Detect Absolute",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dyson V15",
+      "V15 Detect"
+    ]
+  },
+  {
+    "brand": "DYSON",
+    "type": "ROBOT_VACUUM",
+    "name": "Gen5detect Absolute",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dyson Gen5",
+      "Gen5detect"
+    ]
+  },
+  {
+    "brand": "DYSON",
+    "type": "ROBOT_VACUUM",
+    "name": "V12 Detect Slim Extra",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dyson V12 Slim",
+      "V12 Detect"
+    ]
+  },
+  {
+    "brand": "DYSON",
+    "type": "ROBOT_VACUUM",
+    "name": "V11 Total Clean",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Dyson V11",
+      "V11 Extra"
+    ]
+  },
+  {
+    "brand": "DYSON",
+    "type": "ROBOT_VACUUM",
+    "name": "V8 Absolute",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "Dyson V8",
+      "V8 Extra"
+    ]
+  }
+]

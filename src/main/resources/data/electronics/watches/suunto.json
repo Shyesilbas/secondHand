@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "SUUNTO",
+    "type": "SMARTWATCH",
+    "name": "Race AMOLED",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Suunto Race",
+      "Race Titanium"
+    ]
+  },
+  {
+    "brand": "SUUNTO",
+    "type": "SMARTWATCH",
+    "name": "Vertical Solar",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Suunto Vertical",
+      "Vertical Titanium"
+    ]
+  },
+  {
+    "brand": "SUUNTO",
+    "type": "SMARTWATCH",
+    "name": "9 Peak Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Suunto 9 Peak Pro",
+      "9 Peak Pro"
+    ]
+  },
+  {
+    "brand": "SUUNTO",
+    "type": "SMARTWATCH",
+    "name": "Ocean Dive & Multisport",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Suunto Ocean",
+      "Ocean Computer"
+    ]
+  }
+]

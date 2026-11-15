@@ -1,0 +1,50 @@
+[
+  {
+    "brand": "HYUNDAI",
+    "type": "COMMERCIAL",
+    "name": "Staria",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Staria (2021–)",
+        "engines": [
+          {
+            "name": "2.2 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prime",
+          "Elite"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HYUNDAI",
+    "type": "COMMERCIAL",
+    "name": "H-1 / Starex",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "H-1 / Starex (2007–2021, TQ)",
+        "engines": [
+          {
+            "name": "2.5 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Multix"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,308 @@
+[
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "UltraSharp U2723QE",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell UltraSharp U2723QE",
+      "U2723QE",
+      "UltraSharp U2723QE"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 27,
+      "screenInches": 27.0,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "UltraSharp U3223QE",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell UltraSharp U3223QE",
+      "U3223QE",
+      "UltraSharp U3223QE"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 32,
+      "screenInches": 31.5,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "UltraSharp U2720Q",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Dell UltraSharp U2720Q",
+      "U2720Q",
+      "UltraSharp U2720Q"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 27,
+      "screenInches": 27.0,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "UltraSharp U2719D",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Dell UltraSharp U2719D",
+      "U2719D",
+      "UltraSharp U2719D"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 27,
+      "screenInches": 27.0,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "UltraSharp U2419H",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Dell UltraSharp U2419H",
+      "U2419H",
+      "UltraSharp U2419H"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 24,
+      "screenInches": 23.8,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "UltraSharp U2422H",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell UltraSharp U2422H",
+      "U2422H",
+      "UltraSharp U2422H"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 24,
+      "screenInches": 23.8,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "UltraSharp U3423WE",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell UltraSharp U3423WE",
+      "U3423WE",
+      "UltraSharp U3423WE"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 34,
+      "screenInches": 34.1,
+      "displayType": "IPS",
+      "refreshRateHz": 60
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "UltraSharp U4025QW",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Dell UltraSharp U4025QW",
+      "U4025QW",
+      "UltraSharp U4025QW"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "Alienware AW3423DWF",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "AW3423DWF",
+      "Alienware AW3423DWF"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 34,
+      "screenInches": 34.2,
+      "displayType": "QD-OLED",
+      "refreshRateHz": 165
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "Alienware AW3423DW",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "AW3423DW",
+      "Alienware AW3423DW"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 34,
+      "screenInches": 34.2,
+      "displayType": "QD-OLED",
+      "refreshRateHz": 175
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "Alienware AW3225QF",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "AW3225QF"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "screenSize": 32,
+      "screenInches": 31.6,
+      "displayType": "QD-OLED",
+      "refreshRateHz": 240
+    }
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "Alienware AW2725DF",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "AW2725DF"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "Alienware AW2524H",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "AW2524H"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "G2724D",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Dell G2724D",
+      "G2724D"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "S2722DGM",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell S2722DGM",
+      "S2722DGM"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "S2522HG",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell S2522HG",
+      "S2522HG"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "S3422DWG",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell S3422DWG",
+      "S3422DWG"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "P2723DE",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell P2723DE",
+      "P2723DE"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "P2422H",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell P2422H",
+      "P2422H"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "E2423H",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Dell E2423H",
+      "E2423H"
+    ]
+  },
+  {
+    "brand": "DELL",
+    "type": "MONITOR",
+    "name": "E2222H",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Dell E2222H",
+      "E2222H"
+    ]
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "BROTHER",
+    "type": "PRINTER",
+    "name": "DCP-T420W Tanklı Renkli Wi-Fi",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Brother T420W",
+      "DCP-T420W"
+    ]
+  },
+  {
+    "brand": "BROTHER",
+    "type": "PRINTER",
+    "name": "DCP-T520W Tanklı Renkli Wi-Fi",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Brother T520W",
+      "DCP-T520W"
+    ]
+  },
+  {
+    "brand": "BROTHER",
+    "type": "PRINTER",
+    "name": "HL-1211W Mono Lazer Wi-Fi",
+    "releaseYear": 2015,
+    "isLegacy": false,
+    "aliases": [
+      "Brother HL-1211W",
+      "HL-1211W"
+    ]
+  }
+]

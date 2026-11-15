@@ -1,0 +1,346 @@
+[
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "YZF-R1",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "YZF-R1 (2015–)",
+        "engines": [
+          {
+            "name": "998cc Crossplane Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "M"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "YZF-R6",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "YZF-R6 (2017–2020)",
+        "engines": [
+          {
+            "name": "599cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "YZF-R3",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "YZF-R3 (2019–)",
+        "engines": [
+          {
+            "name": "321cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "YZF-R25",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "YZF-R25 (2019–)",
+        "engines": [
+          {
+            "name": "249cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "World GP 60th Anniversary"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "MT-09",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "MT-09 (2021–)",
+        "trims": [
+          "Standard",
+          "SP"
+        ],
+        "versions": [
+          {
+            "name": "889cc CP3 Inline-3",
+            "fuelType": "GASOLINE",
+            "horsePower": 119,
+            "torqueNm": 93,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "MT-09 (2017–2020)",
+        "engines": [
+          {
+            "name": "847cc Inline-3",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "MT-07",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "MT-07 (2021–)",
+        "trims": [
+          "Standard"
+        ],
+        "versions": [
+          {
+            "name": "689cc Parallel-Twin",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 689,
+            "horsePower": 73,
+            "powerKw": 54,
+            "torqueNm": 67,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "MT-07 (2014–2020)",
+        "engines": [
+          {
+            "name": "689cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "MT-03",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "MT-03 (2020–)",
+        "engines": [
+          {
+            "name": "321cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "Tracer 9",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "Tracer 9 (2021–)",
+        "engines": [
+          {
+            "name": "889cc CP3 Inline-3",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "GT",
+          "GT+"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "Tracer 7",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "Tracer 7 (2021–)",
+        "engines": [
+          {
+            "name": "689cc Parallel-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "TMAX 560",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "TMAX 560 (2022–)",
+        "trims": [
+          "Standard",
+          "Tech MAX"
+        ],
+        "versions": [
+          {
+            "name": "562cc Parallel-Twin",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 562,
+            "horsePower": 48,
+            "powerKw": 35,
+            "torqueNm": 56,
+            "gearbox": "CVT",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "XMAX 300",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "XMAX 300 (2023–)",
+        "trims": [
+          "Standard",
+          "Tech MAX"
+        ],
+        "versions": [
+          {
+            "name": "292cc Single",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 292,
+            "horsePower": 28,
+            "torqueNm": 29,
+            "gearbox": "CVT",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "XMAX 250 Tech MAX",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "XMAX 250 (2014–2022)",
+        "engines": [
+          {
+            "name": "249cc Single",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Tech MAX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "YAMAHA",
+    "type": "MOTORCYCLE",
+    "name": "FJR1300",
+    "supportedBodyTypes": [
+      "TOURING"
+    ],
+    "generations": [
+      {
+        "name": "FJR1300 (2016–2020)",
+        "engines": [
+          {
+            "name": "1298cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "A",
+          "AE",
+          "AS"
+        ]
+      }
+    ]
+  }
+]

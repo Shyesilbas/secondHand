@@ -1,0 +1,143 @@
+[
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook X Pro 2024",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook X Pro 2024",
+      "MateBook X Pro 2024",
+      "X Pro 2024"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook X Pro 2023",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook X Pro 2023",
+      "MateBook X Pro 2023",
+      "X Pro 2023"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook X Pro 2022",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook X Pro 2022",
+      "MateBook X Pro 2022",
+      "X Pro 2022"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook D 16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook D 16",
+      "MateBook D 16",
+      "D 16",
+      "MateBook D16"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook D 15",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook D 15",
+      "MateBook D 15",
+      "D 15",
+      "MateBook D15"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook D 14",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook D 14",
+      "MateBook D 14",
+      "D 14",
+      "MateBook D14"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook 14",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook 14",
+      "MateBook 14"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook 14s",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook 14s",
+      "MateBook 14s"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook E",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook E",
+      "MateBook E"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook E Go",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei MateBook E Go",
+      "MateBook E Go"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook X",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei MateBook X",
+      "MateBook X"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "LAPTOP",
+    "name": "MateBook 13",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei MateBook 13",
+      "MateBook 13"
+    ]
+  }
+]

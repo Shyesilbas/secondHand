@@ -1,0 +1,2416 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 16 (M4 Max)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M4 Max 16",
+      "MBP 16 M4 Max"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 16,
+      "screenInches": 16.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M4 Max 14-core CPU · 32-core GPU · 36 GB / 1 TB",
+        "ram": 36,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "32-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 14-core CPU · 32-core GPU · 36 GB / 2 TB",
+        "ram": 36,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "32-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 14-core CPU · 32-core GPU · 36 GB / 4 TB",
+        "ram": 36,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "32-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 14-core CPU · 32-core GPU · 36 GB / 8 TB",
+        "ram": 36,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "32-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 48 GB / 1 TB",
+        "ram": 48,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 48 GB / 2 TB",
+        "ram": 48,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 48 GB / 4 TB",
+        "ram": 48,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 48 GB / 8 TB",
+        "ram": 48,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 64 GB / 1 TB",
+        "ram": 64,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 64 GB / 2 TB",
+        "ram": 64,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 64 GB / 4 TB",
+        "ram": 64,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 64 GB / 8 TB",
+        "ram": 64,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 128 GB / 1 TB",
+        "ram": 128,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 128 GB / 2 TB",
+        "ram": 128,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 128 GB / 4 TB",
+        "ram": 128,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 128 GB / 8 TB",
+        "ram": 128,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 16 (M4 Pro)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M4 Pro 16",
+      "MBP 16 M4 Pro"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 16,
+      "screenInches": 16.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 24 GB / 4 TB",
+        "ram": 24,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 48 GB / 512 GB",
+        "ram": 48,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 48 GB / 1 TB",
+        "ram": 48,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 48 GB / 2 TB",
+        "ram": 48,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 48 GB / 4 TB",
+        "ram": 48,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 14 (M4 Max)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M4 Max 14",
+      "MBP 14 M4 Max"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 14,
+      "screenInches": 14.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M4 Max 14-core CPU · 32-core GPU · 36 GB / 1 TB",
+        "ram": 36,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "32-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 14-core CPU · 32-core GPU · 36 GB / 2 TB",
+        "ram": 36,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "32-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 14-core CPU · 32-core GPU · 36 GB / 4 TB",
+        "ram": 36,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "32-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 14-core CPU · 32-core GPU · 36 GB / 8 TB",
+        "ram": 36,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "32-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 48 GB / 1 TB",
+        "ram": 48,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 48 GB / 2 TB",
+        "ram": 48,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 48 GB / 4 TB",
+        "ram": 48,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 48 GB / 8 TB",
+        "ram": 48,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 64 GB / 1 TB",
+        "ram": 64,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 64 GB / 2 TB",
+        "ram": 64,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 64 GB / 4 TB",
+        "ram": 64,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 64 GB / 8 TB",
+        "ram": 64,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 128 GB / 1 TB",
+        "ram": 128,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 128 GB / 2 TB",
+        "ram": 128,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 128 GB / 4 TB",
+        "ram": 128,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M4 Max 16-core CPU · 40-core GPU · 128 GB / 8 TB",
+        "ram": 128,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 14 (M4 Pro)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M4 Pro 14",
+      "MBP 14 M4 Pro"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 14,
+      "screenInches": 14.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M4 Pro 12-core CPU · 16-core GPU · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "16-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 12-core CPU · 16-core GPU · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "16-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 12-core CPU · 16-core GPU · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "16-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 12-core CPU · 16-core GPU · 24 GB / 4 TB",
+        "ram": 24,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "16-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 12-core CPU · 16-core GPU · 48 GB / 512 GB",
+        "ram": 48,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "16-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 12-core CPU · 16-core GPU · 48 GB / 1 TB",
+        "ram": 48,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "16-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 12-core CPU · 16-core GPU · 48 GB / 2 TB",
+        "ram": 48,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "16-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 12-core CPU · 16-core GPU · 48 GB / 4 TB",
+        "ram": 48,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "16-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 24 GB / 4 TB",
+        "ram": 24,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 48 GB / 512 GB",
+        "ram": 48,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 48 GB / 1 TB",
+        "ram": 48,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 48 GB / 2 TB",
+        "ram": 48,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      },
+      {
+        "name": "Apple M4 Pro 14-core CPU · 20-core GPU · 48 GB / 4 TB",
+        "ram": 48,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4 Pro 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "20-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 14 (M4)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M4 14",
+      "MBP 14 M4"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 14,
+      "screenInches": 14.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M4 · 10-core GPU · 16 GB / 512 GB",
+        "ram": 16,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M4 · 10-core GPU · 16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M4 · 10-core GPU · 16 GB / 2 TB",
+        "ram": 16,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M4 · 10-core GPU · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M4 · 10-core GPU · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M4 · 10-core GPU · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M4 · 10-core GPU · 32 GB / 512 GB",
+        "ram": 32,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M4 · 10-core GPU · 32 GB / 1 TB",
+        "ram": 32,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M4 · 10-core GPU · 32 GB / 2 TB",
+        "ram": 32,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M4",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 16 (M3 Max)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M3 Max 16"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 16,
+      "screenInches": 16.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 36 GB / 1 TB",
+        "ram": 36,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 36 GB / 2 TB",
+        "ram": 36,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 36 GB / 4 TB",
+        "ram": 36,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 36 GB / 8 TB",
+        "ram": 36,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 96 GB / 1 TB",
+        "ram": 96,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 96 GB / 2 TB",
+        "ram": 96,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 96 GB / 4 TB",
+        "ram": 96,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 96 GB / 8 TB",
+        "ram": 96,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 48 GB / 1 TB",
+        "ram": 48,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 48 GB / 2 TB",
+        "ram": 48,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 48 GB / 4 TB",
+        "ram": 48,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 48 GB / 8 TB",
+        "ram": 48,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 64 GB / 1 TB",
+        "ram": 64,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 64 GB / 2 TB",
+        "ram": 64,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 64 GB / 4 TB",
+        "ram": 64,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 64 GB / 8 TB",
+        "ram": 64,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 128 GB / 1 TB",
+        "ram": 128,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 128 GB / 2 TB",
+        "ram": 128,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 128 GB / 4 TB",
+        "ram": 128,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 128 GB / 8 TB",
+        "ram": 128,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 16 (M3 Pro)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M3 Pro 16"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 16,
+      "screenInches": 16.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 18 GB / 512 GB",
+        "ram": 18,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 18 GB / 1 TB",
+        "ram": 18,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 18 GB / 2 TB",
+        "ram": 18,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 18 GB / 4 TB",
+        "ram": 18,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 36 GB / 512 GB",
+        "ram": 36,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 36 GB / 1 TB",
+        "ram": 36,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 36 GB / 2 TB",
+        "ram": 36,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 36 GB / 4 TB",
+        "ram": 36,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 14 (M3 Max)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M3 Max 14"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 14,
+      "screenInches": 14.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 36 GB / 1 TB",
+        "ram": 36,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 36 GB / 2 TB",
+        "ram": 36,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 36 GB / 4 TB",
+        "ram": 36,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 36 GB / 8 TB",
+        "ram": 36,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 96 GB / 1 TB",
+        "ram": 96,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 96 GB / 2 TB",
+        "ram": 96,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 96 GB / 4 TB",
+        "ram": 96,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 14-core CPU · 30-core GPU · 96 GB / 8 TB",
+        "ram": 96,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 14-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "30-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 48 GB / 1 TB",
+        "ram": 48,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 48 GB / 2 TB",
+        "ram": 48,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 48 GB / 4 TB",
+        "ram": 48,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 48 GB / 8 TB",
+        "ram": 48,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 64 GB / 1 TB",
+        "ram": 64,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 64 GB / 2 TB",
+        "ram": 64,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 64 GB / 4 TB",
+        "ram": 64,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 64 GB / 8 TB",
+        "ram": 64,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 128 GB / 1 TB",
+        "ram": 128,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 128 GB / 2 TB",
+        "ram": 128,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 128 GB / 4 TB",
+        "ram": 128,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      },
+      {
+        "name": "Apple M3 Max 16-core CPU · 40-core GPU · 128 GB / 8 TB",
+        "ram": 128,
+        "storage": 8192,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Max 16-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "40-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 14 (M3 Pro)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M3 Pro 14"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 14,
+      "screenInches": 14.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M3 Pro 11-core CPU · 14-core GPU · 18 GB / 512 GB",
+        "ram": 18,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 11-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "14-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 11-core CPU · 14-core GPU · 18 GB / 1 TB",
+        "ram": 18,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 11-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "14-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 11-core CPU · 14-core GPU · 18 GB / 2 TB",
+        "ram": 18,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 11-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "14-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 11-core CPU · 14-core GPU · 18 GB / 4 TB",
+        "ram": 18,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 11-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "14-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 11-core CPU · 14-core GPU · 36 GB / 512 GB",
+        "ram": 36,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 11-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "14-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 11-core CPU · 14-core GPU · 36 GB / 1 TB",
+        "ram": 36,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 11-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "14-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 11-core CPU · 14-core GPU · 36 GB / 2 TB",
+        "ram": 36,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 11-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "14-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 11-core CPU · 14-core GPU · 36 GB / 4 TB",
+        "ram": 36,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 11-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "14-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 18 GB / 512 GB",
+        "ram": 18,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 18 GB / 1 TB",
+        "ram": 18,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 18 GB / 2 TB",
+        "ram": 18,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 18 GB / 4 TB",
+        "ram": 18,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 36 GB / 512 GB",
+        "ram": 36,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 36 GB / 1 TB",
+        "ram": 36,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 36 GB / 2 TB",
+        "ram": 36,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      },
+      {
+        "name": "Apple M3 Pro 12-core CPU · 18-core GPU · 36 GB / 4 TB",
+        "ram": 36,
+        "storage": 4096,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3 Pro 12-core CPU",
+        "source": "claude-draft",
+        "gpuModel": "18-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Pro 14 (M3)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Pro M3 14"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 14,
+      "screenInches": 14.2,
+      "displayType": "Liquid Retina XDR (Mini-LED)",
+      "refreshRateHz": 120
+    },
+    "colors": [
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M3 · 10-core GPU · 8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 8 GB / 1 TB",
+        "ram": 8,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 8 GB / 2 TB",
+        "ram": 8,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 16 GB / 512 GB",
+        "ram": 16,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 16 GB / 2 TB",
+        "ram": 16,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Air 15 (M3)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Air M3 15"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 15,
+      "screenInches": 15.3,
+      "displayType": "Liquid Retina (LCD)",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Midnight",
+        "color": "MIDNIGHT_BLUE"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      },
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M3 · 10-core GPU · 8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 8 GB / 1 TB",
+        "ram": 8,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 8 GB / 2 TB",
+        "ram": 8,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 16 GB / 256 GB",
+        "ram": 16,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 16 GB / 512 GB",
+        "ram": 16,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 16 GB / 2 TB",
+        "ram": 16,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 24 GB / 256 GB",
+        "ram": 24,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M3 · 10-core GPU · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Air 13 (M3)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "MacBook Air M3 13"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 13,
+      "screenInches": 13.6,
+      "displayType": "Liquid Retina (LCD)",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Midnight",
+        "color": "MIDNIGHT_BLUE"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      },
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M3 · 8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 8 GB / 1 TB",
+        "ram": 8,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 8 GB / 2 TB",
+        "ram": 8,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 16 GB / 256 GB",
+        "ram": 16,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 16 GB / 512 GB",
+        "ram": 16,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 16 GB / 2 TB",
+        "ram": 16,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 24 GB / 256 GB",
+        "ram": 24,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M3 · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M3",
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Air 15 (M2)",
+    "releaseYear": 2023,
+    "isLegacy": true,
+    "aliases": [
+      "MacBook Air M2 15"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 15,
+      "screenInches": 15.3,
+      "displayType": "Liquid Retina (LCD)",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Midnight",
+        "color": "MIDNIGHT_BLUE"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      },
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M2 · 10-core GPU · 8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 8 GB / 1 TB",
+        "ram": 8,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 8 GB / 2 TB",
+        "ram": 8,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 16 GB / 256 GB",
+        "ram": 16,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 16 GB / 512 GB",
+        "ram": 16,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 16 GB / 2 TB",
+        "ram": 16,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 24 GB / 256 GB",
+        "ram": 24,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      },
+      {
+        "name": "Apple M2 · 10-core GPU · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft",
+        "gpuModel": "10-core GPU"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Air 13 (M2)",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "MacBook Air M2 13"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 13,
+      "screenInches": 13.6,
+      "displayType": "Liquid Retina (LCD)",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Midnight",
+        "color": "MIDNIGHT_BLUE"
+      },
+      {
+        "name": "Starlight",
+        "color": "WHITE"
+      },
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M2 · 8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 8 GB / 1 TB",
+        "ram": 8,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 8 GB / 2 TB",
+        "ram": 8,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 16 GB / 256 GB",
+        "ram": 16,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 16 GB / 512 GB",
+        "ram": 16,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 16 GB / 2 TB",
+        "ram": 16,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 24 GB / 256 GB",
+        "ram": 24,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 24 GB / 512 GB",
+        "ram": 24,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 24 GB / 1 TB",
+        "ram": 24,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M2 · 24 GB / 2 TB",
+        "ram": 24,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M2",
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  },
+  {
+    "brand": "APPLE",
+    "type": "LAPTOP",
+    "name": "MacBook Air 13 (M1)",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "MacBook Air M1"
+    ],
+    "specs": {
+      "processor": "APPLE_SILICON",
+      "operatingSystem": "macOS",
+      "screenSize": 13,
+      "screenInches": 13.3,
+      "displayType": "Retina (LCD)",
+      "refreshRateHz": 60
+    },
+    "colors": [
+      {
+        "name": "Space Gray",
+        "color": "GRAY"
+      },
+      {
+        "name": "Gold",
+        "color": "GOLD"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ],
+    "variants": [
+      {
+        "name": "Apple M1 · 8 GB / 256 GB",
+        "ram": 8,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M1",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M1 · 8 GB / 512 GB",
+        "ram": 8,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M1",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M1 · 8 GB / 1 TB",
+        "ram": 8,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M1",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M1 · 8 GB / 2 TB",
+        "ram": 8,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M1",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M1 · 16 GB / 256 GB",
+        "ram": 16,
+        "storage": 256,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M1",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M1 · 16 GB / 512 GB",
+        "ram": 16,
+        "storage": 512,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M1",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M1 · 16 GB / 1 TB",
+        "ram": 16,
+        "storage": 1024,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M1",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Apple M1 · 16 GB / 2 TB",
+        "ram": 16,
+        "storage": 2048,
+        "storageType": "SSD",
+        "processor": "APPLE_SILICON",
+        "chipset": "Apple M1",
+        "source": "claude-draft"
+      }
+    ],
+    "source": "claude-draft"
+  }
+]

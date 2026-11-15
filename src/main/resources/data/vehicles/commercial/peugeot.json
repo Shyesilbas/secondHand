@@ -1,0 +1,244 @@
+[
+  {
+    "brand": "PEUGEOT",
+    "type": "COMMERCIAL",
+    "name": "Rifter",
+    "supportedBodyTypes": [
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Rifter (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 BlueHDi 100",
+            "fuelType": "DIESEL",
+            "horsePower": 100,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "1.5 BlueHDi 130",
+            "fuelType": "DIESEL",
+            "horsePower": 130,
+            "engineCapacity": 1499
+          }
+        ],
+        "trims": [
+          "Active",
+          "Allure",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "COMMERCIAL",
+    "name": "Partner",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Partner Van (2018–, K9)",
+        "engines": [
+          {
+            "name": "1.5 BlueHDi 100",
+            "fuelType": "DIESEL",
+            "horsePower": 100,
+            "engineCapacity": 1499
+          }
+        ],
+        "trims": [
+          "Active",
+          "Pro",
+          "Premium"
+        ]
+      },
+      {
+        "name": "Partner Tepee (2008–2018, B9)",
+        "engines": [
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Outdoor",
+          "Zenith",
+          "Style"
+        ]
+      },
+      {
+        "name": "Partner (1996–2008, M59)",
+        "engines": [
+          {
+            "name": "1.9 D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 HDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Kombi",
+          "Adventure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "COMMERCIAL",
+    "name": "Expert",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Expert (2016–, K0)",
+        "engines": [
+          {
+            "name": "2.0 BlueHDi 145",
+            "fuelType": "DIESEL",
+            "horsePower": 145,
+            "engineCapacity": 1997
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Pro",
+          "Standart Panelvan",
+          "City Van"
+        ]
+      },
+      {
+        "name": "Expert (2007–2016, G9)",
+        "engines": [
+          {
+            "name": "2.0 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "COMMERCIAL",
+    "name": "Boxer",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS",
+      "LIGHT_TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "Boxer (2014–, X290)",
+        "engines": [
+          {
+            "name": "2.2 BlueHDi 140",
+            "fuelType": "DIESEL",
+            "horsePower": 140,
+            "engineCapacity": 2179
+          },
+          {
+            "name": "2.2 BlueHDi 165",
+            "fuelType": "DIESEL",
+            "horsePower": 165,
+            "engineCapacity": 2179
+          },
+          {
+            "name": "2.0 BlueHDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "L1H1",
+          "L2H2",
+          "L3H2",
+          "L4H2"
+        ]
+      },
+      {
+        "name": "Boxer (2006–2014, X250)",
+        "engines": [
+          {
+            "name": "2.2 HDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "COMMERCIAL",
+    "name": "Landtrek",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "Landtrek (2020–)",
+        "engines": [
+          {
+            "name": "1.9 D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4 T",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Active",
+          "Allure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PEUGEOT",
+    "type": "COMMERCIAL",
+    "name": "e-Partner",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "e-Partner (2021–)",
+        "engines": [
+          {
+            "name": "e-Partner 100 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Pro"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "CASPER",
+    "type": "MONITOR",
+    "name": "Excalibur 27 240Hz 0.5ms Curved",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Excalibur 27 240Hz",
+      "Excalibur 27 Curved"
+    ]
+  },
+  {
+    "brand": "CASPER",
+    "type": "MONITOR",
+    "name": "Excalibur 31.5 240Hz 0.5ms Curved",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Excalibur 31.5 240Hz",
+      "Excalibur 32 Curved"
+    ]
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "COMMERCIAL",
+    "name": "Sprinter",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS",
+      "LIGHT_TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "Sprinter (2018–, W907/910)",
+        "engines": [
+          {
+            "name": "314 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "316 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "319 CDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Tourer"
+        ]
+      },
+      {
+        "name": "Sprinter (2006–2018, W906)",
+        "engines": [
+          {
+            "name": "313 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "316 CDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "COMMERCIAL",
+    "name": "Vito",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Vito (2014–, W447)",
+        "engines": [
+          {
+            "name": "114 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "116 CDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Mixto",
+          "Tourer Pro",
+          "Tourer Select"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "COMMERCIAL",
+    "name": "Citan",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Citan (2021–, W420)",
+        "engines": [
+          {
+            "name": "110 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "112 CDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Pro",
+          "Tourer Pro"
+        ]
+      }
+    ]
+  }
+]

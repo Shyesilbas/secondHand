@@ -1,0 +1,228 @@
+[
+  {
+    "brand": "TESLA",
+    "type": "CAR",
+    "name": "Model Y",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Model Y (2025–, Juniper)",
+        "startYear": 2025,
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "trims": [
+          "Standart",
+          "Premium",
+          "Performance"
+        ],
+        "versions": [
+          {
+            "name": "Standart RWD",
+            "fuelType": "ELECTRIC",
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Long Range RWD",
+            "fuelType": "ELECTRIC",
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "RWD",
+            "source": "claude-draft",
+            "specs": {
+              "electricRange": 622
+            }
+          },
+          {
+            "name": "Long Range AWD",
+            "fuelType": "ELECTRIC",
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "Performance AWD",
+            "fuelType": "ELECTRIC",
+            "gearbox": "AUTOMATIC",
+            "gearCount": 1,
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Model Y (2020–)",
+        "startYear": 2020,
+        "endYear": 2025,
+        "engines": [
+          {
+            "name": "RWD Standart (299 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 299,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Long Range Dual Motor (514 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 514,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Performance AWD (534 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 534,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Standart Range",
+          "Long Range",
+          "Performance"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE"
+      }
+    ]
+  },
+  {
+    "brand": "TESLA",
+    "type": "CAR",
+    "name": "Model 3",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Model 3 Highland (2023–)",
+        "startYear": 2023,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "RWD (283 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 283,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Long Range AWD (498 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 498,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Performance AWD (627 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 627,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Standart",
+          "Long Range",
+          "Performance"
+        ]
+      },
+      {
+        "name": "Model 3 (2017–2023)",
+        "startYear": 2017,
+        "endYear": 2023,
+        "engines": [
+          {
+            "name": "Standard Range Plus (283 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 283,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Long Range AWD (440 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 440,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Performance (480 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 480,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Standard Range Plus",
+          "Long Range",
+          "Performance"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "TESLA",
+    "type": "CAR",
+    "name": "Model S",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Model S Facelift (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "Dual Motor AWD (670 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 670,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Plaid Tri Motor (1020 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 1020,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Long Range",
+          "Plaid"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "TESLA",
+    "type": "CAR",
+    "name": "Model X",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Model X Facelift (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "Dual Motor AWD (670 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 670,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Plaid Tri Motor (1020 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 1020,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Long Range",
+          "Plaid"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "brand": "KARSAN",
+    "type": "TRUCK",
+    "name": "Atak",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  }
+]

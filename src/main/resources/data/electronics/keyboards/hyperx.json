@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "HYPERX",
+    "type": "KEYBOARD",
+    "name": "Alloy Origins",
+    "releaseYear": 2019,
+    "isLegacy": false,
+    "aliases": [
+      "HyperX Alloy Origins",
+      "Alloy Origins Red"
+    ]
+  },
+  {
+    "brand": "HYPERX",
+    "type": "KEYBOARD",
+    "name": "Alloy Origins Core",
+    "releaseYear": 2019,
+    "isLegacy": false,
+    "aliases": [
+      "HyperX Alloy Origins Core",
+      "Alloy TKL"
+    ]
+  },
+  {
+    "brand": "HYPERX",
+    "type": "KEYBOARD",
+    "name": "Alloy 60",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HyperX Alloy Origins 60",
+      "Alloy 60%"
+    ]
+  }
+]

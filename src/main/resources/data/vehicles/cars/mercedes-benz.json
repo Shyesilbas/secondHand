@@ -1,0 +1,2534 @@
+[
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "A-Class",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "A-Class (2018–, W177)",
+        "trims": [
+          "Style",
+          "AMG Line",
+          "Progressive",
+          "AMG"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2018,
+        "versions": [
+          {
+            "name": "A 180 d",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "A 180",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "A 200",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1332,
+            "horsePower": 163,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "A 220 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "A 250 e",
+            "fuelType": "HYBRID",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG A 35 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG A 45 S 4MATIC+",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "A-Class (2012–2018, W176)",
+        "engines": [
+          {
+            "name": "A 180 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "A 180",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "A 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "A 220 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "A 250",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG A 45 4MATIC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Urban",
+          "Style",
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "A-Class (2004–2012, W169)",
+        "engines": [
+          {
+            "name": "A 150",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "A 160",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "A 170",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "A 180 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "A 200",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "Avantgarde"
+        ]
+      },
+      {
+        "name": "A-Class (1997–2004, W168)",
+        "engines": [
+          {
+            "name": "A 140",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "A 160",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "A 170 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "A 190",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "Avantgarde"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "A-Class Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "A-Class Sedan (2018–, V177)",
+        "engines": [
+          {
+            "name": "A 180 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "A 200",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "A 220 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "A 250 4MATIC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Style",
+          "AMG Line",
+          "Progressive",
+          "AMG"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "B-Class",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "B-Class (2019–, W247)",
+        "engines": [
+          {
+            "name": "B 180",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B 180 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "B 200",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "B 220 4MATIC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B 250 e",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Progressive",
+          "AMG Line"
+        ]
+      },
+      {
+        "name": "B-Class (2011–2019, W246)",
+        "engines": [
+          {
+            "name": "B 180",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B 180 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "B 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B 220 CDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Urban",
+          "AMG Line"
+        ]
+      },
+      {
+        "name": "B-Class (2005–2011, W245)",
+        "engines": [
+          {
+            "name": "B 150",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B 160",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B 170",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B 180 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "B 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "B 200 CDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "Avantgarde"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "C-Class",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "C-Class (2021–, W206)",
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2021,
+        "versions": [
+          {
+            "name": "C 180",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1496,
+            "horsePower": 170,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "RWD",
+            "source": "verified"
+          },
+          {
+            "name": "C 200",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1496,
+            "horsePower": 204,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "RWD",
+            "source": "verified",
+            "torqueNm": 300
+          },
+          {
+            "name": "C 200 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "C 220 d",
+            "fuelType": "DIESEL",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "C 300 e",
+            "fuelType": "HYBRID",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG C 43 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG C 63 S E PERFORMANCE",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "C-Class (2014–2021, W205)",
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "Exclusive",
+          "AMG"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2014,
+        "endYear": 2021,
+        "versions": [
+          {
+            "name": "C 180 1.6 156",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1595,
+            "horsePower": 156,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "C 200",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "C 200 d",
+            "fuelType": "DIESEL",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "C 220 d",
+            "fuelType": "DIESEL",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "C 250 d 4MATIC",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "C 300",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG C 43 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG C 63",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "C-Class (2007–2014, W204)",
+        "engines": [
+          {
+            "name": "C 180 Kompressor",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 180 CGI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 200 Kompressor",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 200 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 220 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 250 CGI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 320 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 63 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "Avantgarde",
+          "AMG Line"
+        ]
+      },
+      {
+        "name": "C-Class (2000–2007, W203)",
+        "engines": [
+          {
+            "name": "C 180",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 180 Kompressor",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 200 Kompressor",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 200 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 220 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 270 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 320",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "Avantgarde"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "C-Class Estate",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "C-Class Estate (2021–, S206)",
+        "engines": [
+          {
+            "name": "C 200 4MATIC",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "C 220 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 200 4MATIC All-Terrain",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "All-Terrain"
+        ]
+      },
+      {
+        "name": "C-Class Estate (2014–2021, S205)",
+        "engines": [
+          {
+            "name": "C 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 220 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 250 d 4MATIC",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line"
+        ]
+      },
+      {
+        "name": "C-Class Estate (2007–2014, S204)",
+        "engines": [
+          {
+            "name": "C 180 CGI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "C 200 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "C 220 CDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "Avantgarde",
+          "AMG Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "CLA",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SEDAN",
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "CLA (2019–, C118)",
+        "trims": [
+          "Style",
+          "AMG Line",
+          "AMG"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "CLA 180",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "CLA 200",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1332,
+            "horsePower": 163,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "CLA 220 d",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "CLA 250 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG CLA 35 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG CLA 45 S 4MATIC+",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "CLA (2013–2019, C117)",
+        "engines": [
+          {
+            "name": "CLA 180",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "CLA 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "CLA 220 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "AMG CLA 45 4MATIC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Urban",
+          "Style",
+          "AMG Line"
+        ]
+      },
+      {
+        "name": "CLA (2025–)",
+        "engines": [
+          {
+            "name": "CLA 200 e",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "CLA e",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Progressive",
+          "AMG Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "CLE",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "CLE Coupe (2023–, C236)",
+        "engines": [
+          {
+            "name": "CLE 200",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "CLE 220 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "CLE 300 4MATIC",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "AMG CLE 53 4MATIC+",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "CLE Cabriolet (2024–, A236)",
+        "engines": [
+          {
+            "name": "CLE 200 Cabriolet",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "CLE 300 4MATIC Cabriolet",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "CLS",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "CLS (2018–2023, C257)",
+        "engines": [
+          {
+            "name": "CLS 220 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "CLS 300 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "CLS 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG CLS 53 4MATIC+",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "CLS (2010–2018, C218)",
+        "engines": [
+          {
+            "name": "CLS 250 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "CLS 350 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "CLS 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "CLS 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "CLS 63 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "CLS (2004–2010, C219)",
+        "engines": [
+          {
+            "name": "CLS 320 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "CLS 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "CLS 350 CGI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "CLS 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "CLS 55 AMG",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "CLS 63 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "AMG Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "E-Class",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "E-Class (2023–, W214)",
+        "trims": [
+          "Exclusive",
+          "AMG Line",
+          "AMG"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2023,
+        "versions": [
+          {
+            "name": "E 180",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1496,
+            "horsePower": 170,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "RWD",
+            "source": "verified"
+          },
+          {
+            "name": "E 200",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 220 d",
+            "fuelType": "DIESEL",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 220 d 4MATIC",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 300 e 4MATIC",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 300 de 4MATIC",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG E 53 Hybrid 4MATIC+",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "E-Class (2016–2023, W213)",
+        "trims": [
+          "Avantgarde",
+          "Exclusive",
+          "AMG Line",
+          "AMG"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2016,
+        "endYear": 2023,
+        "versions": [
+          {
+            "name": "E 180",
+            "fuelType": "GASOLINE",
+            "horsePower": 156,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "RWD",
+            "source": "verified"
+          },
+          {
+            "name": "E 200",
+            "fuelType": "GASOLINE",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 200 d 160",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 160,
+            "torqueNm": 360,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "RWD",
+            "startYear": 2020,
+            "source": "verified"
+          },
+          {
+            "name": "E 220 d",
+            "fuelType": "DIESEL",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 220 d 4MATIC",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 300 e",
+            "fuelType": "HYBRID",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 350 e",
+            "fuelType": "HYBRID",
+            "drivetrain": "RWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "E 400 d 4MATIC",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG E 43 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG E 53 4MATIC+",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "E-Class (2009–2016, W212)",
+        "engines": [
+          {
+            "name": "E 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 220 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "E 250 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "E 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 63 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "Avantgarde",
+          "AMG"
+        ]
+      },
+      {
+        "name": "E-Class (2002–2009, W211)",
+        "engines": [
+          {
+            "name": "E 200 Kompressor",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 220 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "E 270 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "E 280",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 320 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "E 320",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 55 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "Avantgarde",
+          "AMG Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "E-Class Coupe/Cabrio",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "E-Class Coupe (2017–2023, C238)",
+        "engines": [
+          {
+            "name": "E 200 Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 220 d Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "E 300 Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG E 53 Coupe 4MATIC+",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "E-Class Cabriolet (2017–2023, A238)",
+        "engines": [
+          {
+            "name": "E 200 Cabriolet",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 300 Cabriolet",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line"
+        ]
+      },
+      {
+        "name": "E-Class Coupe (2009–2017, C207)",
+        "engines": [
+          {
+            "name": "E 250 CGI Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 250 CDI Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "E 350 Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Avantgarde",
+          "AMG Sport"
+        ]
+      },
+      {
+        "name": "E-Class Cabriolet (2010–2017, A207)",
+        "engines": [
+          {
+            "name": "E 250 CGI Cabriolet",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "E 250 CDI Cabriolet",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Avantgarde",
+          "AMG Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "S-Class",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S-Class (2020–, W223)",
+        "engines": [
+          {
+            "name": "S 350 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "S 400 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "S 450 4MATIC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 500 4MATIC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 580 e 4MATIC",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "S 680 4MATIC Maybach",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG S 63 E PERFORMANCE",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Inspiration",
+          "Exclusive",
+          "Maybach",
+          "AMG"
+        ]
+      },
+      {
+        "name": "S-Class (2013–2020, W222)",
+        "engines": [
+          {
+            "name": "S 350 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "S 400",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 63 AMG",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 65 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "Exclusive",
+          "AMG",
+          "Maybach"
+        ]
+      },
+      {
+        "name": "S-Class (2005–2013, W221)",
+        "engines": [
+          {
+            "name": "S 320 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "S 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 350 BlueTEC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "S 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 63 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Elegance",
+          "AMG Sport"
+        ]
+      },
+      {
+        "name": "S-Class (1998–2005, W220)",
+        "engines": [
+          {
+            "name": "S 320",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 320 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "S 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "S 55 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "GLA",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "GLA (2019–, H247)",
+        "trims": [
+          "Style",
+          "AMG Line",
+          "AMG"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "GLA 180",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLA 200",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1332,
+            "horsePower": 163,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLA 220 d",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLA 250 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG GLA 35 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG GLA 45 S 4MATIC+",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "GLA (2013–2019, X156)",
+        "engines": [
+          {
+            "name": "GLA 180",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "GLA 180 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLA 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "GLA 220 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "AMG GLA 45 4MATIC",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Urban",
+          "AMG Line",
+          "AMG"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "GLB",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "GLB (2019–, X247)",
+        "trims": [
+          "Progressive",
+          "AMG Line",
+          "AMG"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": null,
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "GLB 180",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLB 200",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1332,
+            "horsePower": 163,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "GLB 220 d 4MATIC",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLB 250 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG GLB 35 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "GLC",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "GLC (2022–, X254)",
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2022,
+        "versions": [
+          {
+            "name": "GLC 200",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1999,
+            "horsePower": 204,
+            "torqueNm": 320,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "AWD",
+            "source": "verified"
+          },
+          {
+            "name": "GLC 220 d 4MATIC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1993,
+            "horsePower": 197,
+            "torqueNm": 440,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "AWD",
+            "source": "verified"
+          },
+          {
+            "name": "GLC 300 e 4MATIC",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLC 300 de 4MATIC",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG GLC 43 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG GLC 63 S E PERFORMANCE",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "GLC (2015–2022, X253)",
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "Exclusive",
+          "AMG"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2015,
+        "endYear": 2022,
+        "versions": [
+          {
+            "name": "GLC 200",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLC 220 d 4MATIC",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLC 250",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1991,
+            "horsePower": 211,
+            "torqueNm": 350,
+            "gearbox": "AUTOMATIC",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLC 300 d 4MATIC",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLC 350 e",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG GLC 43 4MATIC",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG GLC 63",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "GLC Coupe",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "GLC Coupe (2023–, C254)",
+        "engines": [
+          {
+            "name": "GLC 200 Coupe",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "GLC 220 d 4MATIC Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLC 300 e 4MATIC Coupe",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "AMG GLC 43 4MATIC Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "GLC Coupe (2016–2023, C253)",
+        "engines": [
+          {
+            "name": "GLC 250 Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "GLC 220 d Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLC 300 d Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "AMG GLC 43 Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "GLE / ML",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "GLE (2019–, V167)",
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": null,
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "GLE 300 d 4MATIC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1950,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLE 350 d 4MATIC",
+            "fuelType": "DIESEL",
+            "engineCapacity": 2925,
+            "horsePower": 272,
+            "torqueNm": 600,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "AWD",
+            "source": "verified"
+          },
+          {
+            "name": "GLE 450 4MATIC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 2999,
+            "horsePower": 367,
+            "torqueNm": 500,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "AWD",
+            "source": "verified"
+          },
+          {
+            "name": "GLE 350 de 4MATIC",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "GLE 580 4MATIC",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 3982,
+            "horsePower": 489,
+            "torqueNm": 700,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 9,
+            "drivetrain": "AWD",
+            "source": "verified"
+          },
+          {
+            "name": "AMG GLE 53 4MATIC+",
+            "fuelType": "HYBRID",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "AMG GLE 63 S 4MATIC+",
+            "fuelType": "GASOLINE",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "ML/GLE (2011–2019, W166)",
+        "engines": [
+          {
+            "name": "ML 250 BlueTEC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "ML 350 BlueTEC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLE 250 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLE 350 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLE 400",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GLE 43 4MATIC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GLE 63 S",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Sport",
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "ML (2005–2011, W164)",
+        "engines": [
+          {
+            "name": "ML 280 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "ML 320 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "ML 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "ML 350 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "ML 500",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Sport",
+          "Grand Edition"
+        ]
+      },
+      {
+        "name": "ML (1997–2005, W163)",
+        "engines": [
+          {
+            "name": "ML 270 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "ML 320",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "ML 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "ML 400 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "ML 430",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "ML 55 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Inspiration",
+          "Final Edition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "GLE Coupe",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "GLE Coupe (2020–, C167)",
+        "engines": [
+          {
+            "name": "GLE 350 de Coupe",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "GLE 400 d Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "AMG GLE 53 Coupe",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "AMG GLE 63 S Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "GLE Coupe (2015–2019, C292)",
+        "engines": [
+          {
+            "name": "GLE 350 d Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLE 400 Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "GLE 450 AMG Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GLE 43 Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GLE 63 S Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "AMG"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "GLS / GL",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "GLS (2019–, X167)",
+        "engines": [
+          {
+            "name": "GLS 350 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLS 400 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLS 450 4MATIC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "GLS 580 4MATIC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "GLS 600 Maybach 4MATIC",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GLS 63 4MATIC+",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "Maybach",
+          "AMG"
+        ]
+      },
+      {
+        "name": "GL/GLS (2012–2019, X166)",
+        "engines": [
+          {
+            "name": "GL 350 BlueTEC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GLS 350 d 4MATIC",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GL 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GL 63 / GLS 63",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Avantgarde",
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "GL (2006–2012, X164)",
+        "engines": [
+          {
+            "name": "GL 320 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GL 350 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GL 420 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "GL 450",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "GL 500",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Grand Edition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "G-Class",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "G-Class (2018–, W463)",
+        "engines": [
+          {
+            "name": "G 350 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "G 450 d",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "G 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "G 580 EQ",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "AMG G 63",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Heritage",
+          "Stronger Than Time",
+          "AMG"
+        ]
+      },
+      {
+        "name": "G-Class (1979–2018, W463)",
+        "engines": [
+          {
+            "name": "G 270 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "G 300 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "G 320 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "G 350 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "G 400 CDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "G 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "G 55 AMG",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "G 63 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Edition",
+          "AMG"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "EQA",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EQA (2021–, H243)",
+        "engines": [
+          {
+            "name": "EQA 250",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQA 300 4MATIC",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQA 350 4MATIC",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Style",
+          "AMG Line",
+          "Electric Art"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "EQB",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EQB (2021–, X243)",
+        "engines": [
+          {
+            "name": "EQB 250",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQB 300 4MATIC",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQB 350 4MATIC",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Style",
+          "AMG Line",
+          "Electric Art"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "EQC",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EQC (2019–, N293)",
+        "engines": [
+          {
+            "name": "EQC 400 4MATIC",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "Electric Art"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "EQE",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EQE Sedan (2022–, V295)",
+        "engines": [
+          {
+            "name": "EQE 300",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQE 350",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQE 350 4MATIC",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQE 500 4MATIC",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "AMG EQE 43 4MATIC",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "AMG EQE 53 4MATIC+",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "Electric Art",
+          "AMG"
+        ]
+      },
+      {
+        "name": "EQE SUV (2022–, X294)",
+        "engines": [
+          {
+            "name": "EQE 350 4MATIC SUV",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQE 500 4MATIC SUV",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "Electric Art"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "EQS",
+    "supportedBodyTypes": [
+      "SEDAN",
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EQS Sedan (2021–, V297)",
+        "engines": [
+          {
+            "name": "EQS 450+",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQS 450 4MATIC",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQS 580 4MATIC",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "AMG EQS 53 4MATIC+",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Electric Art",
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "EQS SUV (2022–, X296)",
+        "engines": [
+          {
+            "name": "EQS 450 4MATIC SUV",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EQS 580 4MATIC SUV",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Maybach EQS 680 SUV",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Electric Art",
+          "Maybach"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "AMG GT",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "AMG GT (2023–, C192)",
+        "engines": [
+          {
+            "name": "AMG GT 43",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "AMG GT 55",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GT 63 S E PERFORMANCE",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "AMG"
+        ]
+      },
+      {
+        "name": "AMG GT (2014–2023, C190)",
+        "engines": [
+          {
+            "name": "AMG GT",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GT S",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GT R",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG GT 63 S 4MATIC+",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "AMG"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "SL",
+    "supportedBodyTypes": [
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "SL (2022–, R232)",
+        "engines": [
+          {
+            "name": "SL 43",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "SL 55 4MATIC+",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG SL 63 4MATIC+",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "SL (2012–2020, R231)",
+        "engines": [
+          {
+            "name": "SL 400",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SL 500",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SL 63 AMG",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SL 65 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "AMG"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "CAR",
+    "name": "SLK / SLC",
+    "supportedBodyTypes": [
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "SLC (2016–2020, R172)",
+        "engines": [
+          {
+            "name": "SLC 180",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLC 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "AMG SLC 43",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "SLK (2011–2016, R172)",
+        "engines": [
+          {
+            "name": "SLK 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 250",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 55 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "AMG Line",
+          "AMG"
+        ]
+      },
+      {
+        "name": "SLK (2004–2011, R171)",
+        "engines": [
+          {
+            "name": "SLK 200 Kompressor",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 280",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 350",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 55 AMG",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "AMG Sport"
+        ]
+      },
+      {
+        "name": "SLK (1996–2004, R170)",
+        "engines": [
+          {
+            "name": "SLK 200",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 200 Kompressor",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 230 Kompressor",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "SLK 320",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  }
+]

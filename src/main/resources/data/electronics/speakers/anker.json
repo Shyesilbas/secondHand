@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "ANKER",
+    "type": "SPEAKER",
+    "name": "Soundcore Motion+",
+    "releaseYear": 2019,
+    "isLegacy": false,
+    "aliases": [
+      "Anker Motion Plus",
+      "Motion+ 30W"
+    ]
+  },
+  {
+    "brand": "ANKER",
+    "type": "SPEAKER",
+    "name": "Soundcore Motion Boom Plus",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Anker Motion Boom Plus",
+      "Motion Boom+ 80W"
+    ]
+  },
+  {
+    "brand": "ANKER",
+    "type": "SPEAKER",
+    "name": "Soundcore Flare 2",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Anker Flare 2",
+      "Flare 2 360"
+    ]
+  }
+]

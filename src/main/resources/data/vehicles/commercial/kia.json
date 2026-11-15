@@ -1,0 +1,29 @@
+[
+  {
+    "brand": "KIA",
+    "type": "COMMERCIAL",
+    "name": "Bongo",
+    "supportedBodyTypes": [
+      "LIGHT_TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "Bongo (2004–, PU)",
+        "engines": [
+          {
+            "name": "2.7 D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.5 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Deluxe"
+        ]
+      }
+    ]
+  }
+]

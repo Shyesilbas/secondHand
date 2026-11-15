@@ -1,0 +1,36 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "KEYBOARD",
+    "name": "Magic Keyboard with Touch ID",
+    "isLegacy": true,
+    "releaseYear": 2021,
+    "aliases": [
+      "Magic Keyboard Touch ID",
+      "Apple Touch ID Keyboard"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "KEYBOARD",
+    "name": "Magic Keyboard",
+    "isLegacy": true,
+    "releaseYear": 2015,
+    "aliases": [
+      "Apple Magic Keyboard 2",
+      "Magic Keyboard 2"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "KEYBOARD",
+    "name": "Wireless Keyboard",
+    "isLegacy": true,
+    "releaseYear": 2011,
+    "aliases": [
+      "Apple Wireless Keyboard",
+      "Wireless Keyboard",
+      "A1314"
+    ]
+  }
+]

@@ -1,0 +1,78 @@
+[
+  {
+    "brand": "LOGITECH",
+    "type": "KEYBOARD",
+    "name": "MX Keys S",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech MX Keys S",
+      "MX Keys"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "KEYBOARD",
+    "name": "MX Mechanical",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech MX Mechanical",
+      "MX Mech"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "KEYBOARD",
+    "name": "G915 LIGHTSPEED",
+    "releaseYear": 2019,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech G915",
+      "G915 Wireless"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "KEYBOARD",
+    "name": "G915 TKL",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech G915 TKL"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "KEYBOARD",
+    "name": "G Pro X TKL",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "G Pro X TKL LIGHTSPEED",
+      "G Pro X Keyboard"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "KEYBOARD",
+    "name": "K380 Multi-Device",
+    "releaseYear": 2015,
+    "isLegacy": false,
+    "aliases": [
+      "Logitech K380",
+      "K380"
+    ]
+  },
+  {
+    "brand": "LOGITECH",
+    "type": "KEYBOARD",
+    "name": "G213 Prodigy",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "Logitech G213",
+      "G213"
+    ]
+  }
+]

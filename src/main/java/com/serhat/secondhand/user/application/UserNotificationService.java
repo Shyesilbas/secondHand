@@ -1,5 +1,7 @@
 package com.serhat.secondhand.user.application;
 
+import com.serhat.secondhand.email.application.EmailLinks;
+import org.springframework.web.util.HtmlUtils;
 import com.serhat.secondhand.email.application.event.EmailEventPublisher;
 import com.serhat.secondhand.email.application.event.impl.*;
 import com.serhat.secondhand.email.application.event.model.GenericEmailData;
@@ -64,11 +66,11 @@ public class UserNotificationService {
     public void sendWelcomeNotification(User user) {
         try {
             String subject = emailConfig.getWelcomeSubject();
-            String content = "SecondHand'e Hoş Geldiniz! Hesabınız başarıyla oluşturuldu. Artık ikinci el eşyalarınızı satabilir, beğendiğiniz ürünleri satın alabilir ve diğer kullanıcılarla güvenli bir şekilde iletişim kurabilirsiniz. Keyifli alışverişler!";
+            String content = "Hesabınız oluşturuldu. Artık ikinci el eşyalarınızı satabilir, beğendiğiniz ürünleri satın alabilir ve diğer kullanıcılarla güvenli bir şekilde iletişim kurabilirsiniz. Keyifli alışverişler!";
 
             var data = GenericEmailData.builder()
                     .userName(user.getName())
-                    .headerTitle("Hoş Geldiniz!")
+                    .headerTitle("Hoş Geldiniz")
                     .message(content)
                     .build();
 
@@ -82,19 +84,12 @@ public class UserNotificationService {
     public void sendVerificationCodeNotification(User user, String verificationCode) {
         try {
             String subject = emailConfig.getVerificationSubject();
-            String content = String.format(
-                "<div class=\"code-card\" style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin: 8px 0;\">" +
-                "  <div class=\"code-label\" style=\"margin-bottom: 6px; font-size: 12px; color: #475569; font-weight: 600;\">Doğrulama Kodunuz</div>" +
-                "  <div class=\"code-value\" style=\"display: inline-block; background-color: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 24px; font-weight: 600; letter-spacing: 6px; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-variant-numeric: tabular-nums;\">%s</div>" +
-                "  <p style=\"margin: 6px 0 0 0; font-size: 12px; color: #64748b;\">Bu güvenlik kodu 15 dakika boyunca geçerlidir.</p>" +
-                "</div>",
-                verificationCode
-            );
-
             var data = GenericEmailData.builder()
                     .userName(user.getName())
                     .headerTitle("E-posta Doğrulama")
-                    .message(content)
+                    .verificationCode(verificationCode)
+                    .codeLabel("Doğrulama kodunuz")
+                    .codeHint("Kod 15 dakika geçerlidir. Bu işlemi siz yapmadıysanız bu e-postayı dikkate almayın.")
                     .build();
 
             emailEventPublisher.publish(new VerificationCodeEmailEvent(user, subject, data));
@@ -108,19 +103,12 @@ public class UserNotificationService {
     public void sendPasswordResetCodeNotification(User user, String verificationCode) {
         try {
             String subject = emailConfig.getPasswordResetSubject();
-            String content = String.format(
-                "<div class=\"code-card\" style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin: 8px 0;\">" +
-                "  <div class=\"code-label\" style=\"margin-bottom: 6px; font-size: 12px; color: #475569; font-weight: 600;\">Şifre Sıfırlama Kodunuz</div>" +
-                "  <div class=\"code-value\" style=\"display: inline-block; background-color: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 24px; font-weight: 600; letter-spacing: 6px; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-variant-numeric: tabular-nums;\">%s</div>" +
-                "  <p style=\"margin: 6px 0 0 0; font-size: 12px; color: #64748b;\">Bu güvenlik kodu 15 dakika boyunca geçerlidir.</p>" +
-                "</div>",
-                verificationCode
-            );
-
             var data = GenericEmailData.builder()
                     .userName(user.getName())
                     .headerTitle("Şifre Sıfırlama")
-                    .message(content)
+                    .verificationCode(verificationCode)
+                    .codeLabel("Şifre sıfırlama kodunuz")
+                    .codeHint("Kod 15 dakika geçerlidir. Bu işlemi siz yapmadıysanız bu e-postayı dikkate almayın.")
                     .build();
 
             emailEventPublisher.publish(new PasswordResetEmailEvent(user, subject, data));
@@ -153,14 +141,15 @@ public class UserNotificationService {
     public void sendPriceChangeNotification(User user, String listingTitle, String oldPriceStr, String newPriceStr, UUID listingId) {
         try {
             String subject = emailConfig.getPriceChangeSubject();
-            String content = String.format("Favorilerinizdeki '%s' ilanının fiyatı %s'den %s'ye düştü.", listingTitle, oldPriceStr, newPriceStr);
+            String content = String.format("Favorilerinizdeki '%s' ilanının fiyatı %s yerine %s oldu.",
+                    HtmlUtils.htmlEscape(listingTitle == null ? "" : listingTitle, "UTF-8"), oldPriceStr, newPriceStr);
 
             var data = GenericEmailData.builder()
                     .userName(user.getName())
-                    .headerTitle("Fiyat Düştü!")
+                    .headerTitle("Fiyat Düştü")
                     .message(content)
                     .actionText("İlanı İncele")
-                    .actionUrl("/listings/" + listingId)
+                    .actionUrl(EmailLinks.listing(listingId))
                     .build();
 
             emailEventPublisher.publish(new PriceChangeEmailEvent(user, subject, data));

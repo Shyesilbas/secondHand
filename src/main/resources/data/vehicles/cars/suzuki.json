@@ -1,0 +1,97 @@
+[
+  {
+    "brand": "SUZUKI",
+    "type": "CAR",
+    "name": "Swift",
+    "supportedBodyTypes": ["HATCHBACK"],
+    "generations": [
+      {
+        "name": "Swift (2023–, AZ series)",
+        "engines": [
+          { "name": "1.2 DualJet Hybrid", "fuelType": "HYBRID" }
+        ],
+        "trims": ["GL", "GLX", "Sport"]
+      },
+      {
+        "name": "Swift (2017–2023, AZ)",
+        "engines": [
+          { "name": "1.2 DualJet 90", "fuelType": "GASOLINE" },
+          { "name": "1.0 Boosterjet 111", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["GL", "GLX", "Sport"]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "CAR",
+    "name": "Vitara",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Vitara (2022–, LY facelift)",
+        "engines": [
+          { "name": "1.4 Boosterjet 129 Mild Hybrid", "fuelType": "HYBRID" },
+          { "name": "1.5 Hybrid 102", "fuelType": "HYBRID" }
+        ],
+        "trims": ["GL", "GLX", "AllGrip"]
+      },
+      {
+        "name": "Vitara (2015–2022, LY)",
+        "engines": [
+          { "name": "1.6 VVT 120", "fuelType": "GASOLINE" },
+          { "name": "1.4 Boosterjet 140", "fuelType": "GASOLINE" },
+          { "name": "1.6 DDiS 120", "fuelType": "DIESEL" }
+        ],
+        "trims": ["GL", "GLX", "S", "AllGrip"]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "CAR",
+    "name": "SX4 S-Cross",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "SX4 S-Cross (2021–, JYB facelift)",
+        "engines": [
+          { "name": "1.4 Boosterjet 129 Mild Hybrid", "fuelType": "HYBRID" }
+        ],
+        "trims": ["GL", "GLX", "AllGrip"]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "CAR",
+    "name": "Jimny",
+    "supportedBodyTypes": ["SUV"],
+    "generations": [
+      {
+        "name": "Jimny (2018–, JB64/74)",
+        "engines": [
+          { "name": "1.5 K15C 102", "fuelType": "GASOLINE" },
+          { "name": "1.5 K15B 102", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["GL", "GLX", "Adventure"]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "CAR",
+    "name": "Ignis",
+    "supportedBodyTypes": ["HATCHBACK"],
+    "generations": [
+      {
+        "name": "Ignis (2016–, FF21S)",
+        "engines": [
+          { "name": "1.2 DualJet 90", "fuelType": "GASOLINE" },
+          { "name": "1.2 DualJet Mild Hybrid", "fuelType": "HYBRID" }
+        ],
+        "trims": ["GL", "GLX"]
+      }
+    ]
+  }
+]

@@ -1,0 +1,80 @@
+[
+  {
+    "brand": "RKS",
+    "type": "MOTORCYCLE",
+    "name": "Arome 125",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Arome 125 (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "124cc Tek Silindir (8.8 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 9,
+            "engineCapacity": 124
+          }
+        ],
+        "trims": [
+          "Standart"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RKS",
+    "type": "MOTORCYCLE",
+    "name": "Bitter 50",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Bitter 50 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "49.6cc Tek Silindir (3.2 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 3,
+            "engineCapacity": 50
+          }
+        ],
+        "trims": [
+          "Standart"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "RKS",
+    "type": "MOTORCYCLE",
+    "name": "Freccia 150",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Freccia 150 (2023–)",
+        "startYear": 2023,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "149.6cc Su Soğutmalı (14 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 14,
+            "engineCapacity": 150
+          }
+        ],
+        "trims": [
+          "Standart"
+        ]
+      }
+    ]
+  }
+]

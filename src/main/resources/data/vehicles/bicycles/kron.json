@@ -1,0 +1,103 @@
+[
+  {
+    "brand": "KRON",
+    "type": "BICYCLE",
+    "name": "XC100",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "XC100 (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "26 Jant V-Fren",
+          "27.5 Jant HD",
+          "29 Jant HD"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KRON",
+    "type": "BICYCLE",
+    "name": "XC150",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "XC150 (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "27.5 HD",
+          "29 HD"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KRON",
+    "type": "BICYCLE",
+    "name": "XC300",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "XC300 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "27.5 HD",
+          "29 HD"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KRON",
+    "type": "BICYCLE",
+    "name": "TX150",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "TX150 Şehir/Tur (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "TX150 28 V",
+          "TX150 28 HD"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KRON",
+    "type": "BICYCLE",
+    "name": "RC1000",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "RC1000 Yol (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "RC1000 700C",
+          "RC2000 700C"
+        ]
+      }
+    ]
+  }
+]

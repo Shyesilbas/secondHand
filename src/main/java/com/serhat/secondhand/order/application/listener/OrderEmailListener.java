@@ -1,5 +1,7 @@
 package com.serhat.secondhand.order.application.listener;
 
+import com.serhat.secondhand.email.application.EmailLinks;
+import org.springframework.web.util.HtmlUtils;
 import com.serhat.secondhand.email.application.event.EmailEventPublisher;
 import com.serhat.secondhand.email.application.event.impl.*;
 import com.serhat.secondhand.email.application.event.model.GenericEmailData;
@@ -48,12 +50,12 @@ public class OrderEmailListener {
     private final TransactionTemplate readOnlyTx;
 
     public OrderEmailListener(EmailEventPublisher emailEventPublisher,
-                              EmailConfig emailConfig,
-                              OrderMapper orderMapper,
-                              IUserService userService,
-                              OrderLogService orderLog,
-                              OrderRepository orderRepository,
-                              PlatformTransactionManager transactionManager) {
+            EmailConfig emailConfig,
+            OrderMapper orderMapper,
+            IUserService userService,
+            OrderLogService orderLog,
+            OrderRepository orderRepository,
+            PlatformTransactionManager transactionManager) {
         this.emailEventPublisher = emailEventPublisher;
         this.emailConfig = emailConfig;
         this.orderMapper = orderMapper;
@@ -71,9 +73,10 @@ public class OrderEmailListener {
             return;
         }
         try {
-            OrderDto orderDto = readOnlyTx.execute(status -> orderRepository.findByIdWithFullDetails(event.order().getId())
-                    .map(orderMapper::toDto)
-                    .orElseGet(() -> orderMapper.toDto(event.order())));
+            OrderDto orderDto = readOnlyTx
+                    .execute(status -> orderRepository.findByIdWithFullDetails(event.order().getId())
+                            .map(orderMapper::toDto)
+                            .orElseGet(() -> orderMapper.toDto(event.order())));
             if (orderDto == null) {
                 return;
             }
@@ -90,7 +93,7 @@ public class OrderEmailListener {
     public void onOrderCancelled(OrderCancelledEvent event) {
         try {
             Order order = event.order();
-            String displayName = getOrderDisplayName(order.getName(), order.getOrderNumber());
+            String displayName = HtmlUtils.htmlEscape(getOrderDisplayName(order.getName(), order.getOrderNumber()), "UTF-8");
             // For a system cancellation the requester is the refunded buyer and the others
             // are the seller(s).
             String content = switch (event.cause()) {
@@ -110,15 +113,19 @@ public class OrderEmailListener {
                 case PARTICIPANT_REQUEST -> "Sipariş " + displayName + " karşı taraf tarafından iptal edildi.";
             };
 
+            Order full = orderRepository.findByIdWithOrderItemsAndSellers(order.getId()).orElse(order);
+            Long buyerId = full.getUser() != null ? full.getUser().getId() : null;
+
             var data1 = GenericEmailData.builder()
                     .userName(event.requester().getName())
-                    .headerTitle("Sipariş İptali")
+                    .headerTitle("Sipariş İptal Edildi")
                     .message(content)
+                    .actionText(orderLinkText(event.requester().getId(), buyerId))
+                    .actionUrl(orderLink(event.requester().getId(), buyerId))
                     .build();
             emailEventPublisher.publish(new OrderCancelledEmailEvent(event.requester(),
                     emailConfig.getOrder().getCancelledSubject(), data1));
 
-            Order full = orderRepository.findByIdWithOrderItemsAndSellers(order.getId()).orElse(order);
             Set<Long> recipientIds = new LinkedHashSet<>();
             if (full.getUser() != null && full.getUser().getId() != null) {
                 recipientIds.add(full.getUser().getId());
@@ -139,8 +146,10 @@ public class OrderEmailListener {
                 User counterparty = userResult.getData();
                 var data = GenericEmailData.builder()
                         .userName(counterparty.getName())
-                        .headerTitle("Sipariş İptali")
+                        .headerTitle("Sipariş İptal Edildi")
                         .message(counterpartyMessage)
+                        .actionText(orderLinkText(counterparty.getId(), buyerId))
+                        .actionUrl(orderLink(counterparty.getId(), buyerId))
                         .build();
                 emailEventPublisher.publish(
                         new OrderCancelledEmailEvent(counterparty, emailConfig.getOrder().getCancelledSubject(), data));
@@ -158,7 +167,8 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String completionWord = event.isAutomatic() ? "otomatik olarak tamamlandı" : "tamamlandı";
-            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") "
+            String content = "Siparişiniz ("
+                    + HtmlUtils.htmlEscape(getOrderDisplayName(order.getName(), order.getOrderNumber()), "UTF-8") + ") "
                     + completionWord + ".";
 
             var data = GenericEmailData.builder()
@@ -179,12 +189,13 @@ public class OrderEmailListener {
     public void onOrderRefunded(OrderRefundedEvent event) {
         try {
             Order order = event.order();
-            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber())
+            String content = "Siparişiniz ("
+                    + HtmlUtils.htmlEscape(getOrderDisplayName(order.getName(), order.getOrderNumber()), "UTF-8")
                     + ") iade edilmiştir. İade tutarı e-cüzdanınıza aktarıldı.";
 
             var data = GenericEmailData.builder()
                     .userName(event.buyer().getName())
-                    .headerTitle("Sipariş İade")
+                    .headerTitle("Sipariş İade Edildi")
                     .message(content)
                     .build();
             emailEventPublisher.publish(
@@ -214,9 +225,9 @@ public class OrderEmailListener {
                     ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt())
                     : "";
             String paymentMethodLabel = orderDto.getPaymentProviderName() != null
-                    ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)"
+                    ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan"
                             : orderDto.getPaymentProviderName())
-                    : "E-Cüzdan (E-Wallet)";
+                    : null;
 
             var data = OrderConfirmationEmailData.builder()
                     .userName(customer.getName())
@@ -288,9 +299,9 @@ public class OrderEmailListener {
                     ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt())
                     : "";
             String paymentMethodLabel = orderDto.getPaymentProviderName() != null
-                    ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)"
+                    ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan"
                             : orderDto.getPaymentProviderName())
-                    : "E-Cüzdan (E-Wallet)";
+                    : null;
 
             var data = OrderConfirmationEmailData.builder()
                     .userName(seller.getName())
@@ -312,6 +323,15 @@ public class OrderEmailListener {
         } catch (RuntimeException e) {
             orderLog.logNotificationFailed("sellerSaleEmail", orderDto.getOrderNumber(), e.getMessage());
         }
+    }
+
+    /** The buyer follows the order under My Orders, every other recipient is a seller. */
+    private String orderLink(Long recipientId, Long buyerId) {
+        return recipientId != null && recipientId.equals(buyerId) ? EmailLinks.MY_ORDERS : EmailLinks.MY_SALES;
+    }
+
+    private String orderLinkText(Long recipientId, Long buyerId) {
+        return recipientId != null && recipientId.equals(buyerId) ? "Siparişlerimi Gör" : "Satışlarımı Gör";
     }
 
     private String getOrderDisplayName(String orderName, String orderNumber) {

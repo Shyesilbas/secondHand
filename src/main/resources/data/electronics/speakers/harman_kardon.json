@@ -1,0 +1,57 @@
+[
+  {
+    "brand": "HARMAN_KARDON",
+    "type": "SPEAKER",
+    "name": "Onyx Studio 8",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Harman Kardon Onyx 8",
+      "Onyx Studio 8 Bluetooth"
+    ]
+  },
+  {
+    "brand": "HARMAN_KARDON",
+    "type": "SPEAKER",
+    "name": "Onyx Studio 7",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "Harman Kardon Onyx 7",
+      "Onyx Studio 7 Bluetooth"
+    ]
+  },
+  {
+    "brand": "HARMAN_KARDON",
+    "type": "SPEAKER",
+    "name": "Aura Studio 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Harman Kardon Aura 4",
+      "Aura Studio 4 LED"
+    ]
+  },
+  {
+    "brand": "HARMAN_KARDON",
+    "type": "SPEAKER",
+    "name": "SoundSticks 4",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Harman Kardon SoundSticks 4",
+      "SoundSticks IV"
+    ]
+  },
+  {
+    "brand": "HARMAN_KARDON",
+    "type": "SPEAKER",
+    "name": "Go + Play 3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Harman Kardon Go Play 3",
+      "Go + Play III"
+    ]
+  }
+]

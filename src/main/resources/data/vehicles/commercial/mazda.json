@@ -1,0 +1,50 @@
+[
+  {
+    "brand": "MAZDA",
+    "type": "COMMERCIAL",
+    "name": "BT-50",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "BT-50 (2020–, TF)",
+        "engines": [
+          {
+            "name": "3.0 Skyactiv-D",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Touring",
+          "Prestige"
+        ]
+      },
+      {
+        "name": "BT-50 (2011–2020, UP/UR)",
+        "engines": [
+          {
+            "name": "2.2 Skyactiv-D",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Manual",
+          "Automatic"
+        ]
+      },
+      {
+        "name": "BT-50 (2006–2011, J97M)",
+        "engines": [
+          {
+            "name": "2.5",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Active"
+        ]
+      }
+    ]
+  }
+]

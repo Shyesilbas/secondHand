@@ -1,0 +1,182 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Odyssey Neo G9",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Odyssey Neo G9",
+      "Odyssey Neo G9",
+      "Neo G9"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Odyssey OLED G9",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Odyssey OLED G9",
+      "Odyssey OLED G9",
+      "OLED G9"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Odyssey OLED G8",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Odyssey OLED G8",
+      "Odyssey OLED G8",
+      "OLED G8"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Odyssey G7",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung Odyssey G7",
+      "Odyssey G7"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Odyssey G5",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung Odyssey G5",
+      "Odyssey G5"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Odyssey G3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Odyssey G3",
+      "Odyssey G3"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Smart Monitor M8",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Smart Monitor M8",
+      "Smart Monitor M8",
+      "M8"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Smart Monitor M7",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Smart Monitor M7",
+      "Smart Monitor M7",
+      "M7"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Smart Monitor M5",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Smart Monitor M5",
+      "Smart Monitor M5",
+      "M5"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "ViewFinity S9",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung ViewFinity S9",
+      "ViewFinity S9",
+      "S9"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "ViewFinity S8",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung ViewFinity S8",
+      "ViewFinity S8",
+      "S8"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "ViewFinity S6",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung ViewFinity S6",
+      "ViewFinity S6",
+      "S6"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Essential Monitor S3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung Essential Monitor S3",
+      "Essential Monitor S3",
+      "Essential S3",
+      "Monitor S3"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Curved Monitor CF390",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung Curved Monitor CF390",
+      "Curved Monitor CF390",
+      "CF390",
+      "Curved CF390"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "MONITOR",
+    "name": "Curved Monitor T55",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung Curved Monitor T55",
+      "Curved Monitor T55",
+      "T55",
+      "Curved T55"
+    ]
+  }
+]

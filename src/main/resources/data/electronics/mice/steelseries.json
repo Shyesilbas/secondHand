@@ -1,0 +1,52 @@
+[
+  {
+    "brand": "STEELSERIES",
+    "type": "MOUSE",
+    "name": "Aerox 3 Wireless",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Aerox 3"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "MOUSE",
+    "name": "Aerox 5 Wireless",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Aerox 5"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "MOUSE",
+    "name": "Rival 3 Wireless",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Rival 3 Wireless"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "MOUSE",
+    "name": "Rival 5",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "SteelSeries Rival 5"
+    ]
+  },
+  {
+    "brand": "STEELSERIES",
+    "type": "MOUSE",
+    "name": "Prime Wireless",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "SteelSeries Prime Wireless"
+    ]
+  }
+]

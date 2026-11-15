@@ -1,0 +1,114 @@
+[
+  {
+    "brand": "DUCATI",
+    "type": "MOTORCYCLE",
+    "name": "Panigale V4",
+    "supportedBodyTypes": ["SPORTBIKE"],
+    "generations": [
+      {
+        "name": "Panigale V4 (2022–)",
+        "engines": [
+          { "name": "1103cc Desmosedici V4", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "S", "R", "SP2"]
+      }
+    ]
+  },
+  {
+    "brand": "DUCATI",
+    "type": "MOTORCYCLE",
+    "name": "Panigale V2",
+    "supportedBodyTypes": ["SPORTBIKE"],
+    "generations": [
+      {
+        "name": "Panigale V2 (2020–)",
+        "engines": [
+          { "name": "955cc L-Twin", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "Bayliss", "White Rosso"]
+      }
+    ]
+  },
+  {
+    "brand": "DUCATI",
+    "type": "MOTORCYCLE",
+    "name": "Monster",
+    "supportedBodyTypes": ["NAKED"],
+    "generations": [
+      {
+        "name": "Monster (2021–)",
+        "engines": [
+          { "name": "937cc L-Twin", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "Plus"]
+      },
+      {
+        "name": "Monster 821 (2014–2020)",
+        "engines": [
+          { "name": "821cc L-Twin", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "Stealth", "Dark"]
+      }
+    ]
+  },
+  {
+    "brand": "DUCATI",
+    "type": "MOTORCYCLE",
+    "name": "Streetfighter V4",
+    "supportedBodyTypes": ["NAKED"],
+    "generations": [
+      {
+        "name": "Streetfighter V4 (2020–)",
+        "engines": [
+          { "name": "1103cc Desmosedici V4", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "S", "SP2", "Lamborghini"]
+      }
+    ]
+  },
+  {
+    "brand": "DUCATI",
+    "type": "MOTORCYCLE",
+    "name": "Multistrada V4",
+    "supportedBodyTypes": ["ADVENTURE"],
+    "generations": [
+      {
+        "name": "Multistrada V4 (2021–)",
+        "engines": [
+          { "name": "1158cc Granturismo V4", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "S", "S Sport", "Pikes Peak", "Rally"]
+      }
+    ]
+  },
+  {
+    "brand": "DUCATI",
+    "type": "MOTORCYCLE",
+    "name": "Scrambler Icon",
+    "supportedBodyTypes": ["NAKED"],
+    "generations": [
+      {
+        "name": "Scrambler Icon (2023–)",
+        "engines": [
+          { "name": "803cc L-Twin", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Icon", "Icon Dark", "Full Throttle", "Nightshift"]
+      }
+    ]
+  },
+  {
+    "brand": "DUCATI",
+    "type": "MOTORCYCLE",
+    "name": "Diavel V4",
+    "supportedBodyTypes": ["CRUISER"],
+    "generations": [
+      {
+        "name": "Diavel V4 (2023–)",
+        "engines": [
+          { "name": "1158cc Granturismo V4", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard"]
+      }
+    ]
+  }
+]

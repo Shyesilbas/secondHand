@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "PHILIPS",
+    "type": "ROBOT_VACUUM",
+    "name": "Homerun 7000 Serisi Aqua XU7000/01",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Philips Homerun 7000",
+      "XU7000"
+    ]
+  },
+  {
+    "brand": "PHILIPS",
+    "type": "ROBOT_VACUUM",
+    "name": "Homerun 3000 Serisi Aqua XU3000/01",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Philips Homerun 3000",
+      "XU3000"
+    ]
+  }
+]

@@ -1,0 +1,185 @@
+[
+  {
+    "brand": "SUZUKI",
+    "type": "MOTORCYCLE",
+    "name": "GSX-R600",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "GSX-R600 (2011–)",
+        "engines": [
+          {
+            "name": "599cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "MOTORCYCLE",
+    "name": "GSX-R750",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "GSX-R750 (2011–)",
+        "engines": [
+          {
+            "name": "750cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "MOTORCYCLE",
+    "name": "GSX-R1000",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "GSX-R1000 (2017–)",
+        "engines": [
+          {
+            "name": "999cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "R"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "MOTORCYCLE",
+    "name": "SV650",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "SV650 (2016–)",
+        "engines": [
+          {
+            "name": "645cc V-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "A2"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "MOTORCYCLE",
+    "name": "GSX-S750",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "GSX-S750 (2017–2021)",
+        "engines": [
+          {
+            "name": "749cc Inline-4",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Z"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "MOTORCYCLE",
+    "name": "V-Strom 650",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "V-Strom 650 (2017–)",
+        "engines": [
+          {
+            "name": "645cc V-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "XT",
+          "Adventure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "MOTORCYCLE",
+    "name": "V-Strom 1050",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "V-Strom 1050 (2020–)",
+        "engines": [
+          {
+            "name": "1037cc V-Twin",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "XT",
+          "DE"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SUZUKI",
+    "type": "MOTORCYCLE",
+    "name": "Burgman 400",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Burgman 400 (2017–)",
+        "engines": [
+          {
+            "name": "399cc Single",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  }
+]

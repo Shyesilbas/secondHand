@@ -1,0 +1,54 @@
+[
+  {
+    "brand": "RAZER",
+    "type": "MOUSE",
+    "name": "DeathAdder V3 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Razer DeathAdder V3 Pro",
+      "DAV3 Pro"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "MOUSE",
+    "name": "Viper V3 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Viper V3 Pro",
+      "Viper V3"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "MOUSE",
+    "name": "Basilisk V3 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Basilisk V3 Pro"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "MOUSE",
+    "name": "Cobra Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Cobra Pro"
+    ]
+  },
+  {
+    "brand": "RAZER",
+    "type": "MOUSE",
+    "name": "Orochi V2",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Razer Orochi V2"
+    ]
+  }
+]

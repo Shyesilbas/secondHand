@@ -1,0 +1,166 @@
+[
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "OMEN 27k",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN 27k",
+      "OMEN 27k",
+      "OMEN 27k 4K"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "OMEN 27q",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN 27q",
+      "OMEN 27q"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "OMEN 32q",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN 32q",
+      "OMEN 32q"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "OMEN X 27",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP OMEN X 27",
+      "OMEN X 27"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "E27 G5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP E27 G5",
+      "E27 G5",
+      "HP E27"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "E24 G5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP E24 G5",
+      "E24 G5",
+      "HP E24"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "E27q G5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP E27q G5",
+      "E27q G5"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "Z27k G3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP Z27k G3",
+      "Z27k G3",
+      "HP Z27k"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "Z32k G3",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP Z32k G3",
+      "Z32k G3",
+      "HP Z32k"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "Z24n G3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP Z24n G3",
+      "Z24n G3",
+      "HP Z24n"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "M27f",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP M27f",
+      "M27f",
+      "HP M27"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "M24f",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP M24f",
+      "M24f",
+      "HP M24"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "P24h G5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP P24h G5",
+      "P24h G5",
+      "HP P24h"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "MONITOR",
+    "name": "P22h G5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP P22h G5",
+      "P22h G5",
+      "HP P22h"
+    ]
+  }
+]

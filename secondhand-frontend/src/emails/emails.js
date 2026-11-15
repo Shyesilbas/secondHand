@@ -215,103 +215,36 @@ export const extractEmailPreview = (rawContent, subject = '') => {
   return formatMonetaryAmountsInText(text);
 };
 
+// The backend layout (templates/emails/layout.html) owns the email design. The inbox only adapts it to the
+// reading pane: the subject is already shown above the frame, so the email's own header is hidden.
 const EDITORIAL_EMAIL_STYLE = `
 <style id="sh-editorial-email-style">
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
   html, body {
     margin: 0 !important;
     padding: 16px 20px !important;
-    background-color: #FAF7F2 !important;
-    color: #1C1917 !important;
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-    font-size: 14px !important;
-    line-height: 1.6 !important;
-    font-variant-numeric: tabular-nums !important;
-    -webkit-font-smoothing: antialiased !important;
+    background-color: #FAFAF9 !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #44403C;
   }
   .container {
-    max-width: 680px !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    background-color: #FFFFFF !important;
-    border: 1px solid #E8E2D8 !important;
-    border-radius: 12px !important;
-    overflow: hidden !important;
-    box-shadow: 0 1px 3px rgba(28, 25, 23, 0.04) !important;
+    max-width: 640px;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    border: 1px solid #E7E5E4;
+    border-radius: 8px;
+    overflow: hidden;
   }
-  .header,
-  .brand-badge,
-  .crown-icon,
-  .benefit-icon {
+  .header {
     display: none !important;
   }
   .content {
-    padding: 20px 24px !important;
-    color: #44403C !important;
-    font-size: 14px !important;
-    line-height: 1.6 !important;
-  }
-  .content p,
-  .greeting,
-  .intro-text {
-    margin: 0 0 12px 0 !important;
-    font-size: 14px !important;
-    line-height: 1.6 !important;
-    color: #44403C !important;
-  }
-  .greeting {
-    font-size: 15px !important;
-    font-weight: 600 !important;
-    color: #1C1917 !important;
-  }
-  .details-box {
-    background-color: #FAF7F2 !important;
-    border: 1px solid #E8E2D8 !important;
-    border-radius: 10px !important;
-    padding: 14px 16px !important;
-    margin: 12px 0 !important;
-  }
-  .details-box .details-table {
-    width: 100% !important;
-    background-color: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    margin: 4px 0 0 0 !important;
-    box-shadow: none !important;
-  }
-  .details-box .details-table td {
-    padding: 7px 0 !important;
-    border-bottom: 1px solid #E8E2D8 !important;
-    background-color: transparent !important;
-  }
-  .details-box .details-table tr:last-child td {
-    border-bottom: none !important;
-  }
-  .signoff {
-    margin-top: 16px !important;
-    padding-top: 12px !important;
-    border-top: 1px solid #F3EFE8 !important;
-    font-size: 13px !important;
-    color: #57534E !important;
-  }
-  .footer {
-    background-color: #FAF7F2 !important;
-    padding: 12px 24px !important;
-    margin-top: 0 !important;
-    text-align: left !important;
-    font-size: 12px !important;
-    color: #6B645C !important;
-    border-top: 1px solid #E8E2D8 !important;
+    padding: 20px 24px;
   }
   @media (max-width: 640px) {
     html, body {
       padding: 10px 8px !important;
-    }
-    .content, .footer {
-      padding-left: 16px !important;
-      padding-right: 16px !important;
     }
   }
 </style>

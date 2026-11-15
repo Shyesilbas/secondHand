@@ -1,0 +1,129 @@
+[
+  {
+    "brand": "MASERATI",
+    "type": "CAR",
+    "name": "Ghibli",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Ghibli (2013–)",
+        "startYear": 2013,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.0 Hybrid (330 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 330,
+            "engineCapacity": 1995
+          },
+          {
+            "name": "3.0 V6 Twin-Turbo (350 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 350,
+            "engineCapacity": 2979
+          },
+          {
+            "name": "3.0 V6 Diesel (275 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 275,
+            "engineCapacity": 2987
+          }
+        ],
+        "trims": [
+          "GT",
+          "Modena",
+          "Trofeo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MASERATI",
+    "type": "CAR",
+    "name": "Levante",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Levante (2016–)",
+        "startYear": 2016,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.0 Hybrid (330 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 330,
+            "engineCapacity": 1995
+          },
+          {
+            "name": "3.0 V6 (350 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 350,
+            "engineCapacity": 2979
+          },
+          {
+            "name": "3.0 V6 Diesel (275 hp)",
+            "fuelType": "DIESEL",
+            "horsePower": 275,
+            "engineCapacity": 2987
+          }
+        ],
+        "trims": [
+          "GT",
+          "Modena",
+          "Trofeo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MASERATI",
+    "type": "CAR",
+    "name": "Grecale",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Grecale (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "2.0 GT (300 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 300,
+            "engineCapacity": 1995
+          },
+          {
+            "name": "2.0 Modena (330 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 330,
+            "engineCapacity": 1995
+          },
+          {
+            "name": "3.0 Trofeo V6 (530 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 530,
+            "engineCapacity": 3000
+          },
+          {
+            "name": "Folgore EV (558 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 558,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "GT",
+          "Modena",
+          "Trofeo",
+          "Folgore"
+        ]
+      }
+    ]
+  }
+]

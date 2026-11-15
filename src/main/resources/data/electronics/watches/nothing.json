@@ -1,0 +1,24 @@
+[
+  {
+    "brand": "NOTHING",
+    "type": "SMARTWATCH",
+    "name": "CMF Watch Pro 2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Nothing CMF Watch Pro 2",
+      "Watch Pro 2"
+    ]
+  },
+  {
+    "brand": "NOTHING",
+    "type": "SMARTWATCH",
+    "name": "CMF Watch Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Nothing CMF Watch Pro",
+      "Watch Pro"
+    ]
+  }
+]

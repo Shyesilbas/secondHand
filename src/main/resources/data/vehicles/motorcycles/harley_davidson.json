@@ -1,0 +1,109 @@
+[
+  {
+    "brand": "HARLEY_DAVIDSON",
+    "type": "MOTORCYCLE",
+    "name": "Sportster Iron 883",
+    "supportedBodyTypes": [
+      "CRUISER"
+    ],
+    "generations": [
+      {
+        "name": "Iron 883 (2009–2022)",
+        "startYear": 2009,
+        "endYear": 2022,
+        "engines": [
+          {
+            "name": "883cc Evolution V-Twin (51 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 51,
+            "engineCapacity": 883
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HARLEY_DAVIDSON",
+    "type": "MOTORCYCLE",
+    "name": "Forty-Eight",
+    "supportedBodyTypes": [
+      "CRUISER"
+    ],
+    "generations": [
+      {
+        "name": "Forty-Eight (2010–2022)",
+        "startYear": 2010,
+        "endYear": 2022,
+        "engines": [
+          {
+            "name": "1202cc Evolution V-Twin (66 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 66,
+            "engineCapacity": 1202
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Special"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HARLEY_DAVIDSON",
+    "type": "MOTORCYCLE",
+    "name": "Street Bob 114",
+    "supportedBodyTypes": [
+      "CRUISER"
+    ],
+    "generations": [
+      {
+        "name": "Street Bob (2018–)",
+        "startYear": 2018,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1868cc Milwaukee-Eight 114 (94 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 94,
+            "engineCapacity": 1868
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "HARLEY_DAVIDSON",
+    "type": "MOTORCYCLE",
+    "name": "Pan America 1250",
+    "supportedBodyTypes": [
+      "ADVENTURE"
+    ],
+    "generations": [
+      {
+        "name": "Pan America (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1252cc Revolution Max 1250 (150 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 150,
+            "engineCapacity": 1252
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Special",
+          "CVO"
+        ]
+      }
+    ]
+  }
+]

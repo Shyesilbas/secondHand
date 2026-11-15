@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "SPEAKER",
+    "name": "HomePod (2nd Gen)",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "HomePod 2",
+      "HomePod 2nd Generation"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "SPEAKER",
+    "name": "HomePod mini",
+    "isLegacy": true,
+    "releaseYear": 2020,
+    "aliases": [
+      "HomePod Mini",
+      "Apple HomePod Mini"
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "SPEAKER",
+    "name": "HomePod (1st Gen)",
+    "isLegacy": true,
+    "releaseYear": 2018,
+    "aliases": [
+      "HomePod 1",
+      "HomePod 1st Generation"
+    ]
+  }
+]

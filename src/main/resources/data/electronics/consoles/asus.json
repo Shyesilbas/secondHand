@@ -1,0 +1,50 @@
+[
+  {
+    "brand": "ASUS",
+    "type": "GAME_CONSOLE",
+    "name": "ROG Ally X",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Ally X",
+      "ROG Ally X",
+      "Ally X"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "1 TB",
+        "storage": 1024,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "ASUS",
+    "type": "GAME_CONSOLE",
+    "name": "ROG Ally",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ASUS ROG Ally",
+      "ROG Ally",
+      "Ally"
+    ],
+    "source": "claude-draft",
+    "variants": [
+      {
+        "name": "Z1 512 GB",
+        "storage": 512,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      },
+      {
+        "name": "Z1 Extreme 512 GB",
+        "storage": 512,
+        "storageType": "NVME",
+        "source": "claude-draft"
+      }
+    ]
+  }
+]

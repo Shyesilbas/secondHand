@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "VIEWSONIC",
+    "type": "MONITOR",
+    "name": "Omni VX2780-2K-PRO",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "ViewSonic VX2780-2K",
+      "VX2780 170Hz"
+    ]
+  },
+  {
+    "brand": "VIEWSONIC",
+    "type": "MONITOR",
+    "name": "Elite XG2431",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "ViewSonic XG2431",
+      "XG2431 240Hz Blur Busters"
+    ]
+  },
+  {
+    "brand": "VIEWSONIC",
+    "type": "MONITOR",
+    "name": "ColorPro VP2776",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "ViewSonic VP2776",
+      "ColorPro 27 4K Colorist"
+    ]
+  }
+]

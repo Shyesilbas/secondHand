@@ -1,0 +1,110 @@
+[
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "HW-Q990D",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung HW-Q990D",
+      "HW-Q990D",
+      "Soundbar HW-Q990D"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "HW-Q990C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung HW-Q990C",
+      "HW-Q990C",
+      "Soundbar HW-Q990C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "HW-Q930C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung HW-Q930C",
+      "HW-Q930C",
+      "Soundbar HW-Q930C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "HW-Q800C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung HW-Q800C",
+      "HW-Q800C",
+      "Soundbar HW-Q800C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "HW-Q700C",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung HW-Q700C",
+      "HW-Q700C",
+      "Soundbar HW-Q700C"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "HW-B650",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung HW-B650",
+      "HW-B650",
+      "Soundbar HW-B650"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "HW-T450",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung HW-T450",
+      "HW-T450",
+      "Soundbar HW-T450"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "MX-ST50B",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Samsung MX-ST50B",
+      "MX-ST50B",
+      "Sound Tower ST50B"
+    ]
+  },
+  {
+    "brand": "SAMSUNG",
+    "type": "SPEAKER",
+    "name": "MX-T70",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Samsung MX-T70",
+      "MX-T70",
+      "Sound Tower T70"
+    ]
+  }
+]

@@ -1,0 +1,1062 @@
+{
+  "types": [
+    {
+      "key": "SINAV_HAZIRLIK",
+      "label": "Sınav Hazırlık"
+    },
+    {
+      "key": "OKUL_KITAPLARI",
+      "label": "Okul Ders & Yardımcı Kitapları"
+    },
+    {
+      "key": "UNIVERSITE_VE_MESLEK",
+      "label": "Üniversite & Meslek Kitapları"
+    },
+    {
+      "key": "SOZLUK_VE_BASVURU",
+      "label": "Sözlük & Başvuru"
+    },
+    {
+      "key": "OKUMA_KITABI",
+      "label": "Roman & Edebiyat"
+    },
+    {
+      "key": "BIYOGRAFI_ANI_GEZI",
+      "label": "Biyografi, Anı & Gezi"
+    },
+    {
+      "key": "COCUK_KITAPLARI",
+      "label": "Çocuk & Gençlik"
+    },
+    {
+      "key": "CIZGI_ROMAN_VE_MANGA",
+      "label": "Çizgi Roman & Manga"
+    },
+    {
+      "key": "DERGI_VE_SURELI_YAYIN",
+      "label": "Dergi & Gazete"
+    },
+    {
+      "key": "DINI_KITAPLAR",
+      "label": "Din & İnanç"
+    },
+    {
+      "key": "KISISEL_GELISIM",
+      "label": "Kişisel Gelişim & Psikoloji"
+    },
+    {
+      "key": "IS_VE_EKONOMI",
+      "label": "İş & Ekonomi"
+    },
+    {
+      "key": "BILIM_VE_TEKNOLOJI",
+      "label": "Bilişim & Yazılım"
+    },
+    {
+      "key": "POPULER_BILIM",
+      "label": "Popüler Bilim & Doğa"
+    },
+    {
+      "key": "TARIH_VE_ARASTIRMA",
+      "label": "Tarih"
+    },
+    {
+      "key": "FELSEFE_VE_SOSYOLOJI",
+      "label": "Felsefe & Sosyal Bilimler"
+    },
+    {
+      "key": "SANAT_VE_TASARIM",
+      "label": "Sanat & Tasarım"
+    },
+    {
+      "key": "HOBI_VE_YASAM",
+      "label": "Hobi & Yaşam"
+    },
+    {
+      "key": "OTHER",
+      "label": "Diğer"
+    }
+  ],
+  "genres": {
+    "SINAV_HAZIRLIK": [
+      {
+        "key": "LGS",
+        "label": "LGS",
+        "replaces": [
+          "TEST_KITABI_LGS"
+        ]
+      },
+      {
+        "key": "TYT",
+        "label": "TYT",
+        "replaces": [
+          {
+            "from": "TEST_KITABI_TYT",
+            "attributes": {
+              "prepFormat": "SORU_BANKASI"
+            }
+          }
+        ]
+      },
+      {
+        "key": "AYT",
+        "label": "AYT",
+        "replaces": [
+          {
+            "from": "TEST_KITABI_AYT_SAYISAL",
+            "attributes": {
+              "prepFormat": "SORU_BANKASI",
+              "aytField": "SAYISAL"
+            }
+          },
+          {
+            "from": "TEST_KITABI_AYT_SOZEL",
+            "attributes": {
+              "prepFormat": "SORU_BANKASI",
+              "aytField": "SOZEL"
+            }
+          },
+          {
+            "from": "TEST_KITABI_AYT_ESIT_AGIRLIK",
+            "attributes": {
+              "prepFormat": "SORU_BANKASI",
+              "aytField": "ESIT_AGIRLIK"
+            }
+          }
+        ]
+      },
+      {
+        "key": "KPSS_GY_GK",
+        "label": "KPSS Genel Yetenek & Genel Kültür",
+        "replaces": [
+          "TEST_KITABI_KPSS_GENEL"
+        ]
+      },
+      {
+        "key": "KPSS_EGITIM",
+        "label": "KPSS Eğitim Bilimleri",
+        "replaces": [
+          "TEST_KITABI_KPSS_EGITIM"
+        ]
+      },
+      {
+        "key": "KPSS_OABT",
+        "label": "KPSS ÖABT",
+        "replaces": [
+          "TEST_KITABI_KPSS_OABT"
+        ]
+      },
+      {
+        "key": "ALES",
+        "label": "ALES",
+        "replaces": [
+          "TEST_KITABI_ALES"
+        ]
+      },
+      {
+        "key": "DGS",
+        "label": "DGS",
+        "replaces": [
+          "TEST_KITABI_DGS"
+        ]
+      },
+      {
+        "key": "YDS_YOKDIL",
+        "label": "YDS & YÖKDİL",
+        "replaces": [
+          "TEST_KITABI_YDS_YOKDIL"
+        ]
+      },
+      {
+        "key": "IELTS_TOEFL",
+        "label": "IELTS & TOEFL",
+        "replaces": [
+          "TEST_KITABI_IELTS_TOEFL"
+        ]
+      },
+      {
+        "key": "MSU",
+        "label": "MSÜ",
+        "replaces": [
+          "TEST_KITABI_MSU"
+        ]
+      },
+      {
+        "key": "EHLIYET",
+        "label": "Ehliyet",
+        "replaces": [
+          "TEST_KITABI_EHLIYET"
+        ]
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Sınavlar",
+        "replaces": [
+          {
+            "from": "TEST_KITABI_BRANS_DENEMELERI",
+            "attributes": {
+              "prepFormat": "DENEME"
+            }
+          },
+          {
+            "from": "TEST_KITABI_GENEL_DENEME",
+            "attributes": {
+              "prepFormat": "DENEME"
+            }
+          },
+          {
+            "from": "TEST_KITABI_CIKMIS_SORULAR",
+            "attributes": {
+              "prepFormat": "CIKMIS_SORULAR"
+            }
+          },
+          "TEST_KITABI_OTHER",
+          {
+            "from": "SINAV_HAZIRLIK_KONU_ANLATIMLI",
+            "attributes": {
+              "prepFormat": "KONU_ANLATIMI"
+            }
+          },
+          {
+            "from": "SINAV_HAZIRLIK_HIZ_VE_RENK_OZETLERI",
+            "attributes": {
+              "prepFormat": "OZET_VE_FORMUL"
+            }
+          },
+          {
+            "from": "SINAV_HAZIRLIK_DERS_OZETLERI_VE_FORMULLER",
+            "attributes": {
+              "prepFormat": "OZET_VE_FORMUL"
+            }
+          },
+          {
+            "from": "SINAV_HAZIRLIK_VIDEO_COZUM_DESTEKLI",
+            "attributes": {
+              "videoSolutions": true
+            }
+          },
+          {
+            "from": "SINAV_HAZIRLIK_YAPRAK_TESTLER",
+            "attributes": {
+              "prepFormat": "YAPRAK_TEST"
+            }
+          }
+        ]
+      }
+    ],
+    "OKUL_KITAPLARI": [
+      {
+        "key": "MATEMATIK_GEOMETRI",
+        "label": "Matematik & Geometri",
+        "replaces": [
+          "DERS_KITABI_MATEMATIK_GEOMETRI"
+        ]
+      },
+      {
+        "key": "FIZIK_KIMYA_BIYOLOJI",
+        "label": "Fizik, Kimya & Biyoloji",
+        "replaces": [
+          "DERS_KITABI_FIZIK_KIMYA_BIYOLOJI"
+        ]
+      },
+      {
+        "key": "TURKCE_EDEBIYAT",
+        "label": "Türkçe & Edebiyat",
+        "replaces": [
+          "DERS_KITABI_TURKCE_EDEBIYAT"
+        ]
+      },
+      {
+        "key": "TARIH_COGRAFYA",
+        "label": "Tarih & Coğrafya",
+        "replaces": [
+          "DERS_KITABI_TARIH_COGRAFYA"
+        ]
+      },
+      {
+        "key": "YABANCI_DIL",
+        "label": "Yabancı Dil",
+        "replaces": [
+          "DERS_KITABI_INGILIZCE",
+          "DERS_KITABI_ALMANCA",
+          "DERS_KITABI_FRANSIZCA"
+        ]
+      },
+      {
+        "key": "DIN_KULTURU",
+        "label": "Din Kültürü ve Ahlak Bilgisi",
+        "replaces": [
+          "DERS_KITABI_DIN_KULTURU"
+        ]
+      },
+      {
+        "key": "FELSEFE",
+        "label": "Felsefe, Psikoloji & Sosyoloji",
+        "replaces": [
+          "DERS_KITABI_FELSEFE_PSIKOLOJI_SOSYOLOJI"
+        ]
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Okul Kitapları",
+        "replaces": [
+          "DERS_KITABI_ILKOKUL",
+          "DERS_KITABI_ORTAOKUL",
+          "DERS_KITABI_LISE",
+          "DERS_KITABI_OTHER"
+        ]
+      }
+    ],
+    "UNIVERSITE_VE_MESLEK": [
+      {
+        "key": "HUKUK",
+        "label": "Hukuk",
+        "replaces": [
+          "DERS_KITABI_HUKUK"
+        ]
+      },
+      {
+        "key": "TIP_VE_SAGLIK",
+        "label": "Tıp & Sağlık",
+        "replaces": [
+          "DERS_KITABI_TIP_DIS_HEKIMLIGI"
+        ]
+      },
+      {
+        "key": "MUHENDISLIK",
+        "label": "Mühendislik",
+        "replaces": [
+          "DERS_KITABI_ELEKTRIK_ELEKTRONIK",
+          "DERS_KITABI_MAKINE_INSAAT"
+        ]
+      },
+      {
+        "key": "BILGISAYAR_BILIMLERI",
+        "label": "Bilgisayar Bilimleri",
+        "replaces": [
+          "DERS_KITABI_BILGISAYAR_YAZILIM"
+        ]
+      },
+      {
+        "key": "IKTISAT_VE_ISLETME",
+        "label": "İktisat & İşletme"
+      },
+      {
+        "key": "EGITIM_BILIMLERI",
+        "label": "Eğitim Bilimleri"
+      },
+      {
+        "key": "FEN_BILIMLERI",
+        "label": "Fen Bilimleri"
+      },
+      {
+        "key": "SOSYAL_BILIMLER",
+        "label": "Sosyal Bilimler"
+      },
+      {
+        "key": "DIL_VE_EDEBIYAT",
+        "label": "Dil & Edebiyat"
+      },
+      {
+        "key": "MIMARLIK_VE_TASARIM",
+        "label": "Mimarlık & Tasarım",
+        "replaces": [
+          "DERS_KITABI_MIMARLIK_GUZEL_SANATLAR"
+        ]
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Üniversite Kitapları",
+        "replaces": [
+          "AKADEMIK_BILIMSEL_ARASTIRMA",
+          "AKADEMIK_TEZLER",
+          "AKADEMIK_MAKALE_DERLEMELERI",
+          "AKADEMIK_DERS_NOTLARI",
+          "AKADEMIK_OTHER"
+        ]
+      }
+    ],
+    "SOZLUK_VE_BASVURU": [
+      {
+        "key": "SOZLUK",
+        "label": "Sözlük",
+        "replaces": [
+          "AKADEMIK_SOZLUK_VE_TERIMLER"
+        ]
+      },
+      {
+        "key": "ANSIKLOPEDI",
+        "label": "Ansiklopedi",
+        "replaces": [
+          "AKADEMIK_ANSIKLOPEDILER"
+        ]
+      },
+      {
+        "key": "ATLAS",
+        "label": "Atlas"
+      },
+      {
+        "key": "YAZIM_VE_DIL_KILAVUZU",
+        "label": "Yazım & Dil Kılavuzu"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Başvuru Kitapları",
+        "replaces": [
+          "AKADEMIK_REFERANS_VE_KAYNAK"
+        ]
+      }
+    ],
+    "OKUMA_KITABI": [
+      {
+        "key": "ROMAN",
+        "label": "Roman",
+        "replaces": [
+          "OKUMA_KITABI_DUNYA_KLASIKLERI",
+          "OKUMA_KITABI_TURK_KLASIKLERI",
+          "OKUMA_KITABI_MODERN_KLASIKLER",
+          "OKUMA_KITABI_PSIKOLOJIK_ROMAN"
+        ]
+      },
+      {
+        "key": "BILIMKURGU",
+        "label": "Bilimkurgu"
+      },
+      {
+        "key": "FANTASTIK",
+        "label": "Fantastik Edebiyat"
+      },
+      {
+        "key": "POLISIYE_VE_MACERA",
+        "label": "Polisiye & Macera"
+      },
+      {
+        "key": "KORKU_VE_GERILIM",
+        "label": "Korku & Gerilim"
+      },
+      {
+        "key": "TARIHI_ROMAN",
+        "label": "Tarihî Roman"
+      },
+      {
+        "key": "DISTOPYA",
+        "label": "Distopya Edebiyatı"
+      },
+      {
+        "key": "HIKAYE_VE_OYKU",
+        "label": "Hikâye ve Öykü"
+      },
+      {
+        "key": "SIIR",
+        "label": "Şiir"
+      },
+      {
+        "key": "TIYATRO_VE_DRAMA",
+        "label": "Tiyatro ve Drama"
+      },
+      {
+        "key": "DENEME_VE_MAKALE",
+        "label": "Deneme & Eleştiri"
+      },
+      {
+        "key": "MIZAH",
+        "label": "Mizah & Popüler Kültür"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Edebiyat Kitapları"
+      }
+    ],
+    "BIYOGRAFI_ANI_GEZI": [
+      {
+        "key": "BIYOGRAFI",
+        "label": "Biyografi",
+        "replaces": [
+          "OKUMA_KITABI_BIYOGRAFI_VE_OTOBIYOGRAFI"
+        ]
+      },
+      {
+        "key": "OTOBIYOGRAFI_VE_ANI",
+        "label": "Otobiyografi & Anı",
+        "replaces": [
+          "OKUMA_KITABI_ANI_VE_GUNLUK"
+        ]
+      },
+      {
+        "key": "GUNLUK_VE_MEKTUP",
+        "label": "Günlük & Mektup"
+      },
+      {
+        "key": "GEZI",
+        "label": "Gezi & Seyahat",
+        "replaces": [
+          "OKUMA_KITABI_GEZI_VE_SEYAHAT"
+        ]
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer"
+      }
+    ],
+    "COCUK_KITAPLARI": [
+      {
+        "key": "RESIMLI_KITAP",
+        "label": "Resimli Kitap"
+      },
+      {
+        "key": "MASAL_VE_HIKAYELER",
+        "label": "Masal ve Hikâyeler"
+      },
+      {
+        "key": "ILK_OKUMA",
+        "label": "İlk Okuma Kitapları"
+      },
+      {
+        "key": "COCUK_ROMANI_VE_OYKU",
+        "label": "Çocuk Romanı & Öykü"
+      },
+      {
+        "key": "MACERA_VE_GENCLIK",
+        "label": "Gençlik Romanı"
+      },
+      {
+        "key": "EGITICI_BILIM",
+        "label": "Bilgi & Bilim"
+      },
+      {
+        "key": "ETKINLIK_VE_ZEKA",
+        "label": "Etkinlik & Zekâ",
+        "replaces": [
+          {
+            "from": "COCUK_KITAPLARI_OKUL_ONCESI",
+            "attributes": {
+              "ageRange": "AGE_4_6"
+            }
+          }
+        ]
+      },
+      {
+        "key": "BOYAMA",
+        "label": "Çocuk Boyama Kitapları"
+      },
+      {
+        "key": "YAPBOZ_VE_HAREKETLI",
+        "label": "Yapboz ve Hareketli Kitaplar"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Çocuk Kitapları"
+      }
+    ],
+    "CIZGI_ROMAN_VE_MANGA": [
+      {
+        "key": "TURK_CIZGI_ROMANI",
+        "label": "Türk Çizgi Romanı"
+      },
+      {
+        "key": "CIZGI_ROMAN",
+        "label": "Çizgi Roman (Comic)",
+        "replaces": [
+          "DERGI_VE_SURELI_YAYIN_CIZGI_ROMAN"
+        ]
+      },
+      {
+        "key": "MANGA",
+        "label": "Manga",
+        "replaces": [
+          "DERGI_VE_SURELI_YAYIN_MANGA_VE_WEBTOON"
+        ]
+      },
+      {
+        "key": "GRAFIK_ROMAN",
+        "label": "Grafik Roman"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer"
+      }
+    ],
+    "DERGI_VE_SURELI_YAYIN": [
+      {
+        "key": "KULTUR_SANAT_DERGILERI",
+        "label": "Edebiyat, Kültür & Sanat Dergileri"
+      },
+      {
+        "key": "BILIM_TEKNOLOJI_DERGILERI",
+        "label": "Bilim ve Popüler Teknoloji Dergileri"
+      },
+      {
+        "key": "TARIH_COGRAFYA_DERGILERI",
+        "label": "Tarih, Atlas & Coğrafya Dergileri"
+      },
+      {
+        "key": "HOBI_DERGILERI",
+        "label": "Hobi & Spor Dergileri"
+      },
+      {
+        "key": "ESKI_GAZETE_VE_KOLEKSIYON",
+        "label": "Eski Gazete & Efemera"
+      },
+      {
+        "key": "FANZIN",
+        "label": "Fanzin ve Bağımsız Yayınlar"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Süreli Yayınlar"
+      }
+    ],
+    "DINI_KITAPLAR": [
+      {
+        "key": "KURAN_VE_TEZVID",
+        "label": "Kur'an-ı Kerim ve Tecvid"
+      },
+      {
+        "key": "TEFSIR_VE_MEAL",
+        "label": "Tefsir ve Meal"
+      },
+      {
+        "key": "HADIS",
+        "label": "Hadis Kitapları"
+      },
+      {
+        "key": "SIYER_I_NEBI",
+        "label": "Siyer-i Nebi (Peygamber Hayatı)"
+      },
+      {
+        "key": "ISLAM_ILMIHALI",
+        "label": "İslam İlmihali"
+      },
+      {
+        "key": "FIKIH_VE_KELAM",
+        "label": "Fıkıh ve Kelam"
+      },
+      {
+        "key": "INANC_VE_ITIKAT",
+        "label": "İnanç ve İtikat"
+      },
+      {
+        "key": "TASAVVUF_VE_AHLAK",
+        "label": "Tasavvuf ve Ahlak"
+      },
+      {
+        "key": "DUA_VE_ZIKIR",
+        "label": "Dua, Evrad ve Zikir"
+      },
+      {
+        "key": "ISLAM_TARIHI",
+        "label": "İslam Tarihi"
+      },
+      {
+        "key": "DINLER_TARIHI",
+        "label": "Dinler Tarihi"
+      },
+      {
+        "key": "DIGER_DINLER",
+        "label": "Diğer Dinler & İnançlar"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Dini Kitaplar"
+      }
+    ],
+    "KISISEL_GELISIM": [
+      {
+        "key": "POPULER_PSIKOLOJI",
+        "label": "Popüler Psikoloji"
+      },
+      {
+        "key": "MOTIVASYON_VE_BASARI",
+        "label": "Motivasyon ve Başarı"
+      },
+      {
+        "key": "ALISKANLIK_GELISTIRME",
+        "label": "Alışkanlık Geliştirme"
+      },
+      {
+        "key": "ETKILI_ILETISIM",
+        "label": "İlişkiler & İletişim"
+      },
+      {
+        "key": "MEDITASYON_VE_MINDFULNESS",
+        "label": "Meditasyon, Yoga & Mindfulness"
+      },
+      {
+        "key": "ZAMAN_YONETIMI",
+        "label": "Zaman Yönetimi ve Verimlilik"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Kişisel Gelişim Kitapları"
+      }
+    ],
+    "IS_VE_EKONOMI": [
+      {
+        "key": "EKONOMI",
+        "label": "Ekonomi"
+      },
+      {
+        "key": "GIRISIMCILIK_VE_STARTUPS",
+        "label": "Girişimcilik ve Startups"
+      },
+      {
+        "key": "IS_YONETIMI_VE_LIDERLIK",
+        "label": "Yönetim & Liderlik",
+        "replaces": [
+          "KISISEL_GELISIM_LIDERLIK_VE_HITABET"
+        ]
+      },
+      {
+        "key": "KARIYER",
+        "label": "Kariyer",
+        "replaces": [
+          "KISISEL_GELISIM_KARIYER_VE_GIRISIMCILIK"
+        ]
+      },
+      {
+        "key": "PAZARLAMA_VE_SATIS",
+        "label": "Pazarlama, Satış & Dijital",
+        "replaces": [
+          "IS_VE_EKONOMI_E_TICARET_VE_DIJITAL"
+        ]
+      },
+      {
+        "key": "KISISEL_FINANS",
+        "label": "Kişisel Finans",
+        "replaces": [
+          "KISISEL_GELISIM_FINANSAL_OKURYAZARLIK"
+        ]
+      },
+      {
+        "key": "FINANS_VE_YATIRIM",
+        "label": "Finans, Yatırım & Borsa",
+        "replaces": [
+          "IS_VE_EKONOMI_BORSA_VE_KRIPTO"
+        ]
+      },
+      {
+        "key": "MUHASEBE_VE_DENETIM",
+        "label": "Muhasebe ve Denetim"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer İş & Ekonomi Kitapları"
+      }
+    ],
+    "BILIM_VE_TEKNOLOJI": [
+      {
+        "key": "PROGRAMLAMA_DILLERI",
+        "label": "Programlama"
+      },
+      {
+        "key": "YAPAY_ZEKA_VE_ML",
+        "label": "Yapay Zekâ & Veri"
+      },
+      {
+        "key": "SIBER_GUVENLIK_VE_AG",
+        "label": "Siber Güvenlik ve Ağ Yönetimi"
+      },
+      {
+        "key": "OFIS_VE_UYGULAMALAR",
+        "label": "Ofis & Uygulamalar"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Bilişim Kitapları"
+      }
+    ],
+    "POPULER_BILIM": [
+      {
+        "key": "UZAY_VE_ASTRONOMI",
+        "label": "Uzay & Astronomi",
+        "replaces": [
+          "BILIM_VE_TEKNOLOJI_UZAY_VE_ASTRONOMI"
+        ]
+      },
+      {
+        "key": "FIZIK_VE_KOZMOLOJI",
+        "label": "Fizik & Kozmoloji",
+        "replaces": [
+          "BILIM_VE_TEKNOLOJI_POPULER_FIZIK"
+        ]
+      },
+      {
+        "key": "BIYOLOJI_VE_EVRIM",
+        "label": "Biyoloji, Genetik & Evrim",
+        "replaces": [
+          "BILIM_VE_TEKNOLOJI_BIYOTEKNOLOJI_VE_GENETIK"
+        ]
+      },
+      {
+        "key": "MATEMATIK",
+        "label": "Matematik"
+      },
+      {
+        "key": "DOGA_VE_CEVRE",
+        "label": "Doğa & Çevre"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Popüler Bilim",
+        "replaces": [
+          "BILIM_VE_TEKNOLOJI_POPULER_BILIM"
+        ]
+      }
+    ],
+    "TARIH_VE_ARASTIRMA": [
+      {
+        "key": "OSMANLI_TARIHI",
+        "label": "Osmanlı Tarihi & Medeniyeti"
+      },
+      {
+        "key": "CUMHURIYET_TARIHI",
+        "label": "Cumhuriyet Tarihi & Atatürk"
+      },
+      {
+        "key": "TURK_TARIHI",
+        "label": "Türk & Orta Asya Tarihi"
+      },
+      {
+        "key": "DUNYA_TARIHI",
+        "label": "Dünya ve Avrupa Tarihi"
+      },
+      {
+        "key": "ANTIK_CAG_VE_ARKEOLOJI",
+        "label": "Antik Çağ, Mitoloji & Arkeoloji"
+      },
+      {
+        "key": "ASKERI_TARIH_VE_SAVASLAR",
+        "label": "Askeri Tarih & Savaşlar"
+      },
+      {
+        "key": "KULTUR_VE_SEHIR_TARIHI",
+        "label": "Sosyal, Şehir & Kültür Tarihi"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Tarih Kitapları"
+      }
+    ],
+    "FELSEFE_VE_SOSYOLOJI": [
+      {
+        "key": "ANTIK_VE_KLASIK_FELSEFE",
+        "label": "Antik Çağ ve Klasik Felsefe"
+      },
+      {
+        "key": "MODERN_VE_CAGDAS_FELSEFE",
+        "label": "Modern & Çağdaş Felsefe"
+      },
+      {
+        "key": "DOGU_FELSEFESI",
+        "label": "Doğu & Tasavvuf Felsefesi"
+      },
+      {
+        "key": "ETIK_VE_AHLAK",
+        "label": "Etik, Ahlak ve Hukuk Felsefesi"
+      },
+      {
+        "key": "MANTIK_VE_EPISTEMOLOJI",
+        "label": "Mantık ve Bilgi Felsefesi"
+      },
+      {
+        "key": "GENEL_SOSYOLOJI",
+        "label": "Genel ve Toplumsal Sosyoloji"
+      },
+      {
+        "key": "ANTROPOLOJI",
+        "label": "Antropoloji & Kültür İncelemeleri"
+      },
+      {
+        "key": "SIYASET_BILIMI",
+        "label": "Siyaset Bilimi & Felsefesi",
+        "replaces": [
+          "FELSEFE_VE_SOSYOLOJI_SIYASET_FELSEFESI",
+          "TARIH_VE_ARASTIRMA_SIYASET_VE_YAKIN_TARIH"
+        ]
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Felsefe & Sosyoloji Kitapları"
+      }
+    ],
+    "SANAT_VE_TASARIM": [
+      {
+        "key": "SANAT_TARIHI_VE_KURAMLARI",
+        "label": "Sanat Tarihi ve Kuramları"
+      },
+      {
+        "key": "MIMARLIK_VE_PLANLAMA",
+        "label": "Mimarlık, Şehir Planlama & İç Mimarlık"
+      },
+      {
+        "key": "FOTOGRAF_VE_SINEMA",
+        "label": "Fotoğrafçılık, Sinema & Video Sanatı"
+      },
+      {
+        "key": "RESIM_VE_HEYKEL",
+        "label": "Resim, Çizim, Heykel & Plastik Sanatlar"
+      },
+      {
+        "key": "GRAFIK_VE_DIJITAL_TASARIM",
+        "label": "Grafik Tasarım, Tipografi & İllüstrasyon"
+      },
+      {
+        "key": "MUZIK_VE_SES",
+        "label": "Müzik Teorisi, Tarihi & Çalgı Eğitimi"
+      },
+      {
+        "key": "MODA_VE_TEKSTIL",
+        "label": "Moda, Tekstil & Kostüm Tarihi"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Sanat & Tasarım Kitapları"
+      }
+    ],
+    "HOBI_VE_YASAM": [
+      {
+        "key": "YEMEK_VE_GASTRONOMI",
+        "label": "Yemek Tarifleri, Gurme & Gastronomi"
+      },
+      {
+        "key": "SAGLIK_VE_BESLENME",
+        "label": "Sağlıklı Yaşam, Diyet & Beslenme"
+      },
+      {
+        "key": "EBEVEYNLIK_VE_BEBEK",
+        "label": "Ebeveynlik, Hamilelik & Bebek Bakımı"
+      },
+      {
+        "key": "EV_BAHCE_VE_BITKILER",
+        "label": "Ev Dekorasyonu, Bahçıvanlık & Bitki Bakımı"
+      },
+      {
+        "key": "EL_SANATLARI_VE_DIY",
+        "label": "El Sanatları, Dikiş-Nakış & Kendin Yap"
+      },
+      {
+        "key": "EVCIL_HAYVAN_BAKIMI",
+        "label": "Evcil Hayvan Sağlığı ve Eğitimi"
+      },
+      {
+        "key": "ASTROLOJI_VE_TAROT",
+        "label": "Astroloji, Tarot & Burçlar"
+      },
+      {
+        "key": "SATRANC_VE_AKIL_OYUNLARI",
+        "label": "Satranç, Akıl Oyunları & Bulmacalar"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Hobi & Yaşam Kitapları"
+      }
+    ],
+    "OTHER": [
+      {
+        "key": "GENEL_KULTUR",
+        "label": "Genel Kültür & Karma Eserler"
+      },
+      {
+        "key": "OTHER",
+        "label": "Diğer Kategorilenmemiş Kitaplar",
+        "replaces": [
+          "OTHER_NADIR_VE_ANTIKA"
+        ]
+      }
+    ]
+  },
+  "languages": [
+    {
+      "key": "TURKISH",
+      "label": "Türkçe"
+    },
+    {
+      "key": "ENGLISH",
+      "label": "İngilizce"
+    },
+    {
+      "key": "GERMAN",
+      "label": "Almanca"
+    },
+    {
+      "key": "FRENCH",
+      "label": "Fransızca"
+    },
+    {
+      "key": "SPANISH",
+      "label": "İspanyolca"
+    },
+    {
+      "key": "ARABIC",
+      "label": "Arapça"
+    },
+    {
+      "key": "RUSSIAN",
+      "label": "Rusça"
+    },
+    {
+      "key": "ITALIAN",
+      "label": "İtalyanca"
+    },
+    {
+      "key": "JAPANESE",
+      "label": "Japonca"
+    },
+    {
+      "key": "KOREAN",
+      "label": "Korece"
+    },
+    {
+      "key": "CHINESE",
+      "label": "Çince"
+    },
+    {
+      "key": "PERSIAN",
+      "label": "Farsça"
+    },
+    {
+      "key": "OTHER",
+      "label": "Diğer"
+    }
+  ],
+  "formats": [
+    {
+      "key": "HARDCOVER",
+      "label": "Ciltli (Hardcover)"
+    },
+    {
+      "key": "PAPERBACK",
+      "label": "Karton Kapak (Paperback)"
+    },
+    {
+      "key": "SPIRAL",
+      "label": "Spiralli"
+    },
+    {
+      "key": "POCKET",
+      "label": "Cep Boy"
+    }
+  ],
+  "conditions": [
+    {
+      "key": "NEW",
+      "label": "Sıfır / Ambalajında"
+    },
+    {
+      "key": "LIKE_NEW",
+      "label": "Yeni Gibi (Temiz)"
+    },
+    {
+      "key": "GOOD",
+      "label": "İyi Durumda"
+    },
+    {
+      "key": "ACCEPTABLE",
+      "label": "Kullanılmış / Çizikli"
+    },
+    {
+      "key": "WORN",
+      "label": "Yıpranmış / Hasarlı"
+    }
+  ]
+}

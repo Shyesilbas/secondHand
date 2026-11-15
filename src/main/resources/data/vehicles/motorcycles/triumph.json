@@ -1,0 +1,107 @@
+[
+  {
+    "brand": "TRIUMPH",
+    "type": "MOTORCYCLE",
+    "name": "Daytona 660",
+    "supportedBodyTypes": ["SPORTBIKE"],
+    "generations": [
+      {
+        "name": "Daytona 660 (2024–)",
+        "engines": [
+          { "name": "660cc Inline-3", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard"]
+      }
+    ]
+  },
+  {
+    "brand": "TRIUMPH",
+    "type": "MOTORCYCLE",
+    "name": "Street Triple",
+    "supportedBodyTypes": ["NAKED"],
+    "generations": [
+      {
+        "name": "Street Triple 765 (2023–)",
+        "engines": [
+          { "name": "765cc Inline-3", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["R", "RS", "Moto2 Edition"]
+      }
+    ]
+  },
+  {
+    "brand": "TRIUMPH",
+    "type": "MOTORCYCLE",
+    "name": "Speed Triple 1200",
+    "supportedBodyTypes": ["NAKED"],
+    "generations": [
+      {
+        "name": "Speed Triple 1200 RS (2021–)",
+        "engines": [
+          { "name": "1160cc Inline-3", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["RS", "RR"]
+      }
+    ]
+  },
+  {
+    "brand": "TRIUMPH",
+    "type": "MOTORCYCLE",
+    "name": "Tiger 900",
+    "supportedBodyTypes": ["ADVENTURE"],
+    "generations": [
+      {
+        "name": "Tiger 900 (2020–)",
+        "engines": [
+          { "name": "888cc Inline-3", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["GT", "GT Pro", "Rally", "Rally Pro"]
+      }
+    ]
+  },
+  {
+    "brand": "TRIUMPH",
+    "type": "MOTORCYCLE",
+    "name": "Tiger 1200",
+    "supportedBodyTypes": ["ADVENTURE"],
+    "generations": [
+      {
+        "name": "Tiger 1200 (2022–)",
+        "engines": [
+          { "name": "1160cc Inline-3", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["GT", "GT Pro", "GT Explorer", "Rally", "Rally Pro", "Rally Explorer"]
+      }
+    ]
+  },
+  {
+    "brand": "TRIUMPH",
+    "type": "MOTORCYCLE",
+    "name": "Bonneville T120",
+    "supportedBodyTypes": ["CRUISER"],
+    "generations": [
+      {
+        "name": "Bonneville T120 (2016–)",
+        "engines": [
+          { "name": "1200cc Parallel-Twin", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["Standard", "Black"]
+      }
+    ]
+  },
+  {
+    "brand": "TRIUMPH",
+    "type": "MOTORCYCLE",
+    "name": "Rocket 3",
+    "supportedBodyTypes": ["CRUISER"],
+    "generations": [
+      {
+        "name": "Rocket 3 (2020–)",
+        "engines": [
+          { "name": "2458cc Inline-3", "fuelType": "GASOLINE" }
+        ],
+        "trims": ["R", "GT"]
+      }
+    ]
+  }
+]

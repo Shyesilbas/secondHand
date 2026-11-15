@@ -1,0 +1,79 @@
+[
+  {
+    "brand": "AMAZFIT",
+    "type": "SMARTWATCH",
+    "name": "Balance",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Amazfit Balance",
+      "Balance AMOLED"
+    ]
+  },
+  {
+    "brand": "AMAZFIT",
+    "type": "SMARTWATCH",
+    "name": "Cheetah Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Amazfit Cheetah Pro",
+      "Cheetah Pro"
+    ]
+  },
+  {
+    "brand": "AMAZFIT",
+    "type": "SMARTWATCH",
+    "name": "T-Rex Ultra",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Amazfit T-Rex Ultra",
+      "T-Rex Ultra Outdoor"
+    ]
+  },
+  {
+    "brand": "AMAZFIT",
+    "type": "SMARTWATCH",
+    "name": "T-Rex 2",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Amazfit T-Rex 2",
+      "T-Rex 2"
+    ]
+  },
+  {
+    "brand": "AMAZFIT",
+    "type": "SMARTWATCH",
+    "name": "GTR 4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Amazfit GTR 4",
+      "GTR 4 Round"
+    ]
+  },
+  {
+    "brand": "AMAZFIT",
+    "type": "SMARTWATCH",
+    "name": "GTS 4",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Amazfit GTS 4",
+      "GTS 4 Square"
+    ]
+  },
+  {
+    "brand": "AMAZFIT",
+    "type": "SMARTWATCH",
+    "name": "Active",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Amazfit Active",
+      "Active Edge"
+    ]
+  }
+]

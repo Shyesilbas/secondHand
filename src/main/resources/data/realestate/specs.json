@@ -1,0 +1,407 @@
+{
+  "roomConfigs": [
+    {
+      "key": "ROOM_1_0",
+      "label": "1+0",
+      "rooms": 1,
+      "livingRooms": 0
+    },
+    {
+      "key": "ROOM_1_1",
+      "label": "1+1",
+      "rooms": 1,
+      "livingRooms": 1
+    },
+    {
+      "key": "ROOM_1_5_1",
+      "label": "1.5+1",
+      "rooms": 1,
+      "livingRooms": 1
+    },
+    {
+      "key": "ROOM_2_0",
+      "label": "2+0",
+      "rooms": 2,
+      "livingRooms": 0
+    },
+    {
+      "key": "ROOM_2_1",
+      "label": "2+1",
+      "rooms": 2,
+      "livingRooms": 1
+    },
+    {
+      "key": "ROOM_2_2",
+      "label": "2+2",
+      "rooms": 2,
+      "livingRooms": 2
+    },
+    {
+      "key": "ROOM_3_0",
+      "label": "3+0",
+      "rooms": 3,
+      "livingRooms": 0
+    },
+    {
+      "key": "ROOM_3_1",
+      "label": "3+1",
+      "rooms": 3,
+      "livingRooms": 1
+    },
+    {
+      "key": "ROOM_3_2",
+      "label": "3+2",
+      "rooms": 3,
+      "livingRooms": 2
+    },
+    {
+      "key": "ROOM_4_0",
+      "label": "4+0",
+      "rooms": 4,
+      "livingRooms": 0
+    },
+    {
+      "key": "ROOM_4_1",
+      "label": "4+1",
+      "rooms": 4,
+      "livingRooms": 1
+    },
+    {
+      "key": "ROOM_4_2",
+      "label": "4+2",
+      "rooms": 4,
+      "livingRooms": 2
+    },
+    {
+      "key": "ROOM_5_1",
+      "label": "5+1",
+      "rooms": 5,
+      "livingRooms": 1
+    },
+    {
+      "key": "ROOM_5_2",
+      "label": "5+2",
+      "rooms": 5,
+      "livingRooms": 2
+    },
+    {
+      "key": "ROOM_6_1",
+      "label": "6+1",
+      "rooms": 6,
+      "livingRooms": 1
+    },
+    {
+      "key": "ROOM_6_2",
+      "label": "6+2",
+      "rooms": 6,
+      "livingRooms": 2
+    },
+    {
+      "key": "ROOM_7_1",
+      "label": "7+1",
+      "rooms": 7,
+      "livingRooms": 1
+    },
+    {
+      "key": "ROOM_8_PLUS",
+      "label": "8+ ve Üzeri",
+      "rooms": 8,
+      "livingRooms": 1
+    }
+  ],
+  "zoningStatuses": [
+    {
+      "key": "RESIDENTIAL_ZONED",
+      "label": "Konut İmarlı"
+    },
+    {
+      "key": "COMMERCIAL_ZONED",
+      "label": "Ticari İmarlı"
+    },
+    {
+      "key": "INDUSTRIAL_ZONED",
+      "label": "Sanayi İmarlı"
+    },
+    {
+      "key": "TOURISM_ZONED",
+      "label": "Turizm İmarlı"
+    },
+    {
+      "key": "MIXED_ZONED",
+      "label": "Ticari + Konut"
+    },
+    {
+      "key": "AGRICULTURAL",
+      "label": "Tarla"
+    },
+    {
+      "key": "VINEYARD_GARDEN",
+      "label": "Bağ/Bahçe"
+    },
+    {
+      "key": "OLIVE_GROVE",
+      "label": "Zeytinlik"
+    },
+    {
+      "key": "PROTECTED_AREA",
+      "label": "Sit Alanı"
+    },
+    {
+      "key": "PUBLIC_ZONED",
+      "label": "Kamu / Özel Kullanım"
+    },
+    {
+      "key": "UNZONED",
+      "label": "İmarsız"
+    }
+  ],
+  "floors": [
+    {
+      "key": "BASEMENT",
+      "label": "Bodrum kat",
+      "number": -1
+    },
+    {
+      "key": "SEMI_BASEMENT",
+      "label": "Yarı bodrum",
+      "number": -1
+    },
+    {
+      "key": "GROUND",
+      "label": "Zemin kat",
+      "number": 0
+    },
+    {
+      "key": "GARDEN",
+      "label": "Bahçe katı",
+      "number": 0
+    },
+    {
+      "key": "HIGH_ENTRANCE",
+      "label": "Yüksek giriş",
+      "number": 0
+    },
+    {
+      "key": "FLOOR_1",
+      "label": "1. kat",
+      "number": 1
+    },
+    {
+      "key": "FLOOR_2",
+      "label": "2. kat",
+      "number": 2
+    },
+    {
+      "key": "FLOOR_3",
+      "label": "3. kat",
+      "number": 3
+    },
+    {
+      "key": "FLOOR_4",
+      "label": "4. kat",
+      "number": 4
+    },
+    {
+      "key": "FLOOR_5",
+      "label": "5. kat",
+      "number": 5
+    },
+    {
+      "key": "FLOOR_6",
+      "label": "6. kat",
+      "number": 6
+    },
+    {
+      "key": "FLOOR_7",
+      "label": "7. kat",
+      "number": 7
+    },
+    {
+      "key": "FLOOR_8",
+      "label": "8. kat",
+      "number": 8
+    },
+    {
+      "key": "FLOOR_9",
+      "label": "9. kat",
+      "number": 9
+    },
+    {
+      "key": "FLOOR_10",
+      "label": "10. kat",
+      "number": 10
+    },
+    {
+      "key": "FLOOR_11",
+      "label": "11. kat",
+      "number": 11
+    },
+    {
+      "key": "FLOOR_12",
+      "label": "12. kat",
+      "number": 12
+    },
+    {
+      "key": "FLOOR_13",
+      "label": "13. kat",
+      "number": 13
+    },
+    {
+      "key": "FLOOR_14",
+      "label": "14. kat",
+      "number": 14
+    },
+    {
+      "key": "FLOOR_15",
+      "label": "15. kat",
+      "number": 15
+    },
+    {
+      "key": "FLOOR_16",
+      "label": "16. kat",
+      "number": 16
+    },
+    {
+      "key": "FLOOR_17",
+      "label": "17. kat",
+      "number": 17
+    },
+    {
+      "key": "FLOOR_18",
+      "label": "18. kat",
+      "number": 18
+    },
+    {
+      "key": "FLOOR_19",
+      "label": "19. kat",
+      "number": 19
+    },
+    {
+      "key": "FLOOR_20",
+      "label": "20. kat",
+      "number": 20
+    },
+    {
+      "key": "FLOOR_21",
+      "label": "21. kat",
+      "number": 21
+    },
+    {
+      "key": "FLOOR_22",
+      "label": "22. kat",
+      "number": 22
+    },
+    {
+      "key": "FLOOR_23",
+      "label": "23. kat",
+      "number": 23
+    },
+    {
+      "key": "FLOOR_24",
+      "label": "24. kat",
+      "number": 24
+    },
+    {
+      "key": "FLOOR_25",
+      "label": "25. kat",
+      "number": 25
+    },
+    {
+      "key": "FLOOR_26",
+      "label": "26. kat",
+      "number": 26
+    },
+    {
+      "key": "FLOOR_27",
+      "label": "27. kat",
+      "number": 27
+    },
+    {
+      "key": "FLOOR_28",
+      "label": "28. kat",
+      "number": 28
+    },
+    {
+      "key": "FLOOR_29",
+      "label": "29. kat",
+      "number": 29
+    },
+    {
+      "key": "FLOOR_30",
+      "label": "30. kat",
+      "number": 30
+    },
+    {
+      "key": "FLOOR_31",
+      "label": "31. kat",
+      "number": 31
+    },
+    {
+      "key": "FLOOR_32",
+      "label": "32. kat",
+      "number": 32
+    },
+    {
+      "key": "FLOOR_33",
+      "label": "33. kat",
+      "number": 33
+    },
+    {
+      "key": "FLOOR_34",
+      "label": "34. kat",
+      "number": 34
+    },
+    {
+      "key": "FLOOR_35",
+      "label": "35. kat",
+      "number": 35
+    },
+    {
+      "key": "FLOOR_36",
+      "label": "36. kat",
+      "number": 36
+    },
+    {
+      "key": "FLOOR_37",
+      "label": "37. kat",
+      "number": 37
+    },
+    {
+      "key": "FLOOR_38",
+      "label": "38. kat",
+      "number": 38
+    },
+    {
+      "key": "FLOOR_39",
+      "label": "39. kat",
+      "number": 39
+    },
+    {
+      "key": "FLOOR_40",
+      "label": "40. kat",
+      "number": 40
+    },
+    {
+      "key": "ROOF",
+      "label": "Çatı katı"
+    },
+    {
+      "key": "DETACHED",
+      "label": "Müstakil (tüm bina)"
+    }
+  ],
+  "infrastructureStatuses": [
+    {
+      "key": "COMPLETE",
+      "label": "Tam (elektrik, su, yol, kanalizasyon)"
+    },
+    {
+      "key": "PARTIAL",
+      "label": "Kısmen var"
+    },
+    {
+      "key": "NONE",
+      "label": "Yok"
+    }
+  ]
+}

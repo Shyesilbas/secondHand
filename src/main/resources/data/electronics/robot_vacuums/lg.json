@@ -1,0 +1,153 @@
+[
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero R9",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG CordZero R9",
+      "R9",
+      "CordZero R9",
+      "LG R9"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero R5",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG CordZero R5",
+      "R5",
+      "CordZero R5",
+      "LG R5"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "RoboKing VR9647PS",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG RoboKing VR9647PS",
+      "VR9647PS",
+      "RoboKing VR9647PS"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero ThinQ R9",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG CordZero ThinQ R9",
+      "R9 ThinQ",
+      "CordZero ThinQ R9"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero A9+",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG CordZero A9+",
+      "CordZero A9+",
+      "A9+",
+      "CordZero A9 Plus",
+      "LG A9+"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero A9 Ultimate",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG CordZero A9 Ultimate",
+      "A9 Ultimate",
+      "CordZero A9 Ultimate"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero A9 Detect",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG CordZero A9 Detect",
+      "A9 Detect",
+      "CordZero A9 Detect"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero R5T",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG CordZero R5T",
+      "R5T",
+      "CordZero R5T"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "RoboKing Turbo+",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG RoboKing Turbo+",
+      "RoboKing Turbo+",
+      "RoboKing Turbo Plus",
+      "LG RoboKing Turbo"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero ThinQ R9 2023",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG CordZero ThinQ R9 2023",
+      "CordZero ThinQ R9 2023",
+      "R9 2023",
+      "CordZero R9 2023"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero A9 Kompressor",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG CordZero A9 Kompressor",
+      "A9 Kompressor",
+      "CordZero A9 Kompressor"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "ROBOT_VACUUM",
+    "name": "CordZero ThinQ A9 2024",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG CordZero ThinQ A9 2024",
+      "CordZero ThinQ A9 2024",
+      "A9 2024",
+      "CordZero ThinQ 2024"
+    ]
+  }
+]

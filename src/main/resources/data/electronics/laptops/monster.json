@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "MONSTER",
+    "type": "LAPTOP",
+    "name": "Abra A5 V20.3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Monster Abra A5",
+      "Abra A5"
+    ]
+  },
+  {
+    "brand": "MONSTER",
+    "type": "LAPTOP",
+    "name": "Abra A7 V14.3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Monster Abra A7",
+      "Abra A7"
+    ]
+  },
+  {
+    "brand": "MONSTER",
+    "type": "LAPTOP",
+    "name": "Tulpar T7 V20.6",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Monster Tulpar T7",
+      "Tulpar T7"
+    ]
+  },
+  {
+    "brand": "MONSTER",
+    "type": "LAPTOP",
+    "name": "Tulpar T5 V23.1",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Monster Tulpar T5",
+      "Tulpar T5"
+    ]
+  },
+  {
+    "brand": "MONSTER",
+    "type": "LAPTOP",
+    "name": "Semruk S7 V9.2",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Monster Semruk S7",
+      "Semruk S7"
+    ]
+  },
+  {
+    "brand": "MONSTER",
+    "type": "LAPTOP",
+    "name": "Huma H5 V4.1",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Monster Huma H5",
+      "Huma H5"
+    ]
+  }
+]

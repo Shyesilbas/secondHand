@@ -207,7 +207,7 @@ public class SellerFollowService {
             try {
                 var data = NewListingEmailData.builder()
                         .userName(follow.getFollower().getName())
-                        .headerTitle("Yeni Bir İlan Eklendi!")
+                        .headerTitle("Yeni Bir İlan Eklendi")
                         .introText("Takip ettiğiniz satıcı " + seller.getName() + " " + seller.getSurname()
                                 + " yeni bir ilan ekledi:")
                         .listingTitle(listing.getTitle())
@@ -215,7 +215,7 @@ public class SellerFollowService {
                                 listing.getPrice() != null ? listing.getPrice() : java.math.BigDecimal.ZERO,
                                 listing.getCurrency() != null ? listing.getCurrency().name() : "TRY"))
                         .listingCity(listing.getCity())
-                        .listingUrl("/listings/" + listing.getId())
+                        .listingUrl(com.serhat.secondhand.email.application.EmailLinks.listing(listing.getId()))
                         .manageNotificationText(
                                 "Bu bildirimleri kapatmak için satıcı profilinden bildirim ayarlarınızı güncelleyebilirsiniz.")
                         .listingImage(listing.getImageUrl())

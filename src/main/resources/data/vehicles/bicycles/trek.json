@@ -1,0 +1,87 @@
+[
+  {
+    "brand": "TREK",
+    "type": "BICYCLE",
+    "name": "Marlin",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Marlin Serisi (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Marlin 5",
+          "Marlin 6",
+          "Marlin 7",
+          "Marlin 8"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "TREK",
+    "type": "BICYCLE",
+    "name": "Dual Sport",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Dual Sport Serisi (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Dual Sport 1",
+          "Dual Sport 2",
+          "Dual Sport 3"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "TREK",
+    "type": "BICYCLE",
+    "name": "Domane",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Domane AL / SL (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Domane AL 2",
+          "Domane AL 4 Disc",
+          "Domane SL 5"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "TREK",
+    "type": "BICYCLE",
+    "name": "FX",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "FX Fitness (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "FX 1",
+          "FX 2 Disc",
+          "FX 3 Disc"
+        ]
+      }
+    ]
+  }
+]

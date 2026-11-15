@@ -1,0 +1,265 @@
+[
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool 9000 BTU",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG Dualcool 9000 BTU",
+      "Dualcool 9000 BTU",
+      "LG 9000 BTU",
+      "LG A09AW",
+      "Dualcool 9000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool 12000 BTU",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG Dualcool 12000 BTU",
+      "Dualcool 12000 BTU",
+      "LG 12000 BTU",
+      "LG A12AW",
+      "Dualcool 12000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool 18000 BTU",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG Dualcool 18000 BTU",
+      "Dualcool 18000 BTU",
+      "LG 18000 BTU",
+      "LG A18AW",
+      "Dualcool 18000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool 24000 BTU",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG Dualcool 24000 BTU",
+      "Dualcool 24000 BTU",
+      "LG 24000 BTU",
+      "LG A24AW",
+      "Dualcool 24000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Artcool 9000 BTU",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG Artcool 9000 BTU",
+      "Artcool 9000 BTU",
+      "Artcool 9000",
+      "LG Artcool Mirror 9000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Artcool 12000 BTU",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG Artcool 12000 BTU",
+      "Artcool 12000 BTU",
+      "Artcool 12000",
+      "LG Artcool Mirror 12000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Artcool 18000 BTU",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG Artcool 18000 BTU",
+      "Artcool 18000 BTU",
+      "Artcool 18000",
+      "LG Artcool Mirror 18000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool Premium 9000 BTU",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool Premium 9000 BTU",
+      "Dualcool Premium 9000 BTU",
+      "Dualcool Premium 9000",
+      "LG S09ET"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool Premium 12000 BTU",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool Premium 12000 BTU",
+      "Dualcool Premium 12000 BTU",
+      "Dualcool Premium 12000",
+      "LG S12ET"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool Premium 18000 BTU",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool Premium 18000 BTU",
+      "Dualcool Premium 18000 BTU",
+      "Dualcool Premium 18000",
+      "LG S18ET"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool Premium 24000 BTU",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool Premium 24000 BTU",
+      "Dualcool Premium 24000 BTU",
+      "Dualcool Premium 24000",
+      "LG S24ET"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool ThinQ 9000 BTU",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool ThinQ 9000 BTU",
+      "Dualcool ThinQ 9000 BTU",
+      "Dualcool ThinQ 9000",
+      "LG ThinQ AC 9000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool ThinQ 12000 BTU",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool ThinQ 12000 BTU",
+      "Dualcool ThinQ 12000 BTU",
+      "Dualcool ThinQ 12000",
+      "LG ThinQ AC 12000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool ThinQ 18000 BTU",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool ThinQ 18000 BTU",
+      "Dualcool ThinQ 18000 BTU",
+      "Dualcool ThinQ 18000",
+      "LG ThinQ AC 18000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool ThinQ 24000 BTU",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool ThinQ 24000 BTU",
+      "Dualcool ThinQ 24000 BTU",
+      "Dualcool ThinQ 24000",
+      "LG ThinQ AC 24000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Artcool ThinQ 12000 BTU",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG Artcool ThinQ 12000 BTU",
+      "Artcool ThinQ 12000 BTU",
+      "Artcool ThinQ 12000",
+      "LG Artcool ThinQ"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Artcool ThinQ 18000 BTU",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG Artcool ThinQ 18000 BTU",
+      "Artcool ThinQ 18000 BTU",
+      "Artcool ThinQ 18000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool 2024 9000 BTU",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool 2024 9000 BTU",
+      "Dualcool 2024 9000 BTU",
+      "LG AC 2024 9000",
+      "Dualcool 2024 9000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool 2024 12000 BTU",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool 2024 12000 BTU",
+      "Dualcool 2024 12000 BTU",
+      "LG AC 2024 12000",
+      "Dualcool 2024 12000"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "AIR_CONDITIONER",
+    "name": "Dualcool 2024 18000 BTU",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG Dualcool 2024 18000 BTU",
+      "Dualcool 2024 18000 BTU",
+      "LG AC 2024 18000",
+      "Dualcool 2024 18000"
+    ]
+  }
+]

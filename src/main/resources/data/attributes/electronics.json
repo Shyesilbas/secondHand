@@ -1,0 +1,274 @@
+{
+  "listingType": "ELECTRONICS",
+  "definitions": [
+    {
+      "key": "hasBox",
+      "label": "Kutusu var",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "key": "hasInvoice",
+      "label": "Faturası var",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "key": "warrantyEndDate",
+      "label": "Garanti bitişi",
+      "dataType": "DATE",
+      "level": "LISTING"
+    },
+    {
+      "scope": "MOBILE_PHONE",
+      "key": "batteryHealthPercent",
+      "label": "Pil sağlığı",
+      "unit": "%",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 100,
+      "filterable": true
+    },
+    {
+      "scope": "MOBILE_PHONE",
+      "key": "batteryReplaced",
+      "label": "Pil değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "MOBILE_PHONE",
+      "key": "batteryOriginal",
+      "label": "Pil orijinal",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "MOBILE_PHONE",
+      "key": "screenReplaced",
+      "label": "Ekran değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "MOBILE_PHONE",
+      "key": "bodyReplaced",
+      "label": "Kasa değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "MOBILE_PHONE",
+      "key": "faceIdWorking",
+      "label": "Face ID çalışıyor",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "MOBILE_PHONE",
+      "key": "touchIdWorking",
+      "label": "Touch ID / parmak izi çalışıyor",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "MOBILE_PHONE",
+      "key": "imeiRegistered",
+      "label": "IMEI kayıtlı",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "TABLET",
+      "key": "batteryHealthPercent",
+      "label": "Pil sağlığı",
+      "unit": "%",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 100,
+      "filterable": true
+    },
+    {
+      "scope": "TABLET",
+      "key": "batteryReplaced",
+      "label": "Pil değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "TABLET",
+      "key": "screenReplaced",
+      "label": "Ekran değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "TABLET",
+      "key": "bodyReplaced",
+      "label": "Kasa değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "TABLET",
+      "key": "faceIdWorking",
+      "label": "Face ID çalışıyor",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "TABLET",
+      "key": "touchIdWorking",
+      "label": "Touch ID / parmak izi çalışıyor",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "LAPTOP",
+      "key": "batteryHealthPercent",
+      "label": "Pil sağlığı",
+      "unit": "%",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 100,
+      "filterable": true
+    },
+    {
+      "scope": "LAPTOP",
+      "key": "batteryReplaced",
+      "label": "Pil değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": false
+    },
+    {
+      "scope": "LAPTOP",
+      "key": "screenReplaced",
+      "label": "Ekran değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "SMARTWATCH",
+      "key": "batteryHealthPercent",
+      "label": "Pil sağlığı",
+      "unit": "%",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 100,
+      "filterable": true
+    },
+    {
+      "scope": "SMARTWATCH",
+      "key": "screenReplaced",
+      "label": "Ekran değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "GAME_CONSOLE",
+      "key": "controllerCount",
+      "label": "Kutudaki kol sayısı",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 0,
+      "max": 8,
+      "filterable": true
+    },
+    {
+      "scope": "GAME_CONSOLE",
+      "key": "controllerDrift",
+      "label": "Kolda drift (kayma) var",
+      "dataType": "BOOLEAN",
+      "level": "LISTING"
+    },
+    {
+      "scope": "GAME_CONSOLE",
+      "key": "modded",
+      "label": "Modlu / yazılımı değiştirilmiş",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "GAME_CONSOLE",
+      "key": "originalCables",
+      "label": "Orijinal kablolar var",
+      "dataType": "BOOLEAN",
+      "level": "LISTING"
+    },
+    {
+      "scope": "GAME_CONSOLE",
+      "key": "includedGameCount",
+      "label": "Dahil oyun sayısı",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "scope": "HEADPHONES",
+      "key": "batteryCondition",
+      "label": "Pil durumu",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "LIKE_NEW",
+          "label": "İlk günkü süreye yakın"
+        },
+        {
+          "value": "REDUCED",
+          "label": "Belirgin kısalmış"
+        },
+        {
+          "value": "WEAK",
+          "label": "Çok kısa / zayıf"
+        }
+      ]
+    },
+    {
+      "scope": "HEADPHONES",
+      "key": "bothSidesWorking",
+      "label": "İki taraf da sorunsuz çalışıyor",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "scope": "HEADPHONES",
+      "key": "chargingCaseIncluded",
+      "label": "Şarj kutusu var",
+      "dataType": "BOOLEAN",
+      "level": "LISTING"
+    },
+    {
+      "scope": "HEADPHONES",
+      "key": "earPadsReplaced",
+      "label": "Kulak pedleri / uçları değişti",
+      "dataType": "BOOLEAN",
+      "level": "LISTING"
+    }
+  ]
+}

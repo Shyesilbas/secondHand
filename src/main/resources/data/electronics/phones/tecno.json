@@ -1,0 +1,57 @@
+[
+  {
+    "brand": "TECNO",
+    "type": "MOBILE_PHONE",
+    "name": "Phantom V Fold 2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Tecno Phantom V Fold 2",
+      "V Fold 2"
+    ]
+  },
+  {
+    "brand": "TECNO",
+    "type": "MOBILE_PHONE",
+    "name": "Camon 30 Pro 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Tecno Camon 30 Pro",
+      "Camon 30P"
+    ]
+  },
+  {
+    "brand": "TECNO",
+    "type": "MOBILE_PHONE",
+    "name": "Camon 30 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Tecno Camon 30",
+      "Camon 30"
+    ]
+  },
+  {
+    "brand": "TECNO",
+    "type": "MOBILE_PHONE",
+    "name": "Spark 20 Pro+",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Tecno Spark 20 Pro Plus",
+      "Spark 20 Pro+"
+    ]
+  },
+  {
+    "brand": "TECNO",
+    "type": "MOBILE_PHONE",
+    "name": "Pova 6 Pro 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Tecno Pova 6 Pro",
+      "Pova 6"
+    ]
+  }
+]

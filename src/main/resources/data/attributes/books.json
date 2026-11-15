@@ -1,0 +1,353 @@
+{
+  "listingType": "BOOKS",
+  "definitions": [
+    {
+      "key": "usageMarks",
+      "label": "Kullanım izleri",
+      "dataType": "MULTI_ENUM",
+      "level": "LISTING",
+      "filterable": false,
+      "options": [
+        {
+          "value": "UNDERLINED",
+          "label": "Altı çizili"
+        },
+        {
+          "value": "MARGIN_NOTES",
+          "label": "Kenar notu var"
+        },
+        {
+          "value": "NAME_WRITTEN",
+          "label": "İsim yazılı"
+        },
+        {
+          "value": "DOG_EARED",
+          "label": "Kıvrık sayfa"
+        },
+        {
+          "value": "YELLOWED",
+          "label": "Sararmış sayfa"
+        },
+        {
+          "value": "MISSING_PAGES",
+          "label": "Eksik sayfa"
+        }
+      ]
+    },
+    {
+      "key": "collectorFeatures",
+      "label": "Koleksiyon özellikleri",
+      "dataType": "MULTI_ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "FIRST_EDITION",
+          "label": "İlk baskı"
+        },
+        {
+          "value": "SIGNED",
+          "label": "İmzalı"
+        },
+        {
+          "value": "OTTOMAN_SCRIPT",
+          "label": "Eski harf (Osmanlıca)"
+        },
+        {
+          "value": "NUMBERED",
+          "label": "Numaralı baskı"
+        }
+      ]
+    },
+    {
+      "key": "prepFormat",
+      "label": "Kitap biçimi",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "scope": "SINAV_HAZIRLIK",
+      "options": [
+        {
+          "value": "SORU_BANKASI",
+          "label": "Soru bankası"
+        },
+        {
+          "value": "DENEME",
+          "label": "Deneme"
+        },
+        {
+          "value": "KONU_ANLATIMI",
+          "label": "Konu anlatımı"
+        },
+        {
+          "value": "YAPRAK_TEST",
+          "label": "Yaprak test"
+        },
+        {
+          "value": "OZET_VE_FORMUL",
+          "label": "Özet & formül"
+        },
+        {
+          "value": "CIKMIS_SORULAR",
+          "label": "Çıkmış sorular"
+        }
+      ]
+    },
+    {
+      "key": "subject",
+      "label": "Ders",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "scope": "SINAV_HAZIRLIK",
+      "options": [
+        {
+          "value": "MATEMATIK",
+          "label": "Matematik"
+        },
+        {
+          "value": "GEOMETRI",
+          "label": "Geometri"
+        },
+        {
+          "value": "FIZIK",
+          "label": "Fizik"
+        },
+        {
+          "value": "KIMYA",
+          "label": "Kimya"
+        },
+        {
+          "value": "BIYOLOJI",
+          "label": "Biyoloji"
+        },
+        {
+          "value": "TURKCE",
+          "label": "Türkçe"
+        },
+        {
+          "value": "EDEBIYAT",
+          "label": "Edebiyat"
+        },
+        {
+          "value": "TARIH",
+          "label": "Tarih"
+        },
+        {
+          "value": "COGRAFYA",
+          "label": "Coğrafya"
+        },
+        {
+          "value": "FELSEFE",
+          "label": "Felsefe"
+        },
+        {
+          "value": "DIN_KULTURU",
+          "label": "Din Kültürü"
+        },
+        {
+          "value": "YABANCI_DIL",
+          "label": "Yabancı dil"
+        },
+        {
+          "value": "GENEL_YETENEK",
+          "label": "Genel yetenek"
+        },
+        {
+          "value": "GENEL_KULTUR",
+          "label": "Genel kültür"
+        },
+        {
+          "value": "EGITIM_BILIMLERI",
+          "label": "Eğitim bilimleri"
+        },
+        {
+          "value": "KARMA",
+          "label": "Karma (tüm dersler)"
+        }
+      ]
+    },
+    {
+      "key": "aytField",
+      "label": "AYT alanı",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "scope": "SINAV_HAZIRLIK",
+      "options": [
+        {
+          "value": "SAYISAL",
+          "label": "Sayısal"
+        },
+        {
+          "value": "ESIT_AGIRLIK",
+          "label": "Eşit ağırlık"
+        },
+        {
+          "value": "SOZEL",
+          "label": "Sözel"
+        },
+        {
+          "value": "DIL",
+          "label": "Dil"
+        }
+      ]
+    },
+    {
+      "key": "solvedRatio",
+      "label": "Çözülmüş sayfalar",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "scope": "SINAV_HAZIRLIK",
+      "options": [
+        {
+          "value": "NONE",
+          "label": "Hiç çözülmemiş"
+        },
+        {
+          "value": "PARTIAL",
+          "label": "Kısmen çözülmüş"
+        },
+        {
+          "value": "FULL",
+          "label": "Tamamen çözülmüş"
+        }
+      ]
+    },
+    {
+      "key": "videoSolutions",
+      "label": "Video çözümlü",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true,
+      "scope": "SINAV_HAZIRLIK"
+    },
+    {
+      "key": "gradeLevel",
+      "label": "Sınıf",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "scope": "OKUL_KITAPLARI",
+      "options": [
+        {
+          "value": "GRADE_1",
+          "label": "1. sınıf"
+        },
+        {
+          "value": "GRADE_2",
+          "label": "2. sınıf"
+        },
+        {
+          "value": "GRADE_3",
+          "label": "3. sınıf"
+        },
+        {
+          "value": "GRADE_4",
+          "label": "4. sınıf"
+        },
+        {
+          "value": "GRADE_5",
+          "label": "5. sınıf"
+        },
+        {
+          "value": "GRADE_6",
+          "label": "6. sınıf"
+        },
+        {
+          "value": "GRADE_7",
+          "label": "7. sınıf"
+        },
+        {
+          "value": "GRADE_8",
+          "label": "8. sınıf"
+        },
+        {
+          "value": "GRADE_9",
+          "label": "9. sınıf"
+        },
+        {
+          "value": "GRADE_10",
+          "label": "10. sınıf"
+        },
+        {
+          "value": "GRADE_11",
+          "label": "11. sınıf"
+        },
+        {
+          "value": "GRADE_12",
+          "label": "12. sınıf"
+        }
+      ]
+    },
+    {
+      "key": "schoolBookKind",
+      "label": "Kitap türü",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "scope": "OKUL_KITAPLARI",
+      "options": [
+        {
+          "value": "MEB",
+          "label": "MEB ders kitabı"
+        },
+        {
+          "value": "SUPPLEMENTARY",
+          "label": "Yardımcı kaynak"
+        }
+      ]
+    },
+    {
+      "key": "ageRange",
+      "label": "Yaş aralığı",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "scope": "COCUK_KITAPLARI",
+      "options": [
+        {
+          "value": "AGE_0_3",
+          "label": "0–3 yaş"
+        },
+        {
+          "value": "AGE_4_6",
+          "label": "4–6 yaş"
+        },
+        {
+          "value": "AGE_7_9",
+          "label": "7–9 yaş"
+        },
+        {
+          "value": "AGE_10_12",
+          "label": "10–12 yaş"
+        },
+        {
+          "value": "AGE_13_PLUS",
+          "label": "13 yaş ve üstü"
+        }
+      ]
+    },
+    {
+      "key": "volumeNumber",
+      "label": "Cilt / sayı no",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "filterable": false,
+      "scope": "CIZGI_ROMAN_VE_MANGA",
+      "min": 1,
+      "max": 9999
+    },
+    {
+      "key": "issueNumber",
+      "label": "Sayı no",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "filterable": false,
+      "scope": "DERGI_VE_SURELI_YAYIN",
+      "min": 1,
+      "max": 99999
+    }
+  ]
+}

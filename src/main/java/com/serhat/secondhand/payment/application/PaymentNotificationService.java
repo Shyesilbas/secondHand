@@ -2,6 +2,7 @@ package com.serhat.secondhand.payment.application;
 
 import com.serhat.secondhand.core.config.VerificationConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.email.application.EmailLinks;
 import com.serhat.secondhand.email.application.event.EmailEventPublisher;
 import com.serhat.secondhand.email.application.event.impl.MembershipUpgradeEmailEvent;
 import com.serhat.secondhand.email.application.event.impl.PaymentSuccessEmailEvent;
@@ -42,35 +43,29 @@ public class PaymentNotificationService {
                                 return;
                         }
 
+                        ReceiptCopy copy = receiptCopy(paymentDto.transactionType());
                         String typeLabel = getLocalizedTransactionType(paymentDto.transactionType());
-                        String subject = emailConfig.getPaymentSuccessSubject();
-                        String listingTitle = paymentDto.listingTitle() != null ? paymentDto.listingTitle() : "Ödeme";
-                        String methodLabel = paymentDto.providerName() != null
-                                        ? (paymentDto.providerName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)"
-                                                        : paymentDto.providerName())
-                                        : "E-Cüzdan (E-Wallet)";
-                        String formattedDate = paymentDto.processedAt() != null
-                                        ? DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-                                                        .format(paymentDto.processedAt())
-                                        : DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-                                                        .format(java.time.LocalDateTime.now());
+                        String formattedDate = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+                                        .format(paymentDto.processedAt() != null ? paymentDto.processedAt()
+                                                        : java.time.LocalDateTime.now());
 
+                        // Fields without a real value stay null so the receipt omits the row.
                         var data = GenericEmailData.builder()
                                         .userName(user.getName())
-                                        .headerTitle("Ödeme Başarılı")
+                                        .headerTitle(copy.title())
+                                        .message(copy.intro())
+                                        .amountLabel(copy.amountLabel())
                                         .amount(formatMoney(paymentDto.amount()))
                                         .currency(paymentDto.currency() != null ? paymentDto.currency() : "TRY")
-                                        .transactionNumber(paymentDto.paymentId() != null
-                                                        ? paymentDto.paymentId().toString().substring(0, 8)
-                                                                        .toUpperCase()
-                                                        : "")
+                                        .transactionNumber(shortReference(paymentDto.paymentId()))
                                         .typeLabel(typeLabel)
-                                        .listingTitle(listingTitle)
-                                        .paymentMethod(methodLabel)
+                                        .listingTitle(paymentDto.listingTitle())
+                                        .paymentMethod(paymentMethodLabel(paymentDto.providerName()))
                                         .transactionDate(formattedDate)
-                                        .actionText("Hesabımı Görüntüle")
-                                        .actionUrl("/account/hub")
+                                        .actionText(copy.actionText())
+                                        .actionUrl(copy.actionUrl())
                                         .build();
+                        String subject = emailConfig.getPaymentSuccessSubject();
 
                         emailEventPublisher.publish(new PaymentSuccessEmailEvent(user, subject, data));
                         log.info("Payment success email event published for user: {}", user.getEmail());
@@ -112,7 +107,8 @@ public class PaymentNotificationService {
                                 .userName(user.getName())
                                 .amount(formatMoney(paymentDto.amount()) + " "
                                                 + (paymentDto.currency() != null ? paymentDto.currency() : "TRY"))
-                                .paymentId(paymentDto.paymentId().toString())
+                                .paymentId(shortReference(paymentDto.paymentId()))
+                                .benefits(com.serhat.secondhand.user.domain.entity.enums.MembershipPlan.PREMIUM.getBenefits())
                                 .date(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
                                                 .format(java.time.LocalDateTime.now()))
                                 .expiryDate(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
@@ -152,23 +148,14 @@ public class PaymentNotificationService {
         public void sendPaymentVerificationNotification(User user, String code, String extraDetails) {
                 try {
                         String subject = emailConfig.getPaymentVerificationSubject();
-                        String base = String.format(
-                                        "<div class=\"code-card\" style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin: 8px 0;\">"
-                                                        +
-                                                        "  <div class=\"code-label\" style=\"font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;\">Ödeme Doğrulama Kodunuz</div>"
-                                                        +
-                                                        "  <div class=\"code-value\" style=\"display: inline-block; background-color: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 24px; font-weight: 600; letter-spacing: 6px; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-variant-numeric: tabular-nums;\">%s</div>"
-                                                        +
-                                                        "  <div style=\"margin-top: 6px; font-size: 12px; color: #64748b;\">Bu kod <strong>%d dakika</strong> boyunca geçerlidir. Güvenliğiniz için bu kodu kimseyle paylaşmayınız.</div>"
-                                                        +
-                                                        "</div>",
-                                        code, verificationConfig.getExpiryMinutes());
-                        String content = base + (extraDetails != null ? extraDetails : "");
-
                         var data = GenericEmailData.builder()
                                         .userName(user.getName())
                                         .headerTitle("Ödeme Doğrulama")
-                                        .message(content)
+                                        .verificationCode(code)
+                                        .codeLabel("Ödeme doğrulama kodunuz")
+                                        .codeHint("Kod " + verificationConfig.getExpiryMinutes()
+                                                        + " dakika geçerlidir. Kimseyle paylaşmayın.")
+                                        .message(extraDetails)
                                         .build();
 
                         log.info("Attempting to publish payment verification email event for user: {}, code: {}",
@@ -185,6 +172,52 @@ public class PaymentNotificationService {
                                         org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
                                         "PAYMENT_VERIFICATION_EMAIL_FAILED");
                 }
+        }
+
+        private record ReceiptCopy(String title, String intro, String amountLabel, String actionText,
+                        String actionUrl) {
+        }
+
+        /** Wording and link per transaction type; the receipt template itself is type-agnostic. */
+        private ReceiptCopy receiptCopy(com.serhat.secondhand.payment.entity.PaymentTransactionType type) {
+                if (type == null) {
+                        return new ReceiptCopy("Ödeme Başarılı", "Ödeme işleminiz tamamlandı.", "Tutar",
+                                        "Ödemelerimi Gör", EmailLinks.PAYMENTS);
+                }
+                return switch (type) {
+                        case ITEM_PURCHASE -> new ReceiptCopy("Ödemeniz Alındı", "Satın alma ödemeniz alındı.",
+                                        "Ödenen Tutar", "Siparişlerimi Gör", EmailLinks.MY_ORDERS);
+                        case ITEM_SALE, EWALLET_PAYMENT_RECEIVED -> new ReceiptCopy("Ödeme Aldınız",
+                                        "Satışınızın ödemesi cüzdanınıza aktarıldı.", "Alınan Tutar",
+                                        "Satışlarımı Gör", EmailLinks.MY_SALES);
+                        case REFUND -> new ReceiptCopy("İade Tamamlandı", "İade işlemi tamamlandı.",
+                                        "İade Tutarı", "Cüzdanımı Gör", EmailLinks.WALLET);
+                        case EWALLET_DEPOSIT -> new ReceiptCopy("Para Yükleme Tamamlandı",
+                                        "Cüzdanınıza para yüklendi.", "Yüklenen Tutar", "Cüzdanımı Gör",
+                                        EmailLinks.WALLET);
+                        case EWALLET_WITHDRAWAL -> new ReceiptCopy("Para Çekme Tamamlandı",
+                                        "Cüzdanınızdan para çekme işlemi tamamlandı.", "Çekilen Tutar",
+                                        "Cüzdanımı Gör", EmailLinks.WALLET);
+                        case LISTING_CREATION -> new ReceiptCopy("İlan Ücreti Ödendi", "İlan ücreti ödemeniz alındı.",
+                                        "Ödenen Tutar", "İlanlarıma Git", EmailLinks.MY_LISTINGS);
+                        case SHOWCASE_PAYMENT -> new ReceiptCopy("Vitrin Ödemesi Alındı",
+                                        "İlanınızı öne çıkarma ödemeniz alındı.", "Ödenen Tutar", "Vitrinlerimi Gör",
+                                        EmailLinks.MY_SHOWCASES);
+                        case MEMBERSHIP_PAYMENT -> new ReceiptCopy("Premium Üyelik Ödemesi",
+                                        "Premium üyelik ödemeniz alındı.", "Ödenen Tutar", "Profilimi Görüntüle",
+                                        EmailLinks.PROFILE);
+                };
+        }
+
+        private String paymentMethodLabel(String providerName) {
+                if (providerName == null || providerName.isBlank()) {
+                        return null;
+                }
+                return "EWALLET".equals(providerName) ? "E-Cüzdan" : providerName;
+        }
+
+        private String shortReference(java.util.UUID paymentId) {
+                return paymentId != null ? paymentId.toString().substring(0, 8).toUpperCase() : null;
         }
 
         private String formatMoney(BigDecimal amount) {

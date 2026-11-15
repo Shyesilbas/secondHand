@@ -1,0 +1,158 @@
+[
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Actros",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "Actros (2019–, MP5)",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "1842",
+            "fuelType": "DIESEL",
+            "horsePower": 421,
+            "source": "claude-draft",
+            "powerKw": 310
+          },
+          {
+            "name": "1845",
+            "fuelType": "DIESEL",
+            "horsePower": 449,
+            "source": "claude-draft",
+            "powerKw": 330
+          },
+          {
+            "name": "1848",
+            "fuelType": "DIESEL",
+            "horsePower": 476,
+            "source": "claude-draft",
+            "powerKw": 350
+          },
+          {
+            "name": "1851",
+            "fuelType": "DIESEL",
+            "horsePower": 510,
+            "source": "claude-draft",
+            "powerKw": 375
+          }
+        ]
+      },
+      {
+        "name": "Actros (2011–2019, MP4)",
+        "startYear": 2011,
+        "versions": [
+          {
+            "name": "1842",
+            "fuelType": "DIESEL",
+            "horsePower": 421,
+            "source": "claude-draft",
+            "powerKw": 310
+          },
+          {
+            "name": "1845",
+            "fuelType": "DIESEL",
+            "horsePower": 449,
+            "source": "claude-draft",
+            "powerKw": 330
+          },
+          {
+            "name": "1848",
+            "fuelType": "DIESEL",
+            "horsePower": 476,
+            "source": "claude-draft",
+            "powerKw": 350
+          },
+          {
+            "name": "1851",
+            "fuelType": "DIESEL",
+            "horsePower": 510,
+            "source": "claude-draft",
+            "powerKw": 375
+          }
+        ],
+        "endYear": 2019
+      }
+    ]
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Arocs",
+    "supportedBodyTypes": [
+      "TIPPER",
+      "TRUCK",
+      "TRACTOR"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Axor",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK",
+      "TIPPER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Atego",
+    "supportedBodyTypes": [
+      "TRUCK"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Travego",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Tourismo",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Intouro",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Citaro",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "MERCEDES_BENZ",
+    "type": "TRUCK",
+    "name": "Conecto",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  }
+]

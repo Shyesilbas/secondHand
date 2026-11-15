@@ -1,0 +1,89 @@
+[
+  {
+    "brand": "SPECIALIZED",
+    "type": "BICYCLE",
+    "name": "Rockhopper",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Rockhopper (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Sport",
+          "Comp",
+          "Elite",
+          "Expert"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SPECIALIZED",
+    "type": "BICYCLE",
+    "name": "Sirrus",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Sirrus (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Sirrus 1.0",
+          "Sirrus 2.0",
+          "Sirrus X 3.0",
+          "Sirrus 4.0"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SPECIALIZED",
+    "type": "BICYCLE",
+    "name": "Allez",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Allez (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Base",
+          "Sport",
+          "Sprint"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SPECIALIZED",
+    "type": "BICYCLE",
+    "name": "Tarmac",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Tarmac SL7 / SL8 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Comp",
+          "Expert",
+          "Pro",
+          "S-Works"
+        ]
+      }
+    ]
+  }
+]

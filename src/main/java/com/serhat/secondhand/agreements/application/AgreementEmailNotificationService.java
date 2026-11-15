@@ -1,5 +1,6 @@
 package com.serhat.secondhand.agreements.application;
 
+import com.serhat.secondhand.email.application.EmailLinks;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.email.application.event.EmailEventPublisher;
 import com.serhat.secondhand.email.application.event.impl.AgreementUpdateEmailEvent;
@@ -51,10 +52,10 @@ public class AgreementEmailNotificationService {
 
         var data = GenericEmailData.builder()
                 .userName(user.getName())
-                .headerTitle(template.getTitle())
-                .message(template.getMessage())
+                .headerTitle("Sözleşme Güncellendi")
+                .message(MESSAGE)
                 .actionText("Sözleşmeleri Görüntüle")
-                .actionUrl("/profile/agreements")
+                .actionUrl(EmailLinks.AGREEMENTS)
                 .build();
 
         emailEventPublisher.publish(new AgreementUpdateEmailEvent(user, subject, data));
@@ -84,10 +85,10 @@ public class AgreementEmailNotificationService {
                 }
                 var data = GenericEmailData.builder()
                         .userName(u.getName())
-                        .headerTitle(template.getTitle())
-                        .message(template.getMessage())
+                        .headerTitle("Sözleşme Güncellendi")
+                        .message(MESSAGE)
                         .actionText("Sözleşmeleri Görüntüle")
-                        .actionUrl("/profile/agreements")
+                        .actionUrl(EmailLinks.AGREEMENTS)
                         .build();
 
                 emailEventPublisher.publish(new AgreementUpdateEmailEvent(u, subject, data));
@@ -97,6 +98,9 @@ public class AgreementEmailNotificationService {
 
         log.info("Agreement publish emails event published for type={} version={}", agreementType, version);
     }
+
+    private static final String MESSAGE =
+            "Kullanıcı sözleşmelerimizden biri güncellendi. Güncel metni Sözleşmeler sayfasından inceleyip onaylayabilirsiniz.";
 
     private String buildSubject(NotificationRequest template) {
         return emailConfig.getAgreement().getSubjectPrefix() + template.getTitle();

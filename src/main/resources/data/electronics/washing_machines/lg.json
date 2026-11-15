@@ -1,0 +1,220 @@
+[
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4J5TN3W",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG F4J5TN3W",
+      "F4J5TN3W",
+      "LG 8kg F4J5"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4J6VY2W",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "LG F4J6VY2W",
+      "F4J6VY2W",
+      "LG 8kg F4J6"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F2J5TNP3W",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG F2J5TNP3W",
+      "F2J5TNP3W",
+      "LG 6.5kg F2J5"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4R5TGW0W",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "LG F4R5TGW0W",
+      "F4R5TGW0W",
+      "LG TurboWash 2019"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4WV508S0",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "LG F4WV508S0",
+      "F4WV508S0",
+      "LG 8kg ThinQ 2020"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4WV709S1",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4WV709S1",
+      "F4WV709S1",
+      "LG 9kg ThinQ 2020"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4WV910P2SE",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4WV910P2SE",
+      "F4WV910P2SE",
+      "LG 10.5kg ThinQ 2020"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4WV512S0",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4WV512S0",
+      "F4WV512S0",
+      "LG TurboWash 360 8kg"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4WV712S2E",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4WV712S2E",
+      "F4WV712S2E",
+      "LG TurboWash 360 9kg"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4WV912P2SE",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4WV912P2SE",
+      "F4WV912P2SE",
+      "LG TurboWash 360 10.5kg"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4T208SSE",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4T208SSE",
+      "F4T208SSE",
+      "LG 8kg AI DD 2022"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4T209SSE",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4T209SSE",
+      "F4T209SSE",
+      "LG 9kg AI DD 2022"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4T2119SS",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4T2119SS",
+      "F4T2119SS",
+      "LG 11kg AI DD 2022"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4WV708S1E",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4WV708S1E",
+      "F4WV708S1E",
+      "LG TurboWash 8kg 2022"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "FT4J5VGAW",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG FT4J5VGAW",
+      "FT4J5VGAW",
+      "LG 8kg 2023",
+      "LG AI DD 2023"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "FT4J6VYGW",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "LG FT4J6VYGW",
+      "FT4J6VYGW",
+      "LG 9kg 2023"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "F4V310SSE",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG F4V310SSE",
+      "F4V310SSE",
+      "LG WashTower 2024",
+      "LG 10kg 2024"
+    ]
+  },
+  {
+    "brand": "LG",
+    "type": "WASHING_MACHINE",
+    "name": "FT60V5SW2",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "LG FT60V5SW2",
+      "FT60V5SW2",
+      "LG TurboWash 2024"
+    ]
+  }
+]

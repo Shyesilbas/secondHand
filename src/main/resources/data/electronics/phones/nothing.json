@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "NOTHING",
+    "type": "MOBILE_PHONE",
+    "name": "Phone (2)",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Nothing Phone 2",
+      "Nothing 2"
+    ]
+  },
+  {
+    "brand": "NOTHING",
+    "type": "MOBILE_PHONE",
+    "name": "Phone (2a)",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Nothing Phone 2a",
+      "Nothing 2a"
+    ]
+  },
+  {
+    "brand": "NOTHING",
+    "type": "MOBILE_PHONE",
+    "name": "Phone (1)",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "Nothing Phone 1",
+      "Nothing 1"
+    ]
+  },
+  {
+    "brand": "NOTHING",
+    "type": "MOBILE_PHONE",
+    "name": "CMF Phone 1",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Nothing CMF Phone 1",
+      "CMF Phone 1"
+    ]
+  }
+]

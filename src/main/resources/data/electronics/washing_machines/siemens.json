@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "SIEMENS",
+    "type": "WASHING_MACHINE",
+    "name": "iQ700 WG54G2Z0TR 10 kg",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Siemens iQ700",
+      "WG54G2Z0TR 1400 Devir"
+    ]
+  },
+  {
+    "brand": "SIEMENS",
+    "type": "WASHING_MACHINE",
+    "name": "iQ500 WG44A2X0TR 9 kg",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Siemens iQ500",
+      "WG44A2X0TR 1400 Devir"
+    ]
+  },
+  {
+    "brand": "SIEMENS",
+    "type": "WASHING_MACHINE",
+    "name": "iQ300 WM14N260TR 8 kg",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Siemens iQ300",
+      "WM14N260TR 1400 Devir"
+    ]
+  }
+]

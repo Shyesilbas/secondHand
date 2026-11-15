@@ -1,0 +1,73 @@
+[
+  {
+    "brand": "GOPRO",
+    "type": "CAMERA",
+    "name": "Hero 13 Black",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "GoPro 13",
+      "Hero 13"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 27
+    }
+  },
+  {
+    "brand": "GOPRO",
+    "type": "CAMERA",
+    "name": "Hero 12 Black",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "GoPro 12",
+      "Hero 12"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 27
+    }
+  },
+  {
+    "brand": "GOPRO",
+    "type": "CAMERA",
+    "name": "Hero 11 Black",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "GoPro 11",
+      "Hero 11"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 27
+    }
+  },
+  {
+    "brand": "GOPRO",
+    "type": "CAMERA",
+    "name": "Hero 10 Black",
+    "releaseYear": 2021,
+    "isLegacy": true,
+    "aliases": [
+      "GoPro 10",
+      "Hero 10"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "cameraMegapixels": 23
+    }
+  },
+  {
+    "brand": "GOPRO",
+    "type": "CAMERA",
+    "name": "Hero Max",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "GoPro Max",
+      "GoPro 360"
+    ]
+  }
+]

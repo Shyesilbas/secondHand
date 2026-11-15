@@ -1,0 +1,60 @@
+[
+  {
+    "brand": "IVECO",
+    "type": "TRUCK",
+    "name": "S-Way",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "S-Way (2019–)",
+        "startYear": 2019,
+        "versions": [
+          {
+            "name": "S-Way 460",
+            "fuelType": "DIESEL",
+            "horsePower": 460,
+            "source": "claude-draft"
+          },
+          {
+            "name": "S-Way 490",
+            "fuelType": "DIESEL",
+            "horsePower": 490,
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "IVECO",
+    "type": "TRUCK",
+    "name": "Stralis",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "IVECO",
+    "type": "TRUCK",
+    "name": "Trakker",
+    "supportedBodyTypes": [
+      "TIPPER",
+      "TRUCK"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "IVECO",
+    "type": "TRUCK",
+    "name": "Eurocargo",
+    "supportedBodyTypes": [
+      "TRUCK"
+    ],
+    "generations": []
+  }
+]

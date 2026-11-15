@@ -1,0 +1,101 @@
+[
+  {
+    "brand": "PIAGGIO",
+    "type": "MOTORCYCLE",
+    "name": "Beverly",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Beverly HPE (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "300 HPE (26 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 26,
+            "engineCapacity": 278
+          },
+          {
+            "name": "400 HPE (35 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 35,
+            "engineCapacity": 399
+          }
+        ],
+        "trims": [
+          "Standart",
+          "S"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PIAGGIO",
+    "type": "MOTORCYCLE",
+    "name": "Medley",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Medley (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "125cc i-get (15 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 15,
+            "engineCapacity": 125
+          },
+          {
+            "name": "150cc i-get (16.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 16,
+            "engineCapacity": 155
+          }
+        ],
+        "trims": [
+          "Standart",
+          "S"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "PIAGGIO",
+    "type": "MOTORCYCLE",
+    "name": "Liberty",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Liberty (2016–)",
+        "startYear": 2016,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "50cc i-get",
+            "fuelType": "GASOLINE",
+            "horsePower": 3,
+            "engineCapacity": 49
+          },
+          {
+            "name": "125cc i-get (11 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 11,
+            "engineCapacity": 124
+          }
+        ],
+        "trims": [
+          "Standart",
+          "S"
+        ]
+      }
+    ]
+  }
+]

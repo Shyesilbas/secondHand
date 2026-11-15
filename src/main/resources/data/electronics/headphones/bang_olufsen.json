@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "BANG_OLUFSEN",
+    "type": "HEADPHONES",
+    "name": "Beoplay H95",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "B&O H95",
+      "Beoplay H95 ANC"
+    ]
+  },
+  {
+    "brand": "BANG_OLUFSEN",
+    "type": "HEADPHONES",
+    "name": "Beoplay HX",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "B&O HX",
+      "Beoplay HX ANC"
+    ]
+  },
+  {
+    "brand": "BANG_OLUFSEN",
+    "type": "HEADPHONES",
+    "name": "Beoplay EX",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "B&O EX",
+      "Beoplay EX TWS"
+    ]
+  }
+]

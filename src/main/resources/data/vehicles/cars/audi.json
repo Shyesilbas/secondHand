@@ -1,0 +1,1991 @@
+[
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A1 Sportback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "A1 Sportback (2018–, GB)",
+        "engines": [
+          {
+            "name": "30 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "35 TFSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Advanced",
+          "S line"
+        ]
+      },
+      {
+        "name": "A1 Sportback (2010–2018, 8X)",
+        "engines": [
+          {
+            "name": "1.0 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Attraction",
+          "Ambition"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A3 Sportback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "A3 Sportback (2020–, 8Y)",
+        "trims": [
+          "Advanced",
+          "S line"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "30 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 110,
+            "torqueNm": 200,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "35 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "30 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "A3 Sportback (2012–2020, 8V)",
+        "engines": [
+          {
+            "name": "1.0 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Attraction",
+          "Ambition",
+          "Ambiente",
+          "Dynamic",
+          "Sport",
+          "Design"
+        ]
+      },
+      {
+        "name": "A3 Sportback (2003–2012, 8P)",
+        "engines": [
+          {
+            "name": "1.4 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 FSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Attraction",
+          "Ambition",
+          "Ambiente"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A3 Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "A3 Sedan (2020–, 8Y)",
+        "trims": [
+          "Advanced",
+          "S line"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "30 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 110,
+            "torqueNm": 200,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "35 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "30 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "35 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "A3 Sedan (2013–2020, 8V)",
+        "trims": [
+          "Ambition",
+          "Ambiente",
+          "Dynamic",
+          "Sport",
+          "Design"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2013,
+        "endYear": 2020,
+        "versions": [
+          {
+            "name": "1.4 TFSI 125 S tronic",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 125,
+            "torqueNm": 200,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 TFSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 TDI 110 S tronic",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 110,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A4 Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "A4 (2015–2024, B9)",
+        "trims": [
+          "Design",
+          "Sport",
+          "S line",
+          "Advanced"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2015,
+        "endYear": 2024,
+        "versions": [
+          {
+            "name": "1.4 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1395,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TFSI",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "3.0 TDI quattro",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "40 TFSI",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "40 TDI",
+            "fuelType": "DIESEL",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "A4 (2008–2015, B8)",
+        "engines": [
+          {
+            "name": "1.8 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "3.0 TDI quattro",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Comfort",
+          "Exclusive"
+        ]
+      },
+      {
+        "name": "A4 (2004–2008, B7)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TFSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "A4 (2000–2004, B6)",
+        "engines": [
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A4 Avant",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "A4 Avant (2015–2024, B9)",
+        "engines": [
+          {
+            "name": "2.0 TDI Avant",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "40 TDI quattro Avant",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Design",
+          "Sport",
+          "S line"
+        ]
+      },
+      {
+        "name": "A4 Avant (2008–2015, B8)",
+        "engines": [
+          {
+            "name": "2.0 TDI Avant",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A5",
+    "supportedBodyTypes": [
+      "COUPE",
+      "CONVERTIBLE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "A5 Coupe (2016–2024, F5)",
+        "engines": [
+          {
+            "name": "2.0 TFSI Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI Coupe",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Sport",
+          "Design",
+          "S line"
+        ]
+      },
+      {
+        "name": "A5 Sportback (2016–2024, F5)",
+        "engines": [
+          {
+            "name": "1.4 TFSI Sportback",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI Sportback",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "40 TFSI Sportback",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "45 TFSI quattro Sportback",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Sport",
+          "Design",
+          "S line"
+        ]
+      },
+      {
+        "name": "A5 Cabriolet (2016–2024, F5)",
+        "engines": [
+          {
+            "name": "2.0 TFSI Cabriolet",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      },
+      {
+        "name": "A5 Coupe (2007–2016, 8T)",
+        "engines": [
+          {
+            "name": "1.8 TFSI Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TFSI Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI Coupe",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 TDI quattro Coupe",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "S line"
+        ]
+      },
+      {
+        "name": "A5 Sportback (2009–2016, 8T)",
+        "engines": [
+          {
+            "name": "1.8 TFSI Sportback",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TFSI Sportback",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI Sportback",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "S line"
+        ]
+      },
+      {
+        "name": "A5 Cabriolet (2009–2016, 8F)",
+        "engines": [
+          {
+            "name": "1.8 TFSI Cabriolet",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TFSI Cabriolet",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A6 Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "A6 (2018–, C8)",
+        "trims": [
+          "Sport",
+          "Design",
+          "S line"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2018,
+        "versions": [
+          {
+            "name": "40 TDI",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1968,
+            "horsePower": 204,
+            "torqueNm": 400,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "source": "verified"
+          },
+          {
+            "name": "45 TFSI",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "50 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "A6 (2011–2018, C7)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "3.0 TDI quattro",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Limousine",
+          "S line"
+        ]
+      },
+      {
+        "name": "A6 (2004–2011, C6)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.7 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 TDI quattro",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.2 FSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "A6 (1997–2004, C5)",
+        "engines": [
+          {
+            "name": "1.8 T",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.9 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.5 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A6 Avant",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "A6 Avant (2018–, C8)",
+        "engines": [
+          {
+            "name": "40 TDI Avant",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Sport",
+          "S line"
+        ]
+      },
+      {
+        "name": "A6 Avant (2011–2018, C7)",
+        "engines": [
+          {
+            "name": "2.0 TDI Avant",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A7",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "A7 Sportback (2018–, 4K8)",
+        "engines": [
+          {
+            "name": "40 TDI Sportback",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "55 TFSI Sportback",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      },
+      {
+        "name": "A7 Sportback (2010–2018, 4G8)",
+        "engines": [
+          {
+            "name": "3.0 TDI Sportback",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 TFSI Sportback",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "S line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "A8",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "A8 (2017–, D5)",
+        "engines": [
+          {
+            "name": "50 TDI L",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "55 TFSI L",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "A8 (2010–2017, D4)",
+        "engines": [
+          {
+            "name": "3.0 TDI L",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "4.2 TDI L",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "A8 (2002–2009, D3)",
+        "engines": [
+          {
+            "name": "3.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "4.2 quattro",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "Q2",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Q2 (2016–, GA)",
+        "trims": [
+          "Dynamic",
+          "Sport",
+          "Design",
+          "S line",
+          "Advanced"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2016,
+        "versions": [
+          {
+            "name": "1.0 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 116,
+            "torqueNm": 200,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 TFSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "30 TFSI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "35 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "Q3",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Q3 (2018–, F3)",
+        "trims": [
+          "Advanced",
+          "S line"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2018,
+        "versions": [
+          {
+            "name": "35 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1498,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Q3 (2011–2018, 8U)",
+        "engines": [
+          {
+            "name": "1.4 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Sport",
+          "S line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "Q3 Sportback",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Q3 Sportback (2019–, F3)",
+        "engines": [
+          {
+            "name": "35 TFSI Sportback",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "Q5",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Q5 (2017–2024, FY)",
+        "trims": [
+          "Sport",
+          "Design",
+          "Advanced",
+          "S line"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2017,
+        "endYear": 2024,
+        "versions": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL",
+            "source": "claude-draft"
+          },
+          {
+            "name": "2.0 TFSI",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft"
+          },
+          {
+            "name": "40 TDI",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1968,
+            "horsePower": 190,
+            "torqueNm": 400,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "AWD",
+            "endYear": 2020,
+            "source": "verified"
+          },
+          {
+            "name": "40 TDI 204",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1968,
+            "horsePower": 204,
+            "torqueNm": 400,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "AWD",
+            "startYear": 2021,
+            "source": "verified"
+          },
+          {
+            "name": "45 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1984,
+            "horsePower": 245,
+            "torqueNm": 370,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "AWD",
+            "endYear": 2020,
+            "source": "verified"
+          },
+          {
+            "name": "45 TFSI 265",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1984,
+            "horsePower": 265,
+            "torqueNm": 370,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "AWD",
+            "startYear": 2021,
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Q5 (2008–2017, 8R)",
+        "engines": [
+          {
+            "name": "2.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TFSI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "3.0 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "S line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "Q5 Sportback",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Q5 Sportback (2021–, FY)",
+        "engines": [
+          {
+            "name": "40 TDI Sportback",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "45 TFSI Sportback",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Advanced",
+          "S line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "Q7",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Q7 (2015–, 4M)",
+        "trims": [
+          "S line",
+          "Premium"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": null,
+        "startYear": 2015,
+        "versions": [
+          {
+            "name": "2.0 TFSI",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1984,
+            "horsePower": 252,
+            "torqueNm": 370,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "source": "verified"
+          },
+          {
+            "name": "3.0 TDI",
+            "fuelType": "DIESEL",
+            "drivetrain": "AWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "50 TDI",
+            "fuelType": "DIESEL",
+            "engineCapacity": 2967,
+            "horsePower": 286,
+            "torqueNm": 600,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "AWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Q7 (2005–2015, 4L)",
+        "engines": [
+          {
+            "name": "3.0 TDI",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "4.2 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "Q8",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Q8 (2018–, 4M)",
+        "engines": [
+          {
+            "name": "50 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "TT Coupe",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "TT Coupe (2014–2023, 8S)",
+        "engines": [
+          {
+            "name": "2.0 TFSI Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      },
+      {
+        "name": "TT Coupe (2006–2014, 8J)",
+        "engines": [
+          {
+            "name": "1.8 TFSI Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TFSI Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "S line"
+        ]
+      },
+      {
+        "name": "TT Coupe (1998–2006, 8N)",
+        "engines": [
+          {
+            "name": "1.8 T Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "TT Roadster",
+    "supportedBodyTypes": [
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "TT Roadster (2014–2023, 8S)",
+        "engines": [
+          {
+            "name": "2.0 TFSI Roadster",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      },
+      {
+        "name": "TT Roadster (2006–2014, 8J)",
+        "engines": [
+          {
+            "name": "2.0 TFSI Roadster",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "TT Roadster (1998–2006, 8N)",
+        "engines": [
+          {
+            "name": "1.8 T Roadster",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "R8 Coupe",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "R8 Coupe (2015–2023, 4S)",
+        "engines": [
+          {
+            "name": "5.2 FSI V10 Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      },
+      {
+        "name": "R8 Coupe (2006–2015, 42)",
+        "engines": [
+          {
+            "name": "4.2 FSI V8 Coupe",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "5.2 FSI V10 Coupe",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "R8 Spyder",
+    "supportedBodyTypes": [
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "R8 Spyder (2016–2023, 4S)",
+        "engines": [
+          {
+            "name": "5.2 FSI V10 Spyder",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      },
+      {
+        "name": "R8 Spyder (2009–2015, 42)",
+        "engines": [
+          {
+            "name": "5.2 FSI V10 Spyder",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "e-tron / Q8 e-tron",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "e-tron SUV (2018–2022, GE)",
+        "engines": [
+          {
+            "name": "55 e-tron",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Advanced",
+          "S line"
+        ]
+      },
+      {
+        "name": "e-tron Sportback (2019–2022, GE)",
+        "engines": [
+          {
+            "name": "55 e-tron Sportback",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      },
+      {
+        "name": "Q8 e-tron (2022–, GE)",
+        "engines": [
+          {
+            "name": "55 e-tron",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Advanced",
+          "S line"
+        ]
+      },
+      {
+        "name": "Q8 Sportback e-tron (2022–, GE)",
+        "engines": [
+          {
+            "name": "55 e-tron Sportback",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "Q4 e-tron",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Q4 e-tron (2021–, F4)",
+        "engines": [
+          {
+            "name": "40 e-tron",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "50 e-tron",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Advanced",
+          "S line"
+        ]
+      },
+      {
+        "name": "Q4 Sportback e-tron (2021–, F4)",
+        "engines": [
+          {
+            "name": "40 e-tron Sportback",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "S line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "e-tron GT",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "e-tron GT (2021–, J1)",
+        "engines": [
+          {
+            "name": "e-tron GT",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "RS e-tron GT (2021–, J1)",
+        "engines": [
+          {
+            "name": "RS e-tron GT",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "S3",
+    "supportedBodyTypes": [
+      "HATCHBACK",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S3 (2020–, 8Y)",
+        "engines": [
+          {
+            "name": "S3",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "S line",
+          "RS"
+        ]
+      },
+      {
+        "name": "S3 (2013–2020, 8V)",
+        "engines": [
+          {
+            "name": "S3",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "S4",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S4 (2015–2024, B9)",
+        "engines": [
+          {
+            "name": "S4 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "S4 (2008–2015, B8)",
+        "engines": [
+          {
+            "name": "S4 TFSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "S5",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S5 (2016–2024, F5)",
+        "engines": [
+          {
+            "name": "S5 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "S5 (2007–2016, 8T)",
+        "engines": [
+          {
+            "name": "S5 TFSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "S6",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S6 (2018–, C8)",
+        "engines": [
+          {
+            "name": "S6 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "S6 (2012–2018, C7)",
+        "engines": [
+          {
+            "name": "S6 TFSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "S7",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "S7 Sportback (2019–, 4K8)",
+        "engines": [
+          {
+            "name": "S7 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "S7 Sportback (2012–2018, 4G8)",
+        "engines": [
+          {
+            "name": "S7 TFSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "S8",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "S8 (2019–, D5)",
+        "engines": [
+          {
+            "name": "S8 TFSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      },
+      {
+        "name": "S8 (2012–2018, D4)",
+        "engines": [
+          {
+            "name": "S8 TFSI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "RS3",
+    "supportedBodyTypes": [
+      "HATCHBACK",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "RS3 Sportback (2021–, 8Y)",
+        "engines": [
+          {
+            "name": "RS3",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      },
+      {
+        "name": "RS3 Sportback (2015–2020, 8V)",
+        "engines": [
+          {
+            "name": "RS3",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "RS4 Avant",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "RS4 Avant (2017–, B9)",
+        "engines": [
+          {
+            "name": "RS4 Avant",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      },
+      {
+        "name": "RS4 Avant (2012–2015, B8)",
+        "engines": [
+          {
+            "name": "RS4 Avant",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "RS5",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "RS5 Coupe (2017–, F5)",
+        "engines": [
+          {
+            "name": "RS5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      },
+      {
+        "name": "RS5 Coupe (2010–2016, 8T)",
+        "engines": [
+          {
+            "name": "RS5",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "RS6 Avant",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "RS6 Avant (2019–, C8)",
+        "engines": [
+          {
+            "name": "RS6",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      },
+      {
+        "name": "RS6 Avant (2013–2018, C7)",
+        "engines": [
+          {
+            "name": "RS6",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "RS7 Sportback",
+    "supportedBodyTypes": [
+      "COUPE",
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "RS7 Sportback (2019–, 4K8)",
+        "engines": [
+          {
+            "name": "RS7 Sportback",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      },
+      {
+        "name": "RS7 Sportback (2013–2018, 4G8)",
+        "engines": [
+          {
+            "name": "RS7 Sportback",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "SQ5",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "SQ5 (2017–, FY)",
+        "engines": [
+          {
+            "name": "SQ5 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "SQ7",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "SQ7 (2016–, 4M)",
+        "engines": [
+          {
+            "name": "SQ7 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "SQ8",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "SQ8 (2019–, 4M)",
+        "engines": [
+          {
+            "name": "SQ8 TDI",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "TTS",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "TTS Coupe (2014–2023, 8S)",
+        "engines": [
+          {
+            "name": "TTS",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "AUDI",
+    "type": "CAR",
+    "name": "TT RS",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "TT RS Coupe (2016–2023, 8S)",
+        "engines": [
+          {
+            "name": "TT RS",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  }
+]

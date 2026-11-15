@@ -1,0 +1,90 @@
+[
+  {
+    "brand": "ROBOROCK",
+    "type": "ROBOT_VACUUM",
+    "name": "S8 MaxV Ultra",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Roborock S8 MaxV",
+      "S8 MaxV"
+    ]
+  },
+  {
+    "brand": "ROBOROCK",
+    "type": "ROBOT_VACUUM",
+    "name": "S8 Pro Ultra",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Roborock S8 Pro",
+      "S8 Pro"
+    ]
+  },
+  {
+    "brand": "ROBOROCK",
+    "type": "ROBOT_VACUUM",
+    "name": "S8",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Roborock S8",
+      "S8 Sonic"
+    ]
+  },
+  {
+    "brand": "ROBOROCK",
+    "type": "ROBOT_VACUUM",
+    "name": "Q Revo MaxV",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Roborock Q Revo MaxV",
+      "Q Revo Max"
+    ]
+  },
+  {
+    "brand": "ROBOROCK",
+    "type": "ROBOT_VACUUM",
+    "name": "Q Revo",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Roborock Q Revo",
+      "Q Revo White"
+    ]
+  },
+  {
+    "brand": "ROBOROCK",
+    "type": "ROBOT_VACUUM",
+    "name": "Q8 Max+",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Roborock Q8 Max Plus",
+      "Q8 Max+"
+    ]
+  },
+  {
+    "brand": "ROBOROCK",
+    "type": "ROBOT_VACUUM",
+    "name": "Q7 Max+",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Roborock Q7 Max Plus",
+      "Q7 Max+"
+    ]
+  },
+  {
+    "brand": "ROBOROCK",
+    "type": "ROBOT_VACUUM",
+    "name": "S7 MaxV Ultra",
+    "releaseYear": 2022,
+    "isLegacy": true,
+    "aliases": [
+      "Roborock S7 MaxV Ultra",
+      "S7 MaxV"
+    ]
+  }
+]

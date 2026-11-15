@@ -1,0 +1,407 @@
+[
+  {
+    "brand": "FORD",
+    "type": "COMMERCIAL",
+    "name": "Transit",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS",
+      "LIGHT_TRUCK"
+    ],
+    "generations": [
+      {
+        "name": "Transit (2019–, V363 facelift)",
+        "engines": [
+          {
+            "name": "2.0 EcoBlue 105",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 EcoBlue 130",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 EcoBlue 170",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Leader",
+          "Trend",
+          "Limited",
+          "Active"
+        ]
+      },
+      {
+        "name": "Transit (2014–2019, Mk8)",
+        "engines": [
+          {
+            "name": "2.0 TDCi 105",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDCi 130",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.2 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Deluxe",
+          "Leader"
+        ]
+      },
+      {
+        "name": "Transit (2006–2014, Mk7)",
+        "engines": [
+          {
+            "name": "2.2 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend"
+        ]
+      },
+      {
+        "name": "Transit (2000–2006, Mk6)",
+        "engines": [
+          {
+            "name": "2.0 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.4 Di",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Standard"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "COMMERCIAL",
+    "name": "Transit Custom",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Transit Custom (2023–, V710)",
+        "trims": [
+          "Trend",
+          "Deluxe",
+          "Leader",
+          "Limited",
+          "Active",
+          "Sport"
+        ],
+        "versions": [
+          {
+            "name": "2.0 EcoBlue 136",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 136,
+            "torqueNm": 360
+          },
+          {
+            "name": "2.0 EcoBlue 150",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 150
+          },
+          {
+            "name": "2.0 EcoBlue 170",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 170
+          },
+          {
+            "name": "2.5 PHEV",
+            "fuelType": "HYBRID",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Transit Custom (2012–2023, V362)",
+        "engines": [
+          {
+            "name": "2.0 EcoBlue 105",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 EcoBlue 130",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.2 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Deluxe",
+          "Leader",
+          "Limited"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "COMMERCIAL",
+    "name": "Transit Connect",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Transit Connect (2013–2021, Mk2)",
+        "engines": [
+          {
+            "name": "1.5 EcoBlue 75",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 EcoBlue 100",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Deluxe",
+          "Leader",
+          "Limited"
+        ]
+      },
+      {
+        "name": "Transit Connect (2002–2013, Mk1)",
+        "engines": [
+          {
+            "name": "1.8 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "T200",
+          "T220",
+          "T230"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "COMMERCIAL",
+    "name": "Ranger",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "Ranger (2022–, T6.2)",
+        "trims": [
+          "XLT",
+          "Limited",
+          "Wildtrak",
+          "XL",
+          "Raptor",
+          "Platinum"
+        ],
+        "versions": [
+          {
+            "name": "2.0 EcoBlue 170",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 170,
+            "torqueNm": 405
+          },
+          {
+            "name": "2.0 EcoBlue 205 Bi-Turbo",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 205,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 10
+          },
+          {
+            "name": "3.0 V6 EcoBlue 240",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 240,
+            "torqueNm": 600,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 10,
+            "drivetrain": "FOUR_X_FOUR"
+          }
+        ]
+      },
+      {
+        "name": "Ranger (2011–2022, T6)",
+        "engines": [
+          {
+            "name": "2.2 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.2 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 EcoBlue",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "XLT",
+          "Limited",
+          "Wildtrak"
+        ]
+      },
+      {
+        "name": "Ranger (2006–2011, PJ/PK)",
+        "engines": [
+          {
+            "name": "2.5 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "XLT",
+          "Thunder"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "COMMERCIAL",
+    "name": "Transit Courier",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Transit Courier (2023–, Mk2)",
+        "trims": [
+          "Trend",
+          "Deluxe"
+        ],
+        "versions": [
+          {
+            "name": "1.0 EcoBoost 100",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft",
+            "horsePower": 100,
+            "gearbox": "MANUAL",
+            "gearCount": 6
+          },
+          {
+            "name": "1.0 EcoBoost 125",
+            "fuelType": "GASOLINE",
+            "source": "claude-draft",
+            "horsePower": 125,
+            "torqueNm": 200,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7
+          },
+          {
+            "name": "1.5 EcoBlue 100",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 100,
+            "torqueNm": 250,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "engineCapacity": 1498
+          }
+        ]
+      },
+      {
+        "name": "Transit Courier (2014–2023, Mk1)",
+        "engines": [
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Deluxe"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "COMMERCIAL",
+    "name": "Ranger Raptor",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "Ranger Raptor (2022–, T6.2)",
+        "engines": [
+          {
+            "name": "3.0 V6 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 EcoBlue Bi-Turbo",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Raptor"
+        ]
+      },
+      {
+        "name": "Ranger Raptor (2019–2022, T6)",
+        "engines": [
+          {
+            "name": "2.0 EcoBlue Bi-Turbo",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Raptor"
+        ]
+      }
+    ]
+  }
+]

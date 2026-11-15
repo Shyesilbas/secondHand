@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "OPPO",
+    "type": "MOBILE_PHONE",
+    "name": "Find X7 Ultra",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Oppo Find X7 Ultra",
+      "Find X7"
+    ]
+  },
+  {
+    "brand": "OPPO",
+    "type": "MOBILE_PHONE",
+    "name": "Find N3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Oppo Find N3 Fold",
+      "Find N3"
+    ]
+  },
+  {
+    "brand": "OPPO",
+    "type": "MOBILE_PHONE",
+    "name": "Reno 12 Pro 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Oppo Reno 12 Pro",
+      "Reno 12P"
+    ]
+  },
+  {
+    "brand": "OPPO",
+    "type": "MOBILE_PHONE",
+    "name": "Reno 12 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Oppo Reno 12",
+      "Reno 12"
+    ]
+  },
+  {
+    "brand": "OPPO",
+    "type": "MOBILE_PHONE",
+    "name": "Reno 11 Pro 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Oppo Reno 11 Pro",
+      "Reno 11P"
+    ]
+  },
+  {
+    "brand": "OPPO",
+    "type": "MOBILE_PHONE",
+    "name": "A78",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Oppo A78",
+      "A78 4G/5G"
+    ]
+  }
+]

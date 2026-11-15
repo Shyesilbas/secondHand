@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "CANON",
+    "type": "PRINTER",
+    "name": "PIXMA G3411 Tanklı",
+    "releaseYear": 2018,
+    "isLegacy": false,
+    "aliases": [
+      "Canon G3411",
+      "PIXMA G3411 Wi-Fi"
+    ]
+  },
+  {
+    "brand": "CANON",
+    "type": "PRINTER",
+    "name": "PIXMA G3470 MegaTank",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Canon G3470",
+      "PIXMA G3470 Wi-Fi"
+    ]
+  },
+  {
+    "brand": "CANON",
+    "type": "PRINTER",
+    "name": "PIXMA E414 Çok Fonksiyonlu",
+    "releaseYear": 2016,
+    "isLegacy": true,
+    "aliases": [
+      "Canon E414",
+      "PIXMA E414"
+    ]
+  },
+  {
+    "brand": "CANON",
+    "type": "PRINTER",
+    "name": "i-SENSYS MF3010 Lazer",
+    "releaseYear": 2011,
+    "isLegacy": true,
+    "aliases": [
+      "Canon MF3010",
+      "i-SENSYS MF3010"
+    ]
+  }
+]

@@ -63,7 +63,7 @@ public class PaymentVerificationService implements IPaymentVerificationService {
     public void generateAndSendVerification(User user) {
         String code = verificationService.generateCode();
         verificationService.generateVerification(user, code, CodeType.PAYMENT_VERIFICATION);
-        paymentNotificationService.sendPaymentVerificationNotification(user, code, "Payment verification code generated.");
+        paymentNotificationService.sendPaymentVerificationNotification(user, code, null);
         log.info("Payment verification code generated and sent to user: {}", user.getEmail());
     }
 

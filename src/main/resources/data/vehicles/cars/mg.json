@@ -1,0 +1,114 @@
+[
+  {
+    "brand": "MG",
+    "type": "CAR",
+    "name": "ZS",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "ZS (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 VTi-tech (106 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 106,
+            "engineCapacity": 1498
+          },
+          {
+            "name": "1.0 T-GDI (111 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 111,
+            "engineCapacity": 999
+          },
+          {
+            "name": "EV (156 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 156,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Luxury"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MG",
+    "type": "CAR",
+    "name": "HS",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "HS (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "1.5 T-GDI (162 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 162,
+            "engineCapacity": 1490
+          },
+          {
+            "name": "PHEV 1.5 T-GDI (258 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 258,
+            "engineCapacity": 1490
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Luxury"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MG",
+    "type": "CAR",
+    "name": "MG4",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "MG4 Electric (2022–)",
+        "startYear": 2022,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "Standard 51 kWh (170 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 170,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Long Range 64 kWh (204 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 204,
+            "engineCapacity": 0
+          },
+          {
+            "name": "XPOWER AWD (435 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 435,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Luxury",
+          "XPOWER"
+        ]
+      }
+    ]
+  }
+]

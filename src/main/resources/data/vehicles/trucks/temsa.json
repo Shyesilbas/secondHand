@@ -1,0 +1,47 @@
+[
+  {
+    "brand": "TEMSA",
+    "type": "TRUCK",
+    "name": "Maraton",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "TEMSA",
+    "type": "TRUCK",
+    "name": "Safari",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "TEMSA",
+    "type": "TRUCK",
+    "name": "Prestij",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "TEMSA",
+    "type": "TRUCK",
+    "name": "Avenue",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "TEMSA",
+    "type": "TRUCK",
+    "name": "MD9",
+    "supportedBodyTypes": [
+      "BUS"
+    ],
+    "generations": []
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "VESTEL",
+    "type": "TV",
+    "name": "65Q9900 QLED 4K Smart TV",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Vestel Q9900 65",
+      "Vestel 65Q9900"
+    ]
+  },
+  {
+    "brand": "VESTEL",
+    "type": "TV",
+    "name": "55U9700 4K Ultra HD Smart TV",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Vestel U9700 55",
+      "Vestel 55U9700"
+    ]
+  },
+  {
+    "brand": "VESTEL",
+    "type": "TV",
+    "name": "50UA9600 Android TV 4K",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Vestel UA9600 50",
+      "Vestel 50UA9600"
+    ]
+  }
+]

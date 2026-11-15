@@ -1,0 +1,23 @@
+[
+  {
+    "brand": "HYPERX",
+    "type": "MOUSE",
+    "name": "Pulsefire Haste 2 Wireless",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HyperX Haste 2 Wireless",
+      "Haste 2"
+    ]
+  },
+  {
+    "brand": "HYPERX",
+    "type": "MOUSE",
+    "name": "Pulsefire Dart",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HyperX Pulsefire Dart Wireless"
+    ]
+  }
+]

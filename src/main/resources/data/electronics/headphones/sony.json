@@ -1,0 +1,340 @@
+[
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WH-1000XM6",
+    "releaseYear": 2025,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WH-1000XM6",
+      "WH-1000XM6",
+      "XM6",
+      "WH XM6"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 30
+    }
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WH-1000XM5",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WH-1000XM5",
+      "WH-1000XM5",
+      "XM5",
+      "WH XM5"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 30
+    },
+    "colors": [
+      {
+        "name": "Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WH-1000XM4",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Sony WH-1000XM4",
+      "WH-1000XM4",
+      "XM4",
+      "WH XM4"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 30
+    }
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WH-1000XM3",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "Sony WH-1000XM3",
+      "WH-1000XM3",
+      "XM3",
+      "WH XM3"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WH-CH720N",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WH-CH720N",
+      "WH-CH720N",
+      "CH720N"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 35
+    }
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WH-CH520",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WH-CH520",
+      "WH-CH520",
+      "CH520"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": false,
+      "hasMicrophone": true,
+      "batteryLifeHours": 50
+    }
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WH-XB910N",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WH-XB910N",
+      "WH-XB910N",
+      "XB910N"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WH-XB900N",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Sony WH-XB900N",
+      "WH-XB900N",
+      "XB900N"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WF-1000XM5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WF-1000XM5",
+      "WF XM5",
+      "WF-1000XM5"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 8
+    }
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WF-1000XM4",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WF-1000XM4",
+      "WF XM4",
+      "WF-1000XM4"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "connectionType": "BLUETOOTH",
+      "wireless": true,
+      "noiseCancelling": true,
+      "hasMicrophone": true,
+      "batteryLifeHours": 8
+    },
+    "colors": [
+      {
+        "name": "Black",
+        "color": "BLACK"
+      },
+      {
+        "name": "Silver",
+        "color": "SILVER"
+      }
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WF-1000XM3",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Sony WF-1000XM3",
+      "WF XM3",
+      "WF-1000XM3"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WF-C700N",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WF-C700N",
+      "WF-C700N",
+      "C700N"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "WF-C500",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Sony WF-C500",
+      "WF-C500",
+      "C500"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "LinkBuds S",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony LinkBuds S",
+      "LinkBuds S"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "LinkBuds",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony LinkBuds",
+      "LinkBuds"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "INZONE H9",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony INZONE H9",
+      "INZONE H9",
+      "H9"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "INZONE H7",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Sony INZONE H7",
+      "INZONE H7",
+      "H7"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "INZONE H5",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony INZONE H5",
+      "INZONE H5",
+      "H5"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "INZONE Buds",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony INZONE Buds",
+      "INZONE Buds"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "Pulse Elite",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Pulse Elite",
+      "Pulse Elite"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "Pulse Explore",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Sony Pulse Explore",
+      "Pulse Explore"
+    ]
+  },
+  {
+    "brand": "SONY",
+    "type": "HEADPHONES",
+    "name": "Pulse 3D",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Sony Pulse 3D",
+      "Pulse 3D"
+    ]
+  }
+]

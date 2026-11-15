@@ -1,0 +1,117 @@
+[
+  {
+    "brand": "TOYOTA",
+    "type": "COMMERCIAL",
+    "name": "Hilux",
+    "supportedBodyTypes": [
+      "PICKUP"
+    ],
+    "generations": [
+      {
+        "name": "Hilux (2015–, AN120/AN130)",
+        "trims": [
+          "Active",
+          "Adventure",
+          "Invincible",
+          "Hi-Cruiser",
+          "GR Sport"
+        ],
+        "versions": [
+          {
+            "name": "2.4 D-4D 150",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 150,
+            "torqueNm": 400,
+            "engineCapacity": 2393
+          },
+          {
+            "name": "2.8 D-4D 204",
+            "fuelType": "DIESEL",
+            "source": "claude-draft",
+            "horsePower": 204,
+            "torqueNm": 500,
+            "engineCapacity": 2755,
+            "drivetrain": "FOUR_X_FOUR",
+            "startYear": 2020
+          }
+        ]
+      },
+      {
+        "name": "Hilux (2005–2015, AN10/AN20/AN30)",
+        "engines": [
+          {
+            "name": "2.5 D-4D",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "3.0 D-4D",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elegant",
+          "Adventure"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "TOYOTA",
+    "type": "COMMERCIAL",
+    "name": "Proace City",
+    "supportedBodyTypes": [
+      "VAN",
+      "COMBI"
+    ],
+    "generations": [
+      {
+        "name": "Proace City (2019–)",
+        "engines": [
+          {
+            "name": "1.5 D-4D 100",
+            "fuelType": "DIESEL",
+            "horsePower": 100,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "1.5 D-4D 130",
+            "fuelType": "DIESEL",
+            "horsePower": 130,
+            "engineCapacity": 1499
+          }
+        ],
+        "trims": [
+          "Dream",
+          "Flame X-Pack",
+          "Passion X-Pack",
+          "Cargo"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "TOYOTA",
+    "type": "COMMERCIAL",
+    "name": "Proace",
+    "supportedBodyTypes": [
+      "VAN",
+      "MINIBUS"
+    ],
+    "generations": [
+      {
+        "name": "Proace (2016–)",
+        "engines": [
+          {
+            "name": "2.0 D-4D",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Vision"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,1117 @@
+[
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Picanto",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Picanto (2024–, JA Facelift)",
+        "engines": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.2 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Cool"
+        ]
+      },
+      {
+        "name": "Picanto (2017–2024, JA)",
+        "engines": [
+          {
+            "name": "1.0 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.25 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Cool",
+          "Elegance",
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Picanto (2011–2017, TA)",
+        "engines": [
+          {
+            "name": "1.25 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Concept"
+        ]
+      },
+      {
+        "name": "Picanto (2004–2011, SA)",
+        "engines": [
+          {
+            "name": "1.1 Epsilon",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.1 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "EX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Rio Hatchback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Rio Hatchback (2017–2023, YB)",
+        "engines": [
+          {
+            "name": "1.25 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Cool",
+          "Elegance",
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Rio Hatchback (2011–2017, UB)",
+        "engines": [
+          {
+            "name": "1.25 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Concept",
+          "Fancy"
+        ]
+      },
+      {
+        "name": "Rio Hatchback (2005–2011, JB)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Trend"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Rio Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Rio Sedan (2017–2023, YB)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Cool"
+        ]
+      },
+      {
+        "name": "Rio Sedan (2011–2017, UB)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Concept"
+        ]
+      },
+      {
+        "name": "Rio Sedan (2005–2011, JB)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "EX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Ceed",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Ceed (2018–, CD)",
+        "trims": [
+          "Cool",
+          "Elegance",
+          "Prestige"
+        ],
+        "bodyType": "HATCHBACK",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2018,
+        "versions": [
+          {
+            "name": "1.4 MPI 100",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1368,
+            "horsePower": 100,
+            "torqueNm": 134,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 T-GDI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.4 T-GDI 140 DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1353,
+            "horsePower": 140,
+            "torqueNm": 242,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 T-GDI",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 CRDi 136 DCT",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 136,
+            "torqueNm": 320,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "drivetrain": "FWD",
+            "source": "verified"
+          }
+        ]
+      },
+      {
+        "name": "Ceed (2012–2018, JD)",
+        "engines": [
+          {
+            "name": "1.6 GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Cool",
+          "Concept",
+          "Concept Plus",
+          "Premium"
+        ]
+      },
+      {
+        "name": "Ceed (2006–2012, ED)",
+        "engines": [
+          {
+            "name": "1.6 CVVT",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Cool",
+          "Motion"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Ceed Sportswagon",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Ceed Sportswagon (2018–, CD)",
+        "engines": [
+          {
+            "name": "1.5 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Ceed Sportswagon (2012–2018, JD)",
+        "engines": [
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Concept Plus",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "ProCeed",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "ProCeed (2018–, CD)",
+        "engines": [
+          {
+            "name": "1.5 T-GDI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GT Line"
+        ]
+      },
+      {
+        "name": "ProCeed (2013–2018, JD)",
+        "engines": [
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Sporty"
+        ]
+      },
+      {
+        "name": "ProCeed (2008–2012, ED)",
+        "engines": [
+          {
+            "name": "1.6 CVVT",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Cool"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Cerato",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Cerato (2018–2021, BD)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Cerato (2013–2018, YD)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Concept Plus",
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Cerato (2009–2013, TD)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Concept"
+        ]
+      },
+      {
+        "name": "Cerato (2004–2009, LD)",
+        "engines": [
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 CRDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "EX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Optima",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Optima (2015–2020, JF)",
+        "engines": [
+          {
+            "name": "1.7 CRDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 Plug-in Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Optima (2010–2015, TF)",
+        "engines": [
+          {
+            "name": "1.7 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Magentis",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Magentis (2005–2010, MG)",
+        "engines": [
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "EX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Stonic",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Stonic (2017–)",
+        "engines": [
+          {
+            "name": "1.4 MPI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 T-GDI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Cool",
+          "Elegance",
+          "Prestige"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "XCeed",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "XCeed (2019–)",
+        "engines": [
+          {
+            "name": "1.5 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Niro",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Niro (2022–, SG2)",
+        "engines": [
+          {
+            "name": "1.6 Hybrid",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "Niro EV 150 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Niro Hybrid (2016–2022, DE)",
+        "engines": [
+          {
+            "name": "1.6 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Niro EV (2018–2022, DE)",
+        "engines": [
+          {
+            "name": "Niro EV 150 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Soul",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Soul (2014–2019, PS)",
+        "engines": [
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium"
+        ]
+      },
+      {
+        "name": "Soul (2008–2014, AM)",
+        "engines": [
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 MPI",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "X-tra",
+          "Concept"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Sportage",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Sportage (2021–, NQ5)",
+        "trims": [
+          "Cool",
+          "Elegant",
+          "Elegance",
+          "Prestige"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2021,
+        "versions": [
+          {
+            "name": "1.6 T-GDI 150 MHEV DCT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1598,
+            "horsePower": 150,
+            "torqueNm": 250,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "source": "verified"
+          },
+          {
+            "name": "1.6 CRDi 136 MHEV DCT",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1598,
+            "horsePower": 136,
+            "torqueNm": 320,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 7,
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 T-GDI Hybrid 230",
+            "fuelType": "HYBRID",
+            "engineCapacity": 1598,
+            "horsePower": 230,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Sportage (2015–2021, QL)",
+        "engines": [
+          {
+            "name": "1.6 GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 T-GDI 4x4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 CRDi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 CRDi 4x4",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 CRDi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Concept",
+          "Cool",
+          "Elegance",
+          "Prestige",
+          "GT Line"
+        ]
+      },
+      {
+        "name": "Sportage (2010–2015, SL)",
+        "engines": [
+          {
+            "name": "1.6 GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 CRDi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Elegance",
+          "GSL"
+        ]
+      },
+      {
+        "name": "Sportage (2004–2010, JE/KM)",
+        "engines": [
+          {
+            "name": "2.0 CRDi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "EX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Sorento",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Sorento (2020–, MQ4)",
+        "engines": [
+          {
+            "name": "1.6 T-GDI Hybrid",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "2.2 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Sorento (2014–2020, UM)",
+        "engines": [
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Sorento (2009–2014, XM)",
+        "engines": [
+          {
+            "name": "2.2 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Premium"
+        ]
+      },
+      {
+        "name": "Sorento (2002–2009, BL)",
+        "engines": [
+          {
+            "name": "2.5 CRDi 4x4",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "EX",
+          "EX Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Carnival",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Carnival (2020–, KA4)",
+        "engines": [
+          {
+            "name": "2.2 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      },
+      {
+        "name": "Carnival (2006–2014, VQ)",
+        "engines": [
+          {
+            "name": "2.9 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "EX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "EV3",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EV3 (2024–)",
+        "engines": [
+          {
+            "name": "EV3 150 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Elegance",
+          "Prestige"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "EV6",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EV6 (2021–)",
+        "engines": [
+          {
+            "name": "EV6 168 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EV6 239 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "EV6 GT 430 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Prestige",
+          "GT Line",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "EV9",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EV9 (2023–)",
+        "engines": [
+          {
+            "name": "EV9 283 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "e-Niro",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "e-Niro (2018–2022)",
+        "engines": [
+          {
+            "name": "e-Niro 150 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Soul EV",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Soul EV (2014–2019)",
+        "engines": [
+          {
+            "name": "Soul EV 81 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Prestige"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Ceed GT",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Ceed GT",
+        "engines": [
+          {
+            "name": "1.6 T-GDI GT",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "ProCeed GT",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "ProCeed GT",
+        "engines": [
+          {
+            "name": "1.6 T-GDI GT",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Stinger",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Stinger (2017–2023, CK)",
+        "engines": [
+          {
+            "name": "2.0 T-GDI",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "3.3 T-GDI V6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 CRDi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "GT Line",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "KIA",
+    "type": "CAR",
+    "name": "Stinger GT",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Stinger GT",
+        "engines": [
+          {
+            "name": "3.3 T-GDI V6 GT",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GT"
+        ]
+      }
+    ]
+  }
+]

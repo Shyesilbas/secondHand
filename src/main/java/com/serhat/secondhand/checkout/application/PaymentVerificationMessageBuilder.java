@@ -1,5 +1,6 @@
 package com.serhat.secondhand.checkout.application;
 
+import org.springframework.web.util.HtmlUtils;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.config.AppConfigProperties;
@@ -35,18 +36,8 @@ public class PaymentVerificationMessageBuilder {
 
     public String buildPaymentDetails(User user, PaymentTransactionType type, InitiateVerificationRequest req) {
         StringBuilder details = new StringBuilder();
-        details.append("<table role=\"presentation\" class=\"details-table\" style=\"width: 100%; border-collapse: collapse; margin-top: 10px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;\">");
-        details.append("  <tr>");
-        details.append("    <td style=\"padding: 10px 14px;\">");
-        details.append("      <div style=\"margin-bottom: 6px; font-size: 13px; color: #0f172a; font-weight: 600;\">Sipariş ve Ödeme Özeti</div>");
-        details.append("      <table role=\"presentation\" style=\"width: 100%; border-collapse: collapse;\">");
-
-        // Service Row
-        details.append("        <tr>");
-        details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">İşlem Türü</td>");
-        details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                .append(getTransactionTypeLabel(type)).append("</td>");
-        details.append("        </tr>");
+        details.append("<table role=\"presentation\" class=\"details\">");
+        appendRow(details, "İşlem", getTransactionTypeLabel(type));
 
         switch (type) {
             case ITEM_PURCHASE -> appendCartDetails(details, user, req);
@@ -54,11 +45,7 @@ public class PaymentVerificationMessageBuilder {
             case SHOWCASE_PAYMENT -> {
                 int days = requireValidShowcaseDays(req);
                 appendListingDetails(details, req, showcasePricingCalculator.totalCost(days));
-                details.append("        <tr>");
-                details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Süre</td>");
-                details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
-                        .append(days).append(" Gün</td>");
-                details.append("        </tr>");
+                appendRow(details, "Süre", days + " Gün");
             }
             case MEMBERSHIP_PAYMENT -> appendAmountRow(details, appConfigProperties.getMembership().getPremiumPrice());
             default -> {
@@ -66,18 +53,8 @@ public class PaymentVerificationMessageBuilder {
             }
         }
 
-        // Date Row
-        details.append("        <tr>");
-        details.append("          <td style=\"padding: 6px 0 0 0; color: #64748b; font-size: 12px;\">İşlem Tarihi</td>");
-        details.append("          <td style=\"padding: 6px 0 0 0; color: #475569; font-size: 12px; font-weight: 500; text-align: right; font-variant-numeric: tabular-nums;\">")
-                .append(java.time.LocalDateTime.now()
-                        .format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")))
-                .append("</td>");
-        details.append("        </tr>");
-
-        details.append("      </table>");
-        details.append("    </td>");
-        details.append("  </tr>");
+        appendRow(details, "Tarih", java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")));
         details.append("</table>");
         return details.toString();
     }
@@ -131,42 +108,23 @@ public class PaymentVerificationMessageBuilder {
                     }
                 }
 
-                details.append("        <tr>");
-                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 13px; font-weight: 500;\">")
-                        .append(itemTitle)
-                        .append(" <span style=\"color: #64748b; font-size: 12px; font-weight: 500; margin-left: 4px;\">(x")
-                        .append(item.getQuantity()).append(")</span></td>");
-                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
-                        .append(formatMoney(item.getNetLineTotal() != null ? item.getNetLineTotal() : item.getCampaignUnitPrice()))
-                        .append("</td>");
-                details.append("        </tr>");
+                appendRow(details, item.getQuantity() > 1 ? itemTitle + " x" + item.getQuantity() : itemTitle,
+                        formatMoney(item.getNetLineTotal() != null ? item.getNetLineTotal() : item.getCampaignUnitPrice()));
             }
         }
 
         if (pricing.getCouponDiscount() != null && pricing.getCouponDiscount().compareTo(BigDecimal.ZERO) > 0) {
-            details.append("        <tr>");
-            details.append("          <td style=\"padding: 6px 0; color: #475569; font-size: 12px; font-weight: 500;\">Kupon İndirimi")
-                    .append(pricing.getCouponCode() != null ? " (" + pricing.getCouponCode() + ")" : "")
-                    .append("</td>");
-            details.append("          <td style=\"padding: 6px 0; color: #0f172a; font-size: 12px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">-")
-                    .append(formatMoney(pricing.getCouponDiscount())).append("</td>");
-            details.append("        </tr>");
+            appendRow(details, "Kupon İndirimi" + (pricing.getCouponCode() != null ? " (" + pricing.getCouponCode() + ")" : ""),
+                    "-" + formatMoney(pricing.getCouponDiscount()));
         }
 
         if (pricing.getCampaignDiscount() != null && pricing.getCampaignDiscount().compareTo(BigDecimal.ZERO) > 0) {
-            details.append("        <tr>");
-            details.append("          <td style=\"padding: 6px 0; color: #475569; font-size: 12px; font-weight: 500;\">Kampanya İndirimi</td>");
-            details.append("          <td style=\"padding: 6px 0; color: #0f172a; font-size: 12px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">-")
-                    .append(formatMoney(pricing.getCampaignDiscount())).append("</td>");
-            details.append("        </tr>");
+            appendRow(details, "Kampanya İndirimi", "-" + formatMoney(pricing.getCampaignDiscount()));
         }
 
         BigDecimal total = pricing.getTotal() != null ? pricing.getTotal() : BigDecimal.ZERO;
-        details.append("        <tr>");
-        details.append("          <td style=\"padding: 12px 0 8px 0; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 14px; font-weight: 600;\">Ödenecek Toplam Tutar</td>");
-        details.append("          <td style=\"padding: 12px 0 8px 0; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 15px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
-                .append(formatMoney(total)).append("</td>");
-        details.append("        </tr>");
+        details.append("<tr class=\"total\"><td class=\"label\">Ödenecek Toplam</td><td class=\"value\">")
+                .append(formatMoney(total)).append("</td></tr>");
     }
 
     private void appendListingDetails(StringBuilder details, InitiateVerificationRequest req, BigDecimal amount) {
@@ -180,20 +138,12 @@ public class PaymentVerificationMessageBuilder {
             }
 
             if (title != null) {
-                details.append("        <tr>");
-                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #64748b; font-size: 13px; font-weight: 500;\">İlan</td>");
-                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                        .append(title).append("</td>");
-                details.append("        </tr>");
+                appendRow(details, "İlan", title);
             }
         }
 
         if (amount != null) {
-            details.append("        <tr>");
-            details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #64748b; font-size: 13px; font-weight: 500;\">Ödenecek Tutar</td>");
-            details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-size: 14px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
-                    .append(formatMoney(amount)).append("</td>");
-            details.append("        </tr>");
+            appendRow(details, "Ödenecek Tutar", formatMoney(amount));
         }
     }
 
@@ -213,8 +163,8 @@ public class PaymentVerificationMessageBuilder {
     }
 
     private String formatMoney(BigDecimal amount) {
-        if (amount == null) return "0.00 TL";
-        return String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TL", amount);
+        if (amount == null) return "0,00 TRY";
+        return String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TRY", amount);
     }
 
     private int requireValidShowcaseDays(InitiateVerificationRequest req) {
@@ -226,10 +176,14 @@ public class PaymentVerificationMessageBuilder {
     }
 
     private void appendAmountRow(StringBuilder details, BigDecimal amount) {
-        details.append("        <tr>");
-        details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Tutar</td>");
-        details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
-                .append(formatMoney(amount)).append("</td>");
-        details.append("        </tr>");
+        appendRow(details, "Tutar", formatMoney(amount));
     }
+
+    /** Values reach the email through th:utext, so user-entered text (listing titles, coupon codes) is escaped here. */
+    private void appendRow(StringBuilder details, String label, String value) {
+        details.append("<tr><td class=\"label\">").append(HtmlUtils.htmlEscape(label, "UTF-8"))
+                .append("</td><td class=\"value\">").append(HtmlUtils.htmlEscape(value == null ? "" : value, "UTF-8"))
+                .append("</td></tr>");
+    }
+
 }

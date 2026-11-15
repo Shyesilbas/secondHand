@@ -1,0 +1,134 @@
+[
+  {
+    "brand": "BAJAJ",
+    "type": "MOTORCYCLE",
+    "name": "Pulsar NS200",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Pulsar NS200 (2014–)",
+        "startYear": 2014,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "199.5cc Triple Spark (24.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 25,
+            "engineCapacity": 200
+          }
+        ],
+        "trims": [
+          "ABS",
+          "Dual Channel ABS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BAJAJ",
+    "type": "MOTORCYCLE",
+    "name": "Pulsar RS200",
+    "supportedBodyTypes": [
+      "SPORTBIKE"
+    ],
+    "generations": [
+      {
+        "name": "Pulsar RS200 (2015–)",
+        "startYear": 2015,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "199.5cc Triple Spark (24.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 25,
+            "engineCapacity": 200
+          }
+        ],
+        "trims": [
+          "Dual Channel ABS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BAJAJ",
+    "type": "MOTORCYCLE",
+    "name": "Dominar 400",
+    "supportedBodyTypes": [
+      "TOURING",
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Dominar 400 (2017–)",
+        "startYear": 2017,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "373cc DOHC (40 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 40,
+            "engineCapacity": 373
+          }
+        ],
+        "trims": [
+          "UG Touring"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BAJAJ",
+    "type": "MOTORCYCLE",
+    "name": "Dominar 250",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Dominar 250 (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "248.7cc DOHC (27 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 27,
+            "engineCapacity": 249
+          }
+        ],
+        "trims": [
+          "Dual Channel ABS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BAJAJ",
+    "type": "MOTORCYCLE",
+    "name": "Pulsar NS125",
+    "supportedBodyTypes": [
+      "NAKED"
+    ],
+    "generations": [
+      {
+        "name": "Pulsar NS125 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "124.4cc CBS (12 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 12,
+            "engineCapacity": 124
+          }
+        ],
+        "trims": [
+          "CBS"
+        ]
+      }
+    ]
+  }
+]

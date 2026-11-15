@@ -1,0 +1,57 @@
+[
+  {
+    "brand": "MARSHALL",
+    "type": "SPEAKER",
+    "name": "Stanmore III",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Stanmore 3",
+      "Stanmore III Bluetooth"
+    ]
+  },
+  {
+    "brand": "MARSHALL",
+    "type": "SPEAKER",
+    "name": "Acton III",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Acton 3",
+      "Acton III Bluetooth"
+    ]
+  },
+  {
+    "brand": "MARSHALL",
+    "type": "SPEAKER",
+    "name": "Woburn III",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Woburn 3",
+      "Woburn III Bluetooth"
+    ]
+  },
+  {
+    "brand": "MARSHALL",
+    "type": "SPEAKER",
+    "name": "Emberton II",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Emberton 2",
+      "Emberton II Portable"
+    ]
+  },
+  {
+    "brand": "MARSHALL",
+    "type": "SPEAKER",
+    "name": "Willen",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Marshall Willen",
+      "Willen Mini"
+    ]
+  }
+]

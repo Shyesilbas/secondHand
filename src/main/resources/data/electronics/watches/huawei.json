@@ -1,0 +1,195 @@
+[
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch Ultimate",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Watch Ultimate",
+      "Watch Ultimate",
+      "Huawei Ultimate"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch 4 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 4 Pro",
+      "Huawei Watch 4 Pro"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Watch 4",
+      "Huawei Watch 4"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch GT 5 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Watch GT 5 Pro",
+      "Watch GT 5 Pro",
+      "GT 5 Pro",
+      "GT5 Pro"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch GT 5",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Watch GT 5",
+      "Watch GT 5",
+      "GT 5",
+      "GT5"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch GT 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Watch GT 4",
+      "Watch GT 4",
+      "GT 4",
+      "GT4"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch GT 3 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Watch GT 3 Pro",
+      "Watch GT 3 Pro",
+      "GT 3 Pro",
+      "GT3 Pro"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch GT 3",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Watch GT 3",
+      "Watch GT 3",
+      "GT 3",
+      "GT3"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch GT 2",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Watch GT 2",
+      "Watch GT 2",
+      "GT 2",
+      "GT2"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch Fit 3",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Watch Fit 3",
+      "Watch Fit 3",
+      "Fit 3"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch Fit 2",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Watch Fit 2",
+      "Watch Fit 2",
+      "Fit 2"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Watch Fit",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Huawei Watch Fit",
+      "Watch Fit",
+      "Watch Fit 1",
+      "Fit 1"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Band 9",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Band 9",
+      "Band 9"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Band 8",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Band 8",
+      "Band 8"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Band 7",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Band 7",
+      "Band 7"
+    ]
+  },
+  {
+    "brand": "HUAWEI",
+    "type": "SMARTWATCH",
+    "name": "Band 6",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Huawei Band 6",
+      "Band 6"
+    ]
+  }
+]

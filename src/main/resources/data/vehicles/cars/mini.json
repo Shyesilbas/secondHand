@@ -1,0 +1,180 @@
+[
+  {
+    "brand": "MINI",
+    "type": "CAR",
+    "name": "Cooper",
+    "supportedBodyTypes": [
+      "HATCHBACK",
+      "CONVERTIBLE"
+    ],
+    "generations": [
+      {
+        "name": "Cooper (2024–)",
+        "startYear": 2024,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "Cooper C 1.5 (156 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 156,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "Cooper S 2.0 (204 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 204,
+            "engineCapacity": 1998
+          },
+          {
+            "name": "Cooper E (184 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 184,
+            "engineCapacity": 0
+          },
+          {
+            "name": "Cooper SE (218 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 218,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Essential",
+          "Classic",
+          "Favoured",
+          "JCW"
+        ]
+      },
+      {
+        "name": "Cooper (2014–2023, F56)",
+        "startYear": 2014,
+        "endYear": 2023,
+        "engines": [
+          {
+            "name": "1.5 Cooper (136 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 136,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "2.0 Cooper S (192 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 192,
+            "engineCapacity": 1998
+          },
+          {
+            "name": "Cooper SE Electric (184 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 184,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Pure",
+          "Signature",
+          "Iconic",
+          "John Cooper Works"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MINI",
+    "type": "CAR",
+    "name": "Countryman",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Countryman (2024–, U25)",
+        "startYear": 2024,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "Countryman C 1.5 (170 hp)",
+            "fuelType": "HYBRID",
+            "horsePower": 170,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "Countryman S ALL4 2.0 (218 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 218,
+            "engineCapacity": 1998
+          },
+          {
+            "name": "Countryman E (204 hp)",
+            "fuelType": "ELECTRIC",
+            "horsePower": 204,
+            "engineCapacity": 0
+          }
+        ],
+        "trims": [
+          "Essential",
+          "Classic",
+          "Favoured",
+          "JCW"
+        ]
+      },
+      {
+        "name": "Countryman (2017–2023, F60)",
+        "startYear": 2017,
+        "endYear": 2023,
+        "engines": [
+          {
+            "name": "1.5 Cooper ALL4 (136 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 136,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "2.0 Cooper S ALL4 (192 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 192,
+            "engineCapacity": 1998
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Signature",
+          "Iconic"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MINI",
+    "type": "CAR",
+    "name": "Clubman",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Clubman (2015–2024, F54)",
+        "startYear": 2015,
+        "endYear": 2024,
+        "engines": [
+          {
+            "name": "1.5 Cooper (136 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 136,
+            "engineCapacity": 1499
+          },
+          {
+            "name": "2.0 Cooper S (192 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 192,
+            "engineCapacity": 1998
+          }
+        ],
+        "trims": [
+          "Classic",
+          "Signature",
+          "JCW"
+        ]
+      }
+    ]
+  }
+]

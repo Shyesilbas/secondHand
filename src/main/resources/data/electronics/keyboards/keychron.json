@@ -1,0 +1,56 @@
+[
+  {
+    "brand": "KEYCHRON",
+    "type": "KEYBOARD",
+    "name": "K2 Version 2",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Keychron K2 V2",
+      "Keychron K2"
+    ]
+  },
+  {
+    "brand": "KEYCHRON",
+    "type": "KEYBOARD",
+    "name": "Q1 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Keychron Q1 Pro",
+      "Q1 Pro Wireless"
+    ]
+  },
+  {
+    "brand": "KEYCHRON",
+    "type": "KEYBOARD",
+    "name": "V1 Max",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Keychron V1 Max",
+      "V1 Max Wireless"
+    ]
+  },
+  {
+    "brand": "KEYCHRON",
+    "type": "KEYBOARD",
+    "name": "K8 Pro",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Keychron K8 Pro",
+      "K8 Pro QMK"
+    ]
+  },
+  {
+    "brand": "KEYCHRON",
+    "type": "KEYBOARD",
+    "name": "K3 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Keychron K3 Pro Low Profile"
+    ]
+  }
+]

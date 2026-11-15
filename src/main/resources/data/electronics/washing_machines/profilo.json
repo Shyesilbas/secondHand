@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "PROFILO",
+    "type": "WASHING_MACHINE",
+    "name": "CGA252X0TR 10 kg",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Profilo CGA252X0TR",
+      "Profilo 10 kg"
+    ]
+  },
+  {
+    "brand": "PROFILO",
+    "type": "WASHING_MACHINE",
+    "name": "CGA242X0TR 9 kg",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Profilo CGA242X0TR",
+      "Profilo 9 kg"
+    ]
+  },
+  {
+    "brand": "PROFILO",
+    "type": "WASHING_MACHINE",
+    "name": "CMG140DTR 9 kg",
+    "releaseYear": 2020,
+    "isLegacy": false,
+    "aliases": [
+      "Profilo CMG140DTR",
+      "Profilo 1400 Devir"
+    ]
+  }
+]

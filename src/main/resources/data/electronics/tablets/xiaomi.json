@@ -1,0 +1,109 @@
+[
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Pad 7 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Pad 7 Pro",
+      "Pad 7 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Pad 7",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Pad 7",
+      "Pad 7"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Pad 6S Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Pad 6S Pro",
+      "Xiaomi Pad 6S Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Pad 6 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Pad 6 Pro",
+      "Xiaomi Pad 6 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Pad 6",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Pad 6",
+      "Xiaomi Pad 6"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Pad 5 Pro",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Pad 5 Pro",
+      "Xiaomi Pad 5 Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Pad 5",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Pad 5",
+      "Xiaomi Pad 5"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Redmi Pad Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Pad Pro"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Redmi Pad SE",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Pad SE"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TABLET",
+    "name": "Redmi Pad",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Redmi Pad"
+    ]
+  }
+]

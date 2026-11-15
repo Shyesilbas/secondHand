@@ -1,0 +1,154 @@
+[
+  {
+    "brand": "APPLE",
+    "type": "SMARTWATCH",
+    "name": "Watch Ultra 2",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Apple Watch Ultra 2",
+      "Watch Ultra 2",
+      "Ultra 2"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Apple S9 SiP",
+      "operatingSystem": "watchOS",
+      "hasNfc": true,
+      "batteryLifeHours": 36
+    },
+    "variants": [
+      {
+        "name": "49 mm GPS + Cellular",
+        "storage": 64,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "SMARTWATCH",
+    "name": "Watch Series 10",
+    "isLegacy": false,
+    "releaseYear": 2024,
+    "aliases": [
+      "Apple Watch Series 10",
+      "Watch Series 10",
+      "Series 10",
+      "S10"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Apple S10 SiP",
+      "operatingSystem": "watchOS",
+      "hasNfc": true,
+      "batteryLifeHours": 18
+    },
+    "variants": [
+      {
+        "name": "42 mm GPS",
+        "storage": 64,
+        "source": "claude-draft"
+      },
+      {
+        "name": "42 mm GPS + Cellular",
+        "storage": 64,
+        "source": "claude-draft"
+      },
+      {
+        "name": "46 mm GPS",
+        "storage": 64,
+        "source": "claude-draft"
+      },
+      {
+        "name": "46 mm GPS + Cellular",
+        "storage": 64,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "SMARTWATCH",
+    "name": "Watch Series 9",
+    "isLegacy": false,
+    "releaseYear": 2023,
+    "aliases": [
+      "Apple Watch Series 9",
+      "Watch Series 9",
+      "Series 9",
+      "S9"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Apple S9 SiP",
+      "operatingSystem": "watchOS",
+      "hasNfc": true,
+      "batteryLifeHours": 18
+    },
+    "variants": [
+      {
+        "name": "41 mm GPS",
+        "storage": 64,
+        "source": "claude-draft"
+      },
+      {
+        "name": "41 mm GPS + Cellular",
+        "storage": 64,
+        "source": "claude-draft"
+      },
+      {
+        "name": "45 mm GPS",
+        "storage": 64,
+        "source": "claude-draft"
+      },
+      {
+        "name": "45 mm GPS + Cellular",
+        "storage": 64,
+        "source": "claude-draft"
+      }
+    ]
+  },
+  {
+    "brand": "APPLE",
+    "type": "SMARTWATCH",
+    "name": "Watch SE (2nd Gen)",
+    "isLegacy": false,
+    "releaseYear": 2022,
+    "aliases": [
+      "Apple Watch SE (2nd Gen)",
+      "Watch SE (2nd Gen)",
+      "Watch SE 2",
+      "SE 2"
+    ],
+    "source": "claude-draft",
+    "specs": {
+      "chipset": "Apple S8 SiP",
+      "operatingSystem": "watchOS",
+      "hasNfc": true,
+      "batteryLifeHours": 18
+    },
+    "variants": [
+      {
+        "name": "40 mm GPS",
+        "storage": 32,
+        "source": "claude-draft"
+      },
+      {
+        "name": "40 mm GPS + Cellular",
+        "storage": 32,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm GPS",
+        "storage": 32,
+        "source": "claude-draft"
+      },
+      {
+        "name": "44 mm GPS + Cellular",
+        "storage": 32,
+        "source": "claude-draft"
+      }
+    ]
+  }
+]

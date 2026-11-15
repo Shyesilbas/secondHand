@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "VIOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "Alpha 2 Pro",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Viomi Alpha 2 Pro",
+      "Alpha 2"
+    ]
+  },
+  {
+    "brand": "VIOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "V3 Max",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Viomi V3 Max",
+      "V3 Max Robot"
+    ]
+  },
+  {
+    "brand": "VIOMI",
+    "type": "ROBOT_VACUUM",
+    "name": "SE",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "Viomi SE",
+      "Viomi Robot SE"
+    ]
+  }
+]

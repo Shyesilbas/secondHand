@@ -1,0 +1,522 @@
+[
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Spectre x360 14",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "HP Spectre x360 14",
+      "Spectre x360 14",
+      "HP Spectre 14"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Spectre x360 16",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "HP Spectre x360 16",
+      "Spectre x360 16",
+      "HP Spectre 16"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Spectre x360 13",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP Spectre x360 13",
+      "Spectre x360 13",
+      "HP Spectre 13"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Spectre Folio",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "HP Spectre Folio",
+      "Spectre Folio"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Envy x360 14",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "HP Envy x360 14",
+      "Envy x360 14",
+      "HP Envy 14"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Envy x360 15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP Envy x360 15",
+      "Envy x360 15",
+      "HP Envy 15"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Envy 16",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Envy 16",
+      "HP Envy 16"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Envy 13",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Envy 13",
+      "HP Envy 13"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Pavilion 15",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Pavilion 15",
+      "HP Pavilion 15"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Pavilion 14",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Pavilion 14",
+      "HP Pavilion 14"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Pavilion x360 14",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP Pavilion x360 14",
+      "Pavilion x360 14"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Pavilion Gaming 15",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP Pavilion Gaming 15",
+      "Pavilion Gaming 15",
+      "Pavilion Gaming"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Victus 16",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "HP Victus 16",
+      "Victus 16"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "Victus 15",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP Victus 15",
+      "Victus 15"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "OMEN Transcend 14",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN Transcend 14",
+      "OMEN Transcend 14",
+      "Transcend 14"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "OMEN Transcend 16",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN Transcend 16",
+      "OMEN Transcend 16",
+      "Transcend 16"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "OMEN 17",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN 17",
+      "OMEN 17"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "OMEN 16",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP OMEN 16",
+      "OMEN 16"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "OMEN 15",
+    "releaseYear": 2020,
+    "isLegacy": true,
+    "aliases": [
+      "HP OMEN 15",
+      "OMEN 15"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 1040 G11",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "HP EliteBook 1040 G11",
+      "EliteBook 1040 G11",
+      "1040 G11"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 1040 G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP EliteBook 1040 G10",
+      "EliteBook 1040 G10",
+      "1040 G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 840 G11",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "HP EliteBook 840 G11",
+      "EliteBook 840 G11",
+      "840 G11"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 840 G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP EliteBook 840 G10",
+      "EliteBook 840 G10",
+      "840 G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 840 G8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP EliteBook 840 G8",
+      "EliteBook 840 G8",
+      "840 G8"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 830 G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP EliteBook 830 G10",
+      "EliteBook 830 G10",
+      "830 G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 830 G8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP EliteBook 830 G8",
+      "EliteBook 830 G8",
+      "830 G8"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 850 G8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP EliteBook 850 G8",
+      "EliteBook 850 G8",
+      "850 G8"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ProBook 450 G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP ProBook 450 G10",
+      "ProBook 450 G10",
+      "450 G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ProBook 450 G9",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP ProBook 450 G9",
+      "ProBook 450 G9",
+      "450 G9"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ProBook 450 G8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP ProBook 450 G8",
+      "ProBook 450 G8",
+      "450 G8"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ProBook 440 G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP ProBook 440 G10",
+      "ProBook 440 G10",
+      "440 G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ProBook 440 G9",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "HP ProBook 440 G9",
+      "ProBook 440 G9",
+      "440 G9"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ProBook 440 G8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP ProBook 440 G8",
+      "ProBook 440 G8",
+      "440 G8"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ProBook 430 G8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP ProBook 430 G8",
+      "ProBook 430 G8",
+      "430 G8"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ZBook Studio G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP ZBook Studio G10",
+      "ZBook Studio G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ZBook Firefly 14 G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP ZBook Firefly 14 G10",
+      "ZBook Firefly 14 G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ZBook Firefly 15 G8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP ZBook Firefly 15 G8",
+      "ZBook Firefly 15 G8"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ZBook Power G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP ZBook Power G10",
+      "ZBook Power G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ZBook Fury 16 G10",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "HP ZBook Fury 16 G10",
+      "ZBook Fury 16 G10"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "250 G8",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "HP 250 G8",
+      "250 G8"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "250 G7",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "HP 250 G7",
+      "250 G7"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "15-da",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "HP 15-da",
+      "15-da"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "15-bs",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "HP 15-bs",
+      "15-bs"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "ProBook 450 G5",
+    "releaseYear": 2017,
+    "isLegacy": true,
+    "aliases": [
+      "HP ProBook 450 G5",
+      "ProBook 450 G5",
+      "450 G5"
+    ]
+  },
+  {
+    "brand": "HP",
+    "type": "LAPTOP",
+    "name": "EliteBook 840 G5",
+    "releaseYear": 2018,
+    "isLegacy": true,
+    "aliases": [
+      "HP EliteBook 840 G5",
+      "EliteBook 840 G5",
+      "840 G5"
+    ]
+  }
+]

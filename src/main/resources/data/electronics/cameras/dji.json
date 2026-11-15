@@ -1,0 +1,68 @@
+[
+  {
+    "brand": "DJI",
+    "type": "CAMERA",
+    "name": "Osmo Pocket 3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Pocket 3",
+      "DJI Pocket 3"
+    ]
+  },
+  {
+    "brand": "DJI",
+    "type": "CAMERA",
+    "name": "Osmo Action 5 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Action 5 Pro",
+      "Action 5"
+    ]
+  },
+  {
+    "brand": "DJI",
+    "type": "CAMERA",
+    "name": "Osmo Action 4",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Action 4",
+      "DJI Action 4"
+    ]
+  },
+  {
+    "brand": "DJI",
+    "type": "CAMERA",
+    "name": "Mini 4 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "DJI Mini 4 Pro",
+      "Mini 4"
+    ]
+  },
+  {
+    "brand": "DJI",
+    "type": "CAMERA",
+    "name": "Air 3",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "DJI Air 3",
+      "Air 3 Drone"
+    ]
+  },
+  {
+    "brand": "DJI",
+    "type": "CAMERA",
+    "name": "Mavic 3 Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "DJI Mavic 3 Pro",
+      "Mavic 3"
+    ]
+  }
+]

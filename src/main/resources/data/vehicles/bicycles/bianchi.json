@@ -1,0 +1,84 @@
+[
+  {
+    "brand": "BIANCHI",
+    "type": "BICYCLE",
+    "name": "Via Nirone 7",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Via Nirone 7 (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Shimano Claris",
+          "Shimano Sora",
+          "Shimano 105"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BIANCHI",
+    "type": "BICYCLE",
+    "name": "Magma",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Magma MTB (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Magma 9.0",
+          "Magma 9.1",
+          "Magma 9.2"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BIANCHI",
+    "type": "BICYCLE",
+    "name": "Sprint",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Sprint Carbon (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Sprint 105",
+          "Sprint Ultegra"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BIANCHI",
+    "type": "BICYCLE",
+    "name": "Duel",
+    "supportedBodyTypes": [
+      "OTHER"
+    ],
+    "generations": [
+      {
+        "name": "Duel Dağ Bisikleti (2019–)",
+        "startYear": 2019,
+        "endYear": null,
+        "engines": [],
+        "trims": [
+          "Duel 27.0",
+          "Duel 29.0"
+        ]
+      }
+    ]
+  }
+]

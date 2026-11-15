@@ -1,0 +1,38 @@
+[
+  {
+    "brand": "FORD_TRUCKS",
+    "type": "TRUCK",
+    "name": "F-MAX",
+    "supportedBodyTypes": [
+      "TRACTOR"
+    ],
+    "generations": [
+      {
+        "name": "F-MAX (2018–)",
+        "startYear": 2018,
+        "versions": [
+          {
+            "name": "F-MAX 500",
+            "fuelType": "DIESEL",
+            "horsePower": 500,
+            "source": "claude-draft",
+            "torqueNm": 2500,
+            "gearbox": "SEMI_AUTOMATIC",
+            "gearCount": 12
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD_TRUCKS",
+    "type": "TRUCK",
+    "name": "Cargo",
+    "supportedBodyTypes": [
+      "TRUCK",
+      "TIPPER",
+      "TRACTOR"
+    ],
+    "generations": []
+  }
+]

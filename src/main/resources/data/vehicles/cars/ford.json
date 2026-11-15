@@ -1,0 +1,1136 @@
+[
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Fiesta",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Fiesta (2017–2023, Mk8)",
+        "engines": [
+          {
+            "name": "1.1 Trend",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium",
+          "Style",
+          "ST-Line"
+        ]
+      },
+      {
+        "name": "Fiesta (2008–2017, Mk7)",
+        "engines": [
+          {
+            "name": "1.25",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 Ti-VCT",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium",
+          "Style",
+          "Collection",
+          "Sport"
+        ]
+      },
+      {
+        "name": "Fiesta (2002–2008, Mk6)",
+        "engines": [
+          {
+            "name": "1.25",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Trend",
+          "Ghia",
+          "Collection"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Focus Hatchback",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Focus Hatchback (2018–, Mk4)",
+        "engines": [
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 EcoBlue",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend X",
+          "Titanium",
+          "Style",
+          "ST-Line",
+          "Active"
+        ]
+      },
+      {
+        "name": "Focus Hatchback (2011–2018, Mk3)",
+        "engines": [
+          {
+            "name": "1.6 Ti-VCT",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Style",
+          "Titanium",
+          "Smart"
+        ]
+      },
+      {
+        "name": "Focus Hatchback (2005–2011, Mk2)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiente",
+          "Trend",
+          "Collection",
+          "Titanium",
+          "Ghia"
+        ]
+      },
+      {
+        "name": "Focus Hatchback (1998–2005, Mk1)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiente",
+          "Comfort",
+          "Trend",
+          "Ghia"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Focus Sedan",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Focus Sedan (2018–, Mk4)",
+        "trims": [
+          "Trend X",
+          "Titanium",
+          "Style",
+          "Active"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2018,
+        "versions": [
+          {
+            "name": "1.5 Ti-VCT 123",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1497,
+            "horsePower": 123,
+            "torqueNm": 150,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.5 Ti-VCT 123 AT",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1497,
+            "horsePower": 123,
+            "torqueNm": 150,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.0 EcoBoost 125",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 125,
+            "torqueNm": 170,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 EcoBlue 115 AT8",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1499,
+            "horsePower": 115,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 8,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Focus Sedan (2011–2018, Mk3)",
+        "trims": [
+          "Trend",
+          "Style",
+          "Titanium"
+        ],
+        "bodyType": "SEDAN",
+        "doors": "FOUR",
+        "seatCount": "FIVE",
+        "startYear": 2011,
+        "endYear": 2018,
+        "versions": [
+          {
+            "name": "1.6 Ti-VCT",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.6 Ti-VCT 125 Powershift",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 1596,
+            "horsePower": 125,
+            "torqueNm": 159,
+            "gearbox": "AUTOMATIC",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "verified"
+          },
+          {
+            "name": "1.6 TDCi 115",
+            "fuelType": "DIESEL",
+            "engineCapacity": 1560,
+            "horsePower": 115,
+            "torqueNm": 270,
+            "gearbox": "MANUAL",
+            "gearCount": 6,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      },
+      {
+        "name": "Focus Sedan (2005–2011, Mk2)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Ambiente",
+          "Trend",
+          "Collection",
+          "Titanium",
+          "Ghia"
+        ]
+      },
+      {
+        "name": "Focus Sedan (1998–2005, Mk1)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.8 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Ambiente",
+          "Comfort",
+          "Trend",
+          "Ghia"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Focus Wagon",
+    "supportedBodyTypes": [
+      "WAGON"
+    ],
+    "generations": [
+      {
+        "name": "Focus Wagon (2018–, Mk4)",
+        "engines": [
+          {
+            "name": "1.5 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 EcoBlue",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Titanium",
+          "ST-Line",
+          "Active"
+        ]
+      },
+      {
+        "name": "Focus Wagon (2011–2018, Mk3)",
+        "engines": [
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Titanium"
+        ]
+      },
+      {
+        "name": "Focus Wagon (2005–2011, Mk2)",
+        "engines": [
+          {
+            "name": "1.6 16V",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium",
+          "Ghia"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Mondeo",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Mondeo (2014–2022, Mk5)",
+        "engines": [
+          {
+            "name": "1.5 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 Hybrid",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Titanium"
+        ]
+      },
+      {
+        "name": "Mondeo (2007–2014, Mk4)",
+        "engines": [
+          {
+            "name": "2.0 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium",
+          "Selective"
+        ]
+      },
+      {
+        "name": "Mondeo (2001–2007, Mk3)",
+        "engines": [
+          {
+            "name": "2.0 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 16V",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Ghia",
+          "Ghia X"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Fusion",
+    "supportedBodyTypes": [
+      "SEDAN"
+    ],
+    "generations": [
+      {
+        "name": "Fusion (2002–2012)",
+        "engines": [
+          {
+            "name": "1.4",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.4 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Comfort",
+          "Lux"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Ka",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Ka (2008–2016, Mk2)",
+        "engines": [
+          {
+            "name": "1.2",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.3 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium"
+        ]
+      },
+      {
+        "name": "Ka (1996–2008, Mk1)",
+        "engines": [
+          {
+            "name": "1.3",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Standard",
+          "Collection"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Puma",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Puma (2020–)",
+        "trims": [
+          "Style",
+          "Titanium",
+          "ST-Line"
+        ],
+        "bodyType": "SUV",
+        "doors": "FIVE",
+        "seatCount": "FIVE",
+        "startYear": 2020,
+        "versions": [
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE",
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 EcoBoost Hybrid 125",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 125,
+            "torqueNm": 170,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          },
+          {
+            "name": "1.0 EcoBoost Hybrid 155",
+            "fuelType": "GASOLINE",
+            "engineCapacity": 999,
+            "horsePower": 155,
+            "drivetrain": "FWD",
+            "source": "claude-draft"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "EcoSport",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "EcoSport (2012–2023)",
+        "engines": [
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Titanium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Kuga",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Kuga (2019–, Mk3)",
+        "engines": [
+          {
+            "name": "1.5 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 EcoBlue Hybrid",
+            "fuelType": "HYBRID"
+          },
+          {
+            "name": "2.5 PHEV",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Titanium",
+          "ST-Line"
+        ]
+      },
+      {
+        "name": "Kuga (2012–2019, Mk2)",
+        "engines": [
+          {
+            "name": "1.6 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium",
+          "ST-Line"
+        ]
+      },
+      {
+        "name": "Kuga (2008–2012, Mk1)",
+        "engines": [
+          {
+            "name": "2.0 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Edge",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Edge (2016–2021)",
+        "engines": [
+          {
+            "name": "2.0 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 EcoBlue",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Titanium",
+          "Sport"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Explorer",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Explorer (2020–)",
+        "engines": [
+          {
+            "name": "3.0 EcoBoost PHEV",
+            "fuelType": "HYBRID"
+          }
+        ],
+        "trims": [
+          "Platinum"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Mustang",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "Mustang (2015–, S550)",
+        "engines": [
+          {
+            "name": "2.3 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "5.0 V8",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Fastback"
+        ]
+      },
+      {
+        "name": "Mustang (2005–2014, S197)",
+        "engines": [
+          {
+            "name": "3.7 V6",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "4.6 V8",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Fastback",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Tourneo Courier",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Tourneo Courier (2023–, Mk2)",
+        "engines": [
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.5 EcoBlue",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium",
+          "Active"
+        ]
+      },
+      {
+        "name": "Tourneo Courier (2014–2023, Mk1)",
+        "engines": [
+          {
+            "name": "1.5 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.0 EcoBoost",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Deluxe",
+          "Titanium",
+          "Black Line"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Tourneo Connect",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Tourneo Connect (2013–2021, Mk2)",
+        "engines": [
+          {
+            "name": "1.6 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "1.5 EcoBlue",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Deluxe",
+          "Titanium"
+        ]
+      },
+      {
+        "name": "Tourneo Connect (2002–2013, Mk1)",
+        "engines": [
+          {
+            "name": "1.8 TDCi",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Kombi",
+          "GLX"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Tourneo Custom",
+    "supportedBodyTypes": [
+      "MPV"
+    ],
+    "generations": [
+      {
+        "name": "Tourneo Custom (2023–, V710)",
+        "engines": [
+          {
+            "name": "2.0 EcoBlue",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Titanium",
+          "Titanium Plus"
+        ]
+      },
+      {
+        "name": "Tourneo Custom (2012–2023, V362)",
+        "engines": [
+          {
+            "name": "2.2 TDCi",
+            "fuelType": "DIESEL"
+          },
+          {
+            "name": "2.0 EcoBlue",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "Trend",
+          "Titanium",
+          "Titanium Plus"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Mustang Mach-E",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Mustang Mach-E (2021–)",
+        "engines": [
+          {
+            "name": "Standard Range 198 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Extended Range 258 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "GT 358 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "RWD",
+          "AWD",
+          "GT"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Explorer EV",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Explorer EV (2024–)",
+        "engines": [
+          {
+            "name": "Explorer EV 210 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Explorer EV 250 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Capri EV",
+    "supportedBodyTypes": [
+      "SUV"
+    ],
+    "generations": [
+      {
+        "name": "Capri EV (2024–)",
+        "engines": [
+          {
+            "name": "Capri EV 210 kW",
+            "fuelType": "ELECTRIC"
+          },
+          {
+            "name": "Capri EV 250 kW",
+            "fuelType": "ELECTRIC"
+          }
+        ],
+        "trims": [
+          "Style",
+          "Premium"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Fiesta ST",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Fiesta ST",
+        "engines": [
+          {
+            "name": "1.5 EcoBoost ST",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "1.6 EcoBoost ST",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "ST"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Focus ST",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Focus ST",
+        "engines": [
+          {
+            "name": "2.0 EcoBoost ST",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.3 EcoBoost ST",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.0 TDCi ST",
+            "fuelType": "DIESEL"
+          }
+        ],
+        "trims": [
+          "ST"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Focus RS",
+    "supportedBodyTypes": [
+      "HATCHBACK"
+    ],
+    "generations": [
+      {
+        "name": "Focus RS",
+        "engines": [
+          {
+            "name": "2.5 RS",
+            "fuelType": "GASOLINE"
+          },
+          {
+            "name": "2.3 EcoBoost RS",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "RS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "FORD",
+    "type": "CAR",
+    "name": "Mustang GT",
+    "supportedBodyTypes": [
+      "COUPE"
+    ],
+    "generations": [
+      {
+        "name": "Mustang GT",
+        "engines": [
+          {
+            "name": "5.0 V8 GT",
+            "fuelType": "GASOLINE"
+          }
+        ],
+        "trims": [
+          "GT"
+        ]
+      }
+    ]
+  }
+]

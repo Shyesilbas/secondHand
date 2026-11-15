@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "INFINIX",
+    "type": "MOBILE_PHONE",
+    "name": "GT 20 Pro",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Infinix GT 20 Pro",
+      "GT 20 Pro Gaming"
+    ]
+  },
+  {
+    "brand": "INFINIX",
+    "type": "MOBILE_PHONE",
+    "name": "Note 40 Pro+ 5G",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Infinix Note 40 Pro Plus",
+      "Note 40 Pro+"
+    ]
+  },
+  {
+    "brand": "INFINIX",
+    "type": "MOBILE_PHONE",
+    "name": "Note 30",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Infinix Note 30",
+      "Note 30 4G/5G"
+    ]
+  },
+  {
+    "brand": "INFINIX",
+    "type": "MOBILE_PHONE",
+    "name": "Zero 30 5G",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Infinix Zero 30",
+      "Zero 30 4K 60fps"
+    ]
+  }
+]

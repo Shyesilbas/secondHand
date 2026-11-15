@@ -1,0 +1,158 @@
+[
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV Max 100",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi TV Max 100",
+      "TV Max 100",
+      "Max 100"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV Max 86",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi TV Max 86",
+      "TV Max 86",
+      "Max 86"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV A Pro 75",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A Pro 75",
+      "TV A Pro 75",
+      "Xiaomi TV A Pro 75"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV A Pro 65",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A Pro 65",
+      "TV A Pro 65",
+      "Xiaomi TV A Pro 65"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV A Pro 55",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A Pro 55",
+      "TV A Pro 55",
+      "Xiaomi TV A Pro 55"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV A Pro 43",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "A Pro 43",
+      "TV A Pro 43",
+      "Xiaomi TV A Pro 43"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV A2 58",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "A2 58",
+      "TV A2 58",
+      "Xiaomi TV A2 58"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV A2 55",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "A2 55",
+      "TV A2 55",
+      "Xiaomi TV A2 55"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "TV A2 43",
+    "releaseYear": 2022,
+    "isLegacy": false,
+    "aliases": [
+      "A2 43",
+      "TV A2 43",
+      "Xiaomi TV A2 43"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "Mi TV P1 55",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Mi TV P1 55",
+      "Mi TV P1 55",
+      "P1 55"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "Mi TV P1 43",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "Xiaomi Mi TV P1 43",
+      "Mi TV P1 43",
+      "P1 43"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "Mi TV 4S 55",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Xiaomi Mi TV 4S 55",
+      "Mi TV 4S 55",
+      "4S 55"
+    ]
+  },
+  {
+    "brand": "XIAOMI",
+    "type": "TV",
+    "name": "Mi TV 4A 43",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Xiaomi Mi TV 4A 43",
+      "Mi TV 4A 43",
+      "4A 43"
+    ]
+  }
+]

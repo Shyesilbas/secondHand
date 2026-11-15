@@ -1,0 +1,182 @@
+{
+  "listingType": "REAL_ESTATE",
+  "definitions": [
+    {
+      "key": "deedStatus",
+      "label": "Tapu durumu",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "CONDOMINIUM",
+          "label": "Kat mülkiyetli"
+        },
+        {
+          "value": "CONSTRUCTION_SERVITUDE",
+          "label": "Kat irtifaklı"
+        },
+        {
+          "value": "DETACHED_TITLE",
+          "label": "Müstakil tapulu"
+        },
+        {
+          "value": "SHARED",
+          "label": "Hisseli tapu"
+        },
+        {
+          "value": "COOPERATIVE",
+          "label": "Kooperatif hisseli"
+        }
+      ]
+    },
+    {
+      "key": "loanEligible",
+      "label": "Krediye uygun",
+      "dataType": "BOOLEAN",
+      "level": "LISTING",
+      "filterable": true
+    },
+    {
+      "key": "deposit",
+      "label": "Depozito",
+      "unit": "TL",
+      "dataType": "DECIMAL",
+      "level": "LISTING",
+      "min": 0,
+      "filterable": false
+    },
+    {
+      "key": "minLeaseMonths",
+      "label": "Minimum kira süresi",
+      "unit": "ay",
+      "dataType": "INTEGER",
+      "level": "LISTING",
+      "min": 1,
+      "max": 120,
+      "filterable": false
+    },
+    {
+      "scope": "RESIDENTIAL",
+      "key": "usageStatus",
+      "label": "Kullanım durumu",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "EMPTY",
+          "label": "Boş"
+        },
+        {
+          "value": "TENANT",
+          "label": "Kiracılı"
+        },
+        {
+          "value": "OWNER",
+          "label": "Mülk sahibi oturuyor"
+        }
+      ]
+    },
+    {
+      "scope": "RESIDENTIAL",
+      "key": "facades",
+      "label": "Cephe",
+      "dataType": "MULTI_ENUM",
+      "level": "LISTING",
+      "filterable": false,
+      "options": [
+        {
+          "value": "NORTH",
+          "label": "Kuzey"
+        },
+        {
+          "value": "SOUTH",
+          "label": "Güney"
+        },
+        {
+          "value": "EAST",
+          "label": "Doğu"
+        },
+        {
+          "value": "WEST",
+          "label": "Batı"
+        }
+      ]
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "usageStatus",
+      "label": "Kullanım durumu",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "EMPTY",
+          "label": "Boş"
+        },
+        {
+          "value": "TENANT",
+          "label": "Kiracılı"
+        },
+        {
+          "value": "OWNER",
+          "label": "Mülk sahibi oturuyor"
+        }
+      ]
+    },
+    {
+      "scope": "COMMERCIAL",
+      "key": "facades",
+      "label": "Cephe",
+      "dataType": "MULTI_ENUM",
+      "level": "LISTING",
+      "filterable": false,
+      "options": [
+        {
+          "value": "NORTH",
+          "label": "Kuzey"
+        },
+        {
+          "value": "SOUTH",
+          "label": "Güney"
+        },
+        {
+          "value": "EAST",
+          "label": "Doğu"
+        },
+        {
+          "value": "WEST",
+          "label": "Batı"
+        }
+      ]
+    },
+    {
+      "scope": "LAND",
+      "key": "waterSource",
+      "label": "Su",
+      "dataType": "ENUM",
+      "level": "LISTING",
+      "filterable": true,
+      "options": [
+        {
+          "value": "MAINS",
+          "label": "Şebeke suyu"
+        },
+        {
+          "value": "WELL",
+          "label": "Kuyu"
+        },
+        {
+          "value": "SPRING",
+          "label": "Kaynak / dere"
+        },
+        {
+          "value": "NONE",
+          "label": "Yok"
+        }
+      ]
+    }
+  ]
+}

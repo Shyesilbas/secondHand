@@ -1,0 +1,23 @@
+[
+  {
+    "brand": "BMC",
+    "type": "TRUCK",
+    "name": "Tuğra",
+    "supportedBodyTypes": [
+      "TRACTOR",
+      "TRUCK",
+      "TIPPER"
+    ],
+    "generations": []
+  },
+  {
+    "brand": "BMC",
+    "type": "TRUCK",
+    "name": "Pro",
+    "supportedBodyTypes": [
+      "TRUCK",
+      "TIPPER"
+    ],
+    "generations": []
+  }
+]

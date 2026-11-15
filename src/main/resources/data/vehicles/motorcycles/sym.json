@@ -1,0 +1,123 @@
+[
+  {
+    "brand": "SYM",
+    "type": "MOTORCYCLE",
+    "name": "Jet 14",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Jet 14 (2017–)",
+        "startYear": 2017,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "125cc (11 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 11,
+            "engineCapacity": 125
+          },
+          {
+            "name": "200cc (12 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 12,
+            "engineCapacity": 169
+          }
+        ],
+        "trims": [
+          "Air Cooled",
+          "Liquid Cooled"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SYM",
+    "type": "MOTORCYCLE",
+    "name": "Jet X 125",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Jet X 125 (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "125cc 4V (12.7 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 13,
+            "engineCapacity": 125
+          }
+        ],
+        "trims": [
+          "ABS",
+          "TCS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SYM",
+    "type": "MOTORCYCLE",
+    "name": "Joymax Z+",
+    "supportedBodyTypes": [
+      "SCOOTER",
+      "TOURING"
+    ],
+    "generations": [
+      {
+        "name": "Joymax Z+ (2021–)",
+        "startYear": 2021,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "250cc (21.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 22,
+            "engineCapacity": 249
+          },
+          {
+            "name": "300cc (26 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 26,
+            "engineCapacity": 278
+          }
+        ],
+        "trims": [
+          "ABS",
+          "TCS"
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "SYM",
+    "type": "MOTORCYCLE",
+    "name": "Fiddle IV",
+    "supportedBodyTypes": [
+      "SCOOTER"
+    ],
+    "generations": [
+      {
+        "name": "Fiddle IV (2020–)",
+        "startYear": 2020,
+        "endYear": null,
+        "engines": [
+          {
+            "name": "125cc Liquid-Cooled (11.5 hp)",
+            "fuelType": "GASOLINE",
+            "horsePower": 12,
+            "engineCapacity": 125
+          }
+        ],
+        "trims": [
+          "CBS",
+          "ABS"
+        ]
+      }
+    ]
+  }
+]

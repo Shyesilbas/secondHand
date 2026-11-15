@@ -1,0 +1,35 @@
+[
+  {
+    "brand": "MSI",
+    "type": "MONITOR",
+    "name": "Optix MAG274QRF-QD",
+    "releaseYear": 2021,
+    "isLegacy": false,
+    "aliases": [
+      "MSI MAG274QRF-QD",
+      "MAG274QRF"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "MONITOR",
+    "name": "G274QPF-QD",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MSI G274QPF-QD",
+      "G274QPF"
+    ]
+  },
+  {
+    "brand": "MSI",
+    "type": "MONITOR",
+    "name": "MAG 323UPF",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "MSI MAG 323UPF",
+      "323UPF 4K 160Hz"
+    ]
+  }
+]

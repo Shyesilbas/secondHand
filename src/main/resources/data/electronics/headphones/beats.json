@@ -1,0 +1,46 @@
+[
+  {
+    "brand": "BEATS",
+    "type": "HEADPHONES",
+    "name": "Studio Pro",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Beats Studio Pro",
+      "Studio Pro Wireless"
+    ]
+  },
+  {
+    "brand": "BEATS",
+    "type": "HEADPHONES",
+    "name": "Solo 4",
+    "releaseYear": 2024,
+    "isLegacy": false,
+    "aliases": [
+      "Beats Solo 4",
+      "Solo 4 Wireless"
+    ]
+  },
+  {
+    "brand": "BEATS",
+    "type": "HEADPHONES",
+    "name": "Studio Buds +",
+    "releaseYear": 2023,
+    "isLegacy": false,
+    "aliases": [
+      "Beats Studio Buds Plus",
+      "Studio Buds + TWS"
+    ]
+  },
+  {
+    "brand": "BEATS",
+    "type": "HEADPHONES",
+    "name": "Powerbeats Pro",
+    "releaseYear": 2019,
+    "isLegacy": true,
+    "aliases": [
+      "Beats Powerbeats Pro",
+      "PBP"
+    ]
+  }
+]
