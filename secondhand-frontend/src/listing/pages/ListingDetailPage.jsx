@@ -46,7 +46,7 @@ const discountPercent = (original, sale) => {
 
 /* ── Sub-components ──────────────────────────────────────── */
 
-const CARD = 'rounded-lg border border-border-light bg-background-secondary/40';
+const CARD = 'rounded border border-border-light bg-background-secondary';
 
 // Mirrors the final geometry: gallery + sections on the left, buy box + seller card on the right.
 const DetailSkeleton = () => (
@@ -328,7 +328,7 @@ const ListingDetailPage = () => {
 
               <DetailSection id="description" title={t("about_this_item", "Açıklama")}>
                 <p
-                  className={`max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-text-secondary ${shouldClampDescription && !isDescriptionExpanded ? 'line-clamp-6' : ''
+                  className={`max-w-prose whitespace-pre-wrap break-words text-base leading-relaxed text-text-secondary ${shouldClampDescription && !isDescriptionExpanded ? 'line-clamp-6' : ''
                     }`}
                 >
                   {listing.description || t("no_description_provided", "Bu ilan için açıklama girilmemiş.")}

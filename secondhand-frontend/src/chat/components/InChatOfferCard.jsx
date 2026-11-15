@@ -60,7 +60,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                 };
             default:
                 return {
-                    bg: 'bg-background-tertiary/80 border-card-border-hover',
+                    bg: 'bg-background-tertiary border-card-border-hover',
                     badge: 'bg-primary text-white',
                     icon: <FiTag className="w-4 h-4 text-text-primary" />,
                     label: t("status_pending")
@@ -88,12 +88,12 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
             {/* Content Details */}
             <div className="space-y-1.5 mb-3">
                 {title && (
-                    <p className="text-xs font-medium text-text-tertiary truncate">
+                    <p className="text-sm font-medium text-text-tertiary truncate">
                         {title}
                     </p>
                 )}
                 <div className="flex items-baseline justify-between">
-                    <span className="text-xs text-text-secondary font-medium">
+                    <span className="text-sm text-text-secondary font-medium">
                         {t("offered_price")}:
                     </span>
                     <span className="text-lg font-semibold text-text-primary tracking-tight">
@@ -117,7 +117,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                     <button
                         onClick={() => offerId && rejectMutation.mutate(offerId)}
                         disabled={rejectMutation.isPending || !offerId}
-                        className="flex items-center justify-center gap-1.5 px-3 py-2 bg-status-error hover:bg-status-error text-white rounded text-xs font-semibold transition-all disabled:opacity-50"
+                        className="inline-flex h-9 items-center justify-center gap-1.5 rounded bg-status-error px-3 text-sm font-medium text-white transition-all hover:bg-status-error disabled:opacity-50"
                     >
                         <FiXCircle className="w-3.5 h-3.5" />
                         {rejectMutation.isPending ? t("processing") : t("reject")}

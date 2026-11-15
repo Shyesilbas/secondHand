@@ -20,9 +20,10 @@ import {
     ORDER_VIEW_MODES,
     SELLER_TO_SHIP_STATUSES
 } from '../../constants/orderUiConstants.js';
-import { getOrderStatusBadgeClass, getOrderStatusDotClass } from '../../utils/statusPresentation.js';
+import { getOrderStatusBadgeVariant } from '../../utils/statusPresentation.js';
 import Button, { buttonClasses } from '../../../common/components/ui/Button.jsx';
 import DataPagination from '../../../common/components/ui/DataPagination.jsx';
+import { Badge, Card, PageHeader, Tabs } from '../../../common/components/ui/index.js';
 import EmptyState from '../../../common/components/ui/EmptyState.jsx';
 import Skeleton from '../../../common/components/ui/Skeleton.jsx';
 import Alert from '../../../common/components/ui/Alert.jsx';
@@ -140,23 +141,23 @@ const Header = ({ title, subtitle, onAnalytics, analyticsLabel, onRefresh, loadi
     const { t } = useTranslation();
     return (
         <div className="space-y-4">
-            <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                    <h1 className="text-2xl font-semibold text-text-primary">{title}</h1>
-                    {subtitle ? <p className="mt-0.5 text-sm text-text-secondary">{subtitle}</p> : null}
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                    {onAnalytics ? (
-                        <Button variant="secondary" size="sm" onClick={onAnalytics}>
-                            <BarChart3 className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
-                            <span className="hidden sm:inline">{analyticsLabel}</span>
+            <PageHeader
+                title={title}
+                subtitle={subtitle}
+                actions={
+                    <>
+                        {onAnalytics ? (
+                            <Button variant="secondary" size="sm" onClick={onAnalytics}>
+                                <BarChart3 className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+                                <span className="hidden sm:inline">{analyticsLabel}</span>
+                            </Button>
+                        ) : null}
+                        <Button variant="secondary" size="sm" className="w-9 !px-0" onClick={onRefresh} disabled={loading} aria-label={t("refresh", "Yenile")}>
+                            <RefreshCw className={`h-4 w-4 ${loading ? 'motion-safe:animate-spin' : ''}`} strokeWidth={1.5} aria-hidden />
                         </Button>
-                    ) : null}
-                    <Button variant="secondary" size="sm" className="w-9 !px-0" onClick={onRefresh} disabled={loading} aria-label={t("refresh", "Yenile")}>
-                        <RefreshCw className={`h-4 w-4 ${loading ? 'motion-safe:animate-spin' : ''}`} strokeWidth={1.5} aria-hidden />
-                    </Button>
-                </div>
-            </div>
+                    </>
+                }
+            />
             <ViewSwitch uiCopy={uiCopy} />
         </div>
     );
@@ -182,14 +183,14 @@ const SellerSummary = ({ flow, uiCopy }) => {
     const toShip = countsError ? '—' : SELLER_TO_SHIP_STATUSES.reduce((sum, s) => sum + (statusCounts[s] || 0), 0);
     return (
         <>
-            <div className="mb-4 flex items-start gap-3 rounded-lg border border-border bg-background-primary p-4" role="note">
+            <div className="mb-4 flex items-start gap-3 rounded border border-border bg-background-primary p-4" role="note">
                 <Clock className={`mt-0.5 h-5 w-5 shrink-0 ${toShip > 0 ? 'text-status-warning-text' : 'text-text-tertiary'}`} strokeWidth={1.5} aria-hidden />
                 <div className="min-w-0">
                     <p className="text-sm font-medium text-text-primary">{uiCopy.shipDeadlineNoteTitle}</p>
                     <p className="mt-0.5 text-sm text-text-secondary">{uiCopy.shipDeadlineNoteBody}</p>
                 </div>
             </div>
-            <div className="mb-6 grid grid-cols-1 divide-y divide-border-light rounded-lg border border-border bg-background-primary sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            <div className="mb-6 grid grid-cols-1 divide-y divide-border-light rounded border border-border bg-background-primary sm:grid-cols-3 sm:divide-x sm:divide-y-0">
                 <SummaryStat label={uiCopy.summaryToShip} value={toShip} loading={countsLoading} />
                 <SummaryStat label={uiCopy.summaryEscrow} value={formatCurrency(flow.escrow.pendingEscrowAmount)} loading={flow.escrow.isLoading} />
                 <SummaryStat label={uiCopy.summaryCompleted} value={countsError ? '—' : statusCounts[ORDER_STATUSES.COMPLETED] || 0} loading={countsLoading} />
@@ -202,37 +203,25 @@ const SellerSummary = ({ flow, uiCopy }) => {
 
 const StatusTabs = ({ activeTab, onChange, getTabCount, disabled, uiCopy }) => {
     const { t } = useTranslation();
+    const items = TAB_ORDER.map(tab => {
+        const count = getTabCount(tab);
+        return {
+            key: tab,
+            label: uiCopy.tabs[tab],
+            count,
+            hideZeroCount: true,
+            highlight: tab === ORDER_LIST_TABS.ACTION && count > 0,
+        };
+    });
+
     return (
-        <div className="-mb-px flex overflow-x-auto" role="tablist" aria-label={t("order_status_filters", "Sipariş durumu filtreleri")}>
-            {TAB_ORDER.map(tab => {
-                const active = !disabled && activeTab === tab;
-                const count = getTabCount(tab);
-                const highlight = tab === ORDER_LIST_TABS.ACTION && count > 0;
-                return (
-                    <button
-                        key={tab}
-                        type="button"
-                        role="tab"
-                        aria-selected={active}
-                        onClick={() => onChange(tab)}
-                        className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors duration-150 ${active
-                                ? 'border-primary font-medium text-text-primary'
-                                : 'border-transparent text-text-secondary hover:text-text-primary'
-                            }`}
-                    >
-                        {uiCopy.tabs[tab]}
-                        {count != null && count > 0 && (
-                            <span
-                                className={`rounded-sm px-1.5 text-xs font-medium tabular-nums ${highlight ? 'bg-status-warning-bg text-status-warning-text' : 'bg-background-tertiary text-text-secondary'
-                                    }`}
-                            >
-                                {count}
-                            </span>
-                        )}
-                    </button>
-                );
-            })}
-        </div>
+        <Tabs
+            items={items}
+            activeKey={disabled ? null : activeTab}
+            onChange={onChange}
+            ariaLabel={t("order_status_filters", "Sipariş durumu filtreleri")}
+            borderBottom={false}
+        />
     );
 };
 
@@ -282,7 +271,7 @@ const SearchBox = ({ search, onSubmit, uiCopy }) => {
 /* ── Order row ───────────────────────────────────────────── */
 
 const OrderRowSkeleton = () => (
-    <div className="flex items-start gap-4 rounded-lg border border-border bg-background-primary p-4 sm:p-5 shadow-sm">
+    <Card className="flex items-start gap-4 sm:p-5">
         <Skeleton className="h-16 w-16 shrink-0 rounded-md" />
         <div className="flex-1 space-y-2.5 pt-0.5">
             <Skeleton className="h-4 w-52 max-w-full" />
@@ -290,7 +279,7 @@ const OrderRowSkeleton = () => (
             <Skeleton className="h-4 w-28" />
         </div>
         <Skeleton className="hidden h-9 w-28 shrink-0 sm:block" />
-    </div>
+    </Card>
 );
 
 // Release time is the backend `autoCompleteAt`; the release itself is the COMPLETED status.
@@ -410,7 +399,7 @@ const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highl
                 }
             }}
             aria-label={`${title}, ${statusLabel}`}
-            className={`group flex cursor-pointer gap-4 rounded-lg border bg-background-primary p-4 shadow-sm hover:shadow transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:p-5 ${highlighted ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'
+            className={`group flex cursor-pointer gap-4 rounded border bg-background-primary p-4 shadow-sm hover:shadow transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:p-5 ${highlighted ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'
                 }`}
         >
             <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-light bg-background-secondary">
@@ -439,10 +428,9 @@ const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highl
 
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                     <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium border ${getOrderStatusBadgeClass(order.status)}`}>
-                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${getOrderStatusDotClass(order.status)}`} aria-hidden />
+                        <Badge variant={getOrderStatusBadgeVariant(order.status)} dot>
                             {statusLabel}
-                        </span>
+                        </Badge>
                         {escrowHint && (
                             <span className="tabular-nums text-text-tertiary">
                                 · {uiCopy.escrowInRow(formatCurrency(escrowAmount, currency))}, {escrowHint}
@@ -585,7 +573,7 @@ const OrdersListLayout = ({
 
     return (
         <div className="min-h-screen bg-background-secondary pb-20">
-            <div className="bg-gradient-to-b from-background-primary via-background-primary/70 to-background-secondary">
+            <div className="bg-background-primary border-b border-border-light">
                 <PageContainer className={`pt-6 pb-5 ${LIST_WIDTH}`}>
                     <Header
                         title={title}

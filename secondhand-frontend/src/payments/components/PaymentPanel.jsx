@@ -49,13 +49,13 @@ const PaymentPanel = ({
  #{selectedListing.id ? selectedListing.id.substring(0, 6).toUpperCase() : ''}
  </span>
  </div>
- <h4 className="text-xs font-semibold text-text-primary truncate">
+ <h4 className="text-sm font-semibold text-text-primary truncate">
  {selectedListing.title}
  </h4>
 
  {feeConfig && (
  <div className="pt-2 border-t border-border flex items-baseline justify-between">
- <span className="text-xs font-semibold text-text-secondary">
+ <span className="text-sm font-semibold text-text-secondary">
  {t("total_due")}
  </span>
  <span className="text-lg font-semibold tabular-nums text-text-price">
@@ -66,7 +66,7 @@ const PaymentPanel = ({
  </div>
 
  {/* E-Wallet Balance Info */}
- <div className="rounded-md border border-border bg-background-primary p-3 flex items-center justify-between text-xs">
+ <div className="rounded-md border border-border bg-background-primary p-3 flex items-center justify-between text-sm">
  <div className="flex items-center gap-2">
  <div className="w-7 h-7 rounded-md bg-secondary-200 text-text-primary flex items-center justify-center font-semibold">
  ₺
@@ -74,7 +74,7 @@ const PaymentPanel = ({
  <div>
  <span className="font-semibold text-text-primary block">{t("ewallet")}</span>
  {eWallet && (
- <span className="text-xs text-text-tertiary ">
+ <span className="text-sm text-text-tertiary">
  {formatPaymentAmount(eWallet?.balance)}
  </span>
  )}
@@ -144,10 +144,10 @@ const PaymentPanel = ({
  <div className="w-10 h-10 bg-background-tertiary rounded flex items-center justify-center mx-auto mb-2 text-text-muted font-semibold">
  ?
  </div>
- <h4 className="text-xs font-semibold text-text-primary mb-1">
+ <h4 className="text-sm font-semibold text-text-primary mb-1">
  {t("no_listing_selected")}
  </h4>
- <p className="text-xs text-text-tertiary max-w-48 mx-auto">
+ <p className="text-sm text-text-tertiary max-w-xs mx-auto">
  {t("choose_a_listing_to_pay_the_listing_fee")}
  </p>
  </div>

@@ -4,6 +4,7 @@ import { ChevronRight, KeyRound, MessageSquare, MailCheck, Shield, UserCheck } f
 import { USER_ACCOUNT_STATUSES } from '../userConstants.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import Button from '../../common/components/ui/Button.jsx';
+import Badge from '../../common/components/ui/Badge.jsx';
 import { useUserSettings, useUpdateUserSettings } from '../hooks/useBlocking.js';
 
 const ProfileAccountStatus = ({ user }) => {
@@ -19,13 +20,13 @@ const ProfileAccountStatus = ({ user }) => {
       case USER_ACCOUNT_STATUSES.ACTIVE:
         return {
           label: t('account_status_active', 'Aktif'),
-          dotClass: 'bg-status-success',
+          variant: 'success',
           description: t('account_active_desc', 'Hesabınız aktif ve kullanıma açık durumda.')
         };
       case USER_ACCOUNT_STATUSES.SUSPENDED:
         return {
           label: t('account_status_suspended', 'Askıya Alındı'),
-          dotClass: 'bg-status-error',
+          variant: 'error',
           description: t(
             'account_suspended_desc',
             'Hesabınız askıya alınmıştır. Destek ekibiyle iletişime geçin.'
@@ -34,13 +35,13 @@ const ProfileAccountStatus = ({ user }) => {
       case USER_ACCOUNT_STATUSES.PENDING:
         return {
           label: t('account_status_pending', 'İncelemede'),
-          dotClass: 'bg-status-warning',
+          variant: 'warning',
           description: t('account_pending_desc', 'Hesabınız onay incelemesindedir.')
         };
       default:
         return {
           label: t('account_status_unknown', 'Bilinmiyor'),
-          dotClass: 'bg-text-tertiary',
+          variant: 'neutral',
           description: t('account_unknown_desc', 'Hesap durumu bilgisi bulunamadı.')
         };
     }
@@ -59,16 +60,15 @@ const ProfileAccountStatus = ({ user }) => {
             aria-hidden="true"
           />
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-text-primary">
+            <h3 className="text-sm font-semibold text-text-primary">
               {t('account_status', 'Hesap Durumu')}
             </h3>
-            <p className="mt-0.5 text-xs text-text-secondary">{status.description}</p>
+            <p className="mt-0.5 text-sm text-text-secondary">{status.description}</p>
           </div>
         </div>
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2.5 py-1 text-xs font-medium text-text-primary">
-          <span className={`h-1.5 w-1.5 rounded-full ${status.dotClass}`} aria-hidden="true" />
-          <span>{status.label}</span>
-        </span>
+        <Badge variant={status.variant} dot className="shrink-0">
+          {status.label}
+        </Badge>
       </div>
 
       {/* 2. Email Verification Row */}
@@ -80,10 +80,10 @@ const ProfileAccountStatus = ({ user }) => {
             aria-hidden="true"
           />
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-text-primary">
+            <h3 className="text-sm font-semibold text-text-primary">
               {t('email_verification', 'E-posta Doğrulaması')}
             </h3>
-            <p className="mt-0.5 text-xs text-text-secondary">
+            <p className="mt-0.5 text-sm text-text-secondary">
               {isVerified
                 ? t('email_verified_desc', 'E-posta adresiniz doğrulanmıştır.')
                 : t(
@@ -96,10 +96,9 @@ const ProfileAccountStatus = ({ user }) => {
 
         <div className="flex shrink-0 items-center gap-2">
           {isVerified ? (
-            <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2.5 py-1 text-xs font-medium text-text-primary">
-              <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden="true" />
-              <span>{t('verified', 'Doğrulandı')}</span>
-            </span>
+            <Badge variant="success" dot>
+              {t('verified', 'Doğrulandı')}
+            </Badge>
           ) : (
             <Link to={ROUTES.VERIFY_ACCOUNT}>
               <Button variant="secondary" size="sm">
@@ -115,10 +114,10 @@ const ProfileAccountStatus = ({ user }) => {
         <div className="flex items-start gap-3 min-w-0">
           <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden="true" />
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-text-primary">
+            <h3 className="text-sm font-semibold text-text-primary">
               {t('messaging_preference', 'Mesajlaşma Tercihi (Global)')}
             </h3>
-            <p className="mt-0.5 text-xs text-text-secondary">
+            <p className="mt-0.5 text-sm text-text-secondary">
               {t('messaging_preference_desc', 'Kapalıyken yeni ilanlarınızda mesajlaşma varsayılan olarak kapalı gelir ve doğrudan mesaj alamazsınız.')}
             </p>
           </div>
@@ -146,7 +145,7 @@ const ProfileAccountStatus = ({ user }) => {
       {/* 3. Change Password Row */}
       <Link
         to={ROUTES.CHANGE_PASSWORD}
-        className="group -mx-2 flex items-center justify-between gap-4 rounded px-2 py-4 transition-colors hover:bg-background-secondary/60"
+        className="group -mx-2 flex items-center justify-between gap-4 rounded px-2 py-4 transition-colors hover:bg-background-secondary"
       >
         <div className="flex items-start gap-3 min-w-0">
           <KeyRound
@@ -155,10 +154,10 @@ const ProfileAccountStatus = ({ user }) => {
             aria-hidden="true"
           />
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-text-primary">
+            <h3 className="text-sm font-semibold text-text-primary">
               {t('change_password', 'Şifre Değiştir')}
             </h3>
-            <p className="mt-0.5 text-xs text-text-secondary">
+            <p className="mt-0.5 text-sm text-text-secondary">
               {t('update_your_password', 'Hesap şifrenizi güvenli şekilde güncelleyin')}
             </p>
           </div>
@@ -173,7 +172,7 @@ const ProfileAccountStatus = ({ user }) => {
       {/* 4. Security & Audit Logs Row */}
       <Link
         to={ROUTES.SECURITY}
-        className="group -mx-2 flex items-center justify-between gap-4 rounded px-2 py-4 last:pb-1 transition-colors hover:bg-background-secondary/60"
+        className="group -mx-2 flex items-center justify-between gap-4 rounded px-2 py-4 last:pb-1 transition-colors hover:bg-background-secondary"
       >
         <div className="flex items-start gap-3 min-w-0">
           <Shield
@@ -182,10 +181,10 @@ const ProfileAccountStatus = ({ user }) => {
             aria-hidden="true"
           />
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-text-primary">
+            <h3 className="text-sm font-semibold text-text-primary">
               {t('security_hub', 'Güvenlik ve Denetim Kayıtları')}
             </h3>
-            <p className="mt-0.5 text-xs text-text-secondary">
+            <p className="mt-0.5 text-sm text-text-secondary">
               {t('manage_sessions', 'Giriş hareketlerini, IP kayıtlarını ve güvenlik olaylarını inceleyin')}
             </p>
           </div>

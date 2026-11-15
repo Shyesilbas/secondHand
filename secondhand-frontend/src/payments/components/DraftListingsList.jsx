@@ -22,7 +22,7 @@ const DraftListingsList = ({
  {listings.length}
  </span>
  </h2>
- <p className="text-xs text-text-tertiary mt-0.5">
+ <p className="text-sm text-text-tertiary mt-0.5">
  {t("choose_a_listing_to_pay_the_listing_fee")}
  </p>
  </div>
@@ -79,7 +79,7 @@ const DraftListingsList = ({
  </div>
 
  {listing.description && (
- <p className="mb-2 line-clamp-1 text-xs text-text-tertiary leading-relaxed">
+ <p className="mb-2 line-clamp-1 text-sm text-text-tertiary leading-relaxed">
  {listing.description}
  </p>
  )}

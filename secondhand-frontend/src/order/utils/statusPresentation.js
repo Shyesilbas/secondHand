@@ -3,6 +3,32 @@ import { PAYMENT_STATUSES } from '../../payments/paymentSchema.js';
 
 const statusUpper = (status) => String(status || '').toUpperCase();
 
+export const getOrderStatusBadgeVariant = (status) => {
+  const value = statusUpper(status);
+  if ([ORDER_STATUSES.COMPLETED, ORDER_STATUSES.DELIVERED].includes(value)) {
+    return 'success';
+  }
+  if ([
+    ORDER_STATUSES.CONFIRMED,
+    ORDER_STATUSES.PROCESSING,
+    ORDER_STATUSES.SHIPPED,
+    ORDER_STATUSES.MEETUP_PENDING,
+    ORDER_STATUSES.HANDOVER_CONFIRMED,
+    ORDER_STATUSES.PENDING
+  ].includes(value)) {
+    return 'warning';
+  }
+  if ([
+    ORDER_STATUSES.CANCELLED,
+    ORDER_STATUSES.REFUNDED,
+    ORDER_STATUSES.VERIFICATION_LOCKED,
+    'FAILED'
+  ].includes(value)) {
+    return 'error';
+  }
+  return 'neutral';
+};
+
 /** Standard Status Badge Token Matrix class */
 export const getOrderStatusBadgeClass = (status) => {
   const value = statusUpper(status);

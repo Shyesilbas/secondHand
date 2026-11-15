@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useMemo } from 'react';
 import ReviewCard from './ReviewCard.jsx';
 import { Star } from 'lucide-react';
+import { Card } from '../../common/components/ui/index.js';
 const STAR_LABELS = ['', 'one', 'two', 'three', 'four', 'five'];
 const ListingReviewsSection = ({
  listing
@@ -25,7 +26,7 @@ const ListingReviewsSection = ({
  };
  });
  }, [stats]);
- return <section className="rounded border border-border bg-background-primary p-5" aria-labelledby="listing-reviews-title">
+ return <Card as="section" shadow={false} aria-labelledby="listing-reviews-title">
  <h2 id="listing-reviews-title" className="text-lg font-semibold text-text-primary mb-4">{t("product_reviews", "Değerlendirmeler")}</h2>
 
  {stats && (stats.totalReviews ?? 0) > 0 && <div className="mb-5 p-4 bg-background-secondary rounded border border-border-light">
@@ -67,6 +68,6 @@ const ListingReviewsSection = ({
  <Star className="w-5 h-5 mx-auto text-text-muted mb-2" strokeWidth={1.5} aria-hidden />
  <p className="text-text-secondary text-sm">{t("no_reviews_for_this_product_yet", "Bu ilan için henüz değerlendirme yapılmamış.")}</p>
  </div>}
- </section>;
+ </Card>;
 };
 export default ListingReviewsSection;

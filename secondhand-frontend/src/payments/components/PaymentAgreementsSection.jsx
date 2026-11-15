@@ -45,7 +45,7 @@ const PaymentAgreementsSection = ({
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 py-1 text-xs text-text-tertiary">
+      <div className="flex items-center gap-2 py-1 text-sm text-text-tertiary">
         <LoadingIndicator size="h-4 w-4" />
         <span>{t('loading_payment_agreements', 'Sözleşmeler yükleniyor')}...</span>
       </div>
@@ -60,9 +60,9 @@ const PaymentAgreementsSection = ({
         return (
           <div
             key={agreement.agreementId}
-            className={`flex items-start justify-between gap-3 rounded-md border px-3 py-2.5 text-xs transition-colors duration-150 ${
+            className={`flex items-start justify-between gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors duration-150 ${
               isChecked
-                ? 'border-border bg-background-secondary/70'
+                ? 'border-border bg-background-secondary'
                 : 'border-border-light bg-background-primary hover:border-card-border-hover'
             }`}
           >

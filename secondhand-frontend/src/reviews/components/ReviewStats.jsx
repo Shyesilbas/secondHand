@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Star } from 'lucide-react';
 import { REVIEW_MESSAGES } from '../reviewConstants.js';
 import { RatingStarsDisplay } from './RatingStarsDisplay.jsx';
+import { Card } from '../../common/components/ui/index.js';
 const ReviewStats = ({
  stats,
  loading
@@ -16,7 +17,7 @@ const ReviewStats = ({
  return 'text-status-error';
  };
  if (loading) {
- return <div className="bg-background-primary rounded-md border border-border-light p-6">
+ return <Card border="light" shadow={false}>
  <div className="animate-pulse">
  <div className="h-4 bg-background-tertiary rounded w-1/4 mb-4"></div>
  <div className="space-y-3">
@@ -24,12 +25,12 @@ const ReviewStats = ({
  <div className="h-3 bg-background-tertiary rounded w-1/3"></div>
  </div>
  </div>
- </div>;
+ </Card>;
  }
  if (!stats) {
- return <div className="bg-background-primary rounded-md border border-border-light p-6">
+ return <Card border="light" shadow={false}>
  <p className="text-text-muted">{REVIEW_MESSAGES.NO_REVIEW_INFO}</p>
- </div>;
+ </Card>;
  }
  const starDistribution = [{
  stars: 5,
@@ -50,7 +51,7 @@ const ReviewStats = ({
  stars: 0,
  count: stats.zeroStarReviews || 0
  }];
- return <div className="bg-background-primary rounded-md border border-border-light p-6">
+ return <Card border="light" shadow={false}>
  <h3 className="text-lg font-semibold text-text-primary tracking-tight mb-6">{t("review_stats")}</h3>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -87,6 +88,6 @@ const ReviewStats = ({
  })}
  </div>
  </div>
- </div>;
+ </Card>;
 };
 export default ReviewStats;

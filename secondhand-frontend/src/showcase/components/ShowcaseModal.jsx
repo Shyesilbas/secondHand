@@ -83,7 +83,7 @@ const BENEFITS = [
 
 const ErrorLine = ({ children }) => (
   <div
-    className="flex items-start gap-2 rounded border border-status-error-border bg-status-error-bg px-3.5 py-2.5 text-xs sm:text-sm text-status-error-text"
+    className="flex items-start gap-2 rounded border border-status-error-border bg-status-error-bg px-3.5 py-2.5 text-sm text-status-error-text"
     role="alert"
   >
     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
@@ -313,7 +313,7 @@ const ShowcaseModal = ({
   };
 
   const renderListingPreviewStrip = () => (
-    <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary/50 p-3">
+    <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary p-3">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-primary">
           {resolvedImage ? (
@@ -367,7 +367,7 @@ const ShowcaseModal = ({
                 onClick={() => setDays(opt.days)}
                 aria-pressed={isSelected}
                 className={`relative flex flex-col justify-between rounded border p-3 text-left transition-colors duration-150 cursor-pointer ${isSelected
-                  ? 'border-primary bg-background-secondary/80 ring-1 ring-primary'
+                  ? 'border-primary bg-background-secondary ring-1 ring-primary'
                   : 'border-border-light bg-background-primary hover:border-border'
                   }`}
               >
@@ -405,7 +405,7 @@ const ShowcaseModal = ({
         <div className="min-w-0">
           <label
             htmlFor="showcase-days"
-            className="block text-xs sm:text-sm font-medium text-text-primary"
+            className="block text-sm font-medium text-text-primary"
           >
             {t('custom_duration', 'Özel Süre Belirle')}
           </label>
@@ -457,7 +457,7 @@ const ShowcaseModal = ({
           return (
             <div
               key={benefit.titleKey || benefit.title}
-              className="flex items-start gap-2.5 rounded border border-border-light bg-background-secondary/30 p-3"
+              className="flex items-start gap-2.5 rounded border border-border-light bg-background-secondary p-3"
             >
               <Icon
                 className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary"
@@ -465,8 +465,8 @@ const ShowcaseModal = ({
                 aria-hidden
               />
               <div className="min-w-0">
-                <p className="text-xs font-medium text-text-primary">{benefit.titleKey ? t(benefit.titleKey, benefit.title) : benefit.title}</p>
-                <p className="mt-0.5 text-xs leading-snug text-text-tertiary">
+                <p className="text-sm font-medium text-text-primary">{benefit.titleKey ? t(benefit.titleKey, benefit.title) : benefit.title}</p>
+                <p className="mt-0.5 text-sm leading-snug text-text-tertiary">
                   {benefit.descKey ? t(benefit.descKey, benefit.desc) : benefit.desc}
                 </p>
               </div>
@@ -513,7 +513,7 @@ const ShowcaseModal = ({
       {/* Price Breakdown */}
       <div>
         <h4 className="mb-2 text-xs font-semibold text-text-secondary">{t('fee_breakdown', 'Ücret Dökümü')}</h4>
-        <dl className="divide-y divide-border-light rounded border border-border-light px-4 text-xs sm:text-sm">
+        <dl className="divide-y divide-border-light rounded border border-border-light px-4 text-sm">
           <div className="flex justify-between gap-4 py-2.5">
             <dt className="text-text-secondary">{t('selected_showcase_duration', 'Seçilen Vitrin Süresi')}</dt>
             <dd className="font-medium tabular-nums text-text-primary">{days} {t('days_short', 'Gün')}</dd>
@@ -552,7 +552,7 @@ const ShowcaseModal = ({
       {/* E-Wallet Balance Card */}
       <div>
         <h4 className="mb-2 text-xs font-semibold text-text-secondary">{t('payment_method', 'Ödeme Yöntemi')}</h4>
-        <div className="rounded border border-border-light bg-background-secondary/30 p-3.5">
+        <div className="rounded border border-border-light bg-background-secondary p-3.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary">
@@ -570,7 +570,7 @@ const ShowcaseModal = ({
                     <span>{hasEnoughBalance ? t('sufficient', 'Yeterli') : t('insufficient_balance', 'Yetersiz Bakiye')}</span>
                   </span>
                 </div>
-                <p className="mt-0.5 text-xs tabular-nums text-text-secondary">
+                <p className="mt-0.5 text-sm tabular-nums text-text-secondary">
                   {t('current_label', 'Mevcut')}: <span className="font-medium text-text-primary">{formatCurrency(Number(eWallet?.balance ?? 0), 'TRY')}</span>
                   {hasEnoughBalance && (
                     <>
@@ -596,7 +596,7 @@ const ShowcaseModal = ({
           </div>
 
           {selectedQuote && !hasEnoughBalance && (
-            <p className="mt-2.5 border-t border-border-light pt-2.5 text-xs text-status-error-text">
+            <p className="mt-2.5 border-t border-border-light pt-2.5 text-sm text-status-error-text">
               {t('insufficient_balance_needed', {
                 defaultValue: 'Bu işlem için {{amount}} ek bakiyeye ihtiyacınız var.',
                 amount: formatCurrency(selectedQuote.shortfall, 'TRY')
@@ -640,7 +640,7 @@ const ShowcaseModal = ({
   const renderStep3 = () => (
     <div className="space-y-5">
       {/* Compact Transaction Summary Bar */}
-      <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary/50 px-3.5 py-2.5 text-xs sm:text-sm">
+      <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary px-3.5 py-2.5 text-sm">
         <span className="truncate font-medium text-text-primary">
           {resolvedTitle} · <span className="tabular-nums text-text-secondary">{days} {t('showcase_days', 'Gün Vitrin')}</span>
         </span>
@@ -653,7 +653,7 @@ const ShowcaseModal = ({
         <h4 className="text-base font-semibold text-text-primary">
           {t('security_verification_code', 'Güvenlik Doğrulama Kodu')}
         </h4>
-        <p className="mx-auto mt-1 max-w-sm text-xs sm:text-sm text-text-secondary">
+        <p className="mx-auto mt-1 max-w-sm text-sm text-text-secondary">
           {t('enter_6_digit_code_to_complete_payment', 'Ödemeyi tamamlamak için e-posta adresinize gönderilen 6 haneli doğrulama kodunu girin.')}
         </p>
 

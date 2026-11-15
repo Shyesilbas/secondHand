@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { Card } from '../../common/components/ui/index.js';
 
 /**
  * One KPI: label, value, optional change against the previous period and a short note.
@@ -30,15 +31,14 @@ const MetricCard = ({ title, value, trend, subtitle, to, emphasis = false }) => 
     </>
   );
 
-  const base = 'block rounded-md border bg-background-primary p-5 shadow-sm';
-  const border = emphasis ? 'border-status-warning-border' : 'border-border';
+  const borderClass = emphasis ? 'border-status-warning-border' : '';
 
   return to ? (
-    <Link to={to} className={`${base} ${border} transition-all duration-150 hover:shadow hover:border-card-borderHover`}>
+    <Card as={Link} to={to} interactive className={`block ${borderClass}`}>
       {body}
-    </Link>
+    </Card>
   ) : (
-    <div className={`${base} ${border}`}>{body}</div>
+    <Card className={borderClass}>{body}</Card>
   );
 };
 

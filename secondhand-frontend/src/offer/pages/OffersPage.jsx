@@ -11,6 +11,7 @@ import CounterOfferModal from '../components/CounterOfferModal.jsx';
 import OfferTrackingCard from '../components/OfferTrackingCard.jsx';
 import { Handshake, LayoutGrid, Search, SlidersHorizontal } from 'lucide-react';
 import Pagination from '../../common/components/ui/Pagination.jsx';
+import Tabs from '../../common/components/ui/Tabs.jsx';
 import { OFFER_DEFAULTS, OFFER_MESSAGES, OFFER_STATUSES, OFFER_TABS } from '../offerConstants.js';
 import { getOfferErrorMessage } from '../utils/offerError.js';
 
@@ -186,24 +187,19 @@ const OffersPage = () => {
  <PageContainer className="py-6 sm:py-7">
  <div className="rounded-md border border-border-light bg-card-bg p-4 sm:p-5">
  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
- <div className="inline-flex rounded bg-background-tertiary p-1">
- <button type="button" onClick={() => {
- setActiveTab(OFFER_TABS.MADE);
- setStatusFilter(STATUS_FILTER.ALL);
- }} className={`inline-flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.MADE ? 'bg-background-primary text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
- <LayoutGrid className="h-4 w-4 opacity-70" />{t("made")}<span className="rounded-sm bg-background-secondary px-2 py-0.5 text-xs font-semibold text-text-secondary">
- {madeTotalElements}
- </span>
- </button>
- <button type="button" onClick={() => {
- setActiveTab(OFFER_TABS.RECEIVED);
- setStatusFilter(STATUS_FILTER.ALL);
- }} className={`inline-flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.RECEIVED ? 'bg-background-primary text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
- <Handshake className="h-4 w-4 opacity-70" />{t("received")}<span className="rounded-sm bg-background-secondary px-2 py-0.5 text-xs font-semibold text-text-secondary">
- {receivedTotalElements}
- </span>
- </button>
- </div>
+ <Tabs
+ variant="segmented"
+ ariaLabel={t("offers", "Teklifler")}
+ activeKey={activeTab}
+ onChange={(key) => {
+  setActiveTab(key);
+  setStatusFilter(STATUS_FILTER.ALL);
+ }}
+ items={[
+  { key: OFFER_TABS.MADE, label: t("made"), icon: LayoutGrid, count: madeTotalElements },
+  { key: OFFER_TABS.RECEIVED, label: t("received"), icon: Handshake, count: receivedTotalElements },
+ ]}
+ />
 
  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
  <div className="relative min-w-48 flex-1">
@@ -225,7 +221,7 @@ const OffersPage = () => {
  {statusChips.map(({
  key,
  label
- }) => <button key={key} type="button" onClick={() => setStatusFilter(key)} className={`inline-flex items-center rounded-md border px-3 py-1.5 text-xs font-semibold transition ${statusFilter === key ? 'border-primary bg-primary-light text-primary' : 'border-border-light bg-card-bg text-text-secondary hover:border-border-dark hover:text-text-primary'}`}>
+ }) => <button key={key} type="button" onClick={() => setStatusFilter(key)} className={`inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-semibold transition ${statusFilter === key ? 'border-primary bg-primary-light text-primary' : 'border-border-light bg-card-bg text-text-secondary hover:border-border-dark hover:text-text-primary'}`}>
  {label}
  <span className={`ml-1.5 tabular-nums ${statusFilter === key ? 'text-primary/70' : 'text-text-muted'}`}>({statusCounts[key] ?? 0})</span>
  </button>)}

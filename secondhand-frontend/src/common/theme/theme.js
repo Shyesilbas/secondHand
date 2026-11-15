@@ -207,8 +207,8 @@ export const theme = {
             mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
         },
         fontSize: {
-            body: ['0.75rem', { lineHeight: '1.125rem' }],
-            caption: ['0.6875rem', { lineHeight: '1rem' }],
+            body: ['0.875rem', { lineHeight: '1.25rem' }],
+            caption: ['0.75rem', { lineHeight: '1.125rem' }],
             sm: ['0.875rem', { lineHeight: '1.25rem' }],
             base: ['1rem', { lineHeight: '1.5rem' }],
             lg: ['1.125rem', { lineHeight: '1.75rem' }],

@@ -8,6 +8,7 @@ import Button from '../../common/components/ui/Button.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import Tabs from '../../common/components/ui/Tabs.jsx';
 import { NOTIFICATION_VIEWS, groupNotificationsByTimeline } from '../notificationConstants.js';
 
 const VIEWS = [
@@ -122,25 +123,17 @@ const InboxNotificationsPanel = () => {
             </Button>
           )}
         </div>
-        <div className="mt-2 flex px-2" role="tablist" aria-label={t('notification_views', 'Bildirim görünümü')}>
-          {VIEWS.map((item) => {
-            const active = view === item.key;
-            return (
-              <button
-                key={item.key}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setView(item.key)}
-                className={`-mb-px border-b-2 px-3 py-2 text-sm transition-colors duration-150 ${
-                  active ? 'border-primary font-medium text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                {t(item.labelKey, item.defaultLabel)}
-              </button>
-            );
-          })}
-        </div>
+        <Tabs
+          className="mt-2 px-2"
+          borderBottom={false}
+          ariaLabel={t('notification_views', 'Bildirim görünümü')}
+          activeKey={view}
+          onChange={setView}
+          items={VIEWS.map((item) => ({
+            key: item.key,
+            label: t(item.labelKey, item.defaultLabel),
+          }))}
+        />
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto" aria-busy={isLoading}>

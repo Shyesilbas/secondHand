@@ -141,7 +141,7 @@ const AuraChatWidgetPanel = () => {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 min-h-0 flex flex-col bg-background-secondary/90">
+                <div className="flex-1 min-h-0 flex flex-col bg-background-secondary">
                     <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
                         {messages.map(m => {
                             const isUser = m.role === 'user';
@@ -150,7 +150,7 @@ const AuraChatWidgetPanel = () => {
                                     {isUser ? <UserRound className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
                                 </div>
                                 <div className={`min-w-0 max-w-[88%] ${isUser ? 'text-right' : ''}`}>
-                                    <div className={`inline-block rounded-md px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-white rounded-tr-sm' : 'border border-border bg-background-tertiary/30 text-text-primary rounded-tl-sm'}`}>
+                                    <div className={`inline-block rounded-md px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-white rounded-tr-sm' : 'border border-border bg-background-tertiary text-text-primary rounded-tl-sm'}`}>
                                         {m.typing ? <div className="flex items-center gap-1.5 py-0.5">
                                             <span className="w-1.5 h-1.5 rounded-full bg-primary" style={{
                                                 animationDelay: '0ms'
@@ -180,7 +180,7 @@ const AuraChatWidgetPanel = () => {
 
                     <div className="shrink-0 border-t border-border-light bg-background-primary p-3">
                         <div className="flex items-end gap-2">
-                            <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded-md border border-border-light bg-background-secondary/80 px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary focus:bg-background-primary" rows={2} />
+                            <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded-md border border-border-light bg-background-secondary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary focus:bg-background-primary" rows={2} />
                             <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 w-11" aria-label={t("send")}>
                                 <Send className="w-4 h-4" />
                             </button>

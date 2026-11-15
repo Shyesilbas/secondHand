@@ -4,6 +4,7 @@ import Button from './Button.jsx';
 const EmptyState = ({
  icon: Icon,
  title = 'Nothing Found',
+ titleAs: TitleTag = 'h3',
  description,
  primaryAction,
  variant = 'default',
@@ -23,9 +24,9 @@ const EmptyState = ({
  <DefaultIcon className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
  </div>
  )}
- <h3 className="mb-2 text-sm font-medium text-text-primary">{title}</h3>
+ <TitleTag className={`mb-2 font-semibold text-text-primary ${isCompact ? 'text-sm' : 'text-base'}`}>{title}</TitleTag>
  {description && (
- <p className={`text-sm text-text-secondary ${isCompact ? 'mb-4' : 'mb-6'}`}>{description}</p>
+ <p className={`text-sm text-text-secondary max-w-md mx-auto ${isCompact ? 'mb-4' : 'mb-6'}`}>{description}</p>
  )}
  {primaryAction && (
  <Button onClick={primaryAction.onClick} disabled={primaryAction.disabled}>

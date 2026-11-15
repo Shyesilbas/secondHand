@@ -40,16 +40,16 @@ const PaymentRow = ({
  </div>
  </div>
 
- <div className="col-span-2 hidden md:block text-xs tabular-nums text-text-secondary">
+ <div className="col-span-2 hidden md:block text-sm tabular-nums text-text-secondary">
  <p>{date}</p>
- <p className="text-text-tertiary">{time}</p>
+ <p className="text-xs text-text-tertiary">{time}</p>
  </div>
 
  <div className="col-span-2 hidden sm:flex items-center">
  <StatusBadge status={payment.status} isSuccess={payment.isSuccess} />
  </div>
 
- <div className="col-span-1 hidden lg:block text-center text-xs text-text-secondary">
+ <div className="col-span-1 hidden lg:block text-center text-sm text-text-secondary">
  {payment.providerName}
  </div>
 

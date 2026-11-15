@@ -10,186 +10,188 @@ import { EllipsisVertical as EllipsisVerticalIcon, MessageCircle } from 'lucide-
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CHAT_MESSAGES } from '../chatConstants.js';
+import PageHeader from '../../common/components/ui/PageHeader.jsx';
 const ChatPage = ({
- embedded = false
+    embedded = false
 }) => {
- const {
- t
- } = useTranslation();
- const {
- user
- } = useAuthState();
- const navigate = useNavigate();
- const location = useLocation();
- const [searchParams, setSearchParams] = useSearchParams();
- const notification = useNotification();
- const {
- chatRooms,
- totalRooms,
- hasMoreRooms,
- isFetchingMoreRooms,
- fetchMoreRooms,
- selectedChatRoom,
- messages,
- isConnected,
- isLoadingRooms,
- selectChatRoom,
- sendMessage,
- isLoadingMessages,
- deleteMessage,
- deleteConversation
- } = useChat(user?.id, {
- enableChatRoomsFetch: true
- });
- const syncRoomToUrl = useCallback(room => {
- if (!location.pathname.startsWith(ROUTES.INBOX)) {
- return;
- }
- setSearchParams(prev => {
- const next = new URLSearchParams(prev);
- next.set("tab");
- if (room?.id) {
- next.set('room', String(room.id));
- } else {
- next.delete('room');
- }
- return next;
- }, {
- replace: true
- });
- }, [location.pathname, setSearchParams]);
- useEffect(() => {
- const roomId = searchParams.get('room');
- if (!roomId || !chatRooms?.length) {
- return;
- }
- const found = chatRooms.find(r => String(r.id) === String(roomId));
- if (found && selectedChatRoom?.id !== found.id) {
- selectChatRoom(found);
- }
- }, [searchParams, chatRooms, selectedChatRoom?.id, selectChatRoom]);
- const handleChatRoomSelect = chatRoom => {
- selectChatRoom(chatRoom);
- syncRoomToUrl(chatRoom);
- };
- const handleListingClick = (listingId, event) => {
- event.stopPropagation();
- if (listingId) {
- navigate(ROUTES.LISTING_DETAIL(listingId));
- }
- };
- const handleBrowseListings = () => {
- navigate(ROUTES.LISTINGS);
- };
- const handleDeleteConversation = roomId => {
- notification.showConfirmation(CHAT_MESSAGES.DELETE_CONVERSATION_TITLE, CHAT_MESSAGES.DELETE_CONVERSATION_CONFIRMATION, () => {
- if (selectedChatRoom?.id === roomId) {
- selectChatRoom(null);
- syncRoomToUrl(null);
- }
- deleteConversation(roomId);
- notification.showSuccess(CHAT_MESSAGES.SUCCESS_TITLE, CHAT_MESSAGES.CONVERSATION_DELETED);
- });
- };
- if (!user) {
- return <PageContainer className="py-8">
- <div className="text-center">
- <h2 className="text-lg font-semibold text-text-primary mb-4">{t("messages")}</h2>
- <p className="text-text-secondary">{t("please_login_to_see_your_messages")}</p>
- </div>
- </PageContainer>;
- }
- const gridHeightClass = embedded ? 'h-[min(72vh,calc(100vh-260px))]' : 'h-[calc(100vh-200px)]';
- return <div className={embedded ? 'min-h-0 bg-transparent' : 'min-h-screen bg-background-secondary'}>
- <PageContainer className={`max-w-screen-2xl ${embedded ? 'px-0 sm:px-0 lg:px-0 py-0' : 'py-8'}`}>
- {!embedded && <div className="flex items-center justify-between mb-8">
- <div>
- <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("messages")}</h1>
- <p className="text-text-tertiary mt-2 tracking-tight">{t("connect_with_buyers_and_sellers")}</p>
- </div>
- <div className="flex items-center space-x-3">
- <div className="flex items-center space-x-2 bg-background-primary px-5 py-2.5 rounded border border-border-light">
- <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-secondary-300'}`}></div>
- <span className="text-sm font-semibold text-text-secondary tracking-tight">
- {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
- </span>
- </div>
- </div>
- </div>}
+    const {
+        t
+    } = useTranslation();
+    const {
+        user
+    } = useAuthState();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const notification = useNotification();
+    const {
+        chatRooms,
+        totalRooms,
+        hasMoreRooms,
+        isFetchingMoreRooms,
+        fetchMoreRooms,
+        selectedChatRoom,
+        messages,
+        isConnected,
+        isLoadingRooms,
+        selectChatRoom,
+        sendMessage,
+        isLoadingMessages,
+        deleteMessage,
+        deleteConversation
+    } = useChat(user?.id, {
+        enableChatRoomsFetch: true
+    });
+    const syncRoomToUrl = useCallback(room => {
+        if (!location.pathname.startsWith(ROUTES.INBOX)) {
+            return;
+        }
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.set("tab");
+            if (room?.id) {
+                next.set('room', String(room.id));
+            } else {
+                next.delete('room');
+            }
+            return next;
+        }, {
+            replace: true
+        });
+    }, [location.pathname, setSearchParams]);
+    useEffect(() => {
+        const roomId = searchParams.get('room');
+        if (!roomId || !chatRooms?.length) {
+            return;
+        }
+        const found = chatRooms.find(r => String(r.id) === String(roomId));
+        if (found && selectedChatRoom?.id !== found.id) {
+            selectChatRoom(found);
+        }
+    }, [searchParams, chatRooms, selectedChatRoom?.id, selectChatRoom]);
+    const handleChatRoomSelect = chatRoom => {
+        selectChatRoom(chatRoom);
+        syncRoomToUrl(chatRoom);
+    };
+    const handleListingClick = (listingId, event) => {
+        event.stopPropagation();
+        if (listingId) {
+            navigate(ROUTES.LISTING_DETAIL(listingId));
+        }
+    };
+    const handleBrowseListings = () => {
+        navigate(ROUTES.LISTINGS);
+    };
+    const handleDeleteConversation = roomId => {
+        notification.showConfirmation(CHAT_MESSAGES.DELETE_CONVERSATION_TITLE, CHAT_MESSAGES.DELETE_CONVERSATION_CONFIRMATION, () => {
+            if (selectedChatRoom?.id === roomId) {
+                selectChatRoom(null);
+                syncRoomToUrl(null);
+            }
+            deleteConversation(roomId);
+            notification.showSuccess(CHAT_MESSAGES.SUCCESS_TITLE, CHAT_MESSAGES.CONVERSATION_DELETED);
+        });
+    };
+    if (!user) {
+        return <PageContainer className="py-8">
+            <div className="text-center">
+                <h2 className="text-lg font-semibold text-text-primary mb-4">{t("messages")}</h2>
+                <p className="text-text-secondary">{t("please_login_to_see_your_messages")}</p>
+            </div>
+        </PageContainer>;
+    }
+    const gridHeightClass = embedded ? 'h-[min(72vh,calc(100vh-260px))]' : 'h-[calc(100vh-200px)]';
+    return <div className={embedded ? 'min-h-0 bg-transparent' : 'min-h-screen bg-background-secondary'}>
+        <PageContainer className={`max-w-screen-2xl ${embedded ? 'px-0 sm:px-0 lg:px-0 py-0' : 'py-8'}`}>
+            {!embedded && (
+                <PageHeader
+                    className="mb-8"
+                    title={t("messages")}
+                    subtitle={t("connect_with_buyers_and_sellers")}
+                    actions={
+                        <div className="flex items-center space-x-2 bg-background-primary px-5 py-2.5 rounded border border-border-light">
+                            <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-secondary-300'}`} />
+                            <span className="text-sm font-semibold text-text-secondary tracking-tight">
+                                {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
+                            </span>
+                        </div>
+                    }
+                />
+            )}
 
- {embedded && <div className="mb-3 flex justify-end">
- <div className="flex items-center space-x-2 rounded border border-border-light bg-background-primary px-4 py-2">
- <div className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-secondary-300'}`} />
- <span className="text-xs font-semibold text-text-secondary">
- {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
- </span>
- </div>
- </div>}
+            {embedded && <div className="mb-3 flex justify-end">
+                <div className="flex items-center space-x-2 rounded border border-border-light bg-background-primary px-4 py-2">
+                    <div className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-secondary-300'}`} />
+                    <span className="text-xs font-semibold text-text-secondary">
+                        {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
+                    </span>
+                </div>
+            </div>}
 
- <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-md border border-border-light bg-background-primary shadow-sm`}>
- {/* Chat Rooms List */}
- <div className="lg:col-span-4 border-r border-border-light h-full flex flex-col overflow-hidden">
- <ChatList chatRooms={chatRooms} totalRooms={totalRooms} hasMoreRooms={hasMoreRooms} isFetchingMoreRooms={isFetchingMoreRooms} onLoadMoreRooms={fetchMoreRooms} isLoadingRooms={isLoadingRooms} selectedChatRoom={selectedChatRoom} userId={user?.id} isConnected={isConnected} onChatRoomSelect={handleChatRoomSelect} onListingClick={handleListingClick} onBrowseListings={handleBrowseListings} onDeleteConversation={handleDeleteConversation} />
- </div>
+            <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-md border border-border-light bg-background-primary shadow-sm`}>
+                {/* Chat Rooms List */}
+                <div className="lg:col-span-4 border-r border-border-light h-full flex flex-col overflow-hidden">
+                    <ChatList chatRooms={chatRooms} totalRooms={totalRooms} hasMoreRooms={hasMoreRooms} isFetchingMoreRooms={isFetchingMoreRooms} onLoadMoreRooms={fetchMoreRooms} isLoadingRooms={isLoadingRooms} selectedChatRoom={selectedChatRoom} userId={user?.id} isConnected={isConnected} onChatRoomSelect={handleChatRoomSelect} onListingClick={handleListingClick} onBrowseListings={handleBrowseListings} onDeleteConversation={handleDeleteConversation} />
+                </div>
 
 
- {/* Chat Window */}
- <div className="lg:col-span-8 flex flex-col h-full overflow-hidden">
- {selectedChatRoom ? <div className="h-full flex flex-col overflow-hidden">
- {/* Chat Header */}
- <div className="bg-background-primary px-6 py-4 border-b border-border-light flex items-center justify-between flex-shrink-0">
- <div className="flex items-center space-x-4">
- <button onClick={() => {
- selectChatRoom(null);
- syncRoomToUrl(null);
- }} className="lg:hidden p-2 hover:bg-background-tertiary/50 rounded transition-all duration-300 ease-in-out">
- <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
- </svg>
- </button>
- <div className="w-12 h-12 bg-secondary-700 rounded-md flex items-center justify-center">
- <span className="text-base font-semibold text-white tracking-tight">
- {(selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'U').charAt(0).toUpperCase()}
- </span>
- </div>
- <div>
- <h3 className="text-sm font-medium text-text-primary tracking-tight">
- {selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'Chat'}
- </h3>
- <div className="flex items-center space-x-2 mt-1">
- <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-text-muted'}`}></div>
- <span className="text-xs font-medium text-text-tertiary tracking-tight">
- {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
- </span>
- </div>
- </div>
- </div>
- <div className="flex items-center space-x-2">
- <button className="p-2.5 hover:bg-background-tertiary/50 rounded transition-all duration-300 ease-in-out">
- <EllipsisVerticalIcon className="w-5 h-5 text-text-secondary" />
- </button>
- </div>
- </div>
+                {/* Chat Window */}
+                <div className="lg:col-span-8 flex flex-col h-full overflow-hidden">
+                    {selectedChatRoom ? <div className="h-full flex flex-col overflow-hidden">
+                        {/* Chat Header */}
+                        <div className="bg-background-primary px-6 py-4 border-b border-border-light flex items-center justify-between flex-shrink-0">
+                            <div className="flex items-center space-x-4">
+                                <button onClick={() => {
+                                    selectChatRoom(null);
+                                    syncRoomToUrl(null);
+                                }} className="lg:hidden p-2 hover:bg-background-tertiary rounded transition-all duration-300 ease-in-out">
+                                    <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <div className="w-12 h-12 bg-secondary-700 rounded-md flex items-center justify-center">
+                                    <span className="text-base font-semibold text-white tracking-tight">
+                                        {(selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'U').charAt(0).toUpperCase()}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-medium text-text-primary tracking-tight">
+                                        {selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'Chat'}
+                                    </h3>
+                                    <div className="flex items-center space-x-2 mt-1">
+                                        <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-text-muted'}`}></div>
+                                        <span className="text-xs font-medium text-text-tertiary tracking-tight">
+                                            {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <button className="p-2.5 hover:bg-background-tertiary rounded transition-all duration-300 ease-in-out">
+                                    <EllipsisVerticalIcon className="w-5 h-5 text-text-secondary" />
+                                </button>
+                            </div>
+                        </div>
 
- {/* Chat Messages Area */}
- <div className="flex-1 bg-background-secondary/50 min-h-0 overflow-hidden">
- <ChatWindow isOpen={true} onClose={() => {}} selectedChatRoom={selectedChatRoom} messages={messages} onSendMessage={sendMessage} onDeleteMessage={deleteMessage} onDeleteConversation={deleteConversation} isLoadingMessages={isLoadingMessages} isConnected={isConnected} onConversationDeleted={() => {
- selectChatRoom(null);
- syncRoomToUrl(null);
- }} isEmbedded={true} />
- </div>
- </div> : <div className="h-full flex items-center justify-center bg-background-secondary">
- <div className="text-center px-8">
- <div className="w-28 h-28 bg-background-tertiary rounded-md flex items-center justify-center mx-auto mb-8">
- <MessageCircle className="w-14 h-14 text-text-muted" />
- </div>
- <h3 className="text-sm font-medium text-text-primary mb-3 tracking-tight">{t("select_a_conversation")}</h3>
- <p className="text-text-tertiary max-w-sm mx-auto tracking-tight leading-relaxed">{t("choose_a_chat_from_the_sidebar_to_start_")}</p>
- </div>
- </div>}
- </div>
- </div>
- </PageContainer>
- </div>;
+                        {/* Chat Messages Area */}
+                        <div className="flex-1 bg-background-secondary min-h-0 overflow-hidden">
+                            <ChatWindow isOpen={true} onClose={() => { }} selectedChatRoom={selectedChatRoom} messages={messages} onSendMessage={sendMessage} onDeleteMessage={deleteMessage} onDeleteConversation={deleteConversation} isLoadingMessages={isLoadingMessages} isConnected={isConnected} onConversationDeleted={() => {
+                                selectChatRoom(null);
+                                syncRoomToUrl(null);
+                            }} isEmbedded={true} />
+                        </div>
+                    </div> : <div className="h-full flex items-center justify-center bg-background-secondary">
+                        <div className="text-center px-8">
+                            <div className="w-28 h-28 bg-background-tertiary rounded-md flex items-center justify-center mx-auto mb-8">
+                                <MessageCircle className="w-14 h-14 text-text-muted" />
+                            </div>
+                            <h3 className="text-sm font-medium text-text-primary mb-3 tracking-tight">{t("select_a_conversation")}</h3>
+                            <p className="text-text-tertiary max-w-sm mx-auto tracking-tight leading-relaxed">{t("choose_a_chat_from_the_sidebar_to_start_")}</p>
+                        </div>
+                    </div>}
+                </div>
+            </div>
+        </PageContainer>
+    </div>;
 };
 export default ChatPage;

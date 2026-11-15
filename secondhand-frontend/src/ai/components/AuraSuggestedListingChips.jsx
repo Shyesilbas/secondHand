@@ -44,7 +44,7 @@ export default function AuraSuggestedListingChips({
               <div className="min-w-0 flex-1 flex flex-col justify-between py-0.5">
                 <div>
                   <div className="flex items-start justify-between gap-1">
-                    <p className="text-xs font-semibold text-text-primary line-clamp-1">
+                    <p className="text-sm font-semibold text-text-primary line-clamp-1">
                       {l?.title || t('listing', 'İlan')}
                     </p>
                     <ArrowUpRight className="w-3.5 h-3.5 text-text-muted group-hover:text-text-primary transition-colors shrink-0" strokeWidth={1.5} />

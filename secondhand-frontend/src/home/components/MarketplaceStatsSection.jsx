@@ -83,10 +83,10 @@ const MarketplaceStatsSection = () => {
  </div>
  <div>
  <span className="text-xs font-semibold text-text-muted">{metric.label}</span>
- <h3 className="text-sm font-medium text-text-primary tracking-tight mt-0.5">{metric.value}</h3>
+ <h3 className="text-base font-semibold text-text-primary tracking-tight mt-0.5">{metric.value}</h3>
  </div>
  </div>
- <p className="text-xs text-text-secondary font-medium mt-3 border-t border-border-light pt-2 leading-relaxed">
+ <p className="text-sm text-text-secondary font-medium mt-3 border-t border-border-light pt-2 leading-relaxed">
  {metric.desc}
  </p>
  </div>

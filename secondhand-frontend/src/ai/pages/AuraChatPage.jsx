@@ -150,7 +150,7 @@ const AssistantMessage = ({ message, copied, onCopy }) => {
           <p className="text-sm text-text-tertiary">{t('aura_preparing_answer', 'Yanıt hazırlanıyor…')}</p>
         ) : (
           <>
-            <AuraMessageContent content={message.content} />
+            <AuraMessageContent content={message.content} size="base" />
             {Array.isArray(message.meta?.suggestedListings) && message.meta.suggestedListings.length > 0 && (
               <div className="mt-3">
                 <AuraSuggestedListingChips listings={message.meta.suggestedListings} />

@@ -20,6 +20,7 @@ import { getCheckoutCurrency, getPricedTotal } from '../utils/pricedLines.js';
 import logger from '../../common/utils/logger.js';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Button from '../../common/components/ui/Button.jsx';
+import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 
 const CheckoutPage = () => {
@@ -193,24 +194,17 @@ const CheckoutPage = () => {
   if (!offerId && cartCount === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background-secondary p-4 antialiased">
-        <div className="w-full max-w-sm text-center bg-background-primary p-8 rounded-md border border-border shadow-sm space-y-4">
-          <ShoppingCart className="mx-auto h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
-          <div className="space-y-1">
-            <h1 className="text-sm font-semibold text-text-primary">
-              {t('empty_cart_title', CART_MESSAGES.EMPTY_CART_TITLE)}
-            </h1>
-            <p className="text-xs text-text-tertiary max-w-xs mx-auto">
-              {t('empty_cart_description', CART_MESSAGES.EMPTY_CART_DESCRIPTION)}
-            </p>
-          </div>
-          <Button 
-            variant="primary"
-            onClick={() => navigate(ROUTES.LISTINGS)} 
-            className="w-full"
-          >
-            <span>{t("browse_listings", "İlanları Keşfet")}</span>
-          </Button>
-        </div>
+        <EmptyState
+          icon={ShoppingCart}
+          title={t('empty_cart_title', CART_MESSAGES.EMPTY_CART_TITLE)}
+          titleAs="h1"
+          description={t('empty_cart_description', CART_MESSAGES.EMPTY_CART_DESCRIPTION)}
+          primaryAction={{
+            label: t('browse_listings', 'İlanları Keşfet'),
+            onClick: () => navigate(ROUTES.LISTINGS),
+          }}
+          className="w-full max-w-md shadow-sm"
+        />
       </div>
     );
   }

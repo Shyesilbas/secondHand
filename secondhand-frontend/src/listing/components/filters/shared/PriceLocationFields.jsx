@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next";
 import { useState } from 'react';
 import EnumDropdown from '../../../../common/components/ui/EnumDropdown.jsx';
 import { MapPin, Landmark, Building2, Map, Loader2, Navigation } from 'lucide-react';
+import Skeleton from '../../../../common/components/ui/Skeleton.jsx';
+import { Card } from '../../../../common/components/ui/index.js';
 import { useQueryClient } from '@tanstack/react-query';
 import { districtsQuery, useLocationOptions } from '../../../../common/hooks/useLocationOptions.js';
 import { useAuthState } from '../../../../auth/AuthContext.jsx';
@@ -112,46 +114,58 @@ const PriceLocationFields = ({
  {/* City Select */}
  <div className="relative">
  <span className={`${fieldLabel} sr-only`}>{t("city")}</span>
+ {loadingCities ? (
+ <Skeleton className="h-10 w-full rounded" />
+ ) : (
  <div className={selectWrapper}>
  <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" />
- <select value={filters.cityKey ?? ''} onChange={handleCityChange} disabled={loadingCities} className={`${inp} pl-10`}>
+ <select value={filters.cityKey ?? ''} onChange={handleCityChange} className={`${inp} pl-10`}>
  <option value="">{t("select_city_i_l")}</option>
  {cities.map(c => <option key={c.key} value={c.key}>
  {c.label}
  </option>)}
  </select>
- {loadingCities ? <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-text-muted" /> : dropdownIcon}
+ {dropdownIcon}
  </div>
+ )}
  </div>
 
  {/* District Select */}
  <div className="relative">
  <span className={`${fieldLabel} sr-only`}>{t("district")}</span>
+ {loadingDistricts ? (
+ <Skeleton className="h-10 w-full rounded" />
+ ) : (
  <div className={selectWrapper}>
  <Map className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" />
- <select value={filters.districtKey ?? ''} onChange={handleDistrictChange} disabled={!filters.cityKey || loadingDistricts} className={`${inp} pl-10`}>
+ <select value={filters.districtKey ?? ''} onChange={handleDistrictChange} disabled={!filters.cityKey} className={`${inp} pl-10`}>
  <option value="">{t("select_district_i_l_e")}</option>
  {districts.map(d => <option key={d.key} value={d.key}>
  {d.label}
  </option>)}
  </select>
- {loadingDistricts ? <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-text-muted" /> : dropdownIcon}
+ {dropdownIcon}
  </div>
+ )}
  </div>
 
  {/* Neighborhood Select */}
  <div className="relative">
  <span className={`${fieldLabel} sr-only`}>{t("neighborhood")}</span>
+ {loadingNeighborhoods ? (
+ <Skeleton className="h-10 w-full rounded" />
+ ) : (
  <div className={selectWrapper}>
  <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" />
- <select value={filters.neighborhoodKey ?? ''} onChange={handleNeighborhoodChange} disabled={!filters.districtKey || loadingNeighborhoods} className={`${inp} pl-10`}>
+ <select value={filters.neighborhoodKey ?? ''} onChange={handleNeighborhoodChange} disabled={!filters.districtKey} className={`${inp} pl-10`}>
  <option value="">{t("select_neighborhood_mahalle")}</option>
  {neighborhoods.map(n => <option key={n.key} value={n.key}>
  {n.label}
  </option>)}
  </select>
- {loadingNeighborhoods ? <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-text-muted" /> : dropdownIcon}
+ {dropdownIcon}
  </div>
+ )}
  </div>
  </>;
  };
@@ -192,7 +206,7 @@ const PriceLocationFields = ({
  </div>;
  }
  return <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
- <div className="rounded-md border border-border-light bg-background-primary p-5">
+ <Card border="light" shadow={false}>
  <div className="mb-4 flex items-center gap-2 text-text-primary">
  <Landmark className="h-4 w-4 text-primary" />
  <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("price_range")}</h3>
@@ -205,9 +219,9 @@ const PriceLocationFields = ({
  </div>
  <EnumDropdown label={t("currency")} enumKey="currencies" value={filters.currency ?? ''} onChange={v => onInputChange('currency', v)} multiple={false} placeholder={t("any_currency")} className="w-full" />
  </div>
- </div>
+ </Card>
 
- <div className="rounded-md border border-border-light bg-background-primary p-5">
+ <Card border="light" shadow={false}>
  <div className="mb-4 flex items-center justify-between gap-2 text-text-primary">
  <div className="flex items-center gap-2">
  <MapPin className="h-4 w-4 text-primary" />
@@ -222,7 +236,7 @@ const PriceLocationFields = ({
  <div className="space-y-4">
  {renderLocationFieldsList()}
  </div>
- </div>
+ </Card>
  </div>;
 };
 export default PriceLocationFields;

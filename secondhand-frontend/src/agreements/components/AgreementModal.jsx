@@ -138,24 +138,24 @@ const AgreementModal = ({
         <div className="rounded border border-border-light bg-background-primary p-4 sm:p-5">
           {isHtmlContent ? (
             <div
-              className="prose prose-sm max-w-none text-sm leading-relaxed text-text-secondary prose-headings:text-text-primary"
+              className="prose prose-base max-w-prose text-base leading-relaxed text-text-secondary prose-headings:text-text-primary"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           ) : (
-            <div className="space-y-4 text-sm leading-relaxed text-text-secondary">
+            <div className="max-w-prose space-y-4 text-base leading-relaxed text-text-secondary">
               {plainBlocks.map((block, idx) => {
                 if (block.type === 'heading') {
                   return (
-                    <h3 key={idx} className="text-sm font-semibold text-text-primary">
+                    <h3 key={idx} className="text-base font-semibold text-text-primary">
                       {block.text}
                     </h3>
                   );
                 }
                 if (block.type === 'list') {
                   return (
-                    <ol key={idx} className="divide-y divide-border-light rounded border border-border-light bg-background-secondary/50">
+                    <ol key={idx} className="divide-y divide-border-light rounded border border-border-light bg-background-secondary">
                       {block.items.map((item) => (
-                        <li key={item.index} className="flex items-start gap-3 px-3.5 py-2.5 text-sm">
+                        <li key={item.index} className="flex items-start gap-3 px-3.5 py-2.5 text-base">
                           <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background-primary text-xs font-semibold tabular-nums text-text-secondary">
                             {item.index}
                           </span>
@@ -166,7 +166,7 @@ const AgreementModal = ({
                   );
                 }
                 return (
-                  <p key={idx} className="text-sm text-text-secondary">
+                  <p key={idx} className="text-base text-text-secondary">
                     {block.text}
                   </p>
                 );

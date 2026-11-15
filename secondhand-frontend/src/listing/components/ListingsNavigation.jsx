@@ -25,7 +25,7 @@ const ListingsNavigation = ({
     const listingNoError = engineSearch?.listingNo?.error || '';
     const clear = engineSearch?.clear;
     return <>
-        <div className="bg-gradient-to-b from-background-primary via-background-primary/70 to-background-secondary">
+        <div className="bg-background-primary border-b border-border-light">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div className="flex items-center gap-3">
@@ -37,11 +37,11 @@ const ListingsNavigation = ({
                         <div>
                             <h1 className="text-xl sm:text-2xl font-semibold text-text-primary tracking-tight">{title}</h1>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="text-xs sm:text-sm font-medium text-text-secondary">
+                                <span className="text-sm font-medium text-text-secondary">
                                     {getListingTypeLabel(selectedCategory || filters?.listingType) || t('all_categories', 'Tüm Kategoriler')}
                                 </span>
                                 <span className="text-border-DEFAULT">·</span>
-                                <span className="text-text-muted text-xs sm:text-sm">{totalElements?.toLocaleString()} {t("results")}</span>
+                                <span className="text-text-muted text-sm">{totalElements?.toLocaleString()} {t("results")}</span>
                             </div>
                         </div>
                     </div>

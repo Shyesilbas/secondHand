@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
 import { ComplaintReason } from '../types/complaintTypes.js';
 import { formatDate, formatDateTime } from '../../common/formatters.js';
-import { Button } from '../../common/components/ui/index.js';
+import { Badge, Button } from '../../common/components/ui/index.js';
 import {
   APPEAL_STATUS_LABELS,
   COMPLAINT_STATUS_LABELS,
@@ -20,12 +20,6 @@ const REASON_LABELS = {
   [ComplaintReason.COPYRIGHT_VIOLATION]: 'Copyright Violation',
   [ComplaintReason.SPAM]: 'Spam',
   [ComplaintReason.OTHER]: 'Other',
-};
-
-const TONE_DOT = {
-  warning: 'bg-status-warning',
-  success: 'bg-status-success',
-  neutral: 'bg-text-muted',
 };
 
 const Row = ({ label, children }) => (
@@ -68,19 +62,14 @@ const ComplaintCard = ({ complaint, side = 'filed', onOpen, onAppeal }) => {
             </h3>
             <p className="text-xs tabular-nums text-text-tertiary">{formatDate(complaint.createdAt) || '-'}</p>
           </div>
-          <span className="inline-flex items-center gap-1.5 text-xs text-text-secondary">
-            <span className={`h-1.5 w-1.5 rounded-full ${TONE_DOT[tone]}`} aria-hidden />
+          <Badge variant={tone} dot>
             {labelOf(COMPLAINT_STATUS_LABELS, complaint.status, t)}
-          </span>
+          </Badge>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <span className="inline-flex items-center rounded-sm bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
-            {targetLabel}
-          </span>
-          <span className="inline-flex items-center rounded-sm bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
-            {REASON_LABELS[complaint.reason] || complaint.reason}
-          </span>
+          <Badge variant="neutral">{targetLabel}</Badge>
+          <Badge variant="neutral">{REASON_LABELS[complaint.reason] || complaint.reason}</Badge>
         </div>
 
         {complaint.description && side === 'filed' && (

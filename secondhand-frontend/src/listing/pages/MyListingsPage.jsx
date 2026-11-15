@@ -52,7 +52,7 @@ const LowStockCard = ({
         />
         <Link
           to={ROUTES.EDIT_LISTING(listing.id)}
-          className="shrink-0 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium text-text-secondary bg-background-secondary hover:bg-secondary-200 hover:text-text-primary border border-border-light rounded transition-colors"
+          className="shrink-0 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium text-text-secondary bg-background-secondary hover:bg-secondary-200 hover:text-text-primary border border-border-light rounded transition-colors"
         >
           <Pencil className="w-3.5 h-3.5" />
           <span>{t("edit")}</span>
@@ -171,14 +171,14 @@ const MyListingsPage = () => {
       <div className="space-y-3">
         <div className="bg-background-primary rounded border border-border-light overflow-hidden">
           <div
-            className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 cursor-pointer hover:bg-background-secondary/60 transition-colors"
+            className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 cursor-pointer hover:bg-background-secondary transition-colors"
             onClick={lowStock.toggle}
           >
             <div className="flex items-center gap-2.5">
               <AlertTriangle className="h-4 w-4 shrink-0 text-status-warning" strokeWidth={1.5} aria-hidden />
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                 <h3 className="text-sm font-semibold text-text-primary">{t("inventory_alert")}</h3>
-                <span className="text-xs text-text-secondary font-medium tabular-nums">
+                <span className="text-sm text-text-secondary font-medium tabular-nums">
                   {stockText} {t("needs_attention")}
                 </span>
               </div>
@@ -190,14 +190,14 @@ const MyListingsPage = () => {
                   <button
                     type="button"
                     onClick={() => setBulkMode('quantity')}
-                    className="inline-flex items-center justify-center rounded text-xs font-medium transition-colors bg-background-secondary text-text-primary hover:bg-secondary-200 border border-border-light h-8 px-3"
+                    className="inline-flex items-center justify-center rounded text-sm font-medium transition-colors bg-background-secondary text-text-primary hover:bg-secondary-200 border border-border-light h-8 px-3"
                   >
                     {t("batch_stock")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setBulkMode('price')}
-                    className="inline-flex items-center justify-center rounded text-xs font-medium transition-colors bg-background-secondary text-text-primary hover:bg-secondary-200 border border-border-light h-8 px-3"
+                    className="inline-flex items-center justify-center rounded text-sm font-medium transition-colors bg-background-secondary text-text-primary hover:bg-secondary-200 border border-border-light h-8 px-3"
                   >
                     {t("batch_prices")}
                   </button>
@@ -208,7 +208,7 @@ const MyListingsPage = () => {
           </div>
 
           {lowStock.isOpen && (
-            <div className="p-3.5 bg-background-secondary/30 border-t border-border-light">
+            <div className="p-3.5 bg-background-secondary border-t border-border-light">
               {!bulkMode ? (
                 <div className={`grid grid-cols-1 ${lowStock.listings.length > 1 ? 'xl:grid-cols-2' : ''} gap-2.5`}>
                   {lowStock.listings.slice(0, 4).map(listing => (
@@ -232,7 +232,7 @@ const MyListingsPage = () => {
                           value={bulkValue}
                           onChange={e => setBulkValue(e.target.value)}
                           placeholder={t("qty")}
-                          className="w-24 h-8 px-2.5 text-xs tabular-nums bg-background-secondary border border-border-light rounded outline-none focus:border-primary"
+                          className="w-24 h-8 px-2.5 text-sm tabular-nums bg-background-secondary border border-border-light rounded outline-none focus:border-primary"
                         />
                       ) : (
                         <PriceInput
@@ -240,14 +240,14 @@ const MyListingsPage = () => {
                           onChange={n => setBulkValue(n != null ? String(n) : '')}
                           placeholder={t("price")}
                           compact
-                          className="w-32 h-8 bg-background-secondary text-xs tabular-nums"
+                          className="w-32 h-8 bg-background-secondary text-sm tabular-nums"
                         />
                       )}
                       <button
                         type="button"
                         onClick={applyBulk}
                         disabled={saving}
-                        className="inline-flex items-center justify-center gap-1.5 rounded text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-8 px-3"
+                        className="inline-flex items-center justify-center gap-1.5 rounded text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-8 px-3"
                       >
                         {t("apply")}
                       </button>
@@ -273,7 +273,7 @@ const MyListingsPage = () => {
                           className="w-4 h-4 rounded-sm border-border-light text-primary shrink-0"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-text-primary truncate">{listing.title}</p>
+                          <p className="text-sm font-medium text-text-primary truncate">{listing.title}</p>
                           <p className="text-xs text-text-secondary tabular-nums">
                             {t("current")} {bulkMode === 'quantity' ? `${listing.quantity} pcs` : formatCurrency(listing.price, listing.currency)}
                           </p>

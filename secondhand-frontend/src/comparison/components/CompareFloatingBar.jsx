@@ -43,7 +43,7 @@ const CompareFloatingBar = memo(() => {
                 <div className="p-3 sm:p-4">
                     <div className="flex flex-col sm:flex-row sm:items-stretch gap-3">
                         <div className="flex-1 flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-thin">
-                            {items.map(item => <div key={item.id} className="relative group flex-shrink-0 w-20 rounded border border-border-light bg-background-secondary/90 overflow-hidden hover:border-primary transition-all">
+                            {items.map(item => <div key={item.id} className="relative group flex-shrink-0 w-20 rounded border border-border-light bg-background-secondary overflow-hidden hover:border-primary transition-all">
                                 <div className="aspect-square relative bg-background-primary">
                                     {item.imageUrl ? <img src={item.imageUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-background-tertiary">
                                         <ImageIcon className="w-5 h-5 text-secondary-300" />
@@ -64,7 +64,7 @@ const CompareFloatingBar = memo(() => {
 
                             {Array.from({
                                 length: maxItems - itemCount
-                            }).map((_, index) => <div key={`empty-${index}`} className="flex-shrink-0 w-20 aspect-3/4 rounded border-2 border-dashed border-border-light bg-background-secondary/40 flex items-center justify-center text-secondary-300">
+                            }).map((_, index) => <div key={`empty-${index}`} className="flex-shrink-0 w-20 aspect-3/4 rounded border-2 border-dashed border-border-light bg-background-secondary flex items-center justify-center text-secondary-300">
                                 <span className="text-xl font-normal leading-none">+</span>
                             </div>)}
                         </div>

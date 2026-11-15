@@ -5,12 +5,14 @@ import PageContainer from '../../common/components/layout/PageContainer.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Button from '../../common/components/ui/Button.jsx';
+import Card from '../../common/components/ui/Card.jsx';
+import PageHeader from '../../common/components/ui/PageHeader.jsx';
 import TimeRangeSelector from './TimeRangeSelector.jsx';
 
 
 /** White card with an optional title row (title, short description, link on the right). */
 export const DashboardCard = ({ title, description, action, children, className = '' }) => (
-  <section className={`rounded border border-border bg-background-primary p-5 ${className}`}>
+  <Card as="section" shadow={false} className={className}>
     {(title || action) && (
       <header className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -21,7 +23,7 @@ export const DashboardCard = ({ title, description, action, children, className 
       </header>
     )}
     {children}
-  </section>
+  </Card>
 );
 
 export const CardLink = ({ to, children }) => (
@@ -42,13 +44,11 @@ export const CardEmpty = ({ children }) => (
 export const DashboardShell = ({ title, subtitle, range, children }) => (
   <div className="min-h-screen bg-background-secondary">
     <PageContainer className="space-y-6 py-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{title}</h1>
-          {subtitle && <p className="mt-1 text-sm text-text-secondary">{subtitle}</p>}
-        </div>
-        {range && <TimeRangeSelector {...range} />}
-      </div>
+      <PageHeader
+        title={title}
+        subtitle={subtitle}
+        actions={range ? <TimeRangeSelector {...range} /> : null}
+      />
       {children}
     </PageContainer>
   </div>

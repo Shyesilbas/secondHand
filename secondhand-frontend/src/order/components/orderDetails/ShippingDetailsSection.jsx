@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Truck, Package, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { ROUTES } from '../../../common/constants/routes.js';
+import Badge from '../../../common/components/ui/Badge.jsx';
 import { formatDateTime, resolveEnumLabel } from '../../../common/formatters.js';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 
@@ -22,30 +23,12 @@ const linesForDeliveryAddress = addr => {
     };
 };
 
-const getShippingStatusPresentation = (status) => {
+const getShippingStatusVariant = (status) => {
     const s = String(status || '').toUpperCase();
-    if (s === 'DELIVERED') {
-        return {
-            badge: 'bg-status-success-bg text-status-success-text border-status-success-border',
-            dot: 'bg-status-success'
-        };
-    }
-    if (['IN_TRANSIT', 'PENDING'].includes(s)) {
-        return {
-            badge: 'bg-status-warning-bg text-status-warning-text border-status-warning-border',
-            dot: 'bg-status-warning'
-        };
-    }
-    if (['CANCELLED', 'RETURNED'].includes(s)) {
-        return {
-            badge: 'bg-status-error-bg text-status-error-text border-status-error-border',
-            dot: 'bg-status-error'
-        };
-    }
-    return {
-        badge: 'bg-background-secondary text-text-secondary border-border',
-        dot: 'bg-text-muted'
-    };
+    if (s === 'DELIVERED') return 'success';
+    if (['IN_TRANSIT', 'PENDING'].includes(s)) return 'warning';
+    if (['CANCELLED', 'RETURNED'].includes(s)) return 'error';
+    return 'neutral';
 };
 
 export const ShippingDetailsSection = React.memo(({
@@ -68,7 +51,7 @@ export const ShippingDetailsSection = React.memo(({
 
     if (!shipping) return null;
 
-    const shippingPresentation = getShippingStatusPresentation(shipping.status);
+    const shippingVariant = getShippingStatusVariant(shipping.status);
     const shippingLabel = resolveEnumLabel(enums, 'shippingStatuses', shipping.status) || shipping.status;
     const useInternalLinks = Boolean(internalTracking?.orderId);
     const canOpenCarrier = Boolean(shipping.trackingUrl && !useInternalLinks);
@@ -85,10 +68,9 @@ export const ShippingDetailsSection = React.memo(({
                     <Truck className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
                     {t("shipping_details", "Kargo & Teslimat Bilgileri")}
                 </h3>
-                <span className={`inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-0.5 text-xs font-medium ${shippingPresentation.badge}`}>
-                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${shippingPresentation.dot}`} aria-hidden />
-                    <span>{shippingLabel}</span>
-                </span>
+                <Badge variant={shippingVariant} dot>
+                    {shippingLabel}
+                </Badge>
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -141,7 +123,7 @@ export const ShippingDetailsSection = React.memo(({
                     {shipping.estimatedDeliveryDate && (
                         <div>
                             <p className="mb-1 text-xs text-text-tertiary">{t("estimated_delivery", "Tahmini Teslimat")}</p>
-                            <div className="flex items-center gap-1.5 text-xs tabular-nums text-text-primary">
+                            <div className="flex items-center gap-1.5 text-sm tabular-nums text-text-primary">
                                 <Calendar className="h-3.5 w-3.5 text-text-tertiary" strokeWidth={1.5} aria-hidden />
                                 {formatDateTime(shipping.estimatedDeliveryDate)}
                             </div>
@@ -151,7 +133,7 @@ export const ShippingDetailsSection = React.memo(({
                     {shipping.deliveredAt && (
                         <div>
                             <p className="mb-1 text-xs text-text-tertiary">{t("delivered_at", "Teslim Tarihi")}</p>
-                            <div className="flex items-center gap-1.5 text-xs tabular-nums text-text-primary">
+                            <div className="flex items-center gap-1.5 text-sm tabular-nums text-text-primary">
                                 <Package className="h-3.5 w-3.5 text-text-tertiary" strokeWidth={1.5} aria-hidden />
                                 {formatDateTime(shipping.deliveredAt)}
                             </div>
@@ -161,7 +143,7 @@ export const ShippingDetailsSection = React.memo(({
                     {!shipping.trackingNumber && shipping.status === 'PENDING' && (
                         <div className="flex items-center gap-2 rounded-sm border border-border bg-background-secondary p-3">
                             <Clock className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-                            <p className="text-xs text-text-secondary">
+                            <p className="text-sm text-text-secondary">
                                 {internalTracking?.isSellerView
                                     ? t("waiting_for_you_to_ship_the_items", "Ürünleri kargoya vermeniz bekleniyor.")
                                     : t("waiting_for_seller_to_ship_the_items", "Satıcının ürünü kargoya vermesi bekleniyor.")}
@@ -177,9 +159,9 @@ export const ShippingDetailsSection = React.memo(({
                         <MapPin className="h-3.5 w-3.5 text-text-tertiary shrink-0" strokeWidth={1.5} aria-hidden />
                         {t("teslimat_adresi", "Teslimat Adresi")}
                     </p>
-                    {addrLine1 ? <p className="text-xs font-medium text-text-primary">{addrLine1}</p> : null}
+                    {addrLine1 ? <p className="text-sm font-medium text-text-primary">{addrLine1}</p> : null}
                     {addrLine2 ? (
-                        <p className={addrLine1 ? 'mt-0.5 text-xs leading-snug text-text-secondary' : 'text-xs font-medium leading-snug text-text-primary'}>
+                        <p className={addrLine1 ? 'mt-0.5 text-sm leading-snug text-text-secondary' : 'text-sm font-medium leading-snug text-text-primary'}>
                             {addrLine2}
                         </p>
                     ) : null}

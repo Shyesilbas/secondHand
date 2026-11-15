@@ -30,10 +30,10 @@ const EmailListItem = ({
       }}
       onClick={() => onSelect(email)}
       className={`group relative cursor-pointer border-b border-border-light border-l-2 px-3.5 py-2.5 sm:px-4 sm:py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-border-focus ${isSelected
-          ? 'border-l-primary bg-background-tertiary/60'
-          : isUnread
-            ? 'border-l-transparent bg-background-primary hover:bg-background-secondary/60'
-            : 'border-l-transparent bg-background-primary hover:bg-background-secondary/40'
+        ? 'border-l-primary bg-background-tertiary'
+        : isUnread
+          ? 'border-l-transparent bg-background-primary hover:bg-background-secondary'
+          : 'border-l-transparent bg-background-primary hover:bg-background-secondary'
         }`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -77,11 +77,11 @@ const EmailListItem = ({
       </div>
 
       <h3
-        className={`mt-1 line-clamp-1 text-xs sm:text-sm leading-snug ${isUnread
-            ? 'font-semibold text-text-primary'
-            : isSelected
-              ? 'font-medium text-text-primary'
-              : 'font-normal text-text-secondary'
+        className={`mt-1 line-clamp-1 text-sm leading-snug ${isUnread
+          ? 'font-semibold text-text-primary'
+          : isSelected
+            ? 'font-medium text-text-primary'
+            : 'font-normal text-text-secondary'
           }`}
       >
         {cleanSubject}

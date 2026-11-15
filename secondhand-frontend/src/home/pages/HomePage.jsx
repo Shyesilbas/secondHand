@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import PageContainer from '../../common/components/layout/PageContainer.jsx';
 import RecentlyViewedSection from '../../listing/components/RecentlyViewedSection.jsx';
-import HeroSection from '../components/HeroSection.jsx';
 import TrustBand from '../components/TrustBand.jsx';
 import HomeSection from '../components/HomeSection.jsx';
 import CategoryGrid from '../components/CategoryGrid.jsx';
@@ -18,8 +17,6 @@ const SectionFallback = () => (
 
 const HomePage = () => (
   <div className="flex min-h-screen flex-col bg-background-secondary">
-    <HeroSection />
-
     <div className="flex flex-col gap-12 py-10">
       <CategoryGrid />
 

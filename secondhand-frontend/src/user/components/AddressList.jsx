@@ -145,7 +145,7 @@ const AddressList = memo(({ isActive }) => {
     <div>
       {addresses.length > 0 && (
         <div className="mb-4 flex items-center justify-between gap-3">
-          <p className="text-xs text-text-secondary">
+          <p className="text-sm text-text-secondary">
             <span className="font-semibold tabular-nums text-text-primary">
               {addresses.length}
             </span>{' '}

@@ -190,7 +190,7 @@ const ListingBasics = ({
                 </span>
                 <div className="mt-2 flex items-start gap-2 rounded border border-border-light bg-background-secondary p-2.5">
                   <Info className="h-4 w-4 shrink-0 text-text-muted mt-0.5" strokeWidth={1.5} aria-hidden />
-                  <p className="text-xs text-text-secondary leading-relaxed">
+                  <p className="text-sm text-text-secondary leading-relaxed">
                     {t("bu_alan_i_aretledi_inizde_r_n_n_z_sipari", "Bu alanı işaretlediğinizde, ürününüz sipariş edilirse telefon numaranız alıcıya, alıcının telefon numarası ise size gösterilir.")}
                   </p>
                 </div>

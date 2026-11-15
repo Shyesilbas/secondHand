@@ -7,133 +7,131 @@ import { useFavorites } from '../hooks/useFavorites.js';
 import { useMyFavoriteLists, FavoriteListModal, FavoriteListCard } from '../../favoritelist/index.js';
 import ListingGrid from '../../listing/components/ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
-import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
+import { SkeletonGrid, EmptyState, PageHeader, Tabs } from '../../common/components/ui/index.js';
 import { formatDate } from '../../common/formatters.js';
 import { FAVORITE_DEFAULTS, FAVORITES_PAGE_TABS } from '../favoriteConstants.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { getListingFavoriteCount } from '../favorites.js';
 const FavoritesPage = () => {
- const {
- t
- } = useTranslation();
- const [activeTab, setActiveTab] = useState(FAVORITES_PAGE_TABS.FAVORITES);
- const [showCreateListModal, setShowCreateListModal] = useState(false);
- const {
- favorites = [],
- isLoading = false,
- error = null,
- pagination = {
- number: FAVORITE_DEFAULTS.PAGE,
- size: FAVORITE_DEFAULTS.PAGE_SIZE,
- totalPages: 0,
- totalElements: 0
- },
- fetchFavorites,
- loadPage
- } = useFavorites();
- const {
- data: myLists = [],
- isLoading: listsLoading,
- refetch: refetchLists
- } = useMyFavoriteLists();
- const handlePageChange = useCallback(nextPage => {
- loadPage(nextPage);
- }, [loadPage]);
- const favoritedListings = useMemo(() => {
- return favorites.map(fav => {
- const listing = fav?.listing;
- if (!listing) return null;
- const favoriteCount = getListingFavoriteCount(listing);
- const isFavorited = true;
- return {
- ...listing,
- createdAt: formatDate(fav.createdAt),
- favoriteStats: {
- ...listing.favoriteStats,
- favoriteCount,
- isFavorited,
- favorited: isFavorited
- },
- reviewStats: listing.reviewStats ?? {
- totalReviews: 0,
- averageRating: listing?.averageRating ?? 0
- }
- };
- }).filter(Boolean);
- }, [favorites]);
- const handleRefresh = useCallback(() => {
- fetchFavorites();
- }, [fetchFavorites]);
- return <div className="min-h-screen bg-background-secondary/90">
- <PageContainer className="py-6 sm:py-8">
- <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
- <div className="flex flex-col gap-3 border-b border-border-light bg-background-secondary/90 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
- <div className="min-w-0">
- <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("favorites")}</h1>
- <p className="mt-0.5 text-xs text-text-tertiary sm:text-sm">{t("saved_listings_and_your_curated_lists_in")}</p>
- </div>
- </div>
+    const {
+        t
+    } = useTranslation();
+    const [activeTab, setActiveTab] = useState(FAVORITES_PAGE_TABS.FAVORITES);
+    const [showCreateListModal, setShowCreateListModal] = useState(false);
+    const {
+        favorites = [],
+        isLoading = false,
+        error = null,
+        pagination = {
+            number: FAVORITE_DEFAULTS.PAGE,
+            size: FAVORITE_DEFAULTS.PAGE_SIZE,
+            totalPages: 0,
+            totalElements: 0
+        },
+        fetchFavorites,
+        loadPage
+    } = useFavorites();
+    const {
+        data: myLists = [],
+        isLoading: listsLoading,
+        refetch: refetchLists
+    } = useMyFavoriteLists();
+    const handlePageChange = useCallback(nextPage => {
+        loadPage(nextPage);
+    }, [loadPage]);
+    const favoritedListings = useMemo(() => {
+        return favorites.map(fav => {
+            const listing = fav?.listing;
+            if (!listing) return null;
+            const favoriteCount = getListingFavoriteCount(listing);
+            const isFavorited = true;
+            return {
+                ...listing,
+                createdAt: formatDate(fav.createdAt),
+                favoriteStats: {
+                    ...listing.favoriteStats,
+                    favoriteCount,
+                    isFavorited,
+                    favorited: isFavorited
+                },
+                reviewStats: listing.reviewStats ?? {
+                    totalReviews: 0,
+                    averageRating: listing?.averageRating ?? 0
+                }
+            };
+        }).filter(Boolean);
+    }, [favorites]);
+    const handleRefresh = useCallback(() => {
+        fetchFavorites();
+    }, [fetchFavorites]);
+    return <div className="min-h-screen bg-background-secondary">
+        <PageContainer className="py-6 sm:py-8">
+            <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
+                <div className="border-b border-border-light bg-background-secondary px-4 py-4 sm:px-5">
+                    <PageHeader
+                        title={t("favorites")}
+                        subtitle={t("saved_listings_and_your_curated_lists_in")}
+                    />
+                </div>
 
- <div className="flex flex-col gap-3 border-b border-border-light px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
- <div className="inline-flex rounded-md bg-background-tertiary p-1">
- <button type="button" onClick={() => setActiveTab(FAVORITES_PAGE_TABS.FAVORITES)} className={`inline-flex items-center gap-2 rounded px-3 py-2 text-sm font-semibold transition sm:px-4 ${activeTab === FAVORITES_PAGE_TABS.FAVORITES ? 'bg-background-primary text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
- <Heart className="h-4 w-4 opacity-70" />{t("saved")}<span className="rounded-sm bg-secondary-200/80 px-2 py-0.5 text-xs font-semibold text-text-secondary">
- {pagination.totalElements}
- </span>
- </button>
- <button type="button" onClick={() => setActiveTab(FAVORITES_PAGE_TABS.LISTS)} className={`inline-flex items-center gap-2 rounded px-3 py-2 text-sm font-semibold transition sm:px-4 ${activeTab === FAVORITES_PAGE_TABS.LISTS ? 'bg-background-primary text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
- <List className="h-4 w-4 opacity-70" />{t("lists")}<span className="rounded-sm bg-secondary-200/80 px-2 py-0.5 text-xs font-semibold text-text-secondary">
- {myLists.length}
- </span>
- </button>
- </div>
+                <div className="flex flex-col gap-3 border-b border-border-light px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+                    <Tabs
+                        variant="segmented"
+                        ariaLabel={t("favorites")}
+                        activeKey={activeTab}
+                        onChange={setActiveTab}
+                        items={[
+                            { key: FAVORITES_PAGE_TABS.FAVORITES, label: t("saved"), icon: Heart, count: pagination.totalElements },
+                            { key: FAVORITES_PAGE_TABS.LISTS, label: t("lists"), icon: List, count: myLists.length },
+                        ]}
+                    />
 
- <div className="flex flex-wrap items-center gap-2">
- {activeTab === FAVORITES_PAGE_TABS.LISTS && <button type="button" onClick={() => setShowCreateListModal(true)} className="inline-flex items-center gap-1.5 rounded bg-btn-primary px-3 py-2 text-xs font-semibold text-white transition hover:bg-btn-primary-hover sm:text-sm">
- <Plus className="h-4 w-4" />{t("new_list")}</button>}
- {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <button type="button" onClick={handleRefresh} disabled={isLoading} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
- <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />{t("refresh")}</button>}
- </div>
- </div>
- </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                        {activeTab === FAVORITES_PAGE_TABS.LISTS && <button type="button" onClick={() => setShowCreateListModal(true)} className="inline-flex items-center gap-1.5 rounded bg-btn-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-btn-primary-hover">
+                            <Plus className="h-4 w-4" />{t("new_list")}</button>}
+                        {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <button type="button" onClick={handleRefresh} disabled={isLoading} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
+                            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />{t("refresh")}</button>}
+                    </div>
+                </div>
+            </div>
 
- <div className="mt-6">
- {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <>
- {isLoading ? <ListingGrid listings={[]} isLoading error={null} /> : error ? <ListingGrid listings={[]} isLoading={false} error={String(error)} /> : favoritedListings.length === 0 ? <EmptyState
- icon={Heart}
- title={t("no_saved_listings_yet")}
- description={t("tap_the_heart_on_a_listing_to_save_it_he")}
- >
- <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-6">{t("browse_listings")}</Link>
- </EmptyState> : <>
- <div className="mb-6">
- <ListingGrid listings={favoritedListings} isLoading={false} error={null} />
- </div>
- {pagination.totalPages > 1 ? <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
- <Pagination page={pagination.number} totalPages={pagination.totalPages} onPageChange={handlePageChange} />
- </div> : null}
- </>}
- </>}
+            <div className="mt-6">
+                {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <>
+                    {isLoading ? <ListingGrid listings={[]} isLoading error={null} /> : error ? <ListingGrid listings={[]} isLoading={false} error={String(error)} /> : favoritedListings.length === 0 ? <EmptyState
+                        icon={Heart}
+                        title={t("no_saved_listings_yet")}
+                        description={t("tap_the_heart_on_a_listing_to_save_it_he")}
+                    >
+                        <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-6">{t("browse_listings")}</Link>
+                    </EmptyState> : <>
+                        <div className="mb-6">
+                            <ListingGrid listings={favoritedListings} isLoading={false} error={null} />
+                        </div>
+                        {pagination.totalPages > 1 ? <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
+                            <Pagination page={pagination.number} totalPages={pagination.totalPages} onPageChange={handlePageChange} />
+                        </div> : null}
+                    </>}
+                </>}
 
- {activeTab === FAVORITES_PAGE_TABS.LISTS && <div>
- {listsLoading ? <SkeletonGrid count={4} columns="grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" /> : myLists.length === 0 ? <EmptyState
- icon={List}
- title={t("no_lists_yet")}
- description={t("create_a_list_to_group_favorites_by_them")}
- >
- <button type="button" onClick={() => setShowCreateListModal(true)} className="mt-6 inline-flex items-center gap-2 rounded bg-btn-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-btn-primary-hover">
- <Plus className="h-5 w-5" />{t("create_your_first_list")}</button>
- </EmptyState> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
- {myLists.map(list => <FavoriteListCard key={list.id} list={list} />)}
- </div>}
- </div>}
- </div>
+                {activeTab === FAVORITES_PAGE_TABS.LISTS && <div>
+                    {listsLoading ? <SkeletonGrid count={4} columns="grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" /> : myLists.length === 0 ? <EmptyState
+                        icon={List}
+                        title={t("no_lists_yet")}
+                        description={t("create_a_list_to_group_favorites_by_them")}
+                    >
+                        <button type="button" onClick={() => setShowCreateListModal(true)} className="mt-6 inline-flex items-center gap-2 rounded bg-btn-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-btn-primary-hover">
+                            <Plus className="h-5 w-5" />{t("create_your_first_list")}</button>
+                    </EmptyState> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {myLists.map(list => <FavoriteListCard key={list.id} list={list} />)}
+                    </div>}
+                </div>}
+            </div>
 
- <FavoriteListModal isOpen={showCreateListModal} onClose={() => setShowCreateListModal(false)} onSuccess={() => {
- refetchLists();
- setShowCreateListModal(false);
- }} />
- </PageContainer>
- </div>;
+            <FavoriteListModal isOpen={showCreateListModal} onClose={() => setShowCreateListModal(false)} onSuccess={() => {
+                refetchLists();
+                setShowCreateListModal(false);
+            }} />
+        </PageContainer>
+    </div>;
 };
 export default FavoritesPage;

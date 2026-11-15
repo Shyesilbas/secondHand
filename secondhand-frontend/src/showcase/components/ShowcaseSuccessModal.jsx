@@ -44,7 +44,7 @@ const ShowcaseSuccessModal = ({
               strokeWidth={1.5}
               aria-hidden
             />
-            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
+            <p className="text-sm text-text-secondary leading-relaxed">
               {listingTitle ? (
                 <>
                   <span className="font-medium text-text-primary">{listingTitle}</span>{' '}
@@ -63,7 +63,7 @@ const ShowcaseSuccessModal = ({
           </div>
 
           {listingTitle && (
-            <div className="flex items-center gap-3 rounded border border-border-light bg-background-secondary/40 p-2.5">
+            <div className="flex items-center gap-3 rounded border border-border-light bg-background-secondary p-2.5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-primary">
                 {listingImage ? (
                   <img src={listingImage} alt="" className="h-full w-full object-cover" />
@@ -71,14 +71,14 @@ const ShowcaseSuccessModal = ({
                   <Package className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
                 )}
               </div>
-              <span className="truncate text-xs font-medium text-text-primary">
+              <span className="truncate text-sm font-medium text-text-primary">
                 {listingTitle}
               </span>
             </div>
           )}
 
           {(days || pricePaid) && (
-            <dl className="divide-y divide-border-light rounded border border-border-light px-3.5 text-xs sm:text-sm">
+            <dl className="divide-y divide-border-light rounded border border-border-light px-3.5 text-sm">
               {days && (
                 <div className="flex justify-between py-2.5">
                   <dt className="text-text-secondary">
@@ -107,7 +107,7 @@ const ShowcaseSuccessModal = ({
                 {paymentAgreements.map((agreement) => (
                   <div
                     key={agreement.agreementId}
-                    className="flex items-center justify-between gap-2 px-3 py-2 text-xs"
+                    className="flex items-center justify-between gap-2 px-3 py-2 text-sm"
                   >
                     <div className="flex min-w-0 items-center gap-2">
                       <FileCheck2

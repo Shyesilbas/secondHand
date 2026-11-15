@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { formatCurrency, formatDateTime, resolveEnumLabel } from '../../common/formatters.js';
 import { getLastUpdateInfo, hasOrderAction } from '../orderConstants.js';
 import { ORDER_ACTIONS, ORDER_LIMITS, ORDER_VIEW_MODES } from '../constants/orderUiConstants.js';
-import { getOrderStatusBadgeClass, getOrderStatusDotClass, getPaymentStatusIndicatorClass, getPaymentStatusTextClass } from '../utils/statusPresentation.js';
+import { getOrderStatusBadgeVariant, getPaymentStatusIndicatorClass, getPaymentStatusTextClass } from '../utils/statusPresentation.js';
 import { AddressSection, NotesSection } from './orderDetails/OrderEditableSections.jsx';
 import { ShipOrderForm } from './orderDetails/ShipOrderForm.jsx';
 import { OrderPaymentSummary } from './orderDetails/OrderPaymentSummary.jsx';
@@ -16,6 +16,7 @@ import useAddresses from '../../user/hooks/useAddresses.js';
 import { AlertCircle, ArrowRight, Check, FileText, Mail, Pencil, Phone, X } from 'lucide-react';
 import Modal from '../../common/components/ui/Modal.jsx';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
+import { Badge, Card } from '../../common/components/ui/index.js';
 import MeetupHandoverSection from './orderDetails/MeetupHandoverSection.jsx';
 import OrderStepper from './orderDetails/OrderStepper.jsx';
 import CancelRefundModal from './CancelRefundModal.jsx';
@@ -24,9 +25,7 @@ import { orderItemIds, useOrderItemReviews } from '../hooks/useOrderItemReviews.
 import { OrderDetailsSkeleton } from './orderDetails/OrderDetailsSkeleton.jsx';
 
 const OrderCard = React.memo(({ children, className = '' }) => (
- <div className={`rounded-md border border-border bg-background-primary p-5 shadow-sm ${className}`}>
- {children}
- </div>
+ <Card className={className}>{children}</Card>
 ));
 OrderCard.displayName = 'OrderCard';
 
@@ -178,10 +177,9 @@ const header = (
  </div>
  )}
  {selectedOrder && (
- <span className={`inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-0.5 text-xs font-medium ${getOrderStatusBadgeClass(selectedOrder.status)}`}>
- <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${getOrderStatusDotClass(selectedOrder.status)}`} aria-hidden />
- <span>{resolveEnumLabel(enums, 'orderStatuses', selectedOrder.status) || selectedOrder.status}</span>
- </span>
+ <Badge variant={getOrderStatusBadgeVariant(selectedOrder.status)} dot>
+ {resolveEnumLabel(enums, 'orderStatuses', selectedOrder.status) || selectedOrder.status}
+ </Badge>
  )}
  </div>
  {selectedOrder && (
@@ -247,7 +245,7 @@ const header = (
  ) : selectedOrder ? (
  <div className="space-y-6">
  {/* Stepper (Horizontal Progress Tracker) */}
- <div className="rounded-md border border-border bg-background-secondary/50 p-4 shadow-sm">
+ <Card surface="secondary" padding="compact">
  <OrderStepper currentStatus={selectedOrder.status} deliveryMethod={selectedOrder.deliveryMethod} />
  <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-border-light pt-2 text-xs tabular-nums text-text-tertiary">
  <span>
@@ -258,7 +256,7 @@ const header = (
  {selectedOrder.deliveryMethod === 'SAFE_MEETUP' ? t('safe_meetup', 'Güvenli Buluşma') : t('cargo_delivery', 'Kargo Teslimatı')}
  </span>
  </div>
- </div>
+ </Card>
 
  {/* Two Column Layout */}
  <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -306,13 +304,13 @@ const header = (
  {selectedOrder.buyerName || selectedOrder.buyerSurname ? `${selectedOrder.buyerName || ''} ${selectedOrder.buyerSurname || ''}`.trim() : t('od_user_fallback', { defaultValue: 'Kullanıcı #{{id}}', id: selectedOrder.userId })}
  </div>
  {selectedOrder.buyerEmail && (
- <div className="mt-1 flex items-center gap-1.5 truncate text-xs text-text-secondary">
+ <div className="mt-1 flex items-center gap-1.5 truncate text-sm text-text-secondary">
  <Mail className="h-3.5 w-3.5 flex-shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  {selectedOrder.buyerEmail}
  </div>
  )}
  {selectedOrder.buyerPhone && (
- <div className="mt-1 flex items-center gap-1.5 truncate text-xs tabular-nums text-text-secondary">
+ <div className="mt-1 flex items-center gap-1.5 truncate text-sm tabular-nums text-text-secondary">
  <Phone className="h-3.5 w-3.5 flex-shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  {selectedOrder.buyerPhone}
  </div>

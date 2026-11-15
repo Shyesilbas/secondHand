@@ -17,6 +17,7 @@ import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import Skeleton, { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
+import Tabs from '../../common/components/ui/Tabs.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useBlockStatus, useBlockUser, useUnblockUser } from '../hooks/useBlocking.js';
 import { useGreatSellerStatus } from '../hooks/useGreatSellerStatus.js';
@@ -48,29 +49,18 @@ const useUserProfile = (userId) => {
 const ProfileTabs = ({ activeTab, onChange, counts }) => {
  const { t } = useTranslation();
  return (
- <div className="mb-5 flex overflow-x-auto border-b border-border-light" role="tablist" aria-label={t('profile_sections', 'Profil bölümleri')}>
- {TABS.map(tab => {
- const active = activeTab === tab.key;
- const count = counts[tab.key];
- return (
- <button
- key={tab.key}
- type="button"
- role="tab"
- aria-selected={active}
- onClick={() => onChange(tab.key)}
- className={`-mb-px inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors duration-150 ${
- active ? 'border-primary font-medium text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
- }`}
- >
- {t(tab.labelKey, tab.defaultLabel)}
- {count > 0 && (
- <span className="rounded-sm bg-background-tertiary px-1.5 text-xs font-medium tabular-nums text-text-secondary">{count}</span>
- )}
- </button>
- );
- })}
- </div>
+ <Tabs
+  className="mb-5"
+  activeKey={activeTab}
+  onChange={onChange}
+  ariaLabel={t('profile_sections', 'Profil bölümleri')}
+  items={TABS.map(tab => ({
+   key: tab.key,
+   label: t(tab.labelKey, tab.defaultLabel),
+   count: counts[tab.key],
+   hideZeroCount: true,
+  }))}
+ />
  );
 };
 

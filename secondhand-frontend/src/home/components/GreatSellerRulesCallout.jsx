@@ -31,8 +31,8 @@ const GreatSellerRulesCallout = ({
  <div className="flex items-center gap-3 mb-8">
  <Info className="h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
  <div>
- <h3 className="text-sm font-medium text-text-primary">{t("platform_recognition_standards")}</h3>
- <p className="text-xs text-text-muted font-medium">{t("automatic_eligibility_based_on_60_day_pe")}</p>
+ <h3 className="text-base font-semibold text-text-primary">{t("platform_recognition_standards")}</h3>
+ <p className="text-sm text-text-muted font-medium">{t("automatic_eligibility_based_on_60_day_pe")}</p>
  </div>
  </div>
 
@@ -44,7 +44,7 @@ const GreatSellerRulesCallout = ({
  <div className="p-2 rounded bg-background-secondary text-text-muted group-hover:bg-primary-light group-hover:text-primary transition-colors">
  <Icon className="w-4 h-4" aria-hidden />
  </div>
- <p className="text-xs font-semibold text-text-primary">{rule.title}</p>
+ <p className="text-sm font-semibold text-text-primary">{rule.title}</p>
  </div>
  <p className="text-body text-text-secondary leading-relaxed font-medium">{rule.body}</p>
  </div>;

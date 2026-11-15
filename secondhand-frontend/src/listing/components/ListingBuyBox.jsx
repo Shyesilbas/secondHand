@@ -3,6 +3,7 @@ import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { useTranslation } from 'react-i18next';
 import { Check, ChevronRight, MapPin, Share2, ShieldCheck } from 'lucide-react';
 import Button from '../../common/components/ui/Button.jsx';
+import Badge from '../../common/components/ui/Badge.jsx';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
@@ -46,7 +47,7 @@ const ListingBuyBox = ({
   const viewCount = listing.viewCount ?? listing.viewStats?.totalViews ?? 0;
 
   return (
-    <section className="rounded-lg border border-border bg-background-secondary/60 p-5" aria-label={t('listing_summary', 'İlan özeti')}>
+    <section className="rounded border border-border bg-background-secondary p-5" aria-label={t('listing_summary', 'İlan özeti')}>
       <h1 className="text-xl font-semibold leading-snug text-text-primary sm:text-2xl">{listing.title}</h1>
 
       <p className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -59,10 +60,10 @@ const ListingBuyBox = ({
           </span>
         )}
         {price.hasCampaign && (
-          <span className="rounded-sm border border-status-error-border bg-status-error-bg px-2 py-0.5 text-xs font-medium tabular-nums text-status-error-text">
+          <Badge variant="error">
             {listing.campaignName || t('discount', 'İndirim')}
             {price.discount ? ` −%${price.discount}` : ''}
-          </span>
+          </Badge>
         )}
       </p>
 

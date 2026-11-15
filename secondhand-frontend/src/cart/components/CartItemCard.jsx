@@ -6,6 +6,7 @@ import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
 import { useReservationTimer } from '../hooks/useReservationTimer.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import Badge from '../../common/components/ui/Badge.jsx';
 import { hasCampaignOnLine } from '../utils/pricedLines.js';
 
 const CartItemCard = ({
@@ -56,7 +57,7 @@ const CartItemCard = ({
   const detailUrl = item.listing?.id ? ROUTES.LISTING_DETAIL(item.listing.id) : null;
 
   return (
-    <article className="group p-4 transition-colors hover:bg-background-secondary/40 sm:p-5">
+    <article className="group p-4 transition-colors hover:bg-background-secondary sm:p-5">
       <div className="flex gap-4">
         {/* Thumbnail */}
         <div className="relative shrink-0">
@@ -110,7 +111,7 @@ const CartItemCard = ({
                 )}
 
                 {/* Seller & Meta */}
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-text-secondary">
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-text-secondary">
                   {sellerId ? (
                     <Link
                       to={ROUTES.USER_PROFILE(sellerId)}
@@ -153,9 +154,9 @@ const CartItemCard = ({
             {/* Badges and Reservation status */}
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
               {isLowStock && (
-                <span className="rounded-full border border-status-warning-border bg-status-warning-bg px-2 py-0.5 text-xs font-medium text-status-warning-text tabular-nums">
+                <Badge variant="warning">
                   {t("stock", "Stok: ")} {Number(maxStock)}
-                </span>
+                </Badge>
               )}
 
               {isReserved && !isExpired && (
@@ -176,9 +177,9 @@ const CartItemCard = ({
               )}
 
               {hasCampaign && (
-                <span className="rounded-full border border-status-success-border bg-status-success-bg px-2 py-0.5 text-xs font-medium text-status-success-text">
+                <Badge variant="success">
                   {shownLine?.appliedCampaign?.name || t("campaign", "Kampanya")}
-                </span>
+                </Badge>
               )}
             </div>
           </div>
@@ -196,7 +197,7 @@ const CartItemCard = ({
               >
                 <Minus className="h-3.5 w-3.5" strokeWidth={2} />
               </button>
-              <span className="min-w-8 text-center text-xs font-semibold tabular-nums text-text-primary px-1">
+              <span className="min-w-8 text-center text-sm font-semibold tabular-nums text-text-primary px-1">
                 {item.quantity}
               </span>
               <button
@@ -242,7 +243,7 @@ const CartItemCard = ({
 
           {/* Notes if present */}
           {item.notes && (
-            <div className="mt-3 rounded-md border border-border-light bg-background-secondary p-2.5 text-xs text-text-secondary">
+            <div className="mt-3 rounded-md border border-border-light bg-background-secondary p-2.5 text-sm text-text-secondary">
               <span className="font-semibold text-text-primary mr-1">{t("note", "Not:")}</span>
               {item.notes}
             </div>

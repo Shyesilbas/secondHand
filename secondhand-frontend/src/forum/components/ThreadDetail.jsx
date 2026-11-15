@@ -90,7 +90,7 @@ export const ThreadDetail = ({
  } finally {
  setStatusUpdating(false);
  }
- }} disabled={statusUpdating} className="h-9 rounded border border-border-light bg-background-primary px-3 text-xs font-medium text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-card-border-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all">
+ }} disabled={statusUpdating} className="h-9 rounded border border-border-light bg-background-primary px-3 text-sm font-medium text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-card-border-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all">
  {FORUM_THREAD_STATUS_OPTIONS.map(statusOption => <option key={statusOption.id} value={statusOption.id}>{statusOption.label}</option>)}
  </select>
  <button type="button" onClick={() => showConfirmation(t("delete"), FORUM_MESSAGES.DELETE_THREAD_CONFIRM, () => onDeleteThread?.(threadId), {
@@ -104,7 +104,7 @@ export const ThreadDetail = ({
 
  {/* ── Thread Body ───────────────────────────────────── */}
  <div className="px-6 py-5">
- <div className="text-sm text-text-secondary whitespace-pre-wrap break-words leading-relaxed">
+ <div className="max-w-prose text-base text-text-secondary whitespace-pre-wrap break-words leading-relaxed">
  {thread?.description || ''}
  </div>
 
@@ -168,7 +168,7 @@ export const ThreadDetail = ({
  }} onReact={onReactComment} threadId={threadId} />)}
  </div> : <div className="px-6 py-12 text-center">
  <p className="text-sm font-semibold text-text-muted">{FORUM_MESSAGES.NO_COMMENTS_YET}</p>
- <p className="text-xs text-text-muted mt-1">{FORUM_MESSAGES.BE_FIRST_TO_COMMENT}</p>
+ <p className="text-sm text-text-muted mt-1">{FORUM_MESSAGES.BE_FIRST_TO_COMMENT}</p>
  </div>}
  </div>}
 

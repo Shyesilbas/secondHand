@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '../../common/formatters.js';
 import { fetchExchangeRate } from '../services/listingAddonService.js';
-import { Button, Skeleton } from '../../common/components/ui/index.js';
+import { Button, Card, Skeleton } from '../../common/components/ui/index.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -34,7 +34,7 @@ const ExchangeRatesTab = ({
                             type="button"
                             aria-pressed={selected === curr}
                             onClick={() => setSelected(curr)}
-                            className={`rounded-sm px-3 py-1 text-xs transition-colors ${selected === curr ? 'bg-background-primary font-medium text-text-primary' : 'text-text-secondary hover:text-text-primary'
+                            className={`rounded-sm px-3 py-1 text-sm transition-colors ${selected === curr ? 'bg-background-primary font-medium text-text-primary' : 'text-text-secondary hover:text-text-primary'
                                 }`}
                         >
                             {curr}
@@ -44,12 +44,12 @@ const ExchangeRatesTab = ({
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-                <div className="flex min-h-24 flex-col justify-center rounded border border-border bg-background-primary p-4">
+                <Card padding="compact" shadow={false} className="flex min-h-24 flex-col justify-center">
                     <p className="text-sm text-text-secondary">{t("original_price")}</p>
                     <p className="mt-1 text-lg font-semibold tabular-nums text-text-primary">{formatCurrency(price, currency)}</p>
-                </div>
+                </Card>
 
-                <div className="flex min-h-24 flex-col justify-center rounded border border-border bg-background-primary p-4">
+                <Card padding="compact" shadow={false} className="flex min-h-24 flex-col justify-center">
                     {isLoading ? (
                         <div className="space-y-2" aria-busy="true" aria-label={t("updating_rates")}>
                             <Skeleton className="h-4 w-24" />
@@ -69,7 +69,7 @@ const ExchangeRatesTab = ({
                             </p>
                         </div>
                     )}
-                </div>
+                </Card>
             </div>
 
             <p className="text-xs text-text-tertiary">{t("exchange_rates_are_updated_daily_and_may")}</p>

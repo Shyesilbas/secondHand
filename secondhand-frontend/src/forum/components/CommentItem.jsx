@@ -63,7 +63,7 @@ export const CommentItem = ({
  <span className="text-text-muted tabular-nums">{formatForumDateTime(comment?.createdAt)}</span>
  </div>
 
- <div className="mt-1.5 text-sm text-text-secondary whitespace-pre-wrap break-words leading-relaxed">
+ <div className="mt-1.5 max-w-prose text-base text-text-secondary whitespace-pre-wrap break-words leading-relaxed">
  {comment?.content || ''}
  </div>
 

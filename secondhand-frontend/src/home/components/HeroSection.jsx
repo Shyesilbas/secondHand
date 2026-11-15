@@ -19,7 +19,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="bg-gradient-to-b from-background-primary via-background-primary/70 to-background-secondary">
+    <section className="bg-background-primary border-b border-border-light">
       <PageContainer className="py-10 sm:py-14">
         <div className="max-w-2xl">
           <h1 className="text-3xl font-semibold leading-tight tracking-tight text-text-primary sm:text-4xl">

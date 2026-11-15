@@ -25,7 +25,7 @@ const SecurityFilters = ({
   }
 
   return (
-    <div className="border-b border-border bg-background-secondary/70 p-5 sm:p-6 transition-colors">
+    <div className="border-b border-border bg-background-secondary p-5 sm:p-6 transition-colors">
       {/* Quick Filter Chips */}
       <div className="mb-5">
         <div className="flex items-center justify-between gap-2 mb-2.5">
@@ -58,11 +58,10 @@ const SecurityFilters = ({
           <button
             type="button"
             onClick={() => updateFilter('eventType', filters.eventType === 'LOGIN_SUCCESS' ? '' : 'LOGIN_SUCCESS')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors cursor-pointer ${
-              filters.eventType === 'LOGIN_SUCCESS'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer ${filters.eventType === 'LOGIN_SUCCESS'
                 ? 'bg-primary text-white'
                 : 'bg-background-primary border border-border text-text-secondary hover:bg-background-tertiary'
-            }`}
+              }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5 text-status-success-text" />
             <span>{t("successful_logins", "Başarılı Girişler")}</span>
@@ -71,11 +70,10 @@ const SecurityFilters = ({
           <button
             type="button"
             onClick={() => updateFilter('eventType', filters.eventType === 'LOGIN_FAILURE' ? '' : 'LOGIN_FAILURE')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors cursor-pointer ${
-              filters.eventType === 'LOGIN_FAILURE'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer ${filters.eventType === 'LOGIN_FAILURE'
                 ? 'bg-primary text-white'
                 : 'bg-background-primary border border-border text-text-secondary hover:bg-background-tertiary'
-            }`}
+              }`}
           >
             <Shield className="w-3.5 h-3.5 text-status-error-text" />
             <span>{t("failed_logins", "Başarısız Girişler")}</span>
@@ -84,11 +82,10 @@ const SecurityFilters = ({
           <button
             type="button"
             onClick={() => updateFilter('eventType', filters.eventType === 'PASSWORD_CHANGE_SUCCESS' ? '' : 'PASSWORD_CHANGE_SUCCESS')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors cursor-pointer ${
-              filters.eventType === 'PASSWORD_CHANGE_SUCCESS'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer ${filters.eventType === 'PASSWORD_CHANGE_SUCCESS'
                 ? 'bg-primary text-white'
                 : 'bg-background-primary border border-border text-text-secondary hover:bg-background-tertiary'
-            }`}
+              }`}
           >
             <Shield className="w-3.5 h-3.5 text-text-primary" />
             <span>{t("password_changes", "Şifre Değişiklikleri")}</span>
@@ -97,11 +94,10 @@ const SecurityFilters = ({
           <button
             type="button"
             onClick={() => updateFilter('eventStatus', filters.eventStatus === 'SUCCESS' ? '' : 'SUCCESS')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors cursor-pointer ${
-              filters.eventStatus === 'SUCCESS'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer ${filters.eventStatus === 'SUCCESS'
                 ? 'bg-primary text-white'
                 : 'bg-background-primary border border-border text-text-secondary hover:bg-background-tertiary'
-            }`}
+              }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5 text-status-success-text" />
             <span>{t("success_events", "Tüm Başarılı Olaylar")}</span>
@@ -120,7 +116,7 @@ const SecurityFilters = ({
           <select
             value={filters.eventType}
             onChange={(e) => updateFilter('eventType', e.target.value)}
-            className="w-full px-3 py-2 text-xs font-medium rounded border border-border bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors cursor-pointer"
+            className="w-full px-3 py-2 text-sm font-medium rounded border border-border bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors cursor-pointer"
           >
             <option value="">{t("all_event_types", "Tüm Olay Türleri")}</option>
             {auditEnums?.eventTypes?.map((eventType) => (
@@ -140,7 +136,7 @@ const SecurityFilters = ({
           <select
             value={filters.eventStatus}
             onChange={(e) => updateFilter('eventStatus', e.target.value)}
-            className="w-full px-3 py-2 text-xs font-medium rounded border border-border bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors cursor-pointer"
+            className="w-full px-3 py-2 text-sm font-medium rounded border border-border bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors cursor-pointer"
           >
             <option value="">{t("all_statuses", "Tüm Durumlar")}</option>
             {auditEnums?.eventStatuses?.map((eventStatus) => (
@@ -163,7 +159,7 @@ const SecurityFilters = ({
               placeholder={t("search_ip_address", "örn. 192.168.1.1")}
               value={filters.ipAddress}
               onChange={(e) => updateFilter('ipAddress', e.target.value)}
-              className="w-full pl-8 pr-3 py-2 text-xs font-medium rounded border border-border bg-background-primary text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors"
+              className="w-full pl-8 pr-3 py-2 text-sm font-medium rounded border border-border bg-background-primary text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors"
             />
             <Globe className="w-3.5 h-3.5 text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
@@ -179,7 +175,7 @@ const SecurityFilters = ({
             type="date"
             value={filters.dateFrom}
             onChange={(e) => updateFilter('dateFrom', e.target.value)}
-            className="w-full px-3 py-2 text-xs font-medium rounded border border-border bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors"
+            className="w-full px-3 py-2 text-sm font-medium rounded border border-border bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors"
           />
         </div>
 
@@ -193,7 +189,7 @@ const SecurityFilters = ({
             type="date"
             value={filters.dateTo}
             onChange={(e) => updateFilter('dateTo', e.target.value)}
-            className="w-full px-3 py-2 text-xs font-medium rounded border border-border bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors"
+            className="w-full px-3 py-2 text-sm font-medium rounded border border-border bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors"
           />
         </div>
 
@@ -209,7 +205,7 @@ const SecurityFilters = ({
               placeholder={t("search_browser_device", "örn. Chrome, Mac, Windows")}
               value={filters.userAgent}
               onChange={(e) => updateFilter('userAgent', e.target.value)}
-              className="w-full pl-8 pr-3 py-2 text-xs font-medium rounded border border-border bg-background-primary text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors"
+              className="w-full pl-8 pr-3 py-2 text-sm font-medium rounded border border-border bg-background-primary text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-border-focus transition-colors"
             />
             <Monitor className="w-3.5 h-3.5 text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>

@@ -7,6 +7,8 @@ import { campaignService } from '../../listing/services/campaignService.js';
 import { listingService } from '../../listing/services/listingService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import Button from '../../common/components/ui/Button.jsx';
+import Card from '../../common/components/ui/Card.jsx';
+import PageHeader from '../../common/components/ui/PageHeader.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
@@ -18,12 +20,12 @@ import { refreshCampaignAffectedQueries } from '../campaignQueries.js';
 const PAGE_SIZE = 10;
 
 const CardSkeleton = () => (
-  <div className="space-y-3 rounded border border-border bg-background-primary p-5">
+  <Card shadow={false} className="space-y-3">
     <Skeleton className="h-3 w-24" />
     <Skeleton className="h-5 w-48" />
     <Skeleton className="h-7 w-32" />
     <Skeleton className="h-20 w-full" />
-  </div>
+  </Card>
 );
 
 const MyCouponsPage = () => {
@@ -114,22 +116,22 @@ const MyCouponsPage = () => {
   return (
     <div className="min-h-screen bg-background-secondary">
       <PageContainer className="space-y-6 py-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{t('campaign_page_title', 'Kampanyalar')}</h1>
-            <p className="mt-1 text-sm text-text-secondary">
-              {totalElements > 0
-                ? t('campaign_page_count', { defaultValue: '{{count}} kampanya', count: totalElements })
-                : t('campaign_page_subtitle', 'İlanlarına indirim tanımla.')}
-            </p>
-          </div>
-          {campaigns.length > 0 && (
-            <Button onClick={openCreate}>
-              <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-              {t('campaign_new', 'Yeni kampanya')}
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title={t('campaign_page_title', 'Kampanyalar')}
+          subtitle={
+            totalElements > 0
+              ? t('campaign_page_count', { defaultValue: '{{count}} kampanya', count: totalElements })
+              : t('campaign_page_subtitle', 'İlanlarına indirim tanımla.')
+          }
+          actions={
+            campaigns.length > 0 ? (
+              <Button onClick={openCreate}>
+                <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                {t('campaign_new', 'Yeni kampanya')}
+              </Button>
+            ) : null
+          }
+        />
 
         {content}
 

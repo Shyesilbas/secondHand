@@ -184,7 +184,7 @@ const CategoryChip = ({
   icon: Icon,
   active,
   onClick
-}) => <button type="button" onClick={onClick} className={`inline-flex items-center gap-1.5 rounded border px-3 py-2 text-xs font-semibold transition-all ${active ? 'border-primary bg-primary text-white' : 'border-transparent bg-background-primary text-text-secondary ring-1 ring-border-light hover:bg-background-secondary'}`}>
+}) => <button type="button" onClick={onClick} className={`inline-flex items-center gap-1.5 rounded border px-3 py-2 text-sm font-medium transition-all ${active ? 'border-primary bg-primary text-white' : 'border-transparent bg-background-primary text-text-secondary ring-1 ring-border-light hover:bg-background-secondary'}`}>
     {Icon && <Icon className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
     <span>{label}</span>
   </button>;

@@ -9,7 +9,7 @@ import {
 import { formatCurrency, formatDate } from '../../common/formatters.js';
 import { useMyShowcases } from '../hooks/useMyShowcases.js';
 import ShowcaseModal from './ShowcaseModal.jsx';
-import { Button, Modal, SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
+import { Badge, Button, Card, Modal, SkeletonGrid, EmptyState, Tabs } from '../../common/components/ui/index.js';
 import { useState, useMemo } from 'react';
 
 const calculateRemainingDays = (endDate) => {
@@ -101,7 +101,7 @@ const MyShowcasesPanel = ({ userId }) => {
   ];
 
   return (
-    <section className="rounded border border-border-light bg-background-primary p-5 sm:p-6">
+    <Card as="section" border="light" shadow={false}>
       {/* ─── Header ─── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-border-light">
         <div>
@@ -109,11 +109,11 @@ const MyShowcasesPanel = ({ userId }) => {
             <h2 className="text-base font-semibold text-text-primary tracking-tight">
               {t('my_showcases', 'Vitrin İlanlarım')}
             </h2>
-            <span className="rounded-sm border border-border bg-background-secondary px-1.5 py-0.5 text-xs font-semibold tabular-nums text-text-primary">
+            <Badge variant="neutral">
               {counts.active} {t('active', 'aktif')}
-            </span>
+            </Badge>
           </div>
-          <p className="mt-0.5 text-xs text-text-tertiary">
+          <p className="mt-0.5 text-sm text-text-tertiary">
             {t(
               'manage_and_track_your_active_listing_pro',
               'Öne çıkarılan vitrin ilanlarınızı yönetin ve kalan süreleri takip edin.'
@@ -122,39 +122,18 @@ const MyShowcasesPanel = ({ userId }) => {
         </div>
 
         {/* ─── Tabs ─── */}
-        <div className="flex items-center gap-1 rounded bg-background-secondary p-1 border border-border-light">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
-                  isActive
-                    ? 'bg-background-primary text-text-primary shadow-sm font-semibold'
-                    : 'text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={`rounded-sm px-1.5 py-0.2 text-xs tabular-nums ${
-                    isActive
-                      ? 'bg-primary text-white'
-                      : 'bg-background-tertiary text-text-tertiary'
-                  }`}
-                >
-                  {tab.count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <Tabs
+          variant="segmented"
+          ariaLabel={t('my_showcases', 'Vitrin İlanlarım')}
+          items={tabs}
+          activeKey={activeTab}
+          onChange={setActiveTab}
+        />
       </div>
 
       {/* ─── Error Alert ─── */}
       {actionError && (
-        <div className="mt-4 flex items-start gap-2.5 rounded border border-status-error/30 bg-background-secondary p-3 text-xs text-status-error-text">
+        <div className="mt-4 flex items-start gap-2.5 rounded border border-status-error/30 bg-background-secondary p-3 text-sm text-status-error-text">
           <AlertTriangle className="h-4 w-4 shrink-0 text-status-error mt-0.5" />
           <div className="flex-1">
             <span className="font-semibold block">{t('operation_error', 'İşlem Hatası')}</span>
@@ -190,7 +169,7 @@ const MyShowcasesPanel = ({ userId }) => {
                   key={showcase.id}
                   className={`flex flex-col justify-between rounded border transition-colors ${
                     showcase.isExpired
-                      ? 'border-border-light bg-background-secondary/30'
+                      ? 'border-border-light bg-background-secondary'
                       : 'border-border-light bg-background-primary hover:border-border-strong'
                   } p-4`}
                 >
@@ -263,7 +242,7 @@ const MyShowcasesPanel = ({ userId }) => {
 
                   {/* Bottom: Action Controls */}
                   <div className="mt-3.5 flex items-center justify-between gap-2 pt-1">
-                    <div className="flex items-center gap-1.5 text-xs text-text-secondary">
+                    <div className="flex items-center gap-1.5 text-sm text-text-secondary">
                       <input
                         type="number"
                         min={1}
@@ -272,7 +251,7 @@ const MyShowcasesPanel = ({ userId }) => {
                         onChange={(e) =>
                           setExtendDays((prev) => ({ ...prev, [showcase.id]: e.target.value }))
                         }
-                        className="h-8 w-14 rounded border border-border bg-background-primary px-1.5 text-center text-xs font-medium tabular-nums text-text-primary focus:border-border-focus focus:outline-none"
+                        className="h-8 w-14 rounded border border-border bg-background-primary px-1.5 text-center text-sm font-medium tabular-nums text-text-primary focus:border-border-focus focus:outline-none"
                       />
                       <span>{t('days', 'gün')}</span>
                     </div>
@@ -283,7 +262,7 @@ const MyShowcasesPanel = ({ userId }) => {
                         size="sm"
                         onClick={() => handleExtend(showcase.id)}
                         disabled={isMutating}
-                        className="flex items-center gap-1.5 text-xs"
+                        className="flex items-center gap-1.5"
                       >
                         <RotateCcw className="h-3 w-3" strokeWidth={1.5} />
                         <span>
@@ -354,7 +333,7 @@ const MyShowcasesPanel = ({ userId }) => {
           }}
         />
       )}
-    </section>
+    </Card>
   );
 };
 

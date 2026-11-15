@@ -11,6 +11,7 @@ import { findEngine } from '../../vehicle/utils/vehicleCatalogUtils.js';
 import PageContainer from '../../common/components/layout/PageContainer.jsx';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
+import PageHeader from '../../common/components/ui/PageHeader.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 
 const GRID_SEARCH_THRESHOLD = 8;
@@ -241,7 +242,7 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
             onClick={() => handleOptionPick(id)}
             aria-pressed={selected}
             className={`group flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors duration-150 focus:outline-none focus-visible:bg-background-secondary ${selected
-              ? 'bg-background-tertiary/70 font-semibold text-text-primary'
+              ? 'bg-background-tertiary font-semibold text-text-primary'
               : 'text-text-primary hover:bg-background-secondary'
               }`}
           >
@@ -425,8 +426,10 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
           </nav>
         )}
 
-        <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{heading}</h1>
-        {(subheading || browseHint) && <p className="mt-1.5 text-sm text-text-secondary">{subheading || browseHint}</p>}
+        <PageHeader
+          title={heading}
+          subtitle={subheading || browseHint}
+        />
 
         {crumbs.length > 0 && (
           <nav className="mt-4 flex flex-wrap items-center gap-1.5 text-sm" aria-label={t('your_selections', 'Seçimlerin')}>

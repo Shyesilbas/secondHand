@@ -90,7 +90,7 @@ const FilterRenderer = ({
  value: false
  }].map(opt => {
  const isActive = val === opt.value;
- return <button key={opt.label} type="button" onClick={() => onChange(field.key, opt.value)} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 ${isActive ? 'bg-background-primary text-text-primary' : 'text-text-tertiary hover:text-text-secondary hover:bg-background-primary/50'}`}>
+ return <button key={opt.label} type="button" onClick={() => onChange(field.key, opt.value)} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all duration-150 ${isActive ? 'bg-background-primary text-text-primary' : 'text-text-tertiary hover:text-text-secondary hover:bg-background-primary/50'}`}>
  {opt.label}
  </button>;
  })}

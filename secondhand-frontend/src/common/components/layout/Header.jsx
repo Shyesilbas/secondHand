@@ -90,11 +90,9 @@ const Header = () => {
  </nav>}
 
  {/* ── Center: Dual Search ──────────────── */}
- <div className="flex-1 flex items-center justify-center gap-2 max-w-xl">
+ <div className="hidden md:flex flex-1 items-center justify-center gap-2 max-w-xl">
  {/* Product/User search */}
- <div className="hidden md:block flex-1">
  <UnifiedSearchBar className="w-full" />
- </div>
  </div>
 
  {/* ── Right Actions ────────────────────── */}
@@ -102,6 +100,13 @@ const Header = () => {
  <LanguageSwitcher />
  {isAuthenticated ? <HeaderAuthActions user={user} emailCount={emailCount} chatCount={chatCount} cartCount={cartCount} orderCount={orderCount} mobileMenuOpen={mobileMenuOpen} onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)} paymentsMenuOpen={paymentsMenuOpen} listingsMenuOpen={listingsMenuOpen} profileMenuOpen={profileMenuOpen} inboxMenuOpen={inboxMenuOpen} onTogglePaymentsMenu={() => dropdowns.toggle('payments')} onToggleListingsMenu={() => dropdowns.toggle('listings')} onToggleProfileMenu={() => dropdowns.toggle('profile')} onToggleInboxMenu={() => dropdowns.toggle('inbox')} closeAllDropdowns={dropdowns.closeAll} paymentsMenuRef={paymentsMenuRef} listingsMenuRef={listingsMenuRef} profileMenuRef={profileMenuRef} inboxMenuRef={inboxMenuRef} onLogout={handleLogout} /> : <HeaderGuestActions />}
  </div>
+ </div>
+ </div>
+
+ {/* ── Mobile Search Row ────────────────── */}
+ <div className="md:hidden border-t border-border-light bg-background-primary">
+ <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-2">
+ <UnifiedSearchBar className="w-full" />
  </div>
  </div>
 

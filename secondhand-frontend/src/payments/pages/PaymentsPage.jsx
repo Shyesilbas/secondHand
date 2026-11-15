@@ -13,6 +13,7 @@ import { useDebouncedValue } from '../../common/hooks/useDebouncedValue.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { motion } from 'framer-motion';
+import PageHeader from '../../common/components/ui/PageHeader.jsx';
 const PaymentsPage = () => {
  const {
  t
@@ -96,25 +97,29 @@ const PaymentsPage = () => {
  <div className={`flex flex-col transition-all duration-500 ${showFilters ? 'lg:ml-80' : ''}`}>
  {/* Modern Header */}
  <header className="sticky top-0 z-40 bg-background-primary border-b border-border-light">
- <PageContainer className="py-4 flex items-center justify-between">
- <div className="flex items-center gap-4">
- <button onClick={toggleFilterSidebar} className="p-2.5 rounded bg-background-secondary text-text-secondary hover:bg-background-tertiary transition-all">
+ <PageContainer className="py-4 flex items-center justify-between gap-4">
+ <div className="flex items-center gap-4 min-w-0 flex-1">
+ <button onClick={toggleFilterSidebar} className="p-2.5 rounded bg-background-secondary text-text-secondary hover:bg-background-tertiary transition-all shrink-0">
  <Filter className="w-5 h-5" />
  </button>
- <div>
- <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("finances")}</h1>
- <div className="flex items-center gap-2">
+ <PageHeader
+ className="flex-1 min-w-0"
+ title={t("finances")}
+ subtitle={
+ <span className="inline-flex items-center gap-2">
  <span className="w-1.5 h-1.5 rounded-full bg-status-success" />
- <p className="text-xs font-semibold text-text-muted">{t("real_time_tracking")}</p>
- </div>
- </div>
- </div>
-
+ <span>{t("real_time_tracking")}</span>
+ </span>
+ }
+ actions={
  <div className="flex items-center gap-3">
  <button onClick={exportCsv} className="hidden sm:flex items-center gap-2 px-4 py-2 rounded text-sm font-semibold text-text-secondary hover:bg-background-secondary transition-colors">
  <Download className="w-4 h-4" />{t("export")}</button>
  <Link to={`${ROUTES.PAYMENT_METHODS}?tab=ewallet`} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4">
  <Wallet className="w-4 h-4" />{t("my_wallet")}</Link>
+ </div>
+ }
+ />
  </div>
  </PageContainer>
  </header>
@@ -144,7 +149,7 @@ const PaymentsPage = () => {
  {/* Content Section */}
  <div className="bg-background-primary border border-border-light rounded-md overflow-hidden">
  {/* Search & Tabs */}
- <div className="p-6 border-b border-border-light bg-background-secondary/30">
+ <div className="p-6 border-b border-border-light bg-background-secondary">
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
  <div className="relative flex-1 max-w-md">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
@@ -161,7 +166,7 @@ const PaymentsPage = () => {
  }, {
  id: PAYMENT_DIRECTIONS.OUTGOING,
  label: 'Outgoing'
- }].map(tab => <button key={tab.id} onClick={() => handleFilterChange('paymentDirection', tab.id)} className={`px-4 py-1.5 rounded text-xs font-semibold transition-all ${directionFilter === tab.id ? 'bg-background-primary text-text-primary' : 'text-text-tertiary hover:text-text-secondary'}`}>
+ }].map(tab => <button key={tab.id} onClick={() => handleFilterChange('paymentDirection', tab.id)} className={`px-4 py-1.5 rounded text-sm font-semibold transition-all ${directionFilter === tab.id ? 'bg-background-primary text-text-primary' : 'text-text-tertiary hover:text-text-secondary'}`}>
  {tab.label}
  </button>)}
  </div>

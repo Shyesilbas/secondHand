@@ -92,7 +92,7 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate, isUpdatingPhone }) => {
               key={field.key}
               className="py-3.5 first:pt-0 last:pb-0 sm:grid sm:grid-cols-3 sm:items-center sm:gap-4"
             >
-              <dt className="text-xs sm:text-sm font-medium text-text-secondary">
+              <dt className="text-sm font-medium text-text-secondary">
                 {field.label}
               </dt>
               <dd className="mt-1 flex items-center justify-between gap-4 sm:col-span-2 sm:mt-0">

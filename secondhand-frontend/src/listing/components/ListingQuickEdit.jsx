@@ -53,7 +53,7 @@ export const ListingQuickEdit = ({
       onClick={e => e.stopPropagation()}
     >
       {showQty && (
-        <div className="inline-flex items-center gap-1.5 bg-background-secondary/60 px-2 py-1 rounded border border-border-light h-9">
+        <div className="inline-flex items-center gap-1.5 bg-background-secondary px-2 py-1 rounded border border-border-light h-9">
           <span className="text-xs font-medium text-text-muted select-none shrink-0">
             {t("qty")}
           </span>
@@ -77,7 +77,7 @@ export const ListingQuickEdit = ({
         </div>
       )}
 
-      <div className="inline-flex items-center gap-1.5 bg-background-secondary/60 px-2 py-1 rounded border border-border-light h-9">
+      <div className="inline-flex items-center gap-1.5 bg-background-secondary px-2 py-1 rounded border border-border-light h-9">
         <span className="text-xs font-medium text-text-muted select-none shrink-0">
           {t("price")}
         </span>

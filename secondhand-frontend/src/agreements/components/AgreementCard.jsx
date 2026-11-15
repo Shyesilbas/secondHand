@@ -45,8 +45,8 @@ const AgreementCard = ({
 
  {/* Action row */}
  <div className="mt-4 flex items-center justify-between">
- <button type="button" onClick={() => onRead(agreement)} className="inline-flex items-center gap-1.5 text-xs font-medium text-text-muted hover:text-text-primary transition-colors duration-200">
- <ExternalLink className="w-3 h-3" />{t("read_agreement")}</button>
+ <button type="button" onClick={() => onRead(agreement)} className="inline-flex items-center gap-1.5 text-sm font-medium text-text-muted hover:text-text-primary transition-colors duration-200">
+ <ExternalLink className="w-3.5 h-3.5" />{t("read_agreement")}</button>
 
  {isPending && <button disabled={accepting} onClick={() => onAccept(agreement)} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
  {accepting ? <>

@@ -269,7 +269,7 @@ const CheckoutAddressStep = ({
                         <span className="flex items-center gap-2">
                           <span className="truncate text-sm font-medium text-text-primary">{address.title || t('address', 'Adres')}</span>
                           {address.mainAddress && (
-                            <span className="inline-flex shrink-0 items-center rounded border border-border px-1.5 py-0.5 text-[11px] font-medium text-text-secondary bg-background-secondary">
+                            <span className="inline-flex shrink-0 items-center rounded border border-border px-1.5 py-0.5 text-xs font-medium text-text-secondary bg-background-secondary">
                               {t('default', 'Varsayılan')}
                             </span>
                           )}
@@ -313,7 +313,7 @@ const CheckoutAddressStep = ({
                 </div>
               )}
               {isMeetup && (
-                <p className="mt-3 text-xs text-text-tertiary">
+                <p className="mt-3 text-sm text-text-tertiary">
                   {t('checkout_meetup_billing_note', 'Elden teslimatta fatura bu adrese düzenlenir.')}
                 </p>
               )}

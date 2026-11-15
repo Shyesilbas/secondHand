@@ -9,6 +9,7 @@ import { usePaymentMethods } from '../hooks/useFinancialAccountManager.js';
 import { useEmails } from '../hooks/useEmails.js';
 import { useListingFeeQuoteQuery } from '../hooks/queries.js';
 import BackButton from '../../common/components/ui/BackButton.jsx';
+import PageHeader from '../../common/components/ui/PageHeader.jsx';
 import ErrorMessage from '../../common/components/ui/ErrorMessage.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import DraftListingsList from '../components/DraftListingsList.jsx';
@@ -88,7 +89,7 @@ const PayListingFeePage = () => {
     }, [showConfirmModal, refetchPaymentMethods]);
 
     return (
-        <div className="min-h-screen bg-background-secondary/60 relative overflow-hidden pb-16">
+        <div className="min-h-screen bg-background-secondary relative overflow-hidden pb-16">
 
             <PageContainer className="py-4 lg:py-6 relative z-10">
                 {/* Header Navigation & Banner */}
@@ -98,45 +99,35 @@ const PayListingFeePage = () => {
                     transition={{ duration: 0.4 }}
                     className="mb-5"
                 >
-                    <div className="mb-2">
-                        <BackButton onClick={() => navigate(-1)} />
-                    </div>
-
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pb-4 border-b border-border">
-                        <div>
-                            <span className="text-xs font-semibold text-text-primary mb-1 block">
-                                {t("checkout_marketplace")}
-                            </span>
-                            <h1 className="text-3xl font-semibold text-text-primary tracking-tight">
-                                {t("listing_fee_payment")}
-                            </h1>
-                            <p className="mt-1.5 text-sm text-text-tertiary max-w-xl leading-relaxed">
-                                {t("complete_a_secure_payment_to_publish_you")}
-                            </p>
-                        </div>
-
-                        {/* Workflow Step Indicator */}
-                        <div className="flex items-center gap-2 bg-background-primary border border-border p-2.5 rounded-md self-start md:self-auto">
-                            <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-primary font-semibold text-xs">
-                                <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-white text-xs">1</span>
-                                <span>{t("select", "Select")}</span>
+                    <PageHeader
+                        back={<BackButton onClick={() => navigate(-1)} />}
+                        eyebrow={t("checkout_marketplace")}
+                        title={t("listing_fee_payment")}
+                        subtitle={t("complete_a_secure_payment_to_publish_you")}
+                        bottomBorder
+                        actions={(
+                            <div className="flex items-center gap-2 bg-background-primary border border-border p-2.5 rounded-md self-start md:self-auto">
+                                <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-primary font-semibold text-xs">
+                                    <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-white text-xs">1</span>
+                                    <span>{t("select", "Select")}</span>
+                                </div>
+                                <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                                <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-secondary font-medium text-xs">
+                                    <span className="flex h-5 w-5 items-center justify-center rounded bg-secondary-400 text-white text-xs">2</span>
+                                    <span>{t("pay_fee", "Pay Fee")}</span>
+                                </div>
+                                <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                                <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-secondary font-medium text-xs">
+                                    <span className="flex h-5 w-5 items-center justify-center rounded bg-secondary-400 text-white text-xs">3</span>
+                                    <span>{t("published", "Published")}</span>
+                                </div>
                             </div>
-                            <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                            <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-secondary font-medium text-xs">
-                                <span className="flex h-5 w-5 items-center justify-center rounded bg-secondary-400 text-white text-xs">2</span>
-                                <span>{t("pay_fee", "Pay Fee")}</span>
-                            </div>
-                            <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                            <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-secondary font-medium text-xs">
-                                <span className="flex h-5 w-5 items-center justify-center rounded bg-secondary-400 text-white text-xs">3</span>
-                                <span>{t("published", "Published")}</span>
-                            </div>
-                        </div>
-                    </div>
+                        )}
+                    />
                 </motion.div>
 
                 {/* Loading State */}

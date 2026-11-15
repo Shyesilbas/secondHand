@@ -23,7 +23,7 @@ const REASON_LABELS = {
 };
 
 const SectionTitle = ({ children }) => (
-  <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">{children}</h4>
+  <h4 className="mb-2 text-xs font-medium text-text-tertiary">{children}</h4>
 );
 
 /**
@@ -59,7 +59,7 @@ const ComplaintDetailModal = ({ complaint, side = 'filed', isOpen, onClose }) =>
           <section>
             <SectionTitle>{t('complaint_reported_message', 'Reported message')}</SectionTitle>
             {complaint.reportedMessageContent ? (
-              <blockquote className="whitespace-pre-wrap break-words rounded border border-border-light bg-background-secondary px-4 py-3 leading-relaxed text-text-primary">
+              <blockquote className="whitespace-pre-wrap break-words rounded border border-border-light bg-background-secondary px-4 py-3 text-base leading-relaxed text-text-primary">
                 {complaint.reportedMessageContent}
               </blockquote>
             ) : (
@@ -90,7 +90,7 @@ const ComplaintDetailModal = ({ complaint, side = 'filed', isOpen, onClose }) =>
         {side === 'filed' && complaint.description && (
           <section>
             <SectionTitle>{t('description', 'Description')}</SectionTitle>
-            <p className="whitespace-pre-wrap break-words leading-relaxed text-text-primary">{complaint.description}</p>
+            <p className="whitespace-pre-wrap break-words text-base leading-relaxed text-text-primary">{complaint.description}</p>
           </section>
         )}
 

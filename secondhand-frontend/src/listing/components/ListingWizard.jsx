@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import PageContainer from '../../common/components/layout/PageContainer.jsx';
 import Button from '../../common/components/ui/Button.jsx';
+import PageHeader from '../../common/components/ui/PageHeader.jsx';
 
 /**
  * Plain step shell for the listing form (create and edit): back link, step counter with a segmented
@@ -89,13 +90,12 @@ const ListingWizard = ({
           </ol>
         </nav>
 
-        <div className="mt-5 flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{current?.title || title}</h1>
-            {current?.description && <p className="mt-1.5 text-sm text-text-secondary">{current.description}</p>}
-          </div>
-          {headerExtra && <div className="shrink-0">{headerExtra}</div>}
-        </div>
+        <PageHeader
+          className="mt-5"
+          title={current?.title || title}
+          subtitle={current?.description}
+          actions={headerExtra}
+        />
 
         <div className="mt-6 rounded border border-border bg-background-primary p-5 sm:p-6">
           {typeof renderStep === 'function' ? renderStep(activeStep) : children}

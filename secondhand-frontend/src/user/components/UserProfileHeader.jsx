@@ -6,6 +6,7 @@ import { FollowButton, FollowStats } from '../../follow/index.js';
 import { formatDate } from '../../common/formatters.js';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import Badge from '../../common/components/ui/Badge.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { useBlockUser } from '../../user/hooks/useBlocking.js';
@@ -111,15 +112,14 @@ const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activ
  <div className="flex flex-wrap items-center gap-2">
  <h1 className="truncate text-2xl font-semibold text-text-primary">{fullName}</h1>
  {isOwnProfile && (
- <span className="rounded-sm bg-background-tertiary px-1.5 py-0.5 text-xs font-medium text-text-secondary">{t('you', 'Sen')}</span>
+ <Badge variant="muted" size="sm">{t('you', 'Sen')}</Badge>
  )}
  </div>
  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-text-tertiary">
  {isGreatSeller && (
- <span className="inline-flex items-center gap-1 rounded-full border border-status-warning-border bg-status-warning-bg px-2 py-0.5 text-xs font-medium text-status-warning-text">
- <Award className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+ <Badge variant="warning" icon={Award}>
  {t('great_seller', 'Harika satıcı')}
- </span>
+ </Badge>
  )}
  {user?.accountVerified && (
  <span className="inline-flex items-center gap-1 text-text-secondary">

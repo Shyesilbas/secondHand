@@ -68,7 +68,7 @@ export const AuraSummary = ({
   return (
     <div ref={containerRef} className="rounded border border-border-light bg-background-secondary p-4">
       <div className="flex items-center justify-between gap-3 mb-2.5 flex-wrap">
-        <div className="flex items-center gap-2 text-text-primary font-semibold text-xs">
+        <div className="flex items-center gap-2 text-text-primary font-semibold text-sm">
           <Sparkles className="w-4 h-4 text-status-warning shrink-0" strokeWidth={1.5} aria-hidden />
           <span>{t("aura_ai_yorum_analizi", "Aura AI Akıllı Değerlendirme")}</span>
         </div>

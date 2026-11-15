@@ -29,7 +29,7 @@ const EWalletPaymentMethod = ({ eWallet, feeQuote }) => {
  return (
  <div className="rounded border border-dashed border-border py-6 text-center">
  <p className="mb-1 text-sm font-medium text-text-primary">{t("ewallet_not_found")}</p>
- <p className="text-xs text-text-tertiary max-w-xs mx-auto">{t("you_need_to_create_an_ewallet_first_to_u")}</p>
+ <p className="text-sm text-text-tertiary max-w-xs mx-auto">{t("you_need_to_create_an_ewallet_first_to_u")}</p>
  </div>
  );
  }

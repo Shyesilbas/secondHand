@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Building2, Home, MapPin, Pencil, Trash2 } from 'lucide-react';
 import { USER_ADDRESS_TYPES } from '../../userConstants.js';
+import Badge from '../../../common/components/ui/Badge.jsx';
 
 const formatNeighborhood = (neighborhoodKey) => {
   if (!neighborhoodKey) return '';
@@ -68,10 +69,9 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
               {getAddressTypeLabel(address.addressType)}
             </h3>
             {address.mainAddress && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-status-success-border bg-status-success-bg px-2 py-0.5 text-xs font-medium text-status-success-text">
-                <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden="true" />
-                <span>{t('main', 'Varsayılan')}</span>
-              </span>
+              <Badge variant="success" dot>
+                {t('main', 'Varsayılan')}
+              </Badge>
             )}
           </div>
 
@@ -98,7 +98,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
           </div>
         </div>
 
-        <div className="mt-2.5 space-y-1 text-xs sm:text-sm text-text-secondary">
+        <div className="mt-2.5 space-y-1 text-sm text-text-secondary">
           <p className="font-medium text-text-primary leading-snug">{address.addressLine}</p>
           {locationParts.length > 0 && <p>{locationParts.join(', ')}</p>}
           {postalCountryParts.length > 0 && (

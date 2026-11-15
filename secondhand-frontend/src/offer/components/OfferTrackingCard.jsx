@@ -3,31 +3,32 @@ import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { CheckCircle2, Clock, ImageOff, ShoppingCart, XCircle } from 'lucide-react';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { OFFER_DEFAULTS, OFFER_STATUSES, OFFER_TABS } from '../offerConstants.js';
+import Badge from '../../common/components/ui/Badge.jsx';
 
 const statusPresentation = {
  [OFFER_STATUSES.PENDING]: {
  label: 'Pending',
- badge: 'bg-background-secondary text-status-warning-text border-border',
+ variant: 'warning',
  icon: Clock
  },
  [OFFER_STATUSES.ACCEPTED]: {
  label: 'Accepted',
- badge: 'bg-background-secondary text-status-success-text border-border',
+ variant: 'success',
  icon: CheckCircle2
  },
  [OFFER_STATUSES.REJECTED]: {
  label: 'Rejected',
- badge: 'bg-background-secondary text-status-error-text border-border',
+ variant: 'error',
  icon: XCircle
  },
  [OFFER_STATUSES.EXPIRED]: {
  label: 'Expired',
- badge: 'bg-background-tertiary text-text-secondary border-border-light',
+ variant: 'muted',
  icon: Clock
  },
  [OFFER_STATUSES.COMPLETED]: {
  label: 'Completed',
- badge: 'bg-primary-light text-primary border-primary/20',
+ variant: 'primary',
  icon: CheckCircle2
  }
 };
@@ -100,7 +101,7 @@ const OfferTrackingCard = ({
  </p>
  )}
 
- <p className="text-xs text-text-muted mt-0.5">
+ <p className="text-sm text-text-muted mt-0.5">
  <span className="font-medium text-text-secondary">{roleLabel}:</span> {personName}
  </p>
 
@@ -122,10 +123,9 @@ const OfferTrackingCard = ({
  </div>
 
  <div className="flex flex-col items-end gap-2 shrink-0">
- <span className={`inline-flex w-fit shrink-0 items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-semibold ${pres.badge}`}>
- <StatusIcon className="h-3.5 w-3.5" />
+ <Badge variant={pres.variant} icon={StatusIcon} className="w-fit shrink-0">
  {pres.label}
- </span>
+ </Badge>
 
  {isExpired ? (
  <span className="text-xs font-medium text-text-muted">{t("offer_expired")}</span>
@@ -153,7 +153,7 @@ const OfferTrackingCard = ({
  type="button"
  onClick={() => onCounter(o)}
  disabled={!canMakeOffers}
- className="inline-flex items-center gap-1.5 rounded border border-border-light bg-card-bg px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-background-secondary transition disabled:cursor-not-allowed disabled:opacity-50"
+ className="inline-flex h-9 items-center gap-1.5 rounded border border-border-light bg-card-bg px-3 text-sm font-medium text-text-primary hover:bg-background-secondary transition disabled:cursor-not-allowed disabled:opacity-50"
  >
  {t("counter")}
  </button>
@@ -167,7 +167,7 @@ const OfferTrackingCard = ({
  </button>
  </>
  ) : (
- <p className="text-right text-xs leading-relaxed text-text-muted">
+ <p className="text-right text-sm leading-relaxed text-text-muted">
  {activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.PENDING
  ? 'Waiting for the seller to respond.'
  : 'No action required.'}

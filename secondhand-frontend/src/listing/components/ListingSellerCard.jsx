@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Award, ChevronRight, Star } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import Badge from '../../common/components/ui/Badge.jsx';
 import { FollowButton } from '../../follow/index.js';
 import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -22,7 +23,7 @@ const ListingSellerCard = ({ listing, isOwner }) => {
   const profilePath = ROUTES.USER_PROFILE(listing.sellerId);
 
   return (
-    <section className="rounded-lg border border-border bg-background-secondary/60 p-5" aria-label={t('seller_information', 'Satıcı bilgileri')}>
+    <section className="rounded border border-border bg-background-secondary p-5" aria-label={t('seller_information', 'Satıcı bilgileri')}>
       <div className="flex items-center justify-between gap-3">
         <Link to={profilePath} className="group flex min-w-0 items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background-tertiary text-sm font-semibold text-text-primary">
@@ -56,10 +57,9 @@ const ListingSellerCard = ({ listing, isOwner }) => {
         )}
 
         {listing.sellerGreatSellerEligible && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-status-warning-border bg-status-warning-bg px-2 py-0.5 text-xs font-medium text-status-warning-text">
-            <Award className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+          <Badge variant="warning" icon={Award}>
             {t('great_seller_status', 'Harika satıcı')}
-          </span>
+          </Badge>
         )}
 
         <Link

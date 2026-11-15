@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import Modal from '../../common/components/ui/Modal.jsx';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
+import Tabs from '../../common/components/ui/Tabs.jsx';
 import { Link } from 'react-router-dom';
 import usePriceHistory from '../hooks/usePriceHistory.js';
 import { formatCurrency } from '../../common/formatters.js';
@@ -193,7 +194,7 @@ const ListingInfoModal = ({
                                         {(listing.sellerName || '?')[0]?.toUpperCase()}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <p className="truncate text-xs font-semibold text-text-primary leading-tight">
+                                        <p className="truncate text-sm font-semibold text-text-primary leading-tight">
                                             {[listing.sellerName, listing.sellerSurname].filter(Boolean).join(' ')}
                                         </p>
                                         {sellerStats && (
@@ -209,7 +210,7 @@ const ListingInfoModal = ({
                         )}
 
                         {/* Location / Escrow Tag */}
-                        <div className="pt-3 border-t border-border-light space-y-2 text-xs font-semibold text-text-secondary">
+                        <div className="pt-3 border-t border-border-light space-y-2 text-sm font-medium text-text-secondary">
                             <div className="flex items-center gap-1.5">
                                 <MapPin className="h-3.5 w-3.5 text-text-muted" />
                                 <span>{[listing.city, listing.district].filter(Boolean).join(' · ')}</span>
@@ -225,25 +226,14 @@ const ListingInfoModal = ({
                 {/* Right Column: Insights & Graphs */}
                 <div className="lg:col-span-8 p-4 sm:p-5 flex flex-col min-h-96 bg-background-secondary">
                     {/* Tab Switcher segment controller */}
-                    <div className="flex p-0.5 bg-background-primary border border-border-light rounded self-start">
-                        {visibleTabs.map(tab => {
-                            const TabIcon = tab.icon;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    type="button"
-                                    onClick={() => onInsightChange(tab.id)}
-                                    className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-all ${activeInsight === tab.id
-                                            ? 'bg-background-secondary text-text-primary border border-border-light font-semibold'
-                                            : 'text-text-muted hover:text-text-primary border border-transparent'
-                                        }`}
-                                >
-                                    <TabIcon className="h-3.5 w-3.5" />
-                                    {tab.label}
-                                </button>
-                            );
-                        })}
-                    </div>
+                    <Tabs
+                        variant="segmented"
+                        ariaLabel={t("listing_insights", "İlan analizleri")}
+                        className="self-start"
+                        items={visibleTabs}
+                        activeKey={activeInsight}
+                        onChange={onInsightChange}
+                    />
 
                     {/* Chart Content Area */}
                     <div className="mt-4 flex-1">
@@ -262,8 +252,8 @@ const ListingInfoModal = ({
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-12 text-center rounded border border-border-light bg-background-primary">
                                         <Eye className="mb-2 h-7 w-7 text-text-muted opacity-40" />
-                                        <p className="text-xs font-semibold text-text-primary">{t("no_view_data")}</p>
-                                        <p className="mt-0.5 max-w-xs text-xs text-text-muted">{t("open_the_full_listing_to_collect_views")}</p>
+                                        <p className="text-sm font-semibold text-text-primary">{t("no_view_data")}</p>
+                                        <p className="mt-0.5 max-w-xs text-sm text-text-muted">{t("open_the_full_listing_to_collect_views")}</p>
                                     </div>
                                 )}
                             </div>

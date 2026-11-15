@@ -176,7 +176,7 @@ const CheckoutPaymentStep = ({
 
         {spendingWarning && (
           <div className="px-5 py-4 sm:px-6">
-            <div className="flex items-start gap-3 rounded-md border border-status-warning-border bg-status-warning-bg/40 p-4" role="alert">
+            <div className="flex items-start gap-3 rounded-md border border-status-warning-border bg-status-warning-bg p-4" role="alert">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-status-warning-text" strokeWidth={1.5} aria-hidden />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-text-primary">{t('spending_limit_warning', 'Aylık harcama limiti uyarısı')}</p>

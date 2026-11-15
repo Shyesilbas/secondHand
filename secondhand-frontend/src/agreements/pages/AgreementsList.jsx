@@ -119,7 +119,7 @@ const AgreementsList = ({
  {FILTER_TABS.map(tab => {
  const isActive = filter === tab.key;
  const count = counts[tab.key] ?? 0;
- return <button key={tab.key} type="button" onClick={() => setFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded text-xs font-semibold transition-all duration-200 ${isActive ? 'bg-background-primary text-text-primary' : 'text-text-muted hover:text-text-secondary'}`}>
+ return <button key={tab.key} type="button" onClick={() => setFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded text-sm font-semibold transition-all duration-200 ${isActive ? 'bg-background-primary text-text-primary' : 'text-text-muted hover:text-text-secondary'}`}>
  {tab.dotColor && <span className={`w-1.5 h-1.5 rounded-full ${tab.dotColor}`} />}
  {tab.label}
  <span className={`tabular-nums ${isActive ? 'text-text-muted' : 'text-text-muted'}`}>

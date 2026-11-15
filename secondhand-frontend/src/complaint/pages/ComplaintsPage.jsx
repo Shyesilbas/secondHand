@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileSearch, ShieldAlert } from 'lucide-react';
 import PageContainer from '@/common/components/layout/PageContainer';
-import { Alert, Button, EmptyState, Skeleton } from '../../common/components/ui/index.js';
+import { Alert, Button, EmptyState, PageHeader, Skeleton, Tabs } from '../../common/components/ui/index.js';
 import { useMyComplaints, useReceivedComplaints } from '../hooks/useComplaints.js';
 import { getComplaintErrorMessage } from '../utils/complaintError.js';
 import { COMPLAINT_TABS } from '../complaintConstants.js';
@@ -31,33 +31,21 @@ const ComplaintsPage = () => {
   return (
     <div className="min-h-screen bg-background-secondary">
       <div className="border-b border-border-light bg-background-secondary">
-        <PageContainer className="flex items-center gap-4 py-4">
-          <ShieldAlert className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{t('my_complaints')}</h1>
-            <p className="mt-0.5 text-xs text-text-tertiary">{t('track_and_manage_your_submissions_to_our')}</p>
-          </div>
+        <PageContainer className="py-4">
+          <PageHeader
+            icon={ShieldAlert}
+            title={t('my_complaints')}
+            subtitle={t('track_and_manage_your_submissions_to_our')}
+          />
         </PageContainer>
         <PageContainer>
-          <div className="flex" role="tablist" aria-label={t('complaint_views', 'Complaint views')}>
-            {tabs.map((item) => {
-              const active = tab === item.key;
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setTab(item.key)}
-                  className={`-mb-px border-b-2 px-3 py-2 text-sm transition-colors duration-150 ${
-                    active ? 'border-primary font-medium text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
+          <Tabs
+            items={tabs}
+            activeKey={tab}
+            onChange={setTab}
+            ariaLabel={t('complaint_views', 'Complaint views')}
+            borderBottom={false}
+          />
         </PageContainer>
       </div>
 

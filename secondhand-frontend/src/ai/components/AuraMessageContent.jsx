@@ -20,8 +20,8 @@ const InlineText = ({ text, isUser }) => {
   );
 };
 
-const FormattedText = ({ text, isUser }) => (
-  <div className={`space-y-1.5 text-sm leading-relaxed ${isUser ? 'text-white' : 'text-text-primary'}`}>
+const FormattedText = ({ text, isUser, size = 'sm' }) => (
+  <div className={`space-y-1.5 ${size === 'base' ? 'text-base' : 'text-sm'} leading-relaxed ${isUser ? 'text-white' : 'text-text-primary'}`}>
     {text.split('\n').map((line, i) => {
       const trimmed = line.trim();
       if (!trimmed) return <div key={i} className="h-1.5" />;
@@ -57,10 +57,10 @@ const FormattedText = ({ text, isUser }) => (
 );
 
 // Renders assistant/user markdown-lite text; an embedded <PriceAdvisorGauge .../> tag becomes the gauge component.
-const AuraMessageContent = ({ content, isUser }) => {
+const AuraMessageContent = ({ content, isUser, size = 'sm' }) => {
   if (typeof content !== 'string') return content;
   const match = content.match(GAUGE_RE);
-  if (!match) return <FormattedText text={content} isUser={isUser} />;
+  if (!match) return <FormattedText text={content} isUser={isUser} size={size} />;
 
   const attr = (name) => match[1].match(new RegExp(`${name}="([^"]+)"`, 'i'))?.[1] ?? null;
   const index = content.indexOf(match[0]);
@@ -68,7 +68,7 @@ const AuraMessageContent = ({ content, isUser }) => {
   const after = content.substring(index + match[0].length).trim();
   return (
     <div className="space-y-3">
-      {before && <FormattedText text={before} isUser={isUser} />}
+      {before && <FormattedText text={before} isUser={isUser} size={size} />}
       <AuraPriceAdvisorGauge
         min={attr('min')}
         max={attr('max')}
@@ -77,7 +77,7 @@ const AuraMessageContent = ({ content, isUser }) => {
         currency={attr('currency') || 'TRY'}
         status={attr('status') || 'Good Deal'}
       />
-      {after && <FormattedText text={after} isUser={isUser} />}
+      {after && <FormattedText text={after} isUser={isUser} size={size} />}
     </div>
   );
 };

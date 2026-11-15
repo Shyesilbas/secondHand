@@ -149,7 +149,7 @@ const UserReviews = ({
     <div className="space-y-6 min-w-0 max-w-full">
       <section className="flex min-w-0 max-w-full flex-col rounded border border-border bg-background-primary overflow-hidden">
         {/* Rating summary banner */}
-        <div className="shrink-0 min-w-0 p-5 sm:p-6 bg-background-secondary/60 border-b border-border">
+        <div className="shrink-0 min-w-0 p-5 sm:p-6 bg-background-secondary border-b border-border">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 min-w-0 w-full">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-status-warning mb-1.5">
@@ -159,7 +159,7 @@ const UserReviews = ({
               <h2 className="text-base sm:text-lg font-semibold text-text-primary tracking-tight">
                 {t("reputation", "Satıcı İtibarı")}
               </h2>
-              <p className="text-xs text-text-muted mt-1 max-w-md leading-relaxed">
+              <p className="text-sm text-text-muted mt-1 max-w-md leading-relaxed">
                 {isOwnProfile
                   ? t('reviews_own_hint', 'Tamamlanan siparişlerin ardından alıcıların bıraktığı değerlendirmeler.')
                   : t('reviews_public_hint', 'Bu üyenin satıcı olarak aldığı tüm geri bildirimler.')}
@@ -215,7 +215,7 @@ const UserReviews = ({
                   </span>
                 ) : null}
               </h3>
-              <p className="text-xs text-text-muted mt-0.5">
+              <p className="text-sm text-text-muted mt-0.5">
                 {filterActive
                   ? t("filtered_reviews_hint", "Seçilen ilana göre filtrelendi · İncelemek için aşağı kaydırın")
                   : t("public_reviews_hint", "Yeniden eskiye · Herkese açık değerlendirmeler")}
@@ -229,7 +229,7 @@ const UserReviews = ({
                   value={pagination.size}
                   onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                   aria-label={t("per_page", "Sayfa başı değerlendirme")}
-                  className="h-8 rounded border border-border bg-background-primary px-2.5 text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-border cursor-pointer"
+                  className="h-8 rounded border border-border bg-background-primary px-2.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-border cursor-pointer"
                 >
                   <option value={10}>10</option>
                   <option value={15}>15</option>
@@ -255,7 +255,7 @@ const UserReviews = ({
                   <button
                     type="button"
                     onClick={() => setListingFilter(ALL_LISTINGS)}
-                    className={`flex-none inline-flex items-center gap-2 rounded border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                    className={`flex-none inline-flex items-center gap-2 rounded border px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
                       !filterActive
                         ? 'border-primary bg-primary text-white'
                         : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
@@ -280,7 +280,7 @@ const UserReviews = ({
                         type="button"
                         onClick={() => setListingFilter(opt.key)}
                         title={opt.title}
-                        className={`flex-none text-left inline-flex flex-col rounded border px-3 py-1.5 text-xs font-medium transition-colors min-w-36 max-w-[260px] cursor-pointer ${
+                        className={`flex-none text-left inline-flex flex-col rounded border px-3 py-1.5 text-sm font-medium transition-colors min-w-36 max-w-[260px] cursor-pointer ${
                           active
                             ? 'border-primary bg-background-secondary text-text-primary'
                             : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
@@ -312,7 +312,7 @@ const UserReviews = ({
         </div>
 
         {/* Reviews list */}
-        <div className="relative bg-background-secondary/20">
+        <div className="relative bg-background-secondary">
           {pagingLoading && !filterActive ? (
             <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 bg-primary/20 animate-pulse" aria-hidden />
           ) : null}
@@ -339,7 +339,7 @@ const UserReviews = ({
               <div className="rounded border border-border bg-background-primary px-6 py-12 text-center">
                 <AlertCircle className="mx-auto mb-3 block h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
                 <p className="mb-1 text-sm font-semibold text-text-primary">{t("couldn_t_load_reviews", "Değerlendirmeler yüklenemedi")}</p>
-                <p className="text-xs text-text-secondary">{receivedReviewsError}</p>
+                <p className="text-sm text-text-secondary">{receivedReviewsError}</p>
               </div>
             </div>
           ) : receivedReviews.length === 0 && !filterActive ? (
@@ -347,7 +347,7 @@ const UserReviews = ({
               <div className="rounded border border-dashed border-border bg-background-primary px-6 py-14 text-center">
                 <Star className="mx-auto mb-3 block h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
                 <h4 className="mb-1 text-base font-semibold text-text-primary">{t("no_reviews_received_yet", "Henüz değerlendirme bulunmuyor")}</h4>
-                <p className="mx-auto max-w-sm text-xs leading-relaxed text-text-muted">
+                <p className="mx-auto max-w-sm text-sm leading-relaxed text-text-muted">
                   {isOwnProfile
                     ? t('no_reviews_own_desc', 'Alıcılar siparişleri tamamlayıp geri bildirim bıraktığında değerlendirmeler burada görünecektir.')
                     : t('no_reviews_public_desc', 'Bu üye henüz herkese açık bir değerlendirme almadı.')}
@@ -355,7 +355,7 @@ const UserReviews = ({
                 {isOwnProfile ? (
                   <Link
                     to={ROUTES.MY_LISTINGS}
-                    className="mt-4 inline-flex text-xs font-semibold text-text-primary underline underline-offset-4 hover:text-primary transition-colors"
+                    className="mt-4 inline-flex text-sm font-semibold text-text-primary underline underline-offset-4 hover:text-primary transition-colors"
                   >
                     {t("go_to_my_listings", "İlanlarıma Git")}
                   </Link>
@@ -366,7 +366,7 @@ const UserReviews = ({
             <div className="p-5 sm:p-6">
               <ul className={`space-y-3.5 pb-1 ${filterActive ? '' : pagingLoading ? 'opacity-70 transition-opacity duration-150' : ''}`}>
                 {displayReviews.length === 0 && filterActive ? (
-                  <li className="rounded border border-dashed border-border bg-background-primary px-6 py-10 text-center text-xs text-text-secondary">
+                  <li className="rounded border border-dashed border-border bg-background-primary px-6 py-10 text-center text-sm text-text-secondary">
                     {t("no_reviews_matched_this_listing_try_relo", "Bu ilan için henüz bir değerlendirme bulunmuyor.")}
                   </li>
                 ) : (

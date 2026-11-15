@@ -544,7 +544,7 @@ const GenericListingForm = ({
               {formData?.title || t("untitled_listing", "Başlıksız ilan")}
             </h2>
             {formData?.description && (
-              <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-text-secondary">
+              <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-text-secondary">
                 {formData.description}
               </p>
             )}
@@ -577,7 +577,7 @@ const GenericListingForm = ({
         {/* Ready indicator */}
         <div className="flex items-center gap-2 rounded border border-border-light bg-background-secondary px-3.5 py-2.5">
           <span className="h-1.5 w-1.5 rounded-full bg-status-success shrink-0" />
-          <p className="text-xs font-medium text-text-secondary">{t("your_listing_is_ready_to_publish", "İlanınız yayınlanmaya hazır.")}</p>
+          <p className="text-sm font-medium text-text-secondary">{t("your_listing_is_ready_to_publish", "İlanınız yayınlanmaya hazır.")}</p>
         </div>
       </div>
     );

@@ -22,7 +22,7 @@ const MessageBubble = memo(({
  if (message.removedByModeration) {
  return (
  <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
- <div className="flex max-w-xs items-start gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-xs text-text-tertiary lg:max-w-md">
+ <div className="flex max-w-xs items-start gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-tertiary lg:max-w-md">
  <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
  <p>{t('message_removed_by_moderation', 'Bu mesaj topluluk kuralları ihlali nedeniyle sistem tarafından silindi.')}</p>
  </div>
@@ -101,7 +101,7 @@ const MessageList = memo(({
  return <div 
  ref={messagesContainerRef} 
  onScroll={handleScroll}
- className="flex-1 min-h-0 overflow-y-auto p-6 bg-background-secondary/50"
+ className="flex-1 min-h-0 overflow-y-auto p-6 bg-background-secondary"
  >
  {isFetchingNextPage && (
  <div className="flex justify-center items-center py-2">
@@ -118,8 +118,8 @@ const MessageList = memo(({
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
  </svg>
  </div>
- <h3 className="text-sm font-medium text-text-primary mb-1 tracking-tight">{t("no_messages_yet")}</h3>
- <p className="text-xs text-text-tertiary tracking-tight">{t("send_the_first_message")}</p>
+ <h3 className="text-base font-medium text-text-primary mb-1 tracking-tight">{t("no_messages_yet")}</h3>
+ <p className="text-sm text-text-tertiary tracking-tight">{t("send_the_first_message")}</p>
  </div> : messages.map(message => <MessageBubble key={message.id} message={message} isOwnMessage={sameChatId(message.senderId, user?.id)} onDeleteMessage={onDeleteMessage} onReportMessage={onReportMessage} />)}
  <div ref={messagesEndRef} />
  </div>;

@@ -11,6 +11,7 @@ import { ORDER_TIME } from '../constants/orderUiConstants.js';
 import { orderService } from '../services/orderService.js';
 import { formatDateTime, formatCurrency } from '../../common/formatters.js';
 import { ShippingDetailsSection } from '../components/orderDetails/ShippingDetailsSection.jsx';
+import { Badge, PageHeader } from '../../common/components/ui/index.js';
 const Panel = ({
  children,
  className = ''
@@ -72,19 +73,18 @@ const OrderShipmentPage = () => {
  <ArrowLeft className="w-4 h-4" />{t("back_to_orders")}</button>
  </div>
 
- <div className="space-y-1">
- <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("shipment_tracking")}</h1>
- <p className="text-sm text-text-tertiary">{title}</p>
- {order?.status ? <p className="text-xs font-semibold text-primary mt-2">{t("order_status")}{order.status}
- </p> : null}
- </div>
+ <PageHeader
+ title={t("shipment_tracking")}
+ subtitle={title}
+ badge={order?.status ? <Badge variant="primary">{t("order_status")}{order.status}</Badge> : null}
+ />
 
  {isLoading ? <Panel className="p-12 flex flex-col items-center justify-center animate-pulse">
  <Package className="w-10 h-10 text-secondary-300 mb-3" />
  <span className="text-sm font-medium text-text-muted">{t("loading_shipment")}</span>
  </Panel> : null}
 
- {errorMessage && !isLoading ? <Panel className="p-6 border-border bg-background-secondary/90">
+ {errorMessage && !isLoading ? <Panel className="p-6 border-border bg-background-secondary">
  <p className="text-sm font-semibold text-status-error-text">{errorMessage}</p>
  <button type="button" className="mt-3 text-sm font-semibold text-primary hover:text-primary underline" onClick={() => refetch()}>{t("try_again")}</button>
  </Panel> : null}

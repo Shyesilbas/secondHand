@@ -128,7 +128,7 @@ const HeaderProfileMenu = ({
               onLogout();
             }}
             type="button"
-            className="w-full flex items-center gap-3 px-3.5 py-2 text-sm text-status-error-text hover:bg-background-secondary/80 transition-colors rounded cursor-pointer font-medium"
+            className="w-full flex items-center gap-3 px-3.5 py-2 text-sm text-status-error-text hover:bg-background-secondary transition-colors rounded cursor-pointer font-medium"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span>{t("sign_out")}</span>

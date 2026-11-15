@@ -1,4 +1,6 @@
 
+import { Card } from '../../../common/components/ui/index.js';
+
 const SkeletonLine = ({ className = 'h-4 w-full' }) => (
   <div className={`bg-background-tertiary animate-pulse rounded ${className}`} />
 );
@@ -7,7 +9,7 @@ export const OrderDetailsSkeleton = () => {
   return (
     <div className="space-y-6">
       {/* Top Stepper Banner */}
-      <div className="p-4 bg-background-secondary/50 border border-border rounded-md shadow-sm space-y-4">
+      <Card surface="secondary" padding="compact" className="space-y-4">
         <div className="flex justify-between items-center py-2">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex flex-col items-center space-y-2 flex-1">
@@ -16,14 +18,14 @@ export const OrderDetailsSkeleton = () => {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Two Column Layout: 7 / 5 grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column */}
         <div className="lg:col-span-7 space-y-6">
           {/* Items Card */}
-          <div className="p-5 bg-background-primary border border-border rounded-md shadow-sm space-y-4">
+          <Card className="space-y-4">
             <div className="flex justify-between items-center border-b border-border-light pb-3">
               <SkeletonLine className="h-4 w-28" />
               <SkeletonLine className="h-4 w-12" />
@@ -40,22 +42,22 @@ export const OrderDetailsSkeleton = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </Card>
 
           {/* Address Card */}
-          <div className="p-5 bg-background-primary border border-border rounded-md shadow-sm space-y-3">
+          <Card className="space-y-3">
             <SkeletonLine className="h-4 w-24" />
             <div className="space-y-2">
               <SkeletonLine className="h-3 w-3/4" />
               <SkeletonLine className="h-3 w-1/2" />
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Right Column */}
         <div className="lg:col-span-5 space-y-6">
           {/* Payment Card */}
-          <div className="p-5 bg-background-primary border border-border rounded-md shadow-sm space-y-4">
+          <Card className="space-y-4">
             <SkeletonLine className="h-4 w-28" />
             <div className="space-y-3">
               <div className="flex justify-between">
@@ -71,7 +73,7 @@ export const OrderDetailsSkeleton = () => {
                 <SkeletonLine className="h-5 w-1/3" />
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

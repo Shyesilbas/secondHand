@@ -71,11 +71,11 @@ export const OrderPaymentSummary = React.memo(({
 
         <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-border-light pt-4">
           <span className="text-sm font-semibold text-text-primary">{t("od_total", "Toplam")}</span>
-          <span className="text-2xl font-bold tabular-nums text-text-price">{total != null ? formatCurrency(total, currency) : '—'}</span>
+          <span className="text-2xl font-semibold tabular-nums text-text-price">{total != null ? formatCurrency(total, currency) : '—'}</span>
         </div>
 
         {showEscrowNotice && (
-          <div className="mt-3 flex items-center gap-2 rounded-sm border border-border bg-background-secondary px-3 py-2 text-xs text-text-secondary">
+          <div className="mt-3 flex items-center gap-2 rounded-sm border border-border bg-background-secondary px-3 py-2 text-sm text-text-secondary">
             <ShieldCheck className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
             <span>{t("od_escrow_note", "Ödeme, teslimat onaylanana kadar escrow havuzunda tutulur.")}</span>
           </div>
@@ -92,7 +92,7 @@ export const OrderPaymentSummary = React.memo(({
                 return (
                   <div
                     key={agreement.agreementId}
-                    className="flex items-start justify-between gap-3 rounded border border-border bg-background-secondary/70 px-3 py-2.5 text-xs"
+                    className="flex items-start justify-between gap-3 rounded border border-border bg-background-secondary px-3 py-2.5 text-sm"
                   >
                     <div className="flex min-w-0 items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />

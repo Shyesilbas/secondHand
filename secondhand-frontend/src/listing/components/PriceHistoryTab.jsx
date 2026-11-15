@@ -6,6 +6,7 @@ import { Clock, DollarSign, Minus, TrendingDown, TrendingUp, ArrowLeftRight } fr
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { computeHistoryStats, computePercentageChange, formatHistoryDateLabel, getHistoryCurrency, sortPriceHistoryAsc, sortPriceHistoryDesc } from '../utils/priceHistoryUtils.js';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import { Card } from '../../common/components/ui/index.js';
 import { theme } from '../../common/theme/theme.js';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
@@ -249,20 +250,20 @@ const PriceHistoryTab = ({
 
   if (error) {
     return (
-      <div className="rounded border border-border-light bg-background-primary p-6 text-center">
+      <Card border="light" shadow={false} className="text-center">
         <TrendingUp className="mx-auto mb-3 block h-5 w-5 shrink-0 text-status-error-text" strokeWidth={1.5} aria-hidden />
         <p className="text-sm font-semibold text-text-primary">{t("unable_to_load_price_history")}</p>
         <p className="text-sm text-text-tertiary mt-1">{t("please_try_again_later")}</p>
-      </div>
+      </Card>
     );
   }
 
   if (loading) {
     return (
-      <div className="space-y-3 rounded border border-border bg-background-primary p-5" aria-busy="true" aria-label={t("analyzing_price_trends")}>
+      <Card shadow={false} className="space-y-3" aria-busy="true" aria-label={t("analyzing_price_trends")}>
         <Skeleton className="h-4 w-40" />
         <Skeleton className="h-40 w-full" />
-      </div>
+      </Card>
     );
   }
 
@@ -282,8 +283,8 @@ const PriceHistoryTab = ({
         {statItems.map(s => <StatItem key={s.title} {...s} />)}
       </div>
 
-      <div className="bg-background-primary rounded border border-border-light overflow-hidden">
-        <div className="px-4 py-3 border-b border-border-light bg-background-secondary/60">
+      <Card padding="none" border="light" shadow={false} className="overflow-hidden">
+        <div className="px-4 py-3 border-b border-border-light bg-background-secondary">
           <h3 className="text-sm font-medium text-text-primary">{t("price_evolution")}</h3>
         </div>
         <div className="p-4 sm:p-5">
@@ -291,10 +292,10 @@ const PriceHistoryTab = ({
             <Line data={chartData} options={chartOptions} />
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-background-primary rounded border border-border-light overflow-hidden">
-        <div className="px-4 py-3 border-b border-border-light bg-background-secondary/60">
+      <Card padding="none" border="light" shadow={false} className="overflow-hidden">
+        <div className="px-4 py-3 border-b border-border-light bg-background-secondary">
           <h3 className="text-sm font-medium text-text-primary">{t("price_history")}</h3>
         </div>
         <div className="divide-y divide-border-light">
@@ -312,7 +313,7 @@ const PriceHistoryTab = ({
                 : 'bg-background-secondary text-text-secondary border-border-light';
             const dotClass = isUp ? 'bg-status-error' : isDown ? 'bg-status-success' : 'bg-primary';
             return (
-              <div key={entry.id ?? idx} className="px-4 py-3 hover:bg-background-secondary/40 transition-colors">
+              <div key={entry.id ?? idx} className="px-4 py-3 hover:bg-background-secondary transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -347,7 +348,7 @@ const PriceHistoryTab = ({
             );
           })}
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

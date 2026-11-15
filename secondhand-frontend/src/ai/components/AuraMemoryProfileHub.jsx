@@ -202,7 +202,7 @@ export default function AuraMemoryProfileHub() {
             </span>
           ))}
           {(!memory?.permanentInterests || memory.permanentInterests.length === 0) && (
-            <span className="text-xs text-text-tertiary">{t("no_saved_interests", "Henüz kayıtlı ilgi alanı yok.")}</span>
+            <span className="text-sm text-text-tertiary">{t("no_saved_interests", "Henüz kayıtlı ilgi alanı yok.")}</span>
           )}
         </div>
         <form onSubmit={handleAddInterest} className="flex gap-2">
@@ -233,7 +233,7 @@ export default function AuraMemoryProfileHub() {
             </span>
           ))}
           {(!memory?.secondHandProfile?.brands || memory.secondHandProfile.brands.length === 0) && (
-            <span className="text-xs text-text-tertiary">{t("no_saved_brands", "Henüz kayıtlı marka yok.")}</span>
+            <span className="text-sm text-text-tertiary">{t("no_saved_brands", "Henüz kayıtlı marka yok.")}</span>
           )}
         </div>
         <form onSubmit={handleAddBrand} className="flex gap-2">
@@ -316,7 +316,7 @@ export default function AuraMemoryProfileHub() {
       </div>
 
       {updateMutation.isPending && (
-        <div className="flex items-center gap-2 text-xs text-text-secondary">
+        <div className="flex items-center gap-2 text-sm text-text-secondary">
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
           <span>{t("saving", "Kaydediliyor...")}</span>
         </div>

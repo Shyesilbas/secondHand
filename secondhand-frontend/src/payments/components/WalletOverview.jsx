@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import WalletOperationModal from './modals/WalletOperationModal.jsx';
 import { Wallet, ArrowUpRight, ArrowDownRight, Settings, AlertCircle, TrendingUp, ShieldAlert } from 'lucide-react';
+import { Badge, Card } from '../../common/components/ui/index.js';
 export const EWalletBalance = ({
  eWallet,
  totalAmount,
@@ -17,7 +18,7 @@ export const EWalletBalance = ({
  const spentPercentage = statisticsLoaded && totalAmount != null && eWallet.spendingWarningLimit ? Math.min(totalAmount / eWallet.spendingWarningLimit * 100, 100).toFixed(1) : 0;
  return <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
  <div className="lg:col-span-1">
- <div className="flex h-full flex-col justify-between rounded-md border border-border bg-background-primary p-5 shadow-sm">
+ <Card className="flex h-full flex-col justify-between">
  <div className="flex items-center gap-2 text-sm text-text-secondary">
  <Wallet className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  {t("prime_card")}
@@ -27,19 +28,17 @@ export const EWalletBalance = ({
  <p className="mt-1 text-2xl font-semibold tabular-nums text-text-price">{formatCurrency(eWallet.balance || 0)}</p>
  </div>
  <div className="mt-6 flex items-center justify-between text-sm">
- <span className="inline-flex items-center gap-1.5 rounded-full border border-status-success-border bg-status-success-bg px-2 py-0.5 text-xs font-medium text-status-success-text">
- <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />{t("active")}
- </span>
+ <Badge variant="success" dot>{t("active")}</Badge>
  <span className="text-text-tertiary">{t("try")}</span>
  </div>
- </div>
+ </Card>
  </div>
 
  {/* Stats and Limits */}
  <div className="lg:col-span-2 flex justify-between flex-col gap-4">
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
  {/* Wallet Limit Card */}
- <div className="bg-background-primary rounded-md border border-border p-5 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+ <Card className="relative flex flex-col justify-between overflow-hidden group">
  <div className="flex items-center justify-between mb-4">
  <TrendingUp className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
  <span className="text-xs font-semibold text-text-muted">{t("account_limit")}</span>
@@ -50,10 +49,10 @@ export const EWalletBalance = ({
  {eWallet.limit ? formatCurrency(eWallet.limit) : t("unlimited", "Limitsiz")}
  </p>
  </div>
- </div>
+ </Card>
 
  {/* Spending Warning Card */}
- <div className="bg-background-primary rounded-md border border-border p-5 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+ <Card className="relative flex flex-col justify-between overflow-hidden group">
  <div className="flex items-center justify-between mb-4">
  <ShieldAlert className="h-5 w-5 shrink-0 text-status-error" strokeWidth={1.5} aria-hidden />
  <span className="text-xs font-semibold text-text-muted">{t("security")}</span>
@@ -68,8 +67,8 @@ export const EWalletBalance = ({
  
  {eWallet.spendingWarningLimit && <div className="mt-4 pt-4 border-t border-border-light">
  <div className="flex justify-between items-end mb-2">
- <span className="text-xs font-medium text-text-tertiary">{t("current_period_spend")}</span>
- {statisticsLoaded && totalAmount != null ? <span className="text-xs font-semibold text-text-secondary">{formatCurrency(totalAmount)}</span> : <button onClick={onLoadStatistics} className="text-xs text-primary font-semibold hover:text-primary transition-colors">{t("reveal")}</button>}
+ <span className="text-sm font-medium text-text-tertiary">{t("current_period_spend")}</span>
+ {statisticsLoaded && totalAmount != null ? <span className="text-sm font-semibold text-text-secondary">{formatCurrency(totalAmount)}</span> : <button onClick={onLoadStatistics} className="text-sm text-primary font-semibold hover:text-primary transition-colors">{t("reveal")}</button>}
  </div>
  {statisticsLoaded && totalAmount != null && <div className="w-full h-1.5 bg-background-tertiary rounded-full overflow-hidden">
  <div className={`h-full rounded-full transition-all duration-500 ${spentPercentage > 90 ? 'bg-status-error' : spentPercentage > 75 ? 'bg-status-warning' : 'bg-status-success'}`} style={{
@@ -77,11 +76,11 @@ export const EWalletBalance = ({
  }} />
  </div>}
 
- {statisticsLoaded && statsData && <p className="mt-3 text-xs text-text-tertiary">{t("incoming_outgoing_transactions")}<span className="font-semibold text-text-secondary">{statsData.totalPayments ?? 0}</span>
+ {statisticsLoaded && statsData && <p className="mt-3 text-sm text-text-tertiary">{t("incoming_outgoing_transactions")}<span className="font-semibold text-text-secondary">{statsData.totalPayments ?? 0}</span>
  </p>}
  </div>}
  </div>
- </div>
+ </Card>
  </div>
  </div>
  </div>;

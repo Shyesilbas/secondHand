@@ -68,7 +68,7 @@ const GenericListingDetails = ({ listing, flat = false }) => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveSection(tab.id)}
-                className={`px-3 py-1.5 text-xs rounded font-medium transition-colors cursor-pointer ${isActive
+                className={`px-3 py-1.5 text-sm rounded font-medium transition-colors cursor-pointer ${isActive
                     ? 'bg-primary text-white'
                     : 'bg-background-secondary text-text-secondary hover:text-text-primary hover:bg-background-tertiary border border-border-light'
                   }`}

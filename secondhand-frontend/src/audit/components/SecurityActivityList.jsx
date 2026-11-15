@@ -145,7 +145,7 @@ const SecurityActivityList = ({
                 </div>
 
                 {log.details && (
-                  <p className="mt-0.5 line-clamp-1 text-xs text-text-secondary">
+                  <p className="mt-0.5 line-clamp-1 text-sm text-text-secondary">
                     {log.details}
                   </p>
                 )}

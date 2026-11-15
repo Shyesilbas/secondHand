@@ -153,7 +153,7 @@ const CreateCampaignModal = ({
  minQuantity: 1
  }))} type="button" aria-pressed={form.campaignType === 'STANDARD'} className={`w-full rounded border p-4 text-left transition-colors ${form.campaignType === 'STANDARD' ? 'border-primary bg-background-primary text-text-primary ring-1 ring-primary' : 'border-transparent text-text-secondary hover:border-border hover:bg-background-primary'}`}>
  <div className="text-sm font-medium">{t("standard_discount")}</div>
- <div className="mt-1 text-xs text-text-tertiary">{t("apply_to_specific_items_or_categories")}</div>
+ <div className="mt-1 text-sm text-text-tertiary">{t("apply_to_specific_items_or_categories")}</div>
  </button>
 
  <button onClick={() => setForm(p => ({
@@ -163,7 +163,7 @@ const CreateCampaignModal = ({
  minQuantity: 2
  }))} type="button" aria-pressed={form.campaignType === 'BUNDLE'} className={`w-full rounded border p-4 text-left transition-colors ${form.campaignType === 'BUNDLE' ? 'border-primary bg-background-primary text-text-primary ring-1 ring-primary' : 'border-transparent text-text-secondary hover:border-border hover:bg-background-primary'}`}>
  <div className="text-sm font-medium">{t("bundle_save")}</div>
- <div className="mt-1 text-xs text-text-tertiary">{t("multi_item_rewards_for_all_your_listings")}</div>
+ <div className="mt-1 text-sm text-text-tertiary">{t("multi_item_rewards_for_all_your_listings")}</div>
  </button>
  </div>
 
@@ -240,7 +240,7 @@ const CreateCampaignModal = ({
  minQuantity: e.target.value
  }))} className="w-full px-4 py-3.5 bg-background-primary border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
  </div>
- <p className="text-xs text-primary leading-relaxed">{t("this_bundle_will_automatically_apply_to")}<b>{t("all_your_active_listings")}</b>{t("customers_will_receive_the_discount_only")}<b>{form.minQuantity || 2}{t("or_more")}</b>{t("items_to_their_cart")}</p>
+ <p className="text-sm text-primary leading-relaxed">{t("this_bundle_will_automatically_apply_to")}<b>{t("all_your_active_listings")}</b>{t("customers_will_receive_the_discount_only")}<b>{form.minQuantity || 2}{t("or_more")}</b>{t("items_to_their_cart")}</p>
  </div>
  </section> : <section className="space-y-4">
  <div className="text-sm font-semibold text-text-primary">{t("select_eligibility")}</div>
@@ -250,7 +250,7 @@ const CreateCampaignModal = ({
  mode: m,
  eligibleListingIds: [],
  eligibleTypes: []
- }))} className={`px-4 py-2 rounded text-xs font-semibold border transition-all ${form.mode === m ? 'bg-primary text-white border-primary' : 'bg-background-primary text-text-secondary border-border hover:border-primary'}`}>
+ }))} className={`px-4 py-2 rounded text-sm font-semibold border transition-all ${form.mode === m ? 'bg-primary text-white border-primary' : 'bg-background-primary text-text-secondary border-border hover:border-primary'}`}>
  {m === 'ALL' ? 'Everything' : m === 'LISTING' ? 'Specific Listings' : 'Listing Types'}
  </button>)}
  </div>
@@ -286,7 +286,7 @@ const CreateCampaignModal = ({
  eligibleTypes: newList
  };
  });
- }} className={`px-4 py-2 rounded text-xs font-semibold border transition-all ${form.eligibleTypes.includes(t) ? 'bg-primary text-white border-primary' : 'bg-background-secondary text-text-secondary border-border'}`}>
+ }} className={`px-4 py-2 rounded text-sm font-semibold border transition-all ${form.eligibleTypes.includes(t) ? 'bg-primary text-white border-primary' : 'bg-background-secondary text-text-secondary border-border'}`}>
  {t}
  </button>)}
  </div>}

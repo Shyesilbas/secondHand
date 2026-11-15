@@ -20,6 +20,7 @@ import LogDetailModal from '../components/LogDetailModal.jsx';
 import RevokeSessionsModal from '../components/RevokeSessionsModal.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Button from '../../common/components/ui/Button.jsx';
+import PageHeader from '../../common/components/ui/PageHeader.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import logger from '../../common/utils/logger.js';
 import { ROUTES } from '@/common/constants/routes';
@@ -79,37 +80,31 @@ const SecurityPage = () => {
   return (
     <div className="min-h-screen bg-background-secondary pb-20 text-text-primary">
       <PageContainer className="py-6 sm:py-10">
-        <div className="mb-4">
-          <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-            <span>{t('back', 'Geri Dön')}</span>
-          </Button>
-        </div>
-
-        {/* Header */}
-        <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-text-primary">
-              {t('security_privacy', 'Hesap Güvenliği & Denetim Günlüğü')}
-            </h1>
-            <p className="mt-1 max-w-2xl text-sm text-text-secondary">
-              {t(
-                'keep_track_of_where_you_ve_signed_in_and',
-                'Hesabınıza gerçekleştirilen oturum açma, parola değişikliği ve güvenlik aktivitelerini takip edin.'
-              )}
-            </p>
-          </div>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowRevokeModal(true)}
-            className="shrink-0 text-status-error-text hover:text-status-error-text"
-          >
-            <LogOut className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-            <span>{t('revoke_all_sessions', 'Tüm Oturumları Kapat')}</span>
-          </Button>
-        </div>
+        <PageHeader
+          className="mb-6"
+          back={
+            <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span>{t('back', 'Geri Dön')}</span>
+            </Button>
+          }
+          title={t('security_privacy', 'Hesap Güvenliği & Denetim Günlüğü')}
+          subtitle={t(
+            'keep_track_of_where_you_ve_signed_in_and',
+            'Hesabınıza gerçekleştirilen oturum açma, parola değişikliği ve güvenlik aktivitelerini takip edin.'
+          )}
+          actions={
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowRevokeModal(true)}
+              className="shrink-0 text-status-error-text hover:text-status-error-text"
+            >
+              <LogOut className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span>{t('revoke_all_sessions', 'Tüm Oturumları Kapat')}</span>
+            </Button>
+          }
+        />
 
         {error && (
           <div className="mb-6">
@@ -178,7 +173,7 @@ const SecurityPage = () => {
 
           {/* Pagination Controls */}
           {shouldShowPagination && (
-            <div className="border-t border-border-light bg-background-secondary/50 p-4">
+            <div className="border-t border-border-light bg-background-secondary p-4">
               <PaginationControls
                 shouldShowPagination={shouldShowPagination}
                 currentPage={currentPage}

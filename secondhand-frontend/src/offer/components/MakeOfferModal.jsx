@@ -146,8 +146,8 @@ const MakeOfferModal = ({
  {recommendedOffers.map(rec => {
  const active = selectedPreset === rec.key;
  const saveVsList = listTotal != null ? roundMoney(listTotal - rec.amount) : null;
- return <button key={rec.key} type="button" aria-pressed={active} onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded-md border px-4 py-3 text-left transition-colors ${active ? 'border-primary ring-1 ring-primary bg-background-secondary/50' : 'border-border hover:border-card-border-hover'}`}>
- <span className="text-xs text-text-secondary">{rec.title}</span>
+ return <button key={rec.key} type="button" aria-pressed={active} onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded-md border px-4 py-3 text-left transition-colors ${active ? 'border-primary ring-1 ring-primary bg-background-secondary' : 'border-border hover:border-card-border-hover'}`}>
+ <span className="text-sm font-medium text-text-secondary">{rec.title}</span>
  <span className="mt-1 text-lg font-semibold tabular-nums text-text-price">{formatCurrency(rec.amount, currency)}</span>
  <span className="mt-1 text-xs text-text-tertiary">
  {rec.hint}
