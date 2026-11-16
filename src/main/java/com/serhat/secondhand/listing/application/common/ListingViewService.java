@@ -34,26 +34,36 @@ public class ListingViewService {
     private final IUserService userService;
     private final StringRedisTemplate redisTemplate;
 
+    static final String RANGE_KEY = "#startDate.truncatedTo(T(java.time.temporal.ChronoUnit).MINUTES) + ':' + "
+            + "#endDate.truncatedTo(T(java.time.temporal.ChronoUnit).MINUTES)";
+
+    /**
+     * Records one view per viewer, listing and {@link ListingBusinessConstants#VIEW_DUPLICATE_WINDOW_HOURS} window.
+     * Anonymous viewers are identified by the server-side IP hash, never by the client-sent session id: a caller
+     * that rotates session ids would otherwise write unlimited rows and inflate the active viewer count. The owner
+     * and duplicate checks run before the listing and user are loaded.
+     */
     @Async("viewTrackingExecutor")
     public void trackView(UUID listingId, Long userId, String sessionId, String ipAddress, String userAgent) {
         try {
-            Listing listing = listingRepository.findById(listingId)
-                    .orElseThrow(() -> new IllegalArgumentException("Listing not found: " + listingId));
-
-            User user = null;
-            if (userId != null) {
-                user = userService.findById(userId).getData();
+            Optional<Long> sellerId = listingRepository.findSellerIdById(listingId);
+            if (sellerId.isEmpty()) {
+                log.debug("Skipping view tracking for unknown listing {}", listingId);
+                return;
             }
-
-            if (user != null && listing.getSeller().getId().equals(userId)) {
+            if (userId != null && userId.equals(sellerId.get())) {
                 log.debug("Skipping view tracking for listing {} - user is the owner", listingId);
                 return;
             }
 
             String ipHash = hashIpAddress(ipAddress);
+            String dedupIdentifier = viewerIdentifier(userId, ipHash);
+            if (dedupIdentifier == null) {
+                log.debug("Skipping view tracking for listing {} - viewer cannot be identified", listingId);
+                return;
+            }
 
             // Active Viewer Presence tracking in Redis (24-hour sliding window)
-            String dedupIdentifier = (userId != null) ? "u:" + userId : ((sessionId != null && !sessionId.isBlank()) ? "s:" + sessionId : "ip:" + ipHash);
             try {
                 String presenceKey = "v4:listing:active_viewers:" + listingId;
                 redisTemplate.opsForZSet().add(presenceKey, dedupIdentifier, (double) System.currentTimeMillis());
@@ -76,10 +86,16 @@ public class ListingViewService {
                 log.warn("Redis view deduplication check failed, falling back to direct tracking: {}", e.getMessage());
             }
 
+            Listing listing = listingRepository.findById(listingId).orElse(null);
+            if (listing == null) {
+                return;
+            }
+            User user = userId != null ? userService.findById(userId).getData() : null;
+
             ListingView view = ListingView.builder()
                     .listing(listing)
                     .user(user)
-                    .sessionId(sessionId)
+                    .sessionId(sessionId != null && sessionId.length() > 255 ? sessionId.substring(0, 255) : sessionId)
                     .ipHash(ipHash)
                     .userAgent(truncateUserAgent(userAgent))
                     .category(listing.getListingType() != null ? listing.getListingType().name() : null)
@@ -97,7 +113,8 @@ public class ListingViewService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "listing:views:seller", key = "#sellerId")
+    // Dates are part of the key (truncated to the minute so the "now" default still hits within a minute).
+    @Cacheable(value = "listing:views:seller", key = "#sellerId + ':' + " + RANGE_KEY)
     public ListingViewStatsDto getAggregatedViewStatisticsForSeller(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
         List<Object[]> stats = listingViewRepository.getAggregatedStats(sellerId, startDate, endDate);
 
@@ -113,6 +130,11 @@ public class ListingViewService {
                 .build();
     }
 
+
+    static String viewerIdentifier(Long userId, String ipHash) {
+        if (userId != null) return "u:" + userId;
+        return (ipHash == null || ipHash.isEmpty()) ? null : "ip:" + ipHash;
+    }
 
     private String hashIpAddress(String ipAddress) {
         if (ipAddress == null || ipAddress.isEmpty()) return "";
@@ -139,7 +161,9 @@ public class ListingViewService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "listing:views:listing", key = "#listingId")
+    // The requester is part of the key: the cache runs before the ownership check, so a key without it would hand
+    // the owner's cached statistics to anyone. Only the owner ever produces an entry under their own id.
+    @Cacheable(value = "listing:views:listing", key = "#listingId + ':' + #requesterId + ':' + " + RANGE_KEY)
     public ListingViewStatsDto getViewStatisticsForOwner(UUID listingId, Long requesterId,
                                                         LocalDateTime startDate, LocalDateTime endDate) {
         Long sellerId = listingRepository.findSellerIdById(listingId)

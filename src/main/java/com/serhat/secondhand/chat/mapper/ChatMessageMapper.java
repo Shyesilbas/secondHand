@@ -37,6 +37,9 @@ public class ChatMessageMapper {
         if (message.isRemovedByModeration()) {
             dto.setRemovedByModeration(true);
             dto.setContent(null);
+        } else if (message.isDeletedBySender()) {
+            dto.setDeletedBySender(true);
+            dto.setContent(null);
         } else {
             dto.setContent(message.getContent());
         }

@@ -35,9 +35,21 @@ public record GeminiRequest(
     public record InlineData(String mimeType, String data) {}
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record GenerationConfig(String responseMimeType, Map<String, Object> responseSchema) {
+    public record GenerationConfig(
+            String responseMimeType,
+            Map<String, Object> responseSchema,
+            Integer maxOutputTokens
+    ) {
         public GenerationConfig(String responseMimeType) {
-            this(responseMimeType, null);
+            this(responseMimeType, null, null);
+        }
+
+        public GenerationConfig(String responseMimeType, Map<String, Object> responseSchema) {
+            this(responseMimeType, responseSchema, null);
+        }
+
+        public GenerationConfig(String responseMimeType, Integer maxOutputTokens) {
+            this(responseMimeType, null, maxOutputTokens);
         }
     }
 }

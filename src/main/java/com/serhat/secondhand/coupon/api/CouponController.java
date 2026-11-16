@@ -1,5 +1,7 @@
 package com.serhat.secondhand.coupon.api;
 
+import jakarta.validation.Valid;
+
 import com.serhat.secondhand.coupon.dto.ActiveCouponDto;
 import com.serhat.secondhand.coupon.dto.CouponParticipationDto;
 import com.serhat.secondhand.coupon.dto.CouponPreviewRequest;
@@ -28,7 +30,7 @@ public class CouponController {
     @PostMapping("/preview")
     @Operation(summary = "Preview pricing with coupon", description = "Calculate total price with cart items, accepted offers and potential coupon codes")
     public ResponseEntity<PricingResultDto> preview(
-            @RequestBody CouponPreviewRequest request,
+            @Valid @RequestBody CouponPreviewRequest request,
             @AuthenticationPrincipal User currentUser) {
 
         log.info("API request to preview pricing for user: {}", currentUser.getId());

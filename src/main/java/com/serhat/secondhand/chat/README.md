@@ -15,6 +15,9 @@ Provides real-time 1-on-1 buyer-seller messaging (`chat_rooms` and `messages` ta
 - **In-Chat Offer Integration:** `POST /api/v1/chats/rooms/{roomId}/offers` (`SendInChatOfferRequest`) creates an `Offer` in `offers` and attaches `offer_id` to a chat message in the room transcript.
 
 - **Messaging lock:** `ChatService` refuses rooms, messages and in-chat offers when a user block exists (`USER_BLOCKED`), when `listings.can_send_message` is false for a listing room (`CHAT_DISABLED_BY_SELLER`), or when the recipient's `users.can_send_message` is false in a direct room (`CHAT_DISABLED_BY_USER`). Existing rooms lock too; `ChatRoomDto.messagingDisabled` carries the reason to the UI.
+- **Per-user room delete (`ChatRoomHide`):** `DELETE /rooms/{roomId}` records `chat_room_hides.hidden_at` for the caller only; the room leaves their list (`ChatRoomRepository.NOT_HIDDEN_FOR_USER`) until a newer message, and their history starts after it. No rows are deleted.
+- **Message delete is a tombstone:** `DELETE /messages/{messageId}` sets `messages.deleted_by_sender_at`; text stays for complaints and `ChatTranscriptService`, clients get `deletedBySender` with null content and can still report it.
+- **Listing rooms:** named from the stored title (`listingTitle` param ignored); own listing is `CHAT_WITH_SELF`; new rooms need `ListingStatus.isPublicBrowsable()` (`LISTING_NOT_AVAILABLE_FOR_CHAT`).
 - **Moderation tombstone:** a penalty on a complaint with `reportedMessageId` sets `messages.removed_by_moderation`; `ChatMessageMapper` then nulls the content for clients while the row keeps its text for appeal review. An approved appeal restores it (`SanctionExecutor`).
 
 ## WebSocket & Redis
@@ -27,4 +30,4 @@ Provides real-time 1-on-1 buyer-seller messaging (`chat_rooms` and `messages` ta
 - `GET /rooms/{roomId}/messages` & `POST /messages` — paginated message history and REST message send.
 - `PUT /rooms/{roomId}/messages/read` & `GET /messages/unread-count` — mark room messages read and get unread badge count.
 - `POST /rooms/{roomId}/offers` — submit an in-chat bargaining offer (`SendInChatOfferRequest`).
-- `DELETE /rooms/{roomId}` & `DELETE /messages/{messageId}` — soft-close a room or delete a message.
+- `DELETE /rooms/{roomId}` & `DELETE /messages/{messageId}` — hide a room for the caller or tombstone own message.

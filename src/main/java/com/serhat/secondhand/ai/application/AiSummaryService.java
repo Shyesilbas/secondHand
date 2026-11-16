@@ -1,24 +1,31 @@
 package com.serhat.secondhand.ai.application;
 
+import com.serhat.secondhand.ai.util.PromptSanitizer;
+import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.security.ClientIpResolver;
 import com.serhat.secondhand.review.entity.Review;
 import com.serhat.secondhand.review.repository.ReviewRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class AiSummaryService {
 
     private static final String SUMMARY_UNAVAILABLE_MESSAGE = "Sistem yoğunluğu nedeniyle şu an yorum özeti oluşturulamadı.";
     private static final int MAX_REVIEWS_FOR_SUMMARY = 20;
+    private static final int MAX_REVIEW_COMMENT_CHARS = 500;
 
     static final String SUMMARY_SYSTEM_INSTRUCTION = """
             Sen SecondHand ikinci el pazaryeri için kullanıcı yorumlarını özetleyen bir asistansın.
@@ -29,6 +36,30 @@ public class AiSummaryService {
 
     private final ReviewRepository reviewRepository;
     private final GeminiClient geminiClient;
+    private final GlobalGeminiBudgetGuard budgetGuard;
+    private final ClientIpResolver clientIpResolver;
+
+    @Value("${ai.summary.negative-cache-seconds:120}")
+    private long negativeCacheSeconds = 120;
+
+    @Value("${ai.summary.ip-hourly-limit:10}")
+    private int ipHourlyLimit = 10;
+
+    public AiSummaryService(ReviewRepository reviewRepository, GeminiClient geminiClient) {
+        this(reviewRepository, geminiClient, null, null);
+    }
+
+    @Autowired
+    public AiSummaryService(
+            ReviewRepository reviewRepository,
+            GeminiClient geminiClient,
+            @Autowired(required = false) GlobalGeminiBudgetGuard budgetGuard,
+            @Autowired(required = false) ClientIpResolver clientIpResolver) {
+        this.reviewRepository = reviewRepository;
+        this.geminiClient = geminiClient;
+        this.budgetGuard = budgetGuard;
+        this.clientIpResolver = clientIpResolver;
+    }
 
     @Cacheable(value = "ai:summaries", key = "'user:' + #userId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
     public String getUserReviewsSummary(Long userId) {
@@ -37,6 +68,8 @@ public class AiSummaryService {
                 .findByReviewedUserIdOrderByCreatedAtDesc(userId, PageRequest.of(0, MAX_REVIEWS_FOR_SUMMARY))
                 .getContent();
         return summarizeReviews(
+                "user",
+                String.valueOf(userId),
                 reviews,
                 "Bu kullanıcı için henüz yapılmış yorum bulunmamaktadır.",
                 "Aşağıda bir satıcıya yapılan kullanıcı yorumları listelenmiştir. Bu yorumları analiz et ve satıcının öne çıkan olumlu ve varsa olumsuz özelliklerini içeren, samimi, anlaşılır ve kısa bir Türkçe özet oluştur.",
@@ -51,6 +84,8 @@ public class AiSummaryService {
                 .findReviewsByListingId(listingId, PageRequest.of(0, MAX_REVIEWS_FOR_SUMMARY))
                 .getContent();
         return summarizeReviews(
+                "listing",
+                String.valueOf(listingId),
                 reviews,
                 "Bu ürün/ilan için henüz yapılmış yorum bulunmamaktadır.",
                 "Aşağıda bir ilan/ürün için yapılan kullanıcı yorumları listelenmiştir. Bu yorumları analiz et ve ürünün öne çıkan özelliklerini, kalitesini, olumlu ve varsa olumsuz yanlarını içeren, samimi, anlaşılır ve kısa bir Türkçe özet oluştur.",
@@ -58,13 +93,33 @@ public class AiSummaryService {
         );
     }
 
-    private String summarizeReviews(List<Review> reviews, String emptyMessage, String taskInstruction, String logContext) {
+    private String summarizeReviews(
+            String targetType,
+            String targetId,
+            List<Review> reviews,
+            String emptyMessage,
+            String taskInstruction,
+            String logContext) {
         if (reviews.isEmpty()) {
             return emptyMessage;
         }
 
+        String cooldownKey = "v4:ai:summary:cooldown:" + targetType + ":" + targetId;
+        if (budgetGuard != null && budgetGuard.isInCooldown(cooldownKey)) {
+            log.debug("Skipping AI {} summary generation during negative-cache cooldown for id={}", logContext, targetId);
+            return SUMMARY_UNAVAILABLE_MESSAGE;
+        }
+
+        if (budgetGuard != null && !isIpAllowed()) {
+            log.warn("AI summary IP hourly limit reached while summarizing {} id={}", logContext, targetId);
+            return SUMMARY_UNAVAILABLE_MESSAGE;
+        }
+
         String reviewBlock = reviews.stream()
-                .map(r -> String.format("- Puan: %d/5 | Yorum: %s", r.getRating(), escapeUntrustedText(r.getComment())))
+                .map(r -> String.format(
+                        "- Puan: %d/5 | Yorum: %s",
+                        r.getRating(),
+                        PromptSanitizer.escapeUntrustedText(PromptSanitizer.truncate(r.getComment(), MAX_REVIEW_COMMENT_CHARS))))
                 .collect(Collectors.joining("\n"));
 
         String prompt = String.format("""
@@ -78,20 +133,45 @@ public class AiSummaryService {
 
         try {
             return geminiClient.generateText(SUMMARY_SYSTEM_INSTRUCTION, prompt);
+        } catch (BusinessException e) {
+            markNegativeCooldown(cooldownKey);
+            log.warn("AI {} summary unavailable ({}): {}", logContext, e.getErrorCode(), e.getMessage());
+            return SUMMARY_UNAVAILABLE_MESSAGE;
         } catch (Exception e) {
+            markNegativeCooldown(cooldownKey);
             log.error("Failed to generate AI {} summary: ", logContext, e);
             return SUMMARY_UNAVAILABLE_MESSAGE;
         }
     }
 
-    /** Neutralizes markup so user review text cannot break out of the untrusted evidence block. */
-    static String escapeUntrustedText(String value) {
-        if (value == null) {
-            return "";
+    private boolean isIpAllowed() {
+        String clientIp = resolveCurrentClientIp();
+        if (clientIp == null || clientIp.isBlank()) {
+            return true;
         }
-        return value.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
+        return budgetGuard.tryConsumeWindow(
+                "v4:ai:summary:ip:" + clientIp,
+                ipHourlyLimit,
+                Duration.ofHours(1)
+        );
+    }
+
+    private String resolveCurrentClientIp() {
+        var attributes = RequestContextHolder.getRequestAttributes();
+        if (attributes instanceof ServletRequestAttributes servletAttrs) {
+            var request = servletAttrs.getRequest();
+            if (clientIpResolver != null) {
+                return clientIpResolver.resolve(request);
+            }
+            return request.getRemoteAddr();
+        }
+        return null;
+    }
+
+    private void markNegativeCooldown(String cooldownKey) {
+        if (budgetGuard != null && negativeCacheSeconds > 0) {
+            budgetGuard.markCooldown(cooldownKey, Duration.ofSeconds(negativeCacheSeconds));
+        }
     }
 
     public static String summaryUnavailableMessage() {

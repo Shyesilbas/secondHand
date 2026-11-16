@@ -101,6 +101,15 @@ public class CampaignService implements ICampaignService {
                 listingIdsByCampaign.getOrDefault(row.getId(), Set.of())));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Campaign> loadActiveCampaignsForPublicRequest(List<Long> sellerIds) {
+        if (sellerIds != null && sellerIds.size() > com.serhat.secondhand.core.dto.PageRequests.MAX_PAGE_SIZE) {
+            throw new com.serhat.secondhand.core.exception.BusinessException(CampaignErrorCodes.TOO_MANY_SELLER_IDS);
+        }
+        return loadActiveCampaignsForSellers(sellerIds == null ? null : sellerIds.stream().distinct().toList());
+    }
+
     @Transactional(readOnly = true)
     public List<Campaign> loadActiveCampaignsForSellers(List<Long> sellerIds) {
         if (sellerIds == null || sellerIds.isEmpty()) return List.of();

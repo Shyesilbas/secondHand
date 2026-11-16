@@ -43,7 +43,8 @@ class ChatServiceRoomPageTest {
             com.serhat.secondhand.user.RestrictionTestSupport.allowAll(), roomRepository, messageRepository, mock(ListingRepository.class), mock(IUserService.class),
             new ChatRoomMapper(), mock(ChatMessageMapper.class), enricher, mock(ChatNotificationService.class),
             mock(ChatRoomUpdater.class), mock(ChatAuthorizationService.class), mock(IOfferService.class),
-            mock(OfferRepository.class), userBlockService);
+            mock(OfferRepository.class), userBlockService,
+            mock(com.serhat.secondhand.chat.repository.ChatRoomHideRepository.class));
 
     private static ChatRoom room(long id) {
         ChatRoom room = new ChatRoom();

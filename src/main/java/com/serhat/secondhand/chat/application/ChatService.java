@@ -7,6 +7,7 @@ import com.serhat.secondhand.chat.dto.ChatRoomDto;
 import com.serhat.secondhand.chat.enricher.ChatEnrichmentContext;
 import com.serhat.secondhand.chat.enricher.ChatRoomEnricher;
 import com.serhat.secondhand.chat.entity.ChatRoom;
+import com.serhat.secondhand.chat.entity.ChatRoomHide;
 import com.serhat.secondhand.chat.entity.Message;
 import com.serhat.secondhand.chat.mapper.ChatMessageMapper;
 import com.serhat.secondhand.chat.mapper.ChatRoomMapper;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,6 +56,7 @@ public class ChatService {
     private final com.serhat.secondhand.offer.application.IOfferService offerService;
     private final com.serhat.secondhand.offer.repository.OfferRepository offerRepository;
     private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
+    private final com.serhat.secondhand.chat.repository.ChatRoomHideRepository chatRoomHideRepository;
 
     @Transactional(readOnly = true)
     public Page<ChatRoomDto> getUserChatRooms(Long userId, Pageable pageable) {
@@ -193,6 +196,9 @@ public class ChatService {
 
     @Transactional
     public ChatRoomDto createOrGetDirectChat(Long user1, Long user2) {
+        if (user1 != null && user1.equals(user2)) {
+            throw new BusinessException(ChatErrorCodes.CHAT_WITH_SELF);
+        }
         Result<Void> validationResult = chatAuthorizationService.validateUsersExist(user1, user2);
         if (validationResult.isError()) {
             throw new IllegalArgumentException("Unable to create chat. Please ensure both users exist.");
@@ -221,9 +227,13 @@ public class ChatService {
     }
 
     @Transactional
-    public ChatRoomDto createOrGetListingChat(Long userId, String listingId, String listingTitle) {
-        Listing listing =
-                listingRepository.findById(UUID.fromString(listingId)).orElseThrow();
+    public ChatRoomDto createOrGetListingChat(Long userId, String listingId) {
+        Listing listing = parseListingId(listingId)
+                .flatMap(listingRepository::findById)
+                .orElseThrow(() -> new BusinessException(ChatErrorCodes.LISTING_NOT_FOUND));
+        if (listing.getSeller().getId().equals(userId)) {
+            throw new BusinessException(ChatErrorCodes.CHAT_WITH_SELF);
+        }
 
         userBlockService.requireNotBlocked(userId, listing.getSeller().getId());
         if (!listing.isCanSendMessage()) {
@@ -238,9 +248,14 @@ public class ChatService {
             }
         }
 
+        // Only a new conversation needs an open listing; an existing one stays reachable after the sale.
+        if (listing.getStatus() == null || !listing.getStatus().isPublicBrowsable()) {
+            throw new BusinessException(ChatErrorCodes.LISTING_NOT_AVAILABLE_FOR_CHAT);
+        }
+
         ChatRoom room =
                 chatRoomMapper.toEntity(
-                        "Chat about: " + listingTitle,
+                        "Chat about: " + listing.getTitle(),
                         ChatRoom.RoomType.LISTING,
                         listingId
                 );
@@ -314,8 +329,14 @@ public class ChatService {
             throw new SecurityException("You do not have permission to delete this message.");
         }
 
+        // Tombstone instead of DELETE: a sender must not be able to erase a message before it is reported.
         Message msg = msgResult.getData();
-        messageRepository.delete(msg);
+        if (msg.isDeletedBySender()) {
+            return;
+        }
+        msg.setDeletedBySenderAt(LocalDateTime.now());
+        msg.setIsRead(true);
+        messageRepository.save(msg);
         chatRoomUpdater.updateLastMessage(msg.getChatRoomId());
     }
 
@@ -335,8 +356,11 @@ public class ChatService {
         if (validationResult.isError()) {
             throw new SecurityException("You do not have permission to view messages in this chat room.");
         }
-        return messageRepository
-                .findByChatRoomIdOrderByCreatedAtDesc(roomId, pageable)
+        Page<Message> page = chatRoomHideRepository.findByChatRoomIdAndUserId(roomId, userId)
+                .map(hide -> messageRepository.findByChatRoomIdAndCreatedAtAfterOrderByCreatedAtDesc(
+                        roomId, hide.getHiddenAt(), pageable))
+                .orElseGet(() -> messageRepository.findByChatRoomIdOrderByCreatedAtDesc(roomId, pageable));
+        return page
                 .map(msg -> {
                     ChatMessageDto dto = chatMessageMapper.toDto(msg);
                     enrichOfferMessage(dto);
@@ -447,9 +471,21 @@ public class ChatService {
             throw new SecurityException("You do not have permission to delete this conversation.");
         }
 
-        ChatRoom room = roomResult.getData();
-        messageRepository.deleteByChatRoomId(chatRoomId);
-        chatRoomRepository.delete(room);
+        // Hide for this user only: deleting rows would erase the other participant's history and the evidence
+        // a complaint about this conversation relies on.
+        ChatRoomHide hide = chatRoomHideRepository.findByChatRoomIdAndUserId(chatRoomId, userId)
+                .orElseGet(() -> ChatRoomHide.builder().chatRoomId(chatRoomId).userId(userId).build());
+        hide.setHiddenAt(LocalDateTime.now());
+        chatRoomHideRepository.save(hide);
+        messageRepository.markMessagesAsRead(chatRoomId, userId);
+    }
+
+    private static Optional<UUID> parseListingId(String listingId) {
+        try {
+            return Optional.of(UUID.fromString(listingId));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return Optional.empty();
+        }
     }
 
 

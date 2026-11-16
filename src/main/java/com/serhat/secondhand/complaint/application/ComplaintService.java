@@ -6,6 +6,7 @@ import com.serhat.secondhand.complaint.Complaint;
 import com.serhat.secondhand.complaint.ComplaintDto;
 import com.serhat.secondhand.complaint.ComplaintMapper;
 import com.serhat.secondhand.complaint.ComplaintRequest;
+import com.serhat.secondhand.complaint.ReceivedComplaintDto;
 import com.serhat.secondhand.complaint.application.event.AppealSubmittedEvent;
 import com.serhat.secondhand.complaint.application.event.ComplaintSubmittedEvent;
 import com.serhat.secondhand.complaint.config.ComplaintModerationProperties;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,7 +114,7 @@ public class ComplaintService implements IComplaintService {
 
     /** Files the one allowed appeal against an Aura decision (proposal section 5.6). */
     @Transactional
-    public Result<ComplaintDto> submitAppeal(Long userId, String complaintId, AppealRequest request) {
+    public Result<ReceivedComplaintDto> submitAppeal(Long userId, String complaintId, AppealRequest request) {
         Complaint complaint = complaintRepository.findByIdWithDetails(complaintId).orElse(null);
         if (complaint == null) {
             return Result.error(ComplaintErrorCodes.COMPLAINT_NOT_FOUND);
@@ -129,7 +131,8 @@ public class ComplaintService implements IComplaintService {
         log.info("Appeal filed for complaint {} by user {}", complaintId, userId);
         Complaint updated = complaintRepository.findByIdWithDetails(complaintId)
                 .orElseThrow(() -> new IllegalStateException("Complaint " + complaintId + " disappeared after appeal"));
-        return Result.success(toDtos(List.of(updated)).get(0));
+        // Only the complained-about user may appeal, so the response uses the restricted view.
+        return Result.success(toReceivedDtos(List.of(updated)).get(0));
     }
 
     @Transactional(readOnly = true)
@@ -139,20 +142,28 @@ public class ComplaintService implements IComplaintService {
     }
 
     @Transactional(readOnly = true)
-    public List<ComplaintDto> getComplaintsAboutUser(User user) {
+    public List<ReceivedComplaintDto> getComplaintsAboutUser(User user) {
         log.info("Getting complaints about user: {}", user.getId());
-        return toDtos(complaintRepository.findByComplainedUserWithDetails(user));
+        return toReceivedDtos(complaintRepository.findByComplainedUserWithDetails(user));
     }
 
     /** Maps complaints in one batch so the reported message contents are loaded with a single query. */
     private List<ComplaintDto> toDtos(List<Complaint> complaints) {
+        return mapWithMessageContents(complaints, complaintMapper::mapComplaintToDto);
+    }
+
+    private List<ReceivedComplaintDto> toReceivedDtos(List<Complaint> complaints) {
+        return mapWithMessageContents(complaints, complaintMapper::mapComplaintToReceivedDto);
+    }
+
+    private <D> List<D> mapWithMessageContents(List<Complaint> complaints, BiFunction<Complaint, String, D> mapper) {
         Set<Long> messageIds = complaints.stream()
                 .map(Complaint::getReportedMessageId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         Map<Long, String> messageContents = chatAuthorizationService.findMessageContents(messageIds);
         return complaints.stream()
-                .map(complaint -> complaintMapper.mapComplaintToDto(complaint,
+                .map(complaint -> mapper.apply(complaint,
                         complaint.getReportedMessageId() == null ? null : messageContents.get(complaint.getReportedMessageId())))
                 .toList();
     }

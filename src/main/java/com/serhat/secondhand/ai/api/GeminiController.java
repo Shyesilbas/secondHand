@@ -3,6 +3,8 @@ package com.serhat.secondhand.ai.api;
 import com.serhat.secondhand.ai.application.GeminiAiService;
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
+import com.serhat.secondhand.ai.util.AiErrorCodes;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,11 +23,18 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Gemini", description = "Gemini operations")
 public class GeminiController {
 
+    private static final int MAX_QUESTION_CHARS = 2000;
+    private static final int MIN_QUESTION_CHARS = 3;
+    private static final int MAX_HELLO_CHARS = 500;
+
     private final GeminiAiService aiService;
 
     @GetMapping("/gemini/hello")
     public String helloAi(@RequestParam(defaultValue = "Hi, which model you are?") String message) {
-        return aiService.testConnection(message);
+        if (message == null || message.isBlank() || message.trim().length() > MAX_HELLO_CHARS) {
+            throw new BusinessException(AiErrorCodes.AI_INVALID_REQUEST);
+        }
+        return aiService.testConnection(message.trim());
     }
 
     // With context
@@ -39,12 +48,13 @@ public class GeminiController {
     // No context
     @GetMapping("/quick")
     public ResponseEntity<AiResponse> quickQuestion(@RequestParam("q") String question) {
-        if (question == null || question.isBlank()) {
-            throw new IllegalArgumentException("Question cannot be empty");
+        String trimmed = question == null ? "" : question.trim();
+        if (trimmed.length() < MIN_QUESTION_CHARS || trimmed.length() > MAX_QUESTION_CHARS) {
+            throw new BusinessException(AiErrorCodes.AI_INVALID_REQUEST);
         }
 
-        log.info("Quick question: {}", question.substring(0, Math.min(50, question.length())));
-        UserQuestionRequest request = new UserQuestionRequest(question, null);
+        log.info("Quick question: {}", trimmed.substring(0, Math.min(50, trimmed.length())));
+        UserQuestionRequest request = new UserQuestionRequest(trimmed, null);
         AiResponse response = aiService.askQuestion(request);
         return ResultResponses.ok(Result.success(response));
     }

@@ -30,14 +30,6 @@ sequenceDiagram
     Service-->>Controller: secure_url
     Controller-->>Client: 200 OK {"url": "https://res.cloudinary.com/..."}
     Client->>DB: İlan kaydederken görsel URL'ini attributes / images listesine yazar
-
-    opt İlan Güncelleme veya Silme
-        Client->>Controller: DELETE /api/v1/images/delete {"imageUrl": "..."}
-        Controller->>Service: deleteImage(imageUrl)
-        Service->>Service: extractPublicIdFromUrl(imageUrl)
-        Service->>Cloudinary: uploader().destroy(publicId)
-        Cloudinary-->>Service: 200 OK result: "ok"
-    end
 ```
 
 ### 1.2 Yükleme Parametreleri ve Optimizasyon Kuralları
@@ -49,16 +41,8 @@ sequenceDiagram
 - **İzin Verilen Formatlar:** Yalnızca `image/jpeg`, `image/png`, `image/gif` ve `image/webp`. MIME type ve uzantı birlikte denetlenir.
 - **Dosya Boyutu Tavanı:** Maksimum 10 MB ($10 \times 1024 \times 1024$ byte).
 
-### 1.3 Yetim Dosya Önleme (Orphan Cleanup)
-Görsel silindiğinde URL yapısından `public_id` regex ile çıkarılır ve Cloudinary API'sine `destroy` çağrısı yapılır:
-```java
-public void deleteImage(String imageUrl) {
-    String publicId = extractPublicIdFromUrl(imageUrl);
-    if (publicId != null) {
-        cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-    }
-}
-```
+### 1.3 Görsel Silme
+API görsel silme ucu sunmaz. Yüklenen görseller bir sahibe bağlanmadığı için client'ın gönderdiği URL ile silme, herhangi bir kullanıcının başkasının ilan görselini silmesine izin veriyordu; bu yüzden uç kaldırıldı. Silme yeniden eklenecekse önce yükleme ile kullanıcı arasında bir sahiplik kaydı tutulmalıdır; kullanılmayan (orphan) görseller şimdilik Cloudinary tarafında kalır.
 
 ---
 

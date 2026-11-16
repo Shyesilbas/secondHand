@@ -208,6 +208,9 @@ public class FavoriteService {
 
     @Transactional(readOnly = true)
     public Result<Map<UUID, FavoriteStatsDto>> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {
+        if (listingIds != null && listingIds.size() > com.serhat.secondhand.core.dto.PageRequests.MAX_PAGE_SIZE) {
+            return Result.error(com.serhat.secondhand.favorite.util.FavoriteErrorCodes.TOO_MANY_LISTING_IDS);
+        }
         return Result.success(favoriteStatsService.getFavoriteStatsForListings(listingIds, userId));
     }
 
@@ -312,7 +315,7 @@ public class FavoriteService {
         int successCount = 0;
         for (User favoriter : favoriters) {
             try {
-                var chatRoomDto = chatService.createOrGetListingChat(favoriter.getId(), listingId.toString(), listing.getTitle());
+                var chatRoomDto = chatService.createOrGetListingChat(favoriter.getId(), listingId.toString());
                 var offerResult = offerService.createSellerOffer(sellerId, favoriter.getId(), listingId, request.getDiscountedPrice(), request.getExpirationHours() != null ? request.getExpirationHours() : 48);
 
                 if (offerResult.isSuccess()) {

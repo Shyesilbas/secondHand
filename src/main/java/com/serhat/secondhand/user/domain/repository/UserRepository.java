@@ -23,11 +23,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findById(Long id);
 
-    @Query("SELECT u FROM User u WHERE " +
-           "LOWER(CONCAT(u.name, ' ', u.surname)) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(u.surname) LIKE LOWER(CONCAT('%', :query, '%')) " +
-           "ORDER BY u.name ASC")
+    /**
+     * One expression only: a match on name or surname is also a match on "name surname", and the expression is
+     * written exactly as the V56 trigram index so PostgreSQL can use it.
+     */
+    @Query(value = "SELECT * FROM users u WHERE LOWER(u.name || ' ' || u.surname) LIKE '%' || LOWER(:query) || '%' " +
+           "ORDER BY u.name ASC, u.id ASC", nativeQuery = true)
     List<User> searchUsers(@Param("query") String query, Pageable pageable);
 
     @Query("SELECT u.id FROM User u")
@@ -79,6 +80,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                SET daily_aura_usage = CASE WHEN daily_aura_reset_date = :today THEN daily_aura_usage + 1 ELSE 1 END,
                    daily_aura_reset_date = :today
              WHERE id = :userId
+               AND acc_status = 'ACTIVE'
                AND (daily_aura_reset_date IS DISTINCT FROM :today OR daily_aura_usage < :dailyLimit)
             """, nativeQuery = true)
     int reserveAuraSlot(@Param("userId") Long userId, @Param("today") java.time.LocalDate today,

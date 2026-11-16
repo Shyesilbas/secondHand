@@ -108,7 +108,9 @@ export const useChat = (userId, options = {}) => {
  const deleteMessageMutation = useMutation({
  mutationFn: ({ messageId }) => chatService.deleteMessage(messageId),
  onSuccess: (_, { messageId }) => {
- setMessages((prev) => prev.filter((msg) => !sameChatId(msg.id, messageId)));
+ // The server keeps a tombstone, so mirror it locally instead of dropping the message.
+ const tombstone = (msg) => (sameChatId(msg.id, messageId) ? { ...msg, content: null, deletedBySender: true } : msg);
+ setMessages((prev) => prev.map(tombstone));
  // Only update the specific message cache, don't refetch everything
  queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
  if (!oldData || !oldData.pages) return oldData;
@@ -116,7 +118,7 @@ export const useChat = (userId, options = {}) => {
  ...oldData,
  pages: oldData.pages.map(page => ({
  ...page,
- content: (page.content || []).filter(msg => !sameChatId(msg.id, messageId))
+ content: (page.content || []).map(tombstone)
  }))
  };
  });

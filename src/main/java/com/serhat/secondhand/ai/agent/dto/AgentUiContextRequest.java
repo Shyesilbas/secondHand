@@ -14,6 +14,7 @@ public record AgentUiContextRequest(
         @Size(max = 100, message = "Listing id must be at most 100 characters")
         String listingId,
 
-        Map<String, String> filters
+        @Size(max = 20, message = "Filters must contain at most 20 entries")
+        Map<@Size(max = 50) String, @Size(max = 120) String> filters
 ) {
 }

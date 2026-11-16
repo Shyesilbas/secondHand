@@ -22,4 +22,7 @@ public interface ICampaignService {
     Page<CampaignDto> listMyCampaigns(Long userId, Pageable pageable);
     
     List<Campaign> loadActiveCampaignsForSellers(List<Long> sellerIds);
+
+    /** Client-supplied seller ids: at most {@code PageRequests.MAX_PAGE_SIZE}, else {@code TOO_MANY_SELLER_IDS}. */
+    List<Campaign> loadActiveCampaignsForPublicRequest(List<Long> sellerIds);
 }

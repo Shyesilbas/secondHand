@@ -102,7 +102,7 @@ const ComplaintModal = ({
  </p>
  {reportedMessage && <blockquote className="mb-4 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-secondary">
  <span className="mb-1 block text-xs text-text-tertiary">{t('reported_message', 'Reported message')}</span>
- <span className="break-words">{reportedMessage.content}</span>
+ <span className="break-words">{reportedMessage.deletedBySender ? <span className="italic">{t('message_deleted_by_sender', 'Bu mesaj gönderen tarafından silindi.')}</span> : reportedMessage.content}</span>
  </blockquote>}
  <form id="complaint-form" onSubmit={handleSubmit} noValidate className="space-y-4">
  <div>

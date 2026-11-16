@@ -27,11 +27,13 @@ Bu doküman ilan kartında ve ilan detayında gösterilen "X kişinin sepetinde"
 
 Frontend ilan açıldığında `POST /api/v1/listings/{id}/view` çağırır (public, giriş zorunlu değil). [`ListingViewService.trackView`](../src/main/java/com/serhat/secondhand/listing/application/common/ListingViewService.java) `@Async("viewTrackingExecutor")` ile çalışır, yani istek beklemez.
 
-**1. Kim olduğu belirlenir.** Giriş yapmış kullanıcı id'siyle, anonim ziyaretçi session id'siyle, o da yoksa IP hash'iyle sayılır. İlan sahibinin kendi görüntülemesi sayılmaz.
+**1. Kim olduğu belirlenir.** Giriş yapmış kullanıcı id'siyle, anonim ziyaretçi sunucunun hesapladığı IP hash'iyle sayılır. Client'ın gönderdiği `sessionId` kimlik olarak kullanılmaz: her istekte yeni bir `sessionId` gönderen biri sınırsız satır yazdırıp sayıyı şişirebiliyordu. IP de yoksa görüntüleme kaydedilmez. İlan sahibinin kendi görüntülemesi, `findSellerIdById` ile ilan yüklenmeden ve Redis'e gidilmeden önce elenir. Aynı IP arkasındaki (NAT) anonim ziyaretçiler tek kişi sayılır; bu bilinçli bir ödünleşimdir.
 
 ```java
-String dedupIdentifier = (userId != null) ? "u:" + userId
-        : ((sessionId != null && !sessionId.isBlank()) ? "s:" + sessionId : "ip:" + ipHash);
+static String viewerIdentifier(Long userId, String ipHash) {
+    if (userId != null) return "u:" + userId;
+    return (ipHash == null || ipHash.isEmpty()) ? null : "ip:" + ipHash;
+}
 ```
 
 **2. ZSET'e yazılır.** Member kullanıcı kimliği, score o anın milisaniyesidir. ZSET member'ları tekil olduğu için aynı kişi gün içinde 50 kez girse de **1 kişi** sayılır; yalnızca score'u güncellenir.
@@ -42,7 +44,7 @@ redisTemplate.opsForZSet().add(presenceKey, dedupIdentifier, (double) System.cur
 redisTemplate.expire(presenceKey, Duration.ofHours(26));
 ```
 
-**3. Kalıcı görüntüleme kaydı ayrıca tekilleştirilir.** `listing_views` tablosuna satır yazılmadan önce `v4:listing:view:dedup:{kimlik}:{listingId}` key'i `SET NX` ile alınır (TTL `VIEW_DUPLICATE_WINDOW_HOURS` = 1 saat). Aynı kişi 1 saat içinde tekrar gelirse DB'ye yeni satır yazılmaz. Redis hata verirse satır yine yazılır. Bu tablo satıcının görüntüleme istatistikleri içindir (`GET /api/v1/listings/{id}/view-stats`), social proof sayısını etkilemez.
+**3. Kalıcı görüntüleme kaydı ayrıca tekilleştirilir.** `listing_views` tablosuna satır yazılmadan önce `v4:listing:view:dedup:{kimlik}:{listingId}` key'i `SET NX` ile alınır (TTL `VIEW_DUPLICATE_WINDOW_HOURS` = 1 saat). Aynı kişi 1 saat içinde tekrar gelirse DB'ye yeni satır yazılmaz ve ilan ile kullanıcı entity'leri hiç yüklenmez. Redis hata verirse satır yine yazılır. Bu tablo satıcının görüntüleme istatistikleri içindir (`GET /api/v1/listings/{id}/view-stats`), social proof sayısını etkilemez.
 
 **4. Okuma.** 24 saatten eski kayıtlar silinir, kalan member sayısı döner:
 

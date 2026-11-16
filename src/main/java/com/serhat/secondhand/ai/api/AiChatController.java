@@ -59,7 +59,7 @@ public class AiChatController {
     }
 
     @PutMapping("/memories")
-    public ResponseEntity<Void> updateMemory(@AuthenticationPrincipal User user, @RequestBody UserMemoryDto dto) {
+    public ResponseEntity<Void> updateMemory(@AuthenticationPrincipal User user, @Valid @RequestBody UserMemoryDto dto) {
         memoryService.updateMemory(user.getId(), dto);
         return ResultResponses.ok(Result.success());
     }

@@ -22,7 +22,7 @@ Manages user accounts (`users` table), sanitized public vs. private profiles, sh
 - **`users.can_send_message`:** default `TRUE`; seeds the create-form default of `listings.can_send_message`.
 
 ## API
-- **Profile (`UserController`, `/api/v1/users`):** `GET /me` · `GET /{id}` · `GET /{id}/listings` · `PUT /email` · `PUT /phone` · `GET /great-sellers` · `GET /{id}/great-seller-status` · `GET /me/restriction` (`RestrictionStatusDto`) · `GET|PATCH /me/settings` (`canSendMessage`) · `GET /me/blocked-users` · `POST|DELETE /{id}/block` · `GET /{id}/block-status`.
+- **Profile (`UserController`, `/api/v1/users`):** `GET /me` · `GET /{id}` · `GET /{id}/listings` · `PUT /email` · `PUT /phone` · `GET /search` (`PublicUserProfileDto`, max 20) · `GET /great-sellers` · `GET /{id}/great-seller-status` · `GET /me/restriction` (`RestrictionStatusDto`) · `GET|PATCH /me/settings` (`canSendMessage`) · `GET /me/blocked-users` · `POST|DELETE /{id}/block` · `GET /{id}/block-status`.
 - **Addresses (`AddressController`, `/api/v1/users/addresses`):** `GET /` · `POST /` · `PUT /{id}` · `DELETE /{id}` · `POST /{id}/main`.
 - **Memberships (`MembershipController`, `/api/v1/memberships`):** `GET /status` · `GET /quote` (`MembershipQuoteDto`: premium price and eWallet balance check) · `POST /upgrade` (`MembershipUpgradeRequest`) · `POST /cancel` · `POST /toggle-auto-renew`.
 - **Badges (`UserBadgesController`, `/api/v1/user/badges`):** `GET /`.

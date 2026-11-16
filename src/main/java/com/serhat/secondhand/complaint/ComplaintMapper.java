@@ -50,6 +50,32 @@ public class ComplaintMapper {
         );
     }
 
+    /** Restricted view for the complained-about user; see {@link ReceivedComplaintDto} for what is left out. */
+    public ReceivedComplaintDto mapComplaintToReceivedDto(Complaint complaint, String reportedMessageContent) {
+        return new ReceivedComplaintDto(
+                complaint.getId(),
+                complaint.getListing() != null ? complaint.getListing().getId() : null,
+                complaint.getListing() != null ? complaint.getListing().getTitle() : null,
+                complaint.getReason(),
+                complaint.getCreatedAt(),
+                complaint.getUpdatedAt(),
+                complaint.getResolvedAt(),
+                complaint.getStatus(),
+                complaint.getAdminNotes(),
+                complaint.getEligibleForReviewAt(),
+                complaint.getReportedMessageId(),
+                complaint.getViolationCategory(),
+                complaint.getPenaltyAction(),
+                complaint.getAppealStatus(),
+                complaint.getAppealReason(),
+                complaint.getAppealSubmittedAt(),
+                complaint.getAppealReviewedAt(),
+                complaint.getAppealDecisionNotes(),
+                complaint.appealDeadline(moderationProperties.getReview().getAppealWindow()),
+                reportedMessageContent
+        );
+    }
+
     public Complaint fromCreateRequest(ComplaintRequest request, User complainer, User complainedUser,
                                        Listing listing, LocalDateTime now, Duration coolingOff) {
         return Complaint.builder()

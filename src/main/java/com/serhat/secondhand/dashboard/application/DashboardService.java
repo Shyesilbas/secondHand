@@ -394,22 +394,19 @@ public class DashboardService implements IDashboardService {
         long activeCityCount = listingStatisticsPort.getActiveCityCount(ListingStatus.ACTIVE);
 
         long vehicleCount = 0, electronicsCount = 0, realEstateCount = 0, clothingCount = 0, booksCount = 0, sportsCount = 0;
-        try {
-            var rows = listingStatisticsPort.getActiveCountsByType(ListingStatus.ACTIVE);
-            for (Object[] row : rows) {
-                String key = row[0].toString();
-                long count = ((Number) row[1]).longValue();
-                switch (key) {
-                    case "VEHICLE" -> vehicleCount = count;
-                    case "ELECTRONICS" -> electronicsCount = count;
-                    case "REAL_ESTATE" -> realEstateCount = count;
-                    case "CLOTHING" -> clothingCount = count;
-                    case "BOOKS" -> booksCount = count;
-                    case "SPORTS" -> sportsCount = count;
-                }
+        // No try/catch: a failed query must fail the request, not be cached as zero counts.
+        for (Object[] row : listingStatisticsPort.getActiveCountsByType(ListingStatus.ACTIVE)) {
+            String key = row[0].toString();
+            long count = ((Number) row[1]).longValue();
+            switch (key) {
+                case "VEHICLE" -> vehicleCount = count;
+                case "ELECTRONICS" -> electronicsCount = count;
+                case "REAL_ESTATE" -> realEstateCount = count;
+                case "CLOTHING" -> clothingCount = count;
+                case "BOOKS" -> booksCount = count;
+                case "SPORTS" -> sportsCount = count;
+                default -> log.debug("Ignoring listing type {} in global statistics", key);
             }
-        } catch (Exception e) {
-            log.error("Failed to retrieve listing counts by type: {}", e.getMessage(), e);
         }
 
         return ListingStatisticsDto.builder()

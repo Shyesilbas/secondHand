@@ -33,6 +33,11 @@ management:
     tags:
       application: ${spring.application.name}
 
+app:
+  e-wallet:
+    # The 10000.00 demo balance from application-core.yml must not reach real accounts.
+    default-balance: 0.00
+
 springdoc:
   api-docs:
     enabled: false

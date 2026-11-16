@@ -1,6 +1,7 @@
 package com.serhat.secondhand.user.api;
 
 import com.serhat.secondhand.complaint.ComplaintDto;
+import com.serhat.secondhand.complaint.ReceivedComplaintDto;
 import com.serhat.secondhand.complaint.application.IComplaintService;
 import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
@@ -154,8 +155,8 @@ public class UserController {
     }
 
     @GetMapping("/me/complaints/received")
-    public ResponseEntity<List<ComplaintDto>> getComplaintsAboutMe(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(complaintService.getComplaintsAboutUser(currentUser));
+    public ResponseEntity<List<ReceivedComplaintDto>> getComplaintsAboutMe(@AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(Result.success(complaintService.getComplaintsAboutUser(currentUser)));
     }
 
     @GetMapping("/me/offers/made")
@@ -239,12 +240,10 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<UserDto>> searchUsers(
+    public ResponseEntity<List<PublicUserProfileDto>> searchUsers(
             @RequestParam String query,
             @RequestParam(defaultValue = "10") int limit) {
-        log.info("Searching users with query: {} and limit: {}", query, limit);
-        List<UserDto> response = userService.searchUsers(query, limit);
-        return ResponseEntity.ok(response);
+        return ResultResponses.ok(Result.success(userService.searchUsers(query, limit)));
     }
 
     @GetMapping("/audit-logs")

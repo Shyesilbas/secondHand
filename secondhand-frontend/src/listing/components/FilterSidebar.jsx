@@ -58,7 +58,8 @@ const FilterSidebar = ({
   }, [onReset]);
   const handleApplyFilters = useCallback(() => {
     if (mode === 'mine') return;
-    onFiltersChange(localFilters);
+    const { page: _ignoredPage, ...rest } = localFilters || {};
+    onFiltersChange(rest);
   }, [localFilters, mode, onFiltersChange]);
   const listingConfig = getListingConfig(selectedCategory);
   const filterConfig = listingConfig?.filterConfig;

@@ -5,10 +5,10 @@ import jakarta.validation.constraints.Size;
 
 public record ChatRequest(
         @NotBlank(message = "Message cannot be empty")
-        @Size(min = 1, max = 5000, message = "Message must be between 1-5000 characters")
+        @Size(min = 1, max = 2000, message = "Message must be between 1-2000 characters")
         String message,
 
-        @Size(max = 25000, message = "Context must be at most 25000 characters")
+        @Size(max = 4000, message = "Context must be at most 4000 characters")
         String context
 ) {
 }

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.favoritelist.api;
 
+import com.serhat.secondhand.core.dto.PageRequests;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.favoritelist.application.FavoriteListService;
 import com.serhat.secondhand.favoritelist.config.FavoriteListConfig;
@@ -152,6 +153,6 @@ public class FavoriteListController {
         if (requestedSize == null || requestedSize < 1) {
             return defaultSize;
         }
-        return requestedSize;
+        return PageRequests.clampSize(requestedSize);
     }
 }

@@ -10,7 +10,8 @@ public enum CampaignErrorCodes implements ErrorCode {
     CAMPAIGN_NOT_OWNED("CAMPAIGN_NOT_OWNED", "Campaign does not belong to user", HttpStatus.FORBIDDEN),
     CAMPAIGN_INVALID("CAMPAIGN_INVALID", "Campaign is invalid", HttpStatus.BAD_REQUEST),
     CAMPAIGN_EXPIRED("CAMPAIGN_EXPIRED", "Campaign is expired", HttpStatus.BAD_REQUEST),
-    CAMPAIGN_NOT_ALLOWED_FOR_TYPE("CAMPAIGN_NOT_ALLOWED_FOR_TYPE", "Campaign is not allowed for this listing type", HttpStatus.BAD_REQUEST);
+    CAMPAIGN_NOT_ALLOWED_FOR_TYPE("CAMPAIGN_NOT_ALLOWED_FOR_TYPE", "Campaign is not allowed for this listing type", HttpStatus.BAD_REQUEST),
+    TOO_MANY_SELLER_IDS("TOO_MANY_SELLER_IDS", "Too many seller ids in one request", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

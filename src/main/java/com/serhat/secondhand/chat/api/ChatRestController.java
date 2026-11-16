@@ -1,5 +1,6 @@
 package com.serhat.secondhand.chat.api;
 
+import com.serhat.secondhand.core.dto.PageRequests;
 import com.serhat.secondhand.chat.application.ChatService;
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;
@@ -54,10 +55,10 @@ public class ChatRestController {
     @PostMapping("/rooms/listing/{listing-id}")
     public ResponseEntity<ChatRoomDto> createOrGetListingChat(
             @PathVariable("listing-id") String listingId,
-            @RequestParam String listingTitle,
+            @RequestParam(required = false) String listingTitle, // ignored: the room is named from the stored listing
             @AuthenticationPrincipal User currentUser) {
-        log.info("Creating or getting listing chat - listingId: {}, userId: {}, title: {}", listingId, currentUser.getId(), listingTitle);
-        ChatRoomDto chatRoom = chatService.createOrGetListingChat(currentUser.getId(), listingId, listingTitle);
+        log.info("Creating or getting listing chat - listingId: {}, userId: {}", listingId, currentUser.getId());
+        ChatRoomDto chatRoom = chatService.createOrGetListingChat(currentUser.getId(), listingId);
         return ResponseEntity.ok(chatRoom);
     }
     
@@ -100,7 +101,7 @@ public class ChatRestController {
             @AuthenticationPrincipal User currentUser) {
         log.debug("Getting messages for chat room: {} (page: {}, size: {}) for user: {}", chatRoomId, page, size, currentUser.getId());
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequests.of(page, size);
         Page<ChatMessageDto> messages = chatService.getChatMessages(chatRoomId, currentUser.getId(), pageable);
         
         log.debug("Returning {} messages for chat room {} (total: {})",
@@ -125,7 +126,7 @@ public class ChatRestController {
             @AuthenticationPrincipal User currentUser) {
         log.debug("Getting all messages for user: {} (page: {}, size: {})", currentUser.getId(), page, size);
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequests.of(page, size);
         Page<ChatMessageDto> messages = chatService.getAllUserMessages(currentUser.getId(), pageable);
         
         log.debug("Returning {} messages for user {} (total: {})",

@@ -30,6 +30,21 @@ const MessageBubble = memo(({
  );
  }
 
+ if (message.deletedBySender) {
+ // The text stays on the server for moderation, so the recipient can still report a deleted message.
+ return (
+ <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
+ <div className="flex max-w-xs items-start gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-tertiary lg:max-w-md">
+ <TrashIcon className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+ <p className="italic">{t('message_deleted_by_sender', 'Bu mesaj gönderen tarafından silindi.')}</p>
+ {!isOwnMessage && onReportMessage && <button type="button" onClick={() => onReportMessage(message)} className="ml-1 shrink-0 text-text-tertiary transition-colors duration-150 hover:text-status-error-text" title={t("report_message", "Report message")} aria-label={t("report_message", "Report message")}>
+ <Flag className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+ </button>}
+ </div>
+ </div>
+ );
+ }
+
  if (message.messageType === 'OFFER') {
  return (
  <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>

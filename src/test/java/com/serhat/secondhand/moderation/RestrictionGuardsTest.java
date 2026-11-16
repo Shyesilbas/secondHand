@@ -128,7 +128,8 @@ class RestrictionGuardsTest {
                 mock(ListingRepository.class), mock(IUserService.class), new ChatRoomMapper(),
                 mock(ChatMessageMapper.class), mock(ChatRoomEnricher.class), mock(ChatNotificationService.class),
                 mock(ChatRoomUpdater.class), authorization, mock(IOfferService.class), mock(OfferRepository.class),
-                mock(com.serhat.secondhand.user.application.UserBlockService.class));
+                mock(com.serhat.secondhand.user.application.UserBlockService.class),
+                mock(com.serhat.secondhand.chat.repository.ChatRoomHideRepository.class));
         ChatMessageDto dto = new ChatMessageDto();
         dto.setSenderId(USER);
         dto.setContent("hi");

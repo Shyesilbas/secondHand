@@ -22,10 +22,4 @@ public class ImageController {
         String imageUrl = cloudinaryService.uploadImage(file);
         return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
     }
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<Map<String, String>> deleteImage(@RequestParam("imageUrl") String imageUrl) {
-        cloudinaryService.deleteImage(imageUrl);
-        return ResponseEntity.ok(Map.of("message", "Image deleted successfully"));
-    }
 }

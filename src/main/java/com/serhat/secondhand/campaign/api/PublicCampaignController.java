@@ -26,7 +26,7 @@ public class PublicCampaignController {
 
     @GetMapping("/active")
     public ResponseEntity<List<CampaignDto>> getActiveCampaignsForSellers(@RequestParam List<Long> sellerIds) {
-        var dtos = campaignService.loadActiveCampaignsForSellers(sellerIds)
+        var dtos = campaignService.loadActiveCampaignsForPublicRequest(sellerIds)
                 .stream()
                 .map(campaignMapper::toDto)
                 .toList();

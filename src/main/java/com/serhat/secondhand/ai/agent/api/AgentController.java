@@ -1,16 +1,10 @@
 package com.serhat.secondhand.ai.agent.api;
 
-import com.serhat.secondhand.ai.agent.dto.AgentDataSourceDto;
 import com.serhat.secondhand.ai.agent.dto.AgentQueryRequest;
 import com.serhat.secondhand.ai.agent.dto.AgentQueryResponse;
 import com.serhat.secondhand.ai.agent.query.AgentQueryService;
-import com.serhat.secondhand.ai.agent.search.AgentSearchAugmentation;
-import com.serhat.secondhand.ai.agent.search.AuraListingSearchOrchestrator;
-import com.serhat.secondhand.ai.application.GeminiAiService;
-import com.serhat.secondhand.ai.dto.AiResponse;
-import com.serhat.secondhand.ai.dto.UserQuestionRequest;
-import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.ai.util.AiErrorCodes;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,53 +16,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/ai/agents")
 @RequiredArgsConstructor
 @Tag(name = "Agent", description = "Agent operations")
 public class AgentController {
 
-    private final GeminiAiService geminiAiService;
     private final AgentQueryService agentQueryService;
-    private final AuraListingSearchOrchestrator listingSearchOrchestrator;
 
     @PostMapping("/query")
     public ResponseEntity<AgentQueryResponse> query(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody AgentQueryRequest request
     ) {
-        Long userId = (user != null) ? user.getId() : null;
-        UserQuestionRequest question = new UserQuestionRequest(request.message(), request.context());
-
-        AgentQueryService.AgentContextBundle contextBundle = agentQueryService.buildContext(userId, request.uiContext());
-        AgentSearchAugmentation searchAug = listingSearchOrchestrator.augment(userId, request.message(), contextBundle.memoryData());
-
-        List<AgentDataSourceDto> dataSources = new ArrayList<>(contextBundle.dataSources());
-        if (searchAug.liveSearchBlock() != null && !searchAug.liveSearchBlock().isBlank()) {
-            dataSources.add(new AgentDataSourceDto("search_results", searchAug.dataSourceStatus()));
+        if (user == null) {
+            throw new BusinessException(AiErrorCodes.AI_AUTHENTICATION_REQUIRED);
         }
-
-        AiResponse aiResponse = geminiAiService.askAgentQuestion(
-                userId,
-                question,
-                contextBundle.memoryData(),
-                contextBundle.domainContext(),
-                request.uiContext(),
-                searchAug.liveSearchBlock()
-        );
-
-        if (aiResponse.success()) {
-            return ResponseEntity.ok(AgentQueryResponse.success(
-                    aiResponse.answer(),
-                    aiResponse.model(),
-                    dataSources,
-                    searchAug.suggestedListings()
-            ));
-        }
-
-        return ResultResponses.ok(Result.success(AgentQueryResponse.error(aiResponse.error(), dataSources)));
+        return ResponseEntity.ok(agentQueryService.executeQuery(user.getId(), request));
     }
 }

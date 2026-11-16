@@ -30,9 +30,25 @@ public class FavoriteStatsService {
             .build();
     }
 
+    /**
+     * Order-independent, collision-free cache key: SHA-256 over the sorted distinct ids. The former 32-bit
+     * {@code Objects.hash} could map two different id sets to one entry and depended on id order.
+     */
+    public static String batchKey(List<UUID> listingIds, Long userId) {
+        String joined = listingIds == null ? "" : listingIds.stream().filter(Objects::nonNull).distinct()
+                .map(UUID::toString).sorted().collect(java.util.stream.Collectors.joining(","));
+        try {
+            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(joined.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(digest) + "_" + userId;
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is not available", e);
+        }
+    }
+
     @Cacheable(
             value = "user:stats:favorites",
-            key = "T(java.util.Objects).hash(#listingIds) + '_' + #userId",
+            key = "T(com.serhat.secondhand.favorite.application.FavoriteStatsService).batchKey(#listingIds, #userId)",
             unless = "#result == null || #result.isEmpty()"
     )
     public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {

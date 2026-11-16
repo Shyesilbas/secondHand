@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.application.common;
 
+import com.serhat.secondhand.core.dto.PageRequests;
 import com.serhat.secondhand.core.dto.CachedPage;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,9 +36,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 public class ListingQueryService {
-
-    private static final EnumSet<ListingStatus> PUBLIC_BROWSABLE_STATUSES =
-            EnumSet.of(ListingStatus.ACTIVE, ListingStatus.SOLD);
 
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
@@ -88,7 +85,7 @@ public class ListingQueryService {
         if (status == ListingStatus.DELETED) {
             return false;
         }
-        if (PUBLIC_BROWSABLE_STATUSES.contains(status)) {
+        if (status != null && status.isPublicBrowsable()) {
             return true;
         }
         return viewerId != null && listing.getSeller() != null && viewerId.equals(listing.getSeller().getId());
@@ -181,14 +178,16 @@ public class ListingQueryService {
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size) {
-        return self.getCachedUserListings(userId, page, size).toPage();
+        // Clamp before the cache: the size is part of the cache key.
+        return self.getCachedUserListings(userId, Math.max(page, 0),
+                PageRequests.clampSize(size)).toPage();
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingStatus status, ListingType listingType, String title) {
         if (status == null && listingType == null && (title == null || title.isBlank())) {
             return getMyListings(userId, page, size);
         }
-        Pageable pageable = PageRequest.of(page, size,
+        Pageable pageable = PageRequests.of(page, size,
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
         Page<Listing> listingsPage = listingRepository.findBySellerIdAndFilters(userId, status, listingType, title != null ? title.trim() : null, pageable);
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
@@ -201,7 +200,7 @@ public class ListingQueryService {
     @Cacheable(value = "listing:userListings", key = "'listings:' + #userId + ':' + #page + ':' + #size")
     public CachedPage<ListingDto> getCachedUserListings(Long userId, int page, int size) {
         log.info("[CACHE MISS] listing:userListings:{} page={}", userId, page);
-        Pageable pageable = PageRequest.of(page, size,
+        Pageable pageable = PageRequests.of(page, size,
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
         Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
 
@@ -229,7 +228,7 @@ public class ListingQueryService {
 
     /** Public uç: taslak, pasif, rezerve ve silinmiş ilanlar sahibi dışında listelenemez. */
     public Result<Page<ListingDto>> findByStatusAsDto(ListingStatus status, Pageable pageable) {
-        if (!PUBLIC_BROWSABLE_STATUSES.contains(status)) {
+        if (status == null || !status.isPublicBrowsable()) {
             return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
         }
         Page<Listing> listingsPage = listingRepository.findByStatus(status, pageable);

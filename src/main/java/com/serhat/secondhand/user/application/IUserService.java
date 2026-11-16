@@ -40,7 +40,7 @@ public interface IUserService {
     
     List<User> getAllUsers();
     
-    List<UserDto> searchUsers(String query, int limit);
+    List<PublicUserProfileDto> searchUsers(String query, int limit);
     
     List<User> findAllByIds(List<Long> ids);
     

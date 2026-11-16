@@ -25,5 +25,6 @@ User-to-user complaints (`complaints` table), optionally about a listing or a ch
 
 ## API
 - `POST /api/v1/complaints` (`ComplaintController`) — submit (`ComplaintRequest`).
-- `POST /api/v1/complaints/{complaintId}/appeal` — appeal (`AppealRequest`).
-- `GET /api/v1/users/me/complaints` and `/received` (`UserController`) — filed by / against the current user (`ComplaintDto`).
+- `POST /api/v1/complaints/{complaintId}/appeal` — appeal (`AppealRequest`, returns `ReceivedComplaintDto`).
+- `GET /api/v1/users/me/complaints` (`UserController`) — filed by the current user (`ComplaintDto`).
+- `GET /api/v1/users/me/complaints/received` — against the current user (`ReceivedComplaintDto`: no complainer identity, description, evidence or AI internals).

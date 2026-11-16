@@ -8,7 +8,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import com.serhat.secondhand.core.dto.PageRequests;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,7 +48,7 @@ public class SellerFollowController {
             @AuthenticationPrincipal User currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequests.of(page, size);
         return ResponseEntity.ok(sellerFollowService.getFollowing(currentUser, pageable));
     }
 
@@ -57,7 +57,7 @@ public class SellerFollowController {
             @AuthenticationPrincipal User currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequests.of(page, size);
         return ResponseEntity.ok(sellerFollowService.getFollowers(currentUser, pageable));
     }
 
@@ -80,7 +80,7 @@ public class SellerFollowController {
             @PathVariable("user-id") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequests.of(page, size);
         return ResponseEntity.ok(sellerFollowService.getFollowersOfUser(userId, pageable));
     }
 
@@ -89,7 +89,7 @@ public class SellerFollowController {
             @PathVariable("user-id") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequests.of(page, size);
         return ResponseEntity.ok(sellerFollowService.getFollowingOfUser(userId, pageable));
     }
 }

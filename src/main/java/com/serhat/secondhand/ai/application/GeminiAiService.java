@@ -8,6 +8,9 @@ import com.serhat.secondhand.ai.dto.UserMemory;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
 import com.serhat.secondhand.ai.memory.ChatRole;
 import com.serhat.secondhand.ai.memory.service.MemoryService;
+import com.serhat.secondhand.ai.util.AiErrorCodes;
+import com.serhat.secondhand.ai.util.PromptSanitizer;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +18,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.LocalDate;
+
 @Service
 @Slf4j
 public class GeminiAiService {
+
+    private static final int MAX_MEMORY_PROMPT_CHARS = 3000;
+    private static final int MAX_RECENT_PROMPT_CHARS = 4000;
+    private static final int MAX_CONTEXT_PROMPT_CHARS = 4000;
+    private static final int MAX_QUESTION_PROMPT_CHARS = 2000;
 
     private final MemoryService memoryService;
     private final GeminiClient geminiClient;
@@ -63,10 +73,9 @@ public class GeminiAiService {
 
         // Reserved outside the try: a reached daily limit must reach the client as a 403
         // AURA_LIMIT_EXCEEDED error, not as a failed answer with HTTP 200.
-        User user = userRepository.findById(userId).orElseThrow();
-        java.time.LocalDate reservedOn = reserveAuraSlot(user);
+        User user = loadUserOrThrow(userId);
+        LocalDate reservedOn = reserveAuraSlot(user);
         try {
-
             UserMemory memory = memoryService.getOrCreate(userId);
             String recent = memoryService.buildRecentConversationBlock(userId);
             String prompt = buildMemoryAwarePrompt(memory, request, recent);
@@ -80,6 +89,19 @@ public class GeminiAiService {
             log.error("Error while processing memory-aware question: ", e);
             return AiResponse.error(clientErrorMessage(e));
         }
+    }
+
+    /** Reserves one daily Aura slot for {@code userId}; throws 403 {@code AURA_LIMIT_EXCEEDED} if exhausted. */
+    public LocalDate reserveAuraSlotForUser(Long userId) {
+        if (userId == null) {
+            throw new BusinessException(AiErrorCodes.AI_AUTHENTICATION_REQUIRED);
+        }
+        User user = loadUserOrThrow(userId);
+        return reserveAuraSlot(user);
+    }
+
+    public void releaseAuraSlotForUser(Long userId, LocalDate reservedOn) {
+        releaseAuraSlot(userId, reservedOn);
     }
 
     // Not @Transactional for the same reason as askQuestion.
@@ -100,10 +122,42 @@ public class GeminiAiService {
 
         // Reserved outside the try: a reached daily limit must reach the client as a 403
         // AURA_LIMIT_EXCEEDED error, not as a failed answer with HTTP 200.
-        User user = userRepository.findById(userId).orElseThrow();
-        java.time.LocalDate reservedOn = reserveAuraSlot(user);
-        try {
+        User user = loadUserOrThrow(userId);
+        LocalDate reservedOn = reserveAuraSlot(user);
+        return answerAgentWithReservedSlot(user, reservedOn, request, memoryData, domainContext, uiContext, liveSearchResults);
+    }
 
+    public AiResponse askAgentQuestionWithReservedSlot(
+            Long userId,
+            LocalDate reservedOn,
+            UserQuestionRequest request,
+            String memoryData,
+            String domainContext,
+            AgentUiContextRequest uiContext,
+            String liveSearchResults
+    ) {
+        if (userId == null) {
+            return AiResponse.error("userId is required");
+        }
+        if (request == null || request.question() == null || request.question().isBlank()) {
+            releaseAuraSlot(userId, reservedOn);
+            return AiResponse.error("Question cannot be empty");
+        }
+        User user = loadUserOrThrow(userId);
+        return answerAgentWithReservedSlot(user, reservedOn, request, memoryData, domainContext, uiContext, liveSearchResults);
+    }
+
+    private AiResponse answerAgentWithReservedSlot(
+            User user,
+            LocalDate reservedOn,
+            UserQuestionRequest request,
+            String memoryData,
+            String domainContext,
+            AgentUiContextRequest uiContext,
+            String liveSearchResults
+    ) {
+        Long userId = user.getId();
+        try {
             String recent = memoryService.buildRecentConversationBlock(userId);
             String live = liveSearchResults == null ? "" : liveSearchResults;
             String prompt = agentPromptBuilder.buildPrompt(memoryData, domainContext, request, uiContext, recent, live);
@@ -119,9 +173,14 @@ public class GeminiAiService {
         }
     }
 
+    private User loadUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(AiErrorCodes.AI_AUTHENTICATION_REQUIRED));
+    }
+
     // Business rule messages (daily limit) are meant for the user; anything else stays in the log.
     private static String clientErrorMessage(Exception e) {
-        if (e instanceof com.serhat.secondhand.core.exception.BusinessException) {
+        if (e instanceof BusinessException) {
             return "Failed to get response: " + e.getMessage();
         }
         return "Failed to get response. Please try again shortly.";
@@ -129,21 +188,19 @@ public class GeminiAiService {
 
     // Counts the question before the Gemini call with one conditional UPDATE, so concurrent requests
     // cannot all pass a stale limit check. Returns the day the slot was taken on, for releaseAuraSlot.
-    private java.time.LocalDate reserveAuraSlot(User user) {
-        java.time.LocalDate today = java.time.LocalDate.now();
+    private LocalDate reserveAuraSlot(User user) {
+        LocalDate today = LocalDate.now();
         int limit = user.getEffectivePlan().getDailyAuraLimit();
         Integer updated = transactionTemplate.execute(status ->
                 userRepository.reserveAuraSlot(user.getId(), today, limit));
         if (updated == null || updated == 0) {
-            throw new com.serhat.secondhand.core.exception.BusinessException(
-                    "Günlük Aura AI kullanım limitinize ulaştınız.",
-                    org.springframework.http.HttpStatus.FORBIDDEN, "AURA_LIMIT_EXCEEDED");
+            throw new BusinessException(AiErrorCodes.AURA_LIMIT_EXCEEDED);
         }
         return today;
     }
 
     // A failed question does not count against the daily limit.
-    private void releaseAuraSlot(Long userId, java.time.LocalDate reservedOn) {
+    private void releaseAuraSlot(Long userId, LocalDate reservedOn) {
         if (reservedOn == null) {
             return;
         }
@@ -170,14 +227,18 @@ public class GeminiAiService {
     private String buildPrompt(UserQuestionRequest request) {
         if (request.context() != null && !request.context().isBlank()) {
             return String.format("""
-                Context: %s
-                
-                Question: %s
-                
-                Please answer the question considering the context above.
-                """, request.context(), request.question());
+                Context:
+                %s
+
+                Question:
+                %s
+
+                Please answer the question considering the untrusted context above.
+                """,
+                    PromptSanitizer.wrapUntrustedEvidence("context", request.context(), MAX_CONTEXT_PROMPT_CHARS),
+                    PromptSanitizer.wrapUntrustedEvidence("user_question", request.question(), MAX_QUESTION_PROMPT_CHARS));
         }
-        return request.question();
+        return PromptSanitizer.truncate(request.question(), MAX_QUESTION_PROMPT_CHARS);
     }
 
     private String buildMemoryAwarePrompt(UserMemory memory, UserQuestionRequest request, String recentConversation) {
@@ -187,7 +248,7 @@ public class GeminiAiService {
         String contextBlock = """
                 USER MEMORY / CONTEXT:
                 %s
-                """.formatted(memoryData);
+                """.formatted(PromptSanitizer.wrapUntrustedEvidence("user_memory", memoryData, MAX_MEMORY_PROMPT_CHARS));
 
         String recentBlock = (recentConversation == null || recentConversation.isBlank())
                 ? ""
@@ -195,14 +256,14 @@ public class GeminiAiService {
                 SON KONUŞMA (önceki turlar, kronolojik):
                 %s
 
-                """.formatted(recentConversation.trim());
+                """.formatted(PromptSanitizer.wrapUntrustedEvidence("recent_conversation", recentConversation, MAX_RECENT_PROMPT_CHARS));
 
         String sessionContextBlock = (request.context() != null && !request.context().isBlank())
                 ? """
                 CURRENT SESSION CONTEXT (kullanıcı şu an bu sayfada/ekranda; cevabını buna göre ver):
                 %s
 
-                """.formatted(request.context().trim())
+                """.formatted(PromptSanitizer.wrapUntrustedEvidence("session_context", request.context(), MAX_CONTEXT_PROMPT_CHARS))
                 : "";
 
         String systemInstruction = AuraSystemInstructions.chatSystemWithPlatformKnowledge();
@@ -212,9 +273,8 @@ public class GeminiAiService {
 
                 """ : "";
 
-        String questionBlock = request.question();
+        String questionBlock = PromptSanitizer.wrapUntrustedEvidence("user_question", request.question(), MAX_QUESTION_PROMPT_CHARS);
 
         return contextBlock + "\n" + recentBlock + sessionContextBlock + systemInstruction + "\n" + introInstruction + "USER:\n" + questionBlock;
     }
-
 }

@@ -85,7 +85,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
         String clientIp = clientIpResolver.resolve(request);
         String requestURI = request.getRequestURI();
-        Category category = categorize(requestURI);
+        Category category = categorize(request.getMethod(), requestURI);
 
         int windowSeconds = rateLimitConfig.getWindowSizeSeconds();
         int maxRequestsPerWindow = category.resolveLimit(rateLimitConfig);
@@ -132,7 +132,20 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    static Category categorize(String uri) {
+    /**
+     * Writes that move money or reserve stock outside {@code /payments}. Reads under these prefixes (public
+     * showcase browsing, wallet balance) stay in the general bucket.
+     */
+    static final List<String> MONEY_WRITE_PREFIXES = List.of(
+            "/api/v1/orders/checkout",
+            "/api/checkout",
+            "/api/v1/e-wallets/deposit",
+            "/api/v1/e-wallets/withdraw",
+            "/api/v1/memberships/upgrade",
+            "/api/v1/showcases",
+            "/api/v1/listings/pay-fee");
+
+    static Category categorize(String method, String uri) {
         if (uri.startsWith("/api/auth/") || uri.startsWith("/api/v1/auth/")) {
             return Category.AUTH;
         }
@@ -141,6 +154,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
         if (isUnder(uri, "/api/payment") || isUnder(uri, "/api/v1/payments")
                 || isUnder(uri, "/api/v1/test/rate-limits/payment")) {
+            return Category.PAYMENT;
+        }
+        boolean write = method != null && !"GET".equalsIgnoreCase(method) && !"HEAD".equalsIgnoreCase(method)
+                && !"OPTIONS".equalsIgnoreCase(method);
+        if (write && MONEY_WRITE_PREFIXES.stream().anyMatch(prefix -> isUnder(uri, prefix))) {
             return Category.PAYMENT;
         }
         return Category.GENERAL;

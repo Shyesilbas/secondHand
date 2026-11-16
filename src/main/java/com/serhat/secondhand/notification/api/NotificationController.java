@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import com.serhat.secondhand.core.dto.PageRequests;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,7 +41,7 @@ public class NotificationController {
             @RequestParam(defaultValue = "false") boolean unreadOnly,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get notifications for user: {}, page: {}, size: {}", currentUser.getEmail(), page, size);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequests.of(page, size);
         return ResponseEntity.ok(notificationService.getUserNotifications(currentUser.getId(), unreadOnly, pageable));
     }
 

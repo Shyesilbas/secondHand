@@ -11,8 +11,8 @@ import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -43,8 +43,8 @@ public class GenericListingFilterService<T extends Listing, F extends ListingFil
 
         List<Predicate> predicates = buildAllPredicates(cb, root, filters, predicateBuilder);
 
+        // No DISTINCT: every fetch above is to-one, so rows cannot repeat.
         query.select(root)
-                .distinct(true)
                 .where(predicates.toArray(new Predicate[0]))
                 .orderBy(buildOrderBy(cb, root, filters, predicateBuilder));
 
@@ -53,13 +53,14 @@ public class GenericListingFilterService<T extends Listing, F extends ListingFil
         typedQuery.setMaxResults(pageable.getPageSize());
 
         List<T> results = typedQuery.getResultList();
-        Long total = executeCountQuery(cb, entityClass, filters, predicateBuilder);
 
         List<ListingDto> dtos = results.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
 
-        return new PageImpl<>(dtos, pageable, total);
+        // The COUNT query only runs when this page alone cannot tell the total (a full page or a later page).
+        return PageableExecutionUtils.getPage(dtos, pageable,
+                () -> executeCountQuery(cb, entityClass, filters, predicateBuilder));
     }
     
     private void applyEntitySpecificFetches(Root<T> root, Class<T> entityClass) {
@@ -107,6 +108,8 @@ public class GenericListingFilterService<T extends Listing, F extends ListingFil
             orders.add(cb.desc(root.get("createdAt")));
         }
 
+        // Unique tie-breaker: equal sort values (same price, same createdAt) otherwise shift between pages.
+        orders.add(cb.asc(root.get("id")));
         return orders;
     }
 

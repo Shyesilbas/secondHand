@@ -82,13 +82,7 @@ public class SecurityHeadersFilter implements Filter {
                 "accelerometer=(), " +
                 "gyroscope=()");
 
-        // Cache-Control for sensitive endpoints
-        String requestURI = httpRequest.getRequestURI();
-        if (requestURI.startsWith("/api/auth/") || requestURI.startsWith("/api/user/")) {
-            httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            httpResponse.setHeader("Pragma", "no-cache");
-            httpResponse.setHeader("Expires", "0");
-        }
+        // No Cache-Control here: Spring Security's default headers already send no-cache, no-store on API responses.
 
         // Cross-Origin-Embedder-Policy: "unsafe-none" allows loading cross-origin
         // resources (Google Fonts, gstatic) that do not set CORP headers. The
@@ -104,12 +98,8 @@ public class SecurityHeadersFilter implements Filter {
         // Server header removal for security through obscurity
         httpResponse.setHeader("Server", "");
 
-        // Add cookie security attributes if this is an authentication endpoint
-        if (requestURI.startsWith("/api/auth/")) {
-            addCookieSecurityHeaders(httpResponse);
-        }
-
-        log.debug("Security headers added for request: {}", requestURI);
+        // Cookie attributes (HttpOnly, Secure, SameSite) are set on each cookie where it is issued, not here.
+        log.debug("Security headers added for request: {}", httpRequest.getRequestURI());
 
         chain.doFilter(request, response);
     }
@@ -187,16 +177,6 @@ public class SecurityHeadersFilter implements Filter {
     /**
      * Adds cookie-specific security headers for authentication endpoints.
      */
-    private void addCookieSecurityHeaders(HttpServletResponse response) {
-        // Ensure cookies are treated securely
-        response.setHeader("Set-Cookie-SameSite", "Strict");
-
-        // Additional cookie protection headers
-        response.setHeader("Cookie-Security", "Secure; HttpOnly; SameSite=Strict");
-
-        log.debug("Cookie security headers added");
-    }
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         log.info("SecurityHeadersFilter initialized");

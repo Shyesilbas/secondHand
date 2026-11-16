@@ -47,7 +47,8 @@ public class ListingViewController {
             HttpServletRequest httpRequest) {
 
         String sessionId = request != null ? request.getSessionId() : null;
-        String userAgent = request != null ? request.getUserAgent() : httpRequest.getHeader("User-Agent");
+        // The request header, not the body: the body field is client-controlled and was stored verbatim.
+        String userAgent = httpRequest.getHeader("User-Agent");
         String ipAddress = auditLogService.getClientIpAddress(httpRequest);
         Long userId = (currentUser != null) ? currentUser.getId() : null;
 

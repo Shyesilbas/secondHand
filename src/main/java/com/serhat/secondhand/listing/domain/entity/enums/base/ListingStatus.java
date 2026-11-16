@@ -16,4 +16,9 @@ public enum ListingStatus {
     ListingStatus(String label) {
         this.label = label;
     }
+
+    /** Statuses anyone may browse; draft, inactive, reserved and deleted listings stay owner-only. */
+    public boolean isPublicBrowsable() {
+        return this == ACTIVE || this == SOLD;
+    }
 }

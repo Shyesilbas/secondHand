@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TrackViewRequest {
     private String sessionId;
-    private String userAgent;
 }

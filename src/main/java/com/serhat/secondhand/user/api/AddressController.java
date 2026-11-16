@@ -1,5 +1,7 @@
 package com.serhat.secondhand.user.api;
 
+import jakarta.validation.Valid;
+
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.domain.dto.AddressDto;
@@ -25,13 +27,13 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<AddressDto> addAddress(@RequestBody AddressDto addressDto, @AuthenticationPrincipal User user) {
+    public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressDto addressDto, @AuthenticationPrincipal User user) {
         return ResultResponses.ok(addressService.addAddress(user.getId(), addressDto));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AddressDto> updateAddress(@PathVariable Long id,
-                                           @RequestBody AddressDto addressDto,
+                                           @Valid @RequestBody AddressDto addressDto,
                                            @AuthenticationPrincipal User user) {
         return ResultResponses.ok(addressService.updateAddress(id, user.getId(), addressDto));
     }

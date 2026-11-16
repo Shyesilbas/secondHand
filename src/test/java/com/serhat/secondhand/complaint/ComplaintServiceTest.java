@@ -177,4 +177,29 @@ class ComplaintServiceTest {
         assertThat(result.getErrorCode()).isEqualTo(ComplaintErrorCodes.APPEAL_ALREADY_SUBMITTED.getCode());
         verify(eventPublisher, never()).publishEvent(any(com.serhat.secondhand.complaint.application.event.AppealSubmittedEvent.class));
     }
+
+    /** GV-26: the reported user sees the decision, never who complained or the complainer's evidence. */
+    @Test
+    void complaintsAboutUserHideComplainerIdentityAndAiInternals() {
+        User reported = user(COMPLAINED);
+        Complaint c = Complaint.builder().id("c-7").complainer(user(COMPLAINER)).complainedUser(reported)
+                .reason("SCAM_FRAUD").description("He lives at ...").adminNotes("Fraud pattern confirmed")
+                .evidenceImageUrls(new java.util.ArrayList<>(java.util.List.of("https://img/evidence.jpg")))
+                .aiConfidenceScore(new java.math.BigDecimal("0.93")).badFaithReport(false)
+                .status(ComplaintStatus.RESOLVED).penaltyAction(PenaltyAction.WARNING)
+                .appealStatus(AppealStatus.NONE).build();
+        when(repository.findByComplainedUserWithDetails(reported)).thenReturn(java.util.List.of(c));
+
+        java.util.List<ReceivedComplaintDto> received = service.getComplaintsAboutUser(reported);
+
+        assertThat(received).singleElement().satisfies(dto -> {
+            assertThat(dto.complaintId()).isEqualTo("c-7");
+            assertThat(dto.adminNotes()).isEqualTo("Fraud pattern confirmed");
+            assertThat(dto.penaltyAction()).isEqualTo(PenaltyAction.WARNING);
+        });
+        java.util.List<String> fields = java.util.Arrays.stream(ReceivedComplaintDto.class.getRecordComponents())
+                .map(java.lang.reflect.RecordComponent::getName).toList();
+        assertThat(fields).doesNotContain("complainerId", "complainedUserId", "description", "evidenceImageUrls",
+                "aiConfidenceScore", "aiReviewedAt", "badFaithReport", "complainerPenaltyAction", "chatRoomId");
+    }
 }

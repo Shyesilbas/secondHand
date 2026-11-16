@@ -4,6 +4,7 @@ import { Check, Clock as ClockIcon, FileText } from 'lucide-react';
 import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
 import { formatDate } from '../../common/formatters.js';
 import { Button, Modal } from '../../common/components/ui/index.js';
+import { sanitizeHtml } from '../../common/utils/sanitizeHtml.js';
 
 const HTML_TAG_PATTERN = /<\/?[a-z][\s\S]*>/i;
 
@@ -67,6 +68,7 @@ const AgreementModal = ({
 
   const content = agreement?.content || '';
   const isHtmlContent = useMemo(() => HTML_TAG_PATTERN.test(content), [content]);
+  const safeHtml = useMemo(() => (isHtmlContent ? sanitizeHtml(content) : ''), [content, isHtmlContent]);
   const plainBlocks = useMemo(
     () => (isHtmlContent ? [] : parsePlainAgreementBlocks(content)),
     [content, isHtmlContent]
@@ -139,7 +141,7 @@ const AgreementModal = ({
           {isHtmlContent ? (
             <div
               className="prose prose-base max-w-prose text-base leading-relaxed text-text-secondary prose-headings:text-text-primary"
-              dangerouslySetInnerHTML={{ __html: content }}
+              dangerouslySetInnerHTML={{ __html: safeHtml }}
             />
           ) : (
             <div className="max-w-prose space-y-4 text-base leading-relaxed text-text-secondary">

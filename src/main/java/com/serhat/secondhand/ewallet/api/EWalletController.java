@@ -1,5 +1,7 @@
 package com.serhat.secondhand.ewallet.api;
 
+import jakarta.validation.Valid;
+
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.ewallet.application.IEWalletService;
@@ -32,7 +34,7 @@ public class EWalletController {
     private final PaymentStatsService paymentStatsService;
 
     @PostMapping
-    public ResponseEntity<EWalletDto> createEWallet(@RequestBody EwalletRequest request) {
+    public ResponseEntity<EWalletDto> createEWallet(@Valid @RequestBody EwalletRequest request) {
         log.info("Creating eWallet for authenticated user");
         EWalletDto eWallet = eWalletService.createEWallet(request);
         return ResultResponses.ok(Result.success(eWallet));
@@ -59,7 +61,7 @@ public class EWalletController {
 
     @PutMapping("/limits")
     public ResponseEntity<EWalletDto> updateLimits(
-            @RequestBody UpdateLimitRequest request) {
+            @Valid @RequestBody UpdateLimitRequest request) {
         log.info("Updating limits for authenticated user");
         EWalletDto eWallet = eWalletService.updateLimits(request);
         return ResultResponses.ok(Result.success(eWallet));
@@ -67,7 +69,7 @@ public class EWalletController {
 
     @PostMapping("/deposit")
     public ResponseEntity<String> deposit(
-            @RequestBody DepositRequest request,
+            @Valid @RequestBody DepositRequest request,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
 
         eWalletService.deposit(request, idempotencyKey);
@@ -77,7 +79,7 @@ public class EWalletController {
 
     @PostMapping("/withdraw")
     public ResponseEntity<String> withdraw(
-            @RequestBody WithdrawRequest request,
+            @Valid @RequestBody WithdrawRequest request,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
         log.info("Processing withdrawal for authenticated user");
         eWalletService.withdraw(request, idempotencyKey);

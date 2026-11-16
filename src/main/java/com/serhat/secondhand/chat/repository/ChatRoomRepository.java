@@ -14,14 +14,18 @@ import java.util.Optional;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+
+    /** A room the user deleted stays out of their list until a message newer than the hide arrives. */
+    String NOT_HIDDEN_FOR_USER = "AND NOT EXISTS (SELECT 1 FROM ChatRoomHide h WHERE h.chatRoomId = cr.id "
+            + "AND h.userId = :userId AND (cr.lastMessageTime IS NULL OR cr.lastMessageTime <= h.hiddenAt)) ";
     
     /**
      * One page of the user's room ids, newest activity first. Ids only, so the page is limited in SQL;
      * fetching the participantIds collection here would make Hibernate paginate in memory.
      */
-    @Query(value = "SELECT cr.id FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds " +
+    @Query(value = "SELECT cr.id FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds " + NOT_HIDDEN_FOR_USER +
             "ORDER BY cr.lastMessageTime DESC NULLS LAST, cr.updatedAt DESC, cr.id DESC",
-            countQuery = "SELECT COUNT(cr) FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds")
+            countQuery = "SELECT COUNT(cr) FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds " + NOT_HIDDEN_FOR_USER)
     Page<Long> findRoomIdPageByParticipantId(@Param("userId") Long userId, Pageable pageable);
 
     @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"participantIds"})

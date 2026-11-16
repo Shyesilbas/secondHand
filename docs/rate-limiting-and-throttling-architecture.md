@@ -33,9 +33,9 @@ Platform genelinde tek tip bir hız sınırlayıcı yerine, tehlike modeline ve 
 │ Domain-Spesifik Hız ve Kötüye Kullanım Kilitleri       │
 │ - Safe Meetup: 30 sn kod yenileme cooldown sınırı      │
 │ - Safe Meetup: 3 hatalı OTP denemesinde 15 dk kilit    │
-│ - Aura AI Arama: Kullanıcı başına dakikada 12 arama    │
-│ - Aura AI Günlük Kota: Veritabanı atomik slot rezervi  │
-│ - Gemini LLM 429: Exponential backoff & retry          │
+│ - Aura AI Arama: Redis fixed-window (kullanıcı başı 12/dk)│
+│ - Aura AI Günlük Kota: DB atomik slot + Global Redis Bütçe│
+│ - Gemini LLM 429: Fail-fast AI_RATE_LIMIT_EXCEEDED         │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -84,7 +84,7 @@ return count
 
 | Kategori | Hedef URI Örüntüsü | Varsayılan Pencere Limiti | 60 sn Pencere Başına Maksimum İstek |
 | :--- | :--- | :--- | :--- |
-| **`PAYMENT`** | `/api/payment/**`, `/api/v1/payments/**`, `/api/v1/test/rate-limits/payment` | 10 istek / 60 sn (`RATE_LIMIT_PAYMENT`) | 10 istek / 60 sn |
+| **`PAYMENT`** | `/api/payment/**`, `/api/v1/payments/**`, `/api/v1/test/rate-limits/payment`; `MONEY_WRITE_PREFIXES` altındaki GET dışı istekler | 10 istek / 60 sn (`RATE_LIMIT_PAYMENT`) | 10 istek / 60 sn |
 | **`AUTH`** | `/api/auth/**`, `/api/v1/auth/**` | 20 istek / 60 sn (`RATE_LIMIT_AUTH`) | 20 istek / 60 sn |
 | **`AI`** | `/api/ai/**`, `/api/v1/ai/**` | 15 istek / 60 sn (`RATE_LIMIT_AI`) | 15 istek / 60 sn |
 | **`GENERAL`** | Yukarıdakiler dışındaki tüm API endpoint'leri | 150 istek / 60 sn (`RATE_LIMIT_GENERAL`) | 150 istek / 60 sn |
@@ -216,28 +216,29 @@ Satıcının alıcı kodunu tahmin etmesini engellemek için:
 
 ### 5.3 Aura AI Canlı İlan Arama Hız Sınırı (`AuraAgentSearchRateLimiter`)
 Aura sohbeti sırasında kullanıcının canlı ilan arama motorunu aşırı yüklemesini önlemek için:
-- **Yapı:** [`AuraAgentSearchRateLimiter.java`](../src/main/java/com/serhat/secondhand/ai/agent/search/AuraAgentSearchRateLimiter.java) içinde bellek içi (in-memory) kayan pencere logu (`ConcurrentHashMap<Long, Deque<Long>>`).
-- **Sınır:** Kullanıcı başına dakikada maksimum **12 canlı arama** (`aura.agent.search.rate-limit-per-minute: 12`, pencere: 60.000 ms).
+- **Yapı:** [`AuraAgentSearchRateLimiter.java`](../src/main/java/com/serhat/secondhand/ai/agent/search/AuraAgentSearchRateLimiter.java) üzerinden [`GlobalGeminiBudgetGuard.java`](../src/main/java/com/serhat/secondhand/ai/application/GlobalGeminiBudgetGuard.java) ile dağıtık Redis fixed-window sayacı (`v4:rate_limit:aura_search:user:<userId>`).
+- **Sınır:** Kullanıcı başına dakikada maksimum **12 canlı arama** (`aura.agent.search.rate-limit-per-minute: 12`, pencere: 60.000 ms). Redis/guard yoksa fail-closed (`false`) döner.
 - **Limit Aşımı:** İstek reddedilmez; arama adımı atlanarak (`AgentSearchAugmentation.rateLimited()`) sohbet akışı kesintisiz sürdürülür.
 
 ### 5.4 Kullanıcı Günlük Aura AI Kotası (`UserRepository.reserveAuraSlot`)
-Kullanıcıların üyelik planlarına göre günlük AI soru sorma limitleri veritabanı seviyesinde atomik koşullu güncelleme ile kontrol edilir ([`UserRepository.java`](../src/main/java/com/serhat/secondhand/user/domain/repository/UserRepository.java#L52-L68)):
+Kullanıcıların üyelik planlarına göre günlük AI soru sorma limitleri veritabanı seviyesinde atomik koşullu güncelleme ile kontrol edilir ([`UserRepository.java`](../src/main/java/com/serhat/secondhand/user/domain/repository/UserRepository.java#L76-L86)):
 
 ```sql
 UPDATE users
    SET daily_aura_usage = CASE WHEN daily_aura_reset_date = :today THEN daily_aura_usage + 1 ELSE 1 END,
        daily_aura_reset_date = :today
  WHERE id = :userId
+   AND acc_status = 'ACTIVE'
    AND (daily_aura_reset_date IS DISTINCT FROM :today OR daily_aura_usage < :dailyLimit);
 ```
 
-- Etkilenen satır sayısı `0` dönerse kullanıcının günlük kotası dolmuştur ve `AURA_LIMIT_EXCEEDED` hatası fırlatılır; harici LLM API'sine boşuna çağrı yapılmaz.
+- Etkilenen satır sayısı `0` dönerse kullanıcının günlük kotası dolmuştur veya hesabı `ACTIVE` değildir; `AURA_LIMIT_EXCEEDED` (HTTP 403) hatası fırlatılır ve `AgentQueryService` akışı arama planlayıcı LLM çağrısını başlatmadan kesilir.
 - Soru cevaplanamaz veya hata oluşursa `releaseAuraSlot` ile sayaç bir geri alınarak compensation sağlanır. Gece yarısı geçtiğinde sayaç otomatik olarak 1'e resetlenir.
 
-### 5.5 Harici Gemini API 429 ve Exponential Backoff (`GeminiClient`)
-Google Gemini API'sinden HTTP 429 Too Many Requests yanıtı alındığında [`GeminiClient.java`](../src/main/java/com/serhat/secondhand/ai/application/GeminiClient.java#L100-L120):
-- Doğrudan hata fırlatmak yerine `backoffMillis` dizisindeki süreler kadar bekleyerek yeniden dener (`exponential backoff`).
-- Deneme hakları tükendiğinde client'a `AI_RATE_LIMIT_EXCEEDED` hata koduyla HTTP 429 döner.
+### 5.5 Harici Gemini API Bütçe Koruması ve 429 Davranışı (`GeminiClient`, `GlobalGeminiBudgetGuard`)
+- **Platform Günlük Bütçe Sınırı:** Tüm Gemini çağrılarından önce `GlobalGeminiBudgetGuard.checkAndConsumeDailyBudget()` (`v4:ai:budget:daily:` key'i, `gemini.api.daily-global-limit` limiti) çalışır; Redis erişilemezse fail-closed davranarak `AI_DAILY_BUDGET_EXCEEDED` (HTTP 429) döner.
+- **Harici 429 Yanıtı:** Google Gemini API'sinden HTTP 429 Too Many Requests yanıtı alındığında [`GeminiClient.java`](../src/main/java/com/serhat/secondhand/ai/application/GeminiClient.java) thread bloklayan `sleep`/retry yapmadan fail-fast şekilde `AI_RATE_LIMIT_EXCEEDED` (HTTP 429) döner; yalnızca memory extraction çağrıları `swallowRateLimit` ile kontrollü fallback kullanır.
+- **Anonim Özet Koruması (`AiSummaryService`):** Cache miss durumlarında IP başına saatlik pencere (`v4:ai:summary:ip:`, `ai.summary.ip-hourly-limit`) ve hata sonrası negative-cache cooldown (`v4:ai:summary:cooldown:`, `ai.summary.negative-cache-seconds`) uygulanır.
 
 ---
 

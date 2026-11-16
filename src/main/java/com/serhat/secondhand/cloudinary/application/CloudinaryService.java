@@ -60,20 +60,6 @@ public class CloudinaryService {
         }
     }
 
-    public void deleteImage(String imageUrl) {
-        try {
-            String publicId = extractPublicIdFromUrl(imageUrl);
-            if (publicId != null) {
-                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-                log.info("Image deleted successfully from Cloudinary: {}", publicId);
-            }
-        } catch (IOException e) {
-            log.error("IO error deleting image from Cloudinary for URL {}: {}", imageUrl, e.getMessage(), e);
-        } catch (Exception e) {
-            log.error("Unexpected error deleting image from Cloudinary for URL {}: {}", imageUrl, e.getMessage(), e);
-        }
-    }
-
     private boolean isValidImageFile(MultipartFile file) {
         String contentType = file.getContentType();
         String originalFilename = file.getOriginalFilename();
@@ -96,26 +82,5 @@ public class CloudinaryService {
                 extension.equals("webp");
 
         return validContentType && validExtension;
-    }
-
-    private String extractPublicIdFromUrl(String imageUrl) {
-        if (imageUrl == null || !imageUrl.contains("cloudinary.com")) {
-            return null;
-        }
-        
-        try {
-            String[] parts = imageUrl.split("/");
-            for (int i = 0; i < parts.length; i++) {
-                if (parts[i].equals("secondhand-listings") && i + 1 < parts.length) {
-                    String fileName = parts[i + 1];
-                    int dotIndex = fileName.lastIndexOf('.');
-                    return "secondhand-listings/" + (dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Error extracting public ID from URL: {}", imageUrl, e);
-        }
-        
-        return null;
     }
 }

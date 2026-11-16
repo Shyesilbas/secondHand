@@ -82,6 +82,15 @@ public class ProdSecurityGuard {
             }
         }
 
+        if (environment.getProperty("app.test-endpoints.enabled", Boolean.class, false)) {
+            errors.add("app.test-endpoints.enabled must be false in prod profile.");
+        }
+
+        String redisPassword = environment.getProperty("spring.data.redis.password", "");
+        if (redisPassword.isBlank()) {
+            errors.add("spring.data.redis.password (REDIS_PASSWORD) must be configured in prod profile.");
+        }
+
         if (!errors.isEmpty()) {
             throw new IllegalStateException("Prod security guard failed: " + String.join(" | ", errors));
         }

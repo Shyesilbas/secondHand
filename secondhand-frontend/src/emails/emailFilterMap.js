@@ -1,5 +1,5 @@
-import { EMAIL_TYPES } from '../emails.js';
-import { EMAIL_FILTERS } from '../emailConstants.js';
+import { EMAIL_TYPES } from './emails.js';
+import { EMAIL_FILTERS } from './emailConstants.js';
 
 export const EMAIL_FILTER_TYPE_MAP = {
   [EMAIL_FILTERS.ALL]: [],

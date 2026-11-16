@@ -25,4 +25,4 @@ Manages seller-created promotional discounts (`campaigns`, `campaign_eligible_ty
 
 ## API
 - **Seller (`CampaignController`, `/api/v1/seller/campaigns`):** `POST /` (`CreateCampaignRequest`) · `PUT /{id}` · `DELETE /{id}` · `GET /` (paginated).
-- **Public (`PublicCampaignController`, `/api/v1/campaigns`):** `GET /active?sellerIds=` — active campaigns for storefront badges.
+- **Public (`PublicCampaignController`, `/api/v1/campaigns`):** `GET /active?sellerIds=` — active campaigns for storefront badges; at most `PageRequests.MAX_PAGE_SIZE` seller ids (`TOO_MANY_SELLER_IDS`).

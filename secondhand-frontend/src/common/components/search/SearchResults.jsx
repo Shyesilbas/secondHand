@@ -83,9 +83,9 @@ const SearchResults = ({
  <div className="font-medium text-text-primary text-sm">
  {user.name} {user.surname}
  </div>
- <div className="text-xs text-text-muted truncate">
- {user.email}
- </div>
+ {user.accountCreationDate && <div className="text-xs text-text-muted truncate">
+ {t('member_since_year', { year: String(user.accountCreationDate).split('/').pop() })}
+ </div>}
  </div>
  </div>
  </div>;

@@ -140,6 +140,7 @@ public class CacheConfig {
                 // Tier 3b — Kısa süreli (5 dakika)
                 .withCacheConfiguration("order:pending", shortConfig)
                 .withCacheConfiguration("listing:views:listing", shortConfig)
+                .withCacheConfiguration("listing:globalStats", shortConfig)
                 .withCacheConfiguration("listing:showcases", shortConfig)
                 .withCacheConfiguration("dashboard:seller", shortConfig)
                 .withCacheConfiguration("dashboard:buyer", shortConfig)

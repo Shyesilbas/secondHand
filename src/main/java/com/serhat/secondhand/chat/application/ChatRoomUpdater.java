@@ -23,7 +23,7 @@ public class ChatRoomUpdater {
         }
 
         Message lastMessage = messageRepository
-                .findTopByChatRoomIdOrderByCreatedAtDesc(roomId)
+                .findFirstByChatRoomIdAndDeletedBySenderAtIsNullOrderByCreatedAtDesc(roomId)
                 .orElse(null);
 
         if (lastMessage == null) {

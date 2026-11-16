@@ -68,13 +68,29 @@ class RateLimitingFilterTest {
 
     @Test
     void onlyPaymentPathsUseThePaymentBucket() {
-        assertThat(RateLimitingFilter.categorize("/api/v1/payments")).isEqualTo(RateLimitingFilter.Category.PAYMENT);
-        assertThat(RateLimitingFilter.categorize("/api/v1/payments/transfer"))
+        assertThat(RateLimitingFilter.categorize("GET", "/api/v1/payments")).isEqualTo(RateLimitingFilter.Category.PAYMENT);
+        assertThat(RateLimitingFilter.categorize("GET", "/api/v1/payments/transfer"))
                 .isEqualTo(RateLimitingFilter.Category.PAYMENT);
-        assertThat(RateLimitingFilter.categorize("/api/v1/listings/payment-guide"))
+        assertThat(RateLimitingFilter.categorize("GET", "/api/v1/listings/payment-guide"))
                 .isEqualTo(RateLimitingFilter.Category.GENERAL);
-        assertThat(RateLimitingFilter.categorize("/api/v1/paymentsX")).isEqualTo(RateLimitingFilter.Category.GENERAL);
-        assertThat(RateLimitingFilter.categorize("/api/v1/auth/login")).isEqualTo(RateLimitingFilter.Category.AUTH);
+        assertThat(RateLimitingFilter.categorize("GET", "/api/v1/paymentsX")).isEqualTo(RateLimitingFilter.Category.GENERAL);
+        assertThat(RateLimitingFilter.categorize("GET", "/api/v1/auth/login")).isEqualTo(RateLimitingFilter.Category.AUTH);
+    }
+
+    /** GV-30: money writes outside /payments share the strict payment bucket; reads stay general. */
+    @Test
+    void moneyWritesUseThePaymentBucket() {
+        for (String uri : List.of("/api/v1/orders/checkout", "/api/checkout/initiate", "/api/v1/e-wallets/deposit",
+                "/api/v1/e-wallets/withdraw", "/api/v1/memberships/upgrade", "/api/v1/showcases",
+                "/api/v1/showcases/abc/extend", "/api/v1/listings/pay-fee")) {
+            assertThat(RateLimitingFilter.categorize("POST", uri)).as(uri).isEqualTo(RateLimitingFilter.Category.PAYMENT);
+        }
+        assertThat(RateLimitingFilter.categorize("GET", "/api/v1/showcases/active"))
+                .isEqualTo(RateLimitingFilter.Category.GENERAL);
+        assertThat(RateLimitingFilter.categorize("POST", "/api/v1/orders/checkoutX"))
+                .isEqualTo(RateLimitingFilter.Category.GENERAL);
+        assertThat(RateLimitingFilter.categorize("POST", "/api/v1/listings/filter"))
+                .isEqualTo(RateLimitingFilter.Category.GENERAL);
     }
 
     @Test

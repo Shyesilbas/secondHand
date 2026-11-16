@@ -19,7 +19,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -177,18 +176,22 @@ public class UserService implements IUserService {
         return userRepository.findAll();
     }
 
+    /** Upper bound for user search results; keeps the endpoint from paging through the whole user base. */
+    static final int MAX_SEARCH_RESULTS = 20;
+
+    /** Returns public profile fields only: contact data, birthdate, role and account state never leave this search. */
     @Transactional(readOnly = true)
-    public List<UserDto> searchUsers(String query, int limit) {
-        log.info("Searching users with query: {} and limit: {}", query, limit);
-        
+    public List<PublicUserProfileDto> searchUsers(String query, int limit) {
         if (query == null || query.trim().length() < 2) {
             return List.of();
         }
-        
-        Pageable pageable = PageRequest.of(0, limit);
-        List<User> users = userRepository.searchUsers(query.trim(), pageable);
+        int safeLimit = Math.min(Math.max(limit, 1), MAX_SEARCH_RESULTS);
+        log.info("Searching users: queryLength={}, limit={}", query.trim().length(), safeLimit);
+
+        List<User> users = userRepository.searchUsers(query.trim(), PageRequest.of(0, safeLimit));
         return users.stream()
                 .map(userMapper::toDto)
+                .map(PublicUserProfileDto::from)
                 .toList();
     }
 

@@ -1,8 +1,11 @@
 package com.serhat.secondhand.ewallet.dto;
 
+import jakarta.validation.constraints.*;
+
 import java.math.BigDecimal;
 
 public class UpdateLimitRequest {
+    @NotNull @Positive
     private BigDecimal newLimit;
 
     public UpdateLimitRequest() {}

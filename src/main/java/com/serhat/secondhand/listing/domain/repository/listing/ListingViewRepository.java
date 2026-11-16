@@ -24,7 +24,7 @@ public interface ListingViewRepository extends JpaRepository<ListingView, UUID> 
 
 
 
-    @Query(value = "SELECT COUNT(v.id), COUNT(DISTINCT COALESCE(v.user_id::text, v.session_id)) " +
+    @Query(value = "SELECT COUNT(v.id), COUNT(DISTINCT COALESCE(v.user_id::text, NULLIF(v.ip_hash, ''), v.session_id)) " +
             "FROM listing_views v " +
             "JOIN listings l ON v.listing_id = l.id " +
             "WHERE l.seller_id = :sellerId " +
@@ -36,7 +36,7 @@ public interface ListingViewRepository extends JpaRepository<ListingView, UUID> 
     @Query(value = """
             SELECT 
                 COUNT(*) as total_views,
-                COUNT(DISTINCT CASE WHEN lv.user_id IS NOT NULL THEN CAST(lv.user_id AS VARCHAR) ELSE lv.session_id END) as unique_views,
+                COUNT(DISTINCT COALESCE(CAST(lv.user_id AS VARCHAR), NULLIF(lv.ip_hash, ''), lv.session_id)) as unique_views,
                 CAST(lv.viewed_at AS DATE) as view_date,
                 COUNT(*) as daily_count
             FROM listing_views lv

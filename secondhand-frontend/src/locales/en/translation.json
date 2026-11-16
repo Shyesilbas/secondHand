@@ -406,6 +406,7 @@
   "try_adjusting_your_search_terms": "Try adjusting your search terms",
   "contact_seller": "Contact Seller",
   "delete_message": "Delete message",
+  "message_deleted_by_sender": "This message was deleted by the sender.",
   "send_the_first_message": "Send the first message!",
   "messages": "Messages",
   "please_login_to_see_your_messages": "Please Login to see your messages.",

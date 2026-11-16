@@ -52,6 +52,17 @@ public class Message {
     @Column(name = "removed_at")
     private LocalDateTime removedAt;
 
+    /**
+     * Set when the sender deletes the message. The row and its text stay for complaints and moderation
+     * ({@code ChatTranscriptService}); clients only get a tombstone.
+     */
+    @Column(name = "deleted_by_sender_at")
+    private LocalDateTime deletedBySenderAt;
+
+    public boolean isDeletedBySender() {
+        return deletedBySenderAt != null;
+    }
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -87,7 +87,7 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
  const paginationHook = useListingPagination({
  data,
  filters: filterHook.filters,
- onPageChange: (page) => filterHook.updateFilters({ page }),
+ onPageChange: filterHook.setPage,
  });
 
  // Initialize search sub-hook

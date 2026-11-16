@@ -405,6 +405,7 @@
   "try_adjusting_your_search_terms": "Arama terimlerinizi değiştirmeyi deneyin",
   "contact_seller": "Satıcıyla İletişime Geç",
   "delete_message": "Mesajı sil",
+  "message_deleted_by_sender": "Bu mesaj gönderen tarafından silindi.",
   "send_the_first_message": "İlk mesajı gönderin!",
   "messages": "Mesajlar",
   "please_login_to_see_your_messages": "Mesajlarınızı görmek için lütfen giriş yapın.",

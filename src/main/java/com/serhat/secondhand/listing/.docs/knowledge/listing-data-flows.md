@@ -34,7 +34,7 @@ Detailed documentation of the internal execution paths and data flows for listin
 
 ### 4. View Tracking Flow
 `ListingViewController` -> `ListingViewService.trackView()` [@Async]
-- IP hashing, duplicate control (1-hour window), async save.
+- Owner check via `findSellerIdById`, viewer keyed by user id or server IP hash (never the client `sessionId`), Redis duplicate control (1-hour window), then entity loads and async save.
 
 ### 5. Price Update Flow (AOP)
 Controller -> Service -> `@TrackPriceChange` -> Repository.save() -> `PriceHistoryAspect.recordPriceChange()` -> Notification logic.

@@ -6,6 +6,11 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+    web:
+      pageable:
+        # Same cap as PageRequests.MAX_PAGE_SIZE for endpoints that bind a Pageable parameter.
+        max-page-size: 100
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -114,6 +119,14 @@ gemini:
     model: ${GEMINI_API_MODEL:gemini-3.1-flash-lite}
     base-url: ${GEMINI_API_BASE_URL}
     fallback-memory-model: ${GEMINI_API_FALLBACK_MEMORY_MODEL:gemini-3.1-flash-lite}
+    daily-global-limit: ${GEMINI_DAILY_GLOBAL_LIMIT:250}
+    max-output-tokens: ${GEMINI_MAX_OUTPUT_TOKENS:1024}
+    memory-max-output-tokens: ${GEMINI_MEMORY_MAX_OUTPUT_TOKENS:512}
+
+ai:
+  summary:
+    ip-hourly-limit: ${AI_SUMMARY_IP_HOURLY_LIMIT:10}
+    negative-cache-seconds: ${AI_SUMMARY_NEGATIVE_CACHE_SECONDS:120}
 
 aura:
   agent:

@@ -1,6 +1,7 @@
 package com.serhat.secondhand.complaint.application;
 
 import com.serhat.secondhand.complaint.ComplaintDto;
+import com.serhat.secondhand.complaint.ReceivedComplaintDto;
 import com.serhat.secondhand.complaint.ComplaintRequest;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -11,9 +12,9 @@ public interface IComplaintService {
     
     Result<ComplaintDto> createComplaint(Long userId, ComplaintRequest complaintRequest);
 
-    Result<ComplaintDto> submitAppeal(Long userId, String complaintId, com.serhat.secondhand.complaint.AppealRequest request);
+    Result<ReceivedComplaintDto> submitAppeal(Long userId, String complaintId, com.serhat.secondhand.complaint.AppealRequest request);
     
     List<ComplaintDto> getUserComplaints(User user);
     
-    List<ComplaintDto> getComplaintsAboutUser(User user);
+    List<ReceivedComplaintDto> getComplaintsAboutUser(User user);
 }

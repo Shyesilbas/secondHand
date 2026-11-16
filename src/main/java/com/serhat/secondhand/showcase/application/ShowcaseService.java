@@ -26,7 +26,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import com.serhat.secondhand.core.dto.PageRequests;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,7 +118,7 @@ public class ShowcaseService implements IShowcaseService {
     @Transactional(readOnly = true)
     public Page<ShowcaseDto> getActiveShowcases(int page, int size, Long viewerId) {
         log.info("Fetching active showcases from database | page={}, size={}", page, size);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequests.of(page, size);
         java.util.Set<Long> hidden = new java.util.HashSet<>(userBlockService.getMutuallyHiddenUserIds(viewerId));
         Page<Showcase> activeShowcases;
         if (hidden.isEmpty()) {

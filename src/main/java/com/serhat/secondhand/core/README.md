@@ -11,6 +11,8 @@ Provides cross-cutting platform infrastructure: the Spring Security filter chain
 ## Business Rules & Invariants
 - **Security Filter Order (`SecurityConfig`):** `SecurityHeadersFilter` (OWASP headers) -> `RateLimitingFilter` (`ClientIpResolver` + `rate_limit_window.lua`, returns `429`) -> `AuthenticationFilter` (stateless JWT cookie/Bearer parser + `AccessRevocationService` check) -> `CsrfCookieFilter` (double-submit `XSRF-TOKEN`) -> `PublicEndpointRegistry` (`@PublicEndpoint` vs `@PreAuthorize`).
 - **Dual-Track Error Envelope:** Controllers return typed `ResponseEntity<T>` via `ResultResponses`, which throws `ResultFailureException` on `Result.error(...)` (`GlobalExceptionHandler` maps it via `ErrorCodeStatuses` to Track A `{"error": CODE, "message": "..."}`). Directly thrown exceptions render RFC 7807 `ProblemDetail` with `"message"` and `"error"`.
+- **Paging cap:** raw `page`/`size` params go through `PageRequests` (max `PageRequests.MAX_PAGE_SIZE`); `Pageable` params get the same cap from `spring.data.web.pageable.max-page-size`.
+- **Prod startup (`ProdSecurityGuard`):** also fails when `app.test-endpoints.enabled` is true or `spring.data.redis.password` (`REDIS_PASSWORD`) is empty. Cache-Control comes from Spring Security defaults, not `SecurityHeadersFilter`.
 - **Scheduling, Outbox, Seeding, Audit & OTP:**
   - `SchedulerLockConfig` secures scheduled jobs with Redis-backed ShedLock (`v4:lock:scheduler` prefix) before `@Transactional` execution.
   - `OutboxHousekeepingScheduler` purges `PROCESSED` rows older than 7 days from `payment_outbox_events`, `order_outbox_events`, and `escrow_outbox_events`.

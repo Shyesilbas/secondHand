@@ -1,5 +1,7 @@
 package com.serhat.secondhand.user.api;
 
+import jakarta.validation.Valid;
+
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.application.MembershipService;
@@ -33,7 +35,7 @@ public class MembershipController {
     }
 
     @PostMapping("/upgrade")
-    public ResponseEntity<MembershipStatusDto> upgradeToPremium(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MembershipUpgradeRequest request) {
+    public ResponseEntity<MembershipStatusDto> upgradeToPremium(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody MembershipUpgradeRequest request) {
         Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.upgradeToPremium(userId, request)));
     }

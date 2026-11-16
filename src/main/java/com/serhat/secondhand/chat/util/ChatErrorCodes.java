@@ -15,7 +15,9 @@ public enum ChatErrorCodes implements ErrorCode {
     INVALID_MESSAGE_CONTENT("INVALID_MESSAGE_CONTENT", "Message content cannot be empty", HttpStatus.BAD_REQUEST),
     MESSAGE_TOO_LONG("MESSAGE_TOO_LONG", "Message content is too long", HttpStatus.BAD_REQUEST),
     CHAT_DISABLED_BY_SELLER("CHAT_DISABLED_BY_SELLER", "Messaging is turned off for this listing", HttpStatus.FORBIDDEN),
-    CHAT_DISABLED_BY_USER("CHAT_DISABLED_BY_USER", "This user does not accept messages", HttpStatus.FORBIDDEN);
+    CHAT_DISABLED_BY_USER("CHAT_DISABLED_BY_USER", "This user does not accept messages", HttpStatus.FORBIDDEN),
+    CHAT_WITH_SELF("CHAT_WITH_SELF", "You cannot start a chat with yourself", HttpStatus.BAD_REQUEST),
+    LISTING_NOT_AVAILABLE_FOR_CHAT("LISTING_NOT_AVAILABLE_FOR_CHAT", "This listing is not open for new conversations", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

@@ -1,11 +1,13 @@
 package com.serhat.secondhand.listing.application.filter;
 
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import org.springframework.data.domain.PageRequest;
+import com.serhat.secondhand.core.dto.PageRequests;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
@@ -17,7 +19,11 @@ public class FilterHelper {
         if (filters.getPage() == null) filters.setPage(0);
         if (filters.getSize() == null) filters.setSize(10);
         if (filters.getStatus() == null) filters.setStatus(ListingStatus.ACTIVE);
-        return PageRequest.of(filters.getPage(), filters.getSize());
+        // Filter endpoints are public: never let a caller browse drafts, inactive or deleted listings.
+        if (!filters.getStatus().isPublicBrowsable()) {
+            throw new BusinessException(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
+        return PageRequests.of(filters.getPage(), filters.getSize());
     }
 
     public static List<Predicate> buildBasePredicates(CriteriaBuilder cb, Root<?> root, ListingFilterDto filters) {
@@ -32,10 +38,11 @@ public class FilterHelper {
         if (filters.getTitle() != null && !filters.getTitle().trim().isEmpty()) {
             predicates.add(cb.like(cb.lower(root.get("title")), "%" + filters.getTitle().toLowerCase() + "%"));
         }
-        if (filters.getCity() != null && !filters.getCity().trim().isEmpty()) {
+        // The indexed catalog keys win; the free-text label LIKE only runs for clients that send no key.
+        if (isBlank(filters.getCityKey()) && !isBlank(filters.getCity())) {
             predicates.add(cb.like(cb.lower(root.get("city")), "%" + filters.getCity().toLowerCase() + "%"));
         }
-        if (filters.getDistrict() != null && !filters.getDistrict().trim().isEmpty()) {
+        if (isBlank(filters.getDistrictKey()) && !isBlank(filters.getDistrict())) {
             predicates.add(cb.like(cb.lower(root.get("district")), "%" + filters.getDistrict().toLowerCase() + "%"));
         }
         if (filters.getCityKey() != null && !filters.getCityKey().trim().isEmpty()) {
@@ -57,5 +64,9 @@ public class FilterHelper {
             predicates.add(cb.equal(root.get("currency"), filters.getCurrency()));
         }
         return predicates;
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

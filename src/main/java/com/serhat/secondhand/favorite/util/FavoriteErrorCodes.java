@@ -10,7 +10,8 @@ public enum FavoriteErrorCodes implements ErrorCode {
     LISTING_NOT_FOUND("LISTING_NOT_FOUND", "Listing not found", HttpStatus.NOT_FOUND),
     INACTIVE_LISTING("INACTIVE_LISTING", "Cannot favorite inactive listing", HttpStatus.BAD_REQUEST),
     OWN_LISTING("OWN_LISTING", "Cannot favorite own listing", HttpStatus.BAD_REQUEST),
-    NOT_FAVORITED("NOT_FAVORITED", "Listing is not in favorites", HttpStatus.BAD_REQUEST);
+    NOT_FAVORITED("NOT_FAVORITED", "Listing is not in favorites", HttpStatus.BAD_REQUEST),
+    TOO_MANY_LISTING_IDS("TOO_MANY_LISTING_IDS", "Too many listing ids in one request", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

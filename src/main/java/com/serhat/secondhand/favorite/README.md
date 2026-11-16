@@ -21,7 +21,7 @@ Manages user listing bookmarks (`favorites` table, unique on `(user_id, listing_
 ## API (`FavoriteController`, `/api/v1/favorites`)
 - `POST /` · `DELETE /{listing-id}` · `POST /toggle` — add, remove, or toggle a favorite.
 - `GET /` & `GET /ids` — paginated favorites (`Page<FavoriteDto>`) or all favorited UUIDs for the authenticated user.
-- `GET /stats/{listing-id}` & `POST /stats` — single or batch `FavoriteStatsDto` lookups (prevents N+1 on listing cards).
+- `GET /stats/{listing-id}` & `POST /stats` — single or batch `FavoriteStatsDto` lookups (prevents N+1 on listing cards). The batch takes at most `PageRequests.MAX_PAGE_SIZE` ids (`TOO_MANY_LISTING_IDS`); its cache key is `FavoriteStatsService.batchKey` (SHA-256 of sorted ids).
 - `GET /check/{listing-id}` & `GET /count/{listing-id}` — boolean check and total favorite count.
 - `GET /top` & `GET /top-listings` — top favorited listings across the platform.
 - `POST /listings/{listing-id}/broadcast-offer` — seller broadcasts a discounted offer to favoriters.
