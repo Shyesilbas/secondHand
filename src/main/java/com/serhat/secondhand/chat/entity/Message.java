@@ -10,9 +10,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "messages", indexes = {
-    @jakarta.persistence.Index(name = "idx_messages_room_created", columnList = "chat_room_id, created_at")
-})
+@Table(name = "messages",
+    indexes = {
+        @Index(name = "idx_messages_offer_id", columnList = "offer_id"),
+        @Index(name = "idx_messages_recipient_id", columnList = "recipient_id"),
+        @Index(name = "idx_messages_recipient_read", columnList = "recipient_id, is_read"),
+        @Index(name = "idx_messages_room_created", columnList = "chat_room_id, created_at"),
+        @Index(name = "idx_messages_sender_id", columnList = "sender_id")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

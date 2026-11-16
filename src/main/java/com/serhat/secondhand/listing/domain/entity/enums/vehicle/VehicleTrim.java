@@ -12,7 +12,10 @@ import org.springframework.data.domain.Persistable;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "vehicle_trims")
+@Table(name = "vehicle_trims",
+    indexes = {
+        @Index(name = "idx_vehicle_trims_vehicle_generation_id", columnList = "vehicle_generation_id")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

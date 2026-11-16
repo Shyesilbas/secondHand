@@ -9,9 +9,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "favorite_list_likes", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"favorite_list_id", "user_id"})
-})
+@Table(name = "favorite_list_likes",
+    indexes = {
+        @Index(name = "idx_favorite_list_likes_list_user", columnList = "favorite_list_id, user_id"),
+        @Index(name = "idx_favorite_list_likes_user_id", columnList = "user_id")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

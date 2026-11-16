@@ -14,9 +14,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "inventory", indexes = {
-    @Index(name = "idx_inventory_listing", columnList = "listing_id", unique = true)
-})
+// listing_id is the primary key (inventory_pkey); no extra index needed.
+@Table(name = "inventory")
 public class Inventory {
 
     @Id

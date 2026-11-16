@@ -22,7 +22,10 @@ import java.util.UUID;
  * {@code startYear}/{@code endYear} null means the generation's years apply.
  */
 @Entity
-@Table(name = "vehicle_versions")
+@Table(name = "vehicle_versions",
+    indexes = {
+        @Index(name = "idx_vehicle_versions_generation", columnList = "vehicle_generation_id")
+    })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -110,7 +113,8 @@ public class VehicleVersion implements Labelable, Persistable<UUID> {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "vehicle_version_trims",
             joinColumns = @JoinColumn(name = "vehicle_version_id"),
-            inverseJoinColumns = @JoinColumn(name = "vehicle_trim_id"))
+            inverseJoinColumns = @JoinColumn(name = "vehicle_trim_id"),
+            indexes = @Index(name = "idx_vehicle_version_trims_trim", columnList = "vehicle_trim_id"))
     private Set<VehicleTrim> trims = new LinkedHashSet<>();
 
     @Override

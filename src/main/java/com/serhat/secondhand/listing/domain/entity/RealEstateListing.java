@@ -13,7 +13,11 @@ import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "real_estate_listings")
+@Table(name = "real_estate_listings",
+    indexes = {
+        @Index(name = "idx_real_estate_listings_gross_area", columnList = "gross_area_m2"),
+        @Index(name = "idx_real_estate_listings_room_count", columnList = "room_count")
+    })
 @Getter @Setter
 @NoArgsConstructor
 @SuperBuilder

@@ -12,10 +12,10 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(
-        name = "agreement_requirements",
-        uniqueConstraints = @UniqueConstraint(name = "uk_agreement_requirements_group_type", columnNames = {"group_code", "agreement_type"})
-)
+@Table(name = "agreement_requirements",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_agreement_requirements_group_type", columnNames = {"group_code", "agreement_type"})
+    })
 @Data
 @Builder
 @NoArgsConstructor

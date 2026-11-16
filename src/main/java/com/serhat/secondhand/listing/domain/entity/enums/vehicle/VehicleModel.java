@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,10 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "vehicle_models")
+@Table(name = "vehicle_models",
+    indexes = {
+        @Index(name = "idx_vehicle_models_car_brand_id", columnList = "car_brand_id")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

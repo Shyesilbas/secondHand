@@ -29,14 +29,12 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(
-        name = "campaigns",
-        indexes = {
-                @Index(name = "idx_campaign_seller_created", columnList = "seller_id, created_at"),
-                @Index(name = "idx_campaign_active_ends", columnList = "active, ends_at"),
-                @Index(name = "idx_campaign_seller_active_time", columnList = "seller_id, active, starts_at, ends_at")
-        }
-)
+@Table(name = "campaigns",
+    indexes = {
+        @Index(name = "idx_campaign_active_ends", columnList = "active, ends_at"),
+        @Index(name = "idx_campaign_seller_active_time", columnList = "seller_id, active, starts_at, ends_at"),
+        @Index(name = "idx_campaign_seller_created", columnList = "seller_id, created_at")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -75,7 +73,11 @@ public class Campaign {
     private Set<ListingType> eligibleTypes;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "campaign_eligible_listings", joinColumns = @JoinColumn(name = "campaign_id"))
+    @CollectionTable(name = "campaign_eligible_listings", joinColumns = @JoinColumn(name = "campaign_id"),
+            indexes = {
+                @Index(name = "idx_campaign_eligible_listings_campaign_id", columnList = "campaign_id"),
+                @Index(name = "idx_campaign_eligible_listings_listing_id", columnList = "listing_id")
+            })
     @Column(name = "listing_id")
     private Set<UUID> eligibleListingIds;
 

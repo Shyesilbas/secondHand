@@ -8,13 +8,17 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "listing_views", indexes = {
-    @Index(name = "idx_listing_view_listing", columnList = "listing_id"),
-    @Index(name = "idx_listing_view_user", columnList = "user_id"),
-    @Index(name = "idx_listing_view_session", columnList = "session_id"),
-    @Index(name = "idx_listing_view_date", columnList = "viewed_at"),
-    @Index(name = "idx_listing_view_category", columnList = "category")
-})
+@Table(name = "listing_views",
+    indexes = {
+        @Index(name = "idx_listing_view_category", columnList = "category"),
+        @Index(name = "idx_listing_view_date", columnList = "viewed_at"),
+        @Index(name = "idx_listing_view_session", columnList = "session_id"),
+        @Index(name = "idx_listing_view_user", columnList = "user_id"),
+        @Index(name = "idx_listing_views_listing_session_viewed", columnList = "listing_id, session_id, viewed_at"),
+        @Index(name = "idx_listing_views_listing_user_viewed", columnList = "listing_id, user_id, viewed_at"),
+        @Index(name = "idx_listing_views_listing_viewed", columnList = "listing_id, viewed_at"),
+        @Index(name = "idx_listing_views_viewer_id", columnList = "viewer_id")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

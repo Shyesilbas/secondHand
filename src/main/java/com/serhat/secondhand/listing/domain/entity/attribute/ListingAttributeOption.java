@@ -9,7 +9,13 @@ import java.util.UUID;
 
 /** Allowed value of an ENUM-like attribute; {@code KEY} options are the keys of an {@code ENUM_MAP}. */
 @Entity
-@Table(name = "listing_attribute_options")
+@Table(name = "listing_attribute_options",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_listing_attribute_option", columnNames = {"definition_id", "option_group", "value"})
+    },
+    indexes = {
+        @Index(name = "idx_listing_attribute_options_definition", columnList = "definition_id")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

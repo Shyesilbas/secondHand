@@ -12,9 +12,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "chat_rooms", indexes = {
-    @jakarta.persistence.Index(name = "idx_chat_rooms_last_msg_time", columnList = "last_message_time")
-})
+@Table(name = "chat_rooms",
+    indexes = {
+        @Index(name = "idx_chat_rooms_last_msg_time", columnList = "last_message_time")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

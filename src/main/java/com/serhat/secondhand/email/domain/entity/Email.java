@@ -22,9 +22,14 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "emails", indexes = {
-    @jakarta.persistence.Index(name = "idx_emails_user_deleted", columnList = "user_id, deleted_at")
-})
+// Flyway-only (partial/GIN, not expressible in JPA): idx_emails_user_read_deleted (partial)
+@Table(name = "emails",
+    indexes = {
+        @Index(name = "idx_emails_deleted_at", columnList = "deleted_at"),
+        @Index(name = "idx_emails_recipient_email", columnList = "recipient_email"),
+        @Index(name = "idx_emails_user_deleted", columnList = "user_id, deleted_at"),
+        @Index(name = "idx_emails_user_type_deleted", columnList = "user_id, email_type, deleted_at")
+    })
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE emails SET deleted_at = now() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")

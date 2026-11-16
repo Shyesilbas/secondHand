@@ -17,12 +17,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "offers", indexes = {
-        @Index(name = "idx_offers_status_expires_at", columnList = "status, expires_at"),
-        @Index(name = "idx_offers_buyer_id", columnList = "buyer_id"),
-        @Index(name = "idx_offers_seller_id", columnList = "seller_id"),
-        @Index(name = "idx_offers_listing_id", columnList = "listing_id")
-})
+@Table(name = "offers",
+    indexes = {
+        @Index(name = "idx_offers_buyer_created", columnList = "buyer_id, created_at"),
+        @Index(name = "idx_offers_listing_status", columnList = "listing_id, status"),
+        @Index(name = "idx_offers_seller_created", columnList = "seller_id, created_at"),
+        @Index(name = "idx_offers_status_expires_at", columnList = "status, expires_at")
+    })
 public class Offer {
 
     @Id

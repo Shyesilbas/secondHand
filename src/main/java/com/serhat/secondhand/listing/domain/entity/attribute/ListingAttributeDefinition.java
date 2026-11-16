@@ -13,7 +13,10 @@ import java.util.UUID;
 
 /** One attribute a listing type accepts; {@code scopeKey} narrows it (e.g. vehicle type CAR), {@code ALL} = every scope. */
 @Entity
-@Table(name = "listing_attribute_definitions")
+@Table(name = "listing_attribute_definitions",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_listing_attribute_definition", columnNames = {"listing_type", "scope_key", "attr_key"})
+    })
 @Getter
 @Setter
 @NoArgsConstructor

@@ -12,7 +12,13 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "clothing_listings")
+@Table(name = "clothing_listings",
+    indexes = {
+        @Index(name = "idx_clothing_listings_audience", columnList = "audience"),
+        @Index(name = "idx_clothing_listings_clothing_brand_id", columnList = "clothing_brand_id"),
+        @Index(name = "idx_clothing_listings_clothing_type_id", columnList = "clothing_type_id"),
+        @Index(name = "idx_clothing_listings_size", columnList = "size_system, size_key")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

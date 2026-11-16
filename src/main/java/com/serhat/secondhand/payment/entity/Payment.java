@@ -12,9 +12,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payment", indexes = {
-    @Index(name = "idx_payment_from_user_idempotency", columnList = "from_user_id,idempotency_key")
-})
+@Table(name = "payment",
+    indexes = {
+        @Index(name = "idx_payment_from_user_idempotency", columnList = "from_user_id, idempotency_key"),
+        @Index(name = "idx_payment_order_id_to_user", columnList = "order_id, to_user_id"),
+        @Index(name = "idx_payment_order_item_id", columnList = "order_item_id"),
+        @Index(name = "idx_payment_to_user_id", columnList = "to_user_id"),
+        @Index(name = "idx_payment_user_id", columnList = "user_id")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

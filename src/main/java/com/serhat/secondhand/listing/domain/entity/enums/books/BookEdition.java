@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,10 @@ import java.util.UUID;
  * set for exam preparation books (e.g. 2026 for a 2026 YKS book).
  */
 @Entity
-@Table(name = "book_editions")
+@Table(name = "book_editions",
+    indexes = {
+        @Index(name = "idx_book_editions_work", columnList = "work_id")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

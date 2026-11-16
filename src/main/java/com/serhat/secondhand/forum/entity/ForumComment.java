@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "forum_comment")
+@Table(name = "forum_comment",
+    indexes = {
+        @Index(name = "idx_forum_comment_thread", columnList = "thread_id")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

@@ -21,11 +21,13 @@ import java.util.UUID;
 @Builder
 @Entity
 @org.hibernate.annotations.BatchSize(size = 20)
-@Table(name = "order_items", indexes = {
-        @Index(name = "idx_order_item_order", columnList = "order_id"),
-        @Index(name = "idx_order_item_listing", columnList = "listing_id"),
-        @Index(name = "idx_order_item_seller", columnList = "seller_id")
-})
+// Flyway-only (partial/GIN, not expressible in JPA): idx_order_item_campaign (partial)
+@Table(name = "order_items",
+    indexes = {
+        @Index(name = "idx_order_items_listing_id", columnList = "listing_id"),
+        @Index(name = "idx_order_items_order_id", columnList = "order_id"),
+        @Index(name = "idx_order_items_seller_id", columnList = "seller_id")
+    })
 @EntityListeners(AuditingEntityListener.class)
 public class OrderItem {
 

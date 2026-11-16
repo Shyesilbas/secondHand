@@ -29,13 +29,14 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "orders", indexes = {
-    @Index(name = "idx_order_user", columnList = "user_id"),
-    @Index(name = "idx_order_status", columnList = "status"),
-    @Index(name = "idx_order_payment_status", columnList = "payment_status"),
-    @Index(name = "idx_order_created", columnList = "created_at"),
-    @Index(name = "idx_order_number", columnList = "order_number")
-})
+@Table(name = "orders",
+    indexes = {
+        @Index(name = "idx_orders_status", columnList = "status"),
+        @Index(name = "idx_orders_status_created", columnList = "status, created_at"),
+        @Index(name = "idx_orders_status_updated", columnList = "status, updated_at"),
+        @Index(name = "idx_orders_user_created", columnList = "user_id, created_at"),
+        @Index(name = "idx_orders_user_status", columnList = "user_id, status")
+    })
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
     private static final java.security.SecureRandom VERIFICATION_CODE_RANDOM = new java.security.SecureRandom();

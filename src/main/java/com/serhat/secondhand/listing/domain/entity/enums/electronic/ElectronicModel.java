@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,11 @@ import org.springframework.data.domain.Persistable;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "electronic_models")
+@Table(name = "electronic_models",
+    indexes = {
+        @Index(name = "idx_electronic_models_brand_id", columnList = "brand_id"),
+        @Index(name = "idx_electronic_models_type_id", columnList = "type_id")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

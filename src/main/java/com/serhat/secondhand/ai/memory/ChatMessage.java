@@ -8,13 +8,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "chat_messages")
+@Table(name = "chat_messages",
+    indexes = {
+        @Index(name = "idx_chat_messages_user_timestamp", columnList = "user_id, timestamp")
+    })
 public class ChatMessage {
 
     @Id

@@ -10,9 +10,14 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_blocks", uniqueConstraints = {
+@Table(name = "user_blocks",
+    uniqueConstraints = {
         @UniqueConstraint(name = "uq_user_blocks_pair", columnNames = {"blocker_id", "blocked_id"})
-})
+    },
+    indexes = {
+        @Index(name = "idx_user_blocks_blocked", columnList = "blocked_id"),
+        @Index(name = "idx_user_blocks_blocker", columnList = "blocker_id")
+    })
 @Getter
 @Setter
 @Builder

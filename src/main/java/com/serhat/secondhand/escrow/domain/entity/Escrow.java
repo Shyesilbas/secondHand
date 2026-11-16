@@ -19,11 +19,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "escrows", indexes = {
-    @Index(name = "idx_escrow_order", columnList = "order_id"),
-    @Index(name = "idx_escrow_seller", columnList = "seller_id"),
-    @Index(name = "idx_escrow_status", columnList = "status")
-})
+@Table(name = "escrows",
+    indexes = {
+        @Index(name = "idx_escrows_buyer_id", columnList = "buyer_id"),
+        @Index(name = "idx_escrows_order_status", columnList = "order_id, status"),
+        @Index(name = "idx_escrows_seller_status", columnList = "seller_id, status")
+    })
 @EntityListeners(AuditingEntityListener.class)
 public class Escrow {
 

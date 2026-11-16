@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "coupon_redemptions")
+@Table(name = "coupon_redemptions",
+    indexes = {
+        @Index(name = "idx_coupon_redemptions_coupon_user", columnList = "coupon_id, user_id"),
+        @Index(name = "idx_coupon_redemptions_order_id", columnList = "order_id"),
+        @Index(name = "idx_coupon_redemptions_user_id", columnList = "user_id")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

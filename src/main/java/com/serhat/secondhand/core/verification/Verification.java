@@ -15,7 +15,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "verification_codes")
+@Table(name = "verification_codes",
+    indexes = {
+        @Index(name = "idx_verification_codes_user_id", columnList = "user_id"),
+        @Index(name = "idx_verification_codes_user_type_created", columnList = "user_id, code_type, created_at")
+    })
 public class Verification {
 
     @Id

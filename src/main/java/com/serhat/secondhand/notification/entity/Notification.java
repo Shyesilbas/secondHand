@@ -18,9 +18,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "notifications", indexes = {
-    @Index(name = "idx_notification_user_created", columnList = "user_id, created_at")
-})
+@Table(name = "notifications",
+    indexes = {
+        @Index(name = "idx_notification_user_created", columnList = "user_id, created_at"),
+        @Index(name = "idx_notifications_user_read_created", columnList = "user_id, is_read, created_at")
+    })
 public class Notification {
 
     @Id

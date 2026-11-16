@@ -30,11 +30,12 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @org.hibernate.annotations.BatchSize(size = 20)
-@Table(name = "users", indexes = {
-        @Index(name = "idx_user_email", columnList = "email"),
-        @Index(name = "idx_user_phone", columnList = "phone"),
-        @Index(name = "idx_user_status", columnList = "acc_status")
-})
+// Flyway-only (not expressible in JPA): idx_users_banned_until (partial), idx_users_full_name_trgm (GIN expression).
+// users.email is covered by the unique constraint index users_email_key.
+@Table(name = "users",
+    indexes = {
+        @Index(name = "idx_users_phone", columnList = "phone")
+    })
 public class User implements UserDetails {
 
     @Id

@@ -56,7 +56,8 @@ public class BookWork implements Persistable<UUID> {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "book_work_authors",
             joinColumns = @JoinColumn(name = "work_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id"))
+            inverseJoinColumns = @JoinColumn(name = "author_id"),
+            indexes = @jakarta.persistence.Index(name = "idx_book_work_authors_author", columnList = "author_id"))
     @OrderColumn(name = "sort_order")
     private List<BookAuthor> authors = new ArrayList<>();
 

@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(
-        name = "notification_event_reads",
-        uniqueConstraints = @UniqueConstraint(name = "uk_notification_event_reads_event_user", columnNames = {"event_id", "user_id"}),
-        indexes = {
-            @Index(name = "idx_event_read_lookup", columnList = "event_id, user_id")
-        }
-)
+@Table(name = "notification_event_reads",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_notification_event_reads_event_user", columnNames = {"event_id", "user_id"})
+    },
+    indexes = {
+        @Index(name = "idx_event_read_lookup", columnList = "event_id, user_id")
+    })
 @Data
 @Builder
 @NoArgsConstructor

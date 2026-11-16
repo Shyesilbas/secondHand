@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Index;
 import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +28,13 @@ import java.util.UUID;
  * picks a variant copies these facts and the model's specs (ElectronicSpecSnapshotter).
  */
 @Entity
-@Table(name = "electronic_model_variants")
+@Table(name = "electronic_model_variants",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_electronic_model_variant_name", columnNames = {"electronic_model_id", "name"})
+    },
+    indexes = {
+        @Index(name = "idx_electronic_model_variants_model", columnList = "electronic_model_id")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

@@ -23,14 +23,16 @@ import java.util.UUID;
 @NoArgsConstructor @AllArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "listings", indexes = {
-    @Index(name = "idx_listing_seller", columnList = "seller_id"),
-    @Index(name = "idx_listing_status", columnList = "status"),
-    @Index(name = "idx_listing_type", columnList = "listing_type"),
-    @Index(name = "idx_listing_location", columnList = "city, district"),
-    @Index(name = "idx_listing_location_keys", columnList = "city_key, district_key"),
-    @Index(name = "idx_listing_created", columnList = "createdAt")
-})
+// Flyway-only (partial/GIN, not expressible in JPA): idx_listings_active_created_at (partial), idx_listings_active_{title,description,listing_no}_trgm (partial GIN), idx_listings_attributes (GIN jsonb_path_ops)
+@Table(name = "listings",
+    indexes = {
+        @Index(name = "idx_listing_created", columnList = "created_at"),
+        @Index(name = "idx_listing_location", columnList = "city, district"),
+        @Index(name = "idx_listing_location_keys", columnList = "city_key, district_key"),
+        @Index(name = "idx_listing_type", columnList = "listing_type"),
+        @Index(name = "idx_listings_seller_status", columnList = "seller_id, status"),
+        @Index(name = "idx_listings_status_type", columnList = "status, listing_type")
+    })
 @Inheritance(strategy = InheritanceType.JOINED)
 @org.hibernate.annotations.BatchSize(size = 20)
 public class Listing {

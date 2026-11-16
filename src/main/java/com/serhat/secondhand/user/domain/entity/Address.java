@@ -11,7 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @org.hibernate.annotations.BatchSize(size = 20)
-@Table(name = "addresses")
+@Table(name = "addresses",
+    indexes = {
+        @Index(name = "idx_addresses_user_id", columnList = "user_id")
+    })
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

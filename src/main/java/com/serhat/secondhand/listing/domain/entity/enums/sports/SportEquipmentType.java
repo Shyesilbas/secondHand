@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,10 @@ import org.springframework.data.domain.Persistable;
 import java.util.UUID;
 
 @Entity
-@Table(name = "sport_equipment_types")
+@Table(name = "sport_equipment_types",
+    indexes = {
+        @Index(name = "idx_sport_equipment_discipline_id", columnList = "discipline_id")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

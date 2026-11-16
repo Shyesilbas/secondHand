@@ -15,7 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "complaints")
+// Flyway-only (partial/GIN, not expressible in JPA): idx_complaints_active_pair, idx_complaints_bad_faith_complainer, idx_complaints_pending_appeals, idx_complaints_review_queue (partial)
+@Table(name = "complaints",
+    indexes = {
+        @Index(name = "idx_complaints_against_created", columnList = "complained_user_id, created_at"),
+        @Index(name = "idx_complaints_pair", columnList = "complainer_id, complained_user_id"),
+        @Index(name = "idx_complaints_status", columnList = "status")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

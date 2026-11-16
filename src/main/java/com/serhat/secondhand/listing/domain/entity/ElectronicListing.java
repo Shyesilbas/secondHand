@@ -10,7 +10,12 @@ import lombok.experimental.SuperBuilder;
 
 
 @Entity
-@Table(name = "electronic_listings")
+@Table(name = "electronic_listings",
+    indexes = {
+        @Index(name = "idx_electronic_listings_electronic_brand_id", columnList = "electronic_brand_id"),
+        @Index(name = "idx_electronic_listings_electronic_model_id", columnList = "electronic_model_id"),
+        @Index(name = "idx_electronic_listings_variant", columnList = "electronic_variant_id")
+    })
 @Getter @Setter
 @NoArgsConstructor
 @SuperBuilder

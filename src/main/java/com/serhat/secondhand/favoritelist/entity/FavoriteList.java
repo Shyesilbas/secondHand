@@ -13,7 +13,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "favorite_lists")
+@Table(name = "favorite_lists",
+    indexes = {
+        @Index(name = "idx_favorite_lists_user_id", columnList = "user_id"),
+        @Index(name = "idx_favorite_lists_user_name", columnList = "user_id, name")
+    })
 @Getter
 @Setter
 @NoArgsConstructor

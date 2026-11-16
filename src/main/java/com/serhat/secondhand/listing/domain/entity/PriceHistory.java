@@ -13,7 +13,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "price_history")
+@Table(name = "price_history",
+    indexes = {
+        @Index(name = "idx_price_history_listing_changed", columnList = "listing_id, change_date")
+    })
 public class PriceHistory {
 
     private static final BigDecimal MAX_PERCENTAGE_CHANGE = new BigDecimal("99999999.99");

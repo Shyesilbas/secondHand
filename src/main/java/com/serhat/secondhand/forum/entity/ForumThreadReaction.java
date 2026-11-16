@@ -20,10 +20,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-        name = "forum_thread_reaction",
-        uniqueConstraints = @UniqueConstraint(name = "uk_forum_thread_reaction_thread_user", columnNames = {"thread_id", "user_id"})
-)
+@Table(name = "forum_thread_reaction",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_forum_thread_reaction_thread_user", columnNames = {"thread_id", "user_id"})
+    })
 @Getter
 @Setter
 @NoArgsConstructor

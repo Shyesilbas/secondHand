@@ -84,7 +84,7 @@ return count
 
 | Kategori | Hedef URI Örüntüsü | Varsayılan Pencere Limiti | 60 sn Pencere Başına Maksimum İstek |
 | :--- | :--- | :--- | :--- |
-| **`PAYMENT`** | `/api/payment/**`, `/api/v1/payments/**`, `/api/v1/test/rate-limits/payment`; `MONEY_WRITE_PREFIXES` altındaki GET dışı istekler | 10 istek / 60 sn (`RATE_LIMIT_PAYMENT`) | 10 istek / 60 sn |
+| **`PAYMENT`** | `/api/payment/**`, `/api/v1/payments/**`, `/api/v1/test/rate-limits/payment` | 10 istek / 60 sn (`RATE_LIMIT_PAYMENT`) | 10 istek / 60 sn |
 | **`AUTH`** | `/api/auth/**`, `/api/v1/auth/**` | 20 istek / 60 sn (`RATE_LIMIT_AUTH`) | 20 istek / 60 sn |
 | **`AI`** | `/api/ai/**`, `/api/v1/ai/**` | 15 istek / 60 sn (`RATE_LIMIT_AI`) | 15 istek / 60 sn |
 | **`GENERAL`** | Yukarıdakiler dışındaki tüm API endpoint'leri | 150 istek / 60 sn (`RATE_LIMIT_GENERAL`) | 150 istek / 60 sn |

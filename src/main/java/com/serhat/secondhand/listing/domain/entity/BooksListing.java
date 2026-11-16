@@ -12,13 +12,18 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "books_listings")
+@Table(name = "books_listings",
+    indexes = {
+        @Index(name = "idx_books_listings_book_genre_id", columnList = "book_genre_id"),
+        @Index(name = "idx_books_listings_edition", columnList = "edition_id")
+    })
 @Getter @Setter
 @NoArgsConstructor
 @SuperBuilder

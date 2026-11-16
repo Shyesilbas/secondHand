@@ -14,11 +14,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "showcases", indexes = {
-    @Index(name = "idx_showcase_status_end", columnList = "status, end_date"),
-    @Index(name = "idx_showcase_user", columnList = "user_id"),
-    @Index(name = "idx_showcase_created", columnList = "created_at")
-})
+@Table(name = "showcases",
+    indexes = {
+        @Index(name = "idx_showcase_created", columnList = "created_at"),
+        @Index(name = "idx_showcase_status_end", columnList = "status, end_date"),
+        @Index(name = "idx_showcases_listing_id", columnList = "listing_id"),
+        @Index(name = "idx_showcases_listing_status", columnList = "listing_id, status"),
+        @Index(name = "idx_showcases_user_status", columnList = "user_id, status")
+    })
 @Data
 @Builder
 @NoArgsConstructor

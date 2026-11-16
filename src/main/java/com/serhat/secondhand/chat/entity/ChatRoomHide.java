@@ -15,8 +15,12 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "chat_room_hides",
-        uniqueConstraints = @UniqueConstraint(name = "uq_chat_room_hides_room_user", columnNames = {"chat_room_id", "user_id"}),
-        indexes = @Index(name = "idx_chat_room_hides_user", columnList = "user_id"))
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_chat_room_hides_room_user", columnNames = {"chat_room_id", "user_id"})
+    },
+    indexes = {
+        @Index(name = "idx_chat_room_hides_user", columnList = "user_id")
+    })
 @Data
 @Builder
 @NoArgsConstructor

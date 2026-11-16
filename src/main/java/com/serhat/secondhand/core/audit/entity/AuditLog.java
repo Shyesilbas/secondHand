@@ -8,7 +8,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "audit_logs")
+@Table(name = "audit_logs",
+    indexes = {
+        @Index(name = "idx_audit_logs_email_created", columnList = "user_email, created_at"),
+        @Index(name = "idx_audit_logs_ip_type_created", columnList = "ip_address, event_type, created_at"),
+        @Index(name = "idx_audit_logs_status_created", columnList = "event_status, created_at"),
+        @Index(name = "idx_audit_logs_type_created", columnList = "event_type, created_at"),
+        @Index(name = "idx_audit_logs_user_created", columnList = "user_id, created_at")
+    })
 @Data
 @Builder
 @NoArgsConstructor

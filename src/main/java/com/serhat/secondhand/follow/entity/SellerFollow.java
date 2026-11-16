@@ -14,9 +14,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "seller_follows", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"follower_id", "followed_id"})
-})
+@Table(name = "seller_follows",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_seller_follows_follower_followed", columnNames = {"follower_id", "followed_id"})
+    },
+    indexes = {
+        @Index(name = "idx_seller_follows_followed_created", columnList = "followed_id, created_at"),
+        @Index(name = "idx_seller_follows_follower_created", columnList = "follower_id, created_at")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -13,9 +13,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "processed_kafka_events", indexes = {
-        @Index(name = "idx_processed_kafka_processed_at", columnList = "processed_at")
-})
+@Table(name = "processed_kafka_events",
+    indexes = {
+        @Index(name = "idx_processed_kafka_events_consumer", columnList = "consumer_group, processed_at")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

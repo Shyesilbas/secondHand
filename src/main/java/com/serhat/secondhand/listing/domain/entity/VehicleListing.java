@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,12 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "vehicle_listings")
+@Table(name = "vehicle_listings",
+    indexes = {
+        @Index(name = "idx_vehicle_listings_car_brand_id", columnList = "car_brand_id"),
+        @Index(name = "idx_vehicle_listings_vehicle_model_id", columnList = "vehicle_model_id"),
+        @Index(name = "idx_vehicle_listings_version", columnList = "vehicle_version_id")
+    })
 @Getter @Setter
 @NoArgsConstructor
 @SuperBuilder
