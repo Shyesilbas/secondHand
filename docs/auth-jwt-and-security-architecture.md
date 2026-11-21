@@ -50,6 +50,8 @@ Oturum `SessionCreationPolicy.STATELESS`'tır; sunucuda HTTP session tutulmaz.
 | Refresh token | 7 gün (604800000 ms) | `sh_rt` HttpOnly cookie | DB'de **SHA-256 hash'i** saklanır (`TokenService.hash`, V38). |
 | Remember-me refresh token | 30 gün (2592000000 ms) | `sh_rt` HttpOnly cookie | Login'de `rememberMe=true` ise. |
 
+`sh_at` her isteğe `Path=/` ile gider. `sh_rt` yalnızca `CookieUtils.REFRESH_TOKEN_COOKIE_PATH` (`/api/v1/auth`) altına gider, çünkü onu sadece refresh ve logout okur; eski `Path=/` kopyası her refresh token yazımında ve logout'ta expire edilir.
+
 Cookie'lerin `Secure`, `SameSite` ve domain değerleri `app.auth.cookie.*` ayarlarından gelir (varsayılan `secure=false`, `same-site=Lax`; prod'da `secure=true` zorunludur).
 
 [`AuthenticationFilter`](../src/main/java/com/serhat/secondhand/core/jwt/AuthenticationFilter.java) önce header'a, yoksa cookie'ye bakar ve kullanıcıyı **DB'ye gitmeden** token claim'lerinden kurar:

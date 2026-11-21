@@ -82,24 +82,23 @@ public class VerificationService implements IVerificationService {
     }
 
     @Override
-    public boolean validateVerificationCode(User user, String code, CodeType codeType) {
-        // Doğrulama kodları (2FA / şifre sıfırlama) hiçbir log seviyesinde
-        // yazılmamalıdır.
-        log.debug("Validating verification code for user id: {}, codeType: {}", user.getId(), codeType);
+    @org.springframework.transaction.annotation.Transactional
+    public boolean consumeVerificationCode(User user, String code, CodeType codeType) {
+        // Verification codes (2FA / password reset / payment) must never be logged at any level.
+        log.debug("Consuming verification code for user id: {}, codeType: {}", user.getId(), codeType);
 
-        LocalDateTime now = LocalDateTime.now();
-
-        Optional<Verification> verification = verificationRepository.findActiveVerificationByUserCodeTypeAndCode(
-                user, codeType, code, now);
-
+        Optional<Verification> verification = verificationRepository.findActiveVerificationForUpdate(
+                user, codeType, code, LocalDateTime.now());
         if (verification.isEmpty()) {
-            int activeCount = verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(
-                    user, codeType, now).size();
-            log.debug("No matching active verification found for user id: {}, active count: {}",
-                    user.getId(), activeCount);
+            log.debug("No matching active verification found for user id: {}", user.getId());
+            return false;
         }
 
-        return verification.isPresent();
+        // Single use: once the caller's transaction commits, this code no longer matches any lookup.
+        Verification used = verification.get();
+        used.setVerified(true);
+        verificationRepository.save(used);
+        return true;
     }
 
     public Result<Void> sendAccountVerificationCode(Authentication authentication) {

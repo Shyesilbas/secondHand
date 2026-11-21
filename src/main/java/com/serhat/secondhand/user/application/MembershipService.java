@@ -131,7 +131,7 @@ public class MembershipService {
                 .transactionType(com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT)
                 .paymentDirection(com.serhat.secondhand.payment.entity.PaymentDirection.OUTGOING)
                 .agreementsAccepted(true)
-                .verificationCode("AUTO_RENEWAL")
+                .systemInitiated(true)
                 .idempotencyKey(idempotencyKey)
                 .build();
 

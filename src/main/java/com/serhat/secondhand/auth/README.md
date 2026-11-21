@@ -1,6 +1,6 @@
 # Auth Domain
 
-Manages user registration, credential and Google OAuth2 login, `HttpOnly` JWT cookie issuance (`access_token`, `refresh_token`), Refresh Token Rotation (RTR) with family-wide replay theft revocation (`tokens` table), session revocation (`AccessRevocationService`), two-tier login throttling (`LoginAttemptService`), and password reset/change flows.
+Manages user registration, credential and Google OAuth2 login, `HttpOnly` JWT cookie issuance (`sh_at`, `sh_rt`), Refresh Token Rotation (RTR) with family-wide replay theft revocation (`tokens` table), session revocation (`AccessRevocationService`), two-tier login throttling (`LoginAttemptService`), and password reset/change flows.
 
 > [!NOTE]
 > **Related Documentation & Runbooks:**
@@ -10,7 +10,9 @@ Manages user registration, credential and Google OAuth2 login, `HttpOnly` JWT co
 > - **Key Entry Points:** [`AuthController`](api/AuthController.java) · [`PasswordController`](api/PasswordController.java) · [`TokenService`](application/TokenService.java) · [`RegistrationService`](application/RegistrationService.java) · [`LoginAttemptService`](application/LoginAttemptService.java) · [`AccessRevocationService`](application/AccessRevocationService.java) · [`PasswordService`](application/PasswordService.java) · [`TokenCleanupScheduler`](application/TokenCleanupScheduler.java)
 
 ## Business Rules & Invariants
-- **Registration & Account Standing:** `RegistrationValidator` enforces unique email/phone, mandatory legal agreement consent (`agreementsAccepted == true`), and BCrypt password hashing. Login requires `AccountStatus.ACTIVE` (`AccountNotActiveException` on `BLOCKED`/`SUSPENDED`/`DELETED`).
+- **Registration & Account Standing:** `RegistrationValidator` enforces mandatory legal agreement consent (`agreementsAccepted == true`); passwords are BCrypt-hashed.
+- **No account enumeration on register:** `RegistrationService` answers a taken email or phone with the same `RegisterResponse` as a new account and still spends the BCrypt hash time; nothing is created. Agreements are validated first so their error cannot reveal an existing account. Login requires `AccountStatus.ACTIVE` (`AccountNotActiveException` on `BLOCKED`/`SUSPENDED`/`DELETED`).
+- **Verification code on demand:** registration (`UserRegisteredEvent` -> `UserNotificationService.onUserRegistered`) sends only the welcome email. The account verification code is sent when the user presses send on the verification page (`VerificationService.sendAccountVerificationCode`).
 - **HttpOnly Cookies & Refresh Token Rotation (RTR):** Tokens live in `HttpOnly`, `SameSite`, `Secure` cookies (`CookieUtils`), never in JSON bodies or `localStorage`. Rotating a refresh token (`POST /api/v1/auth/refresh`) marks the parent `Token` row `TokenStatus.REVOKED` and issues a child in the same `family_id`. If an already-`REVOKED` refresh token is presented (replay theft), `TokenService` immediately revokes the entire token family (`revokeAllByFamilyId`) and returns `401 INVALID_REFRESH_TOKEN`.
 - **Housekeeping (`TokenCleanupScheduler`):** Purges expired/revoked `tokens` rows older than 30 days daily at midnight.
 - **Change rule:** Tokens are minted only after the user/token rows are saved; refresh validates both the JWT signature and the stored token status.

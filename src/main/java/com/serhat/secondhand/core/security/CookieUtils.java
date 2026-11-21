@@ -22,6 +22,10 @@ public class CookieUtils {
 
     public static final String ACCESS_TOKEN_COOKIE = "sh_at";
     public static final String REFRESH_TOKEN_COOKIE = "sh_rt";
+    /** Only AuthController's refresh and logout read the refresh token, so it is not sent with other requests. */
+    public static final String REFRESH_TOKEN_COOKIE_PATH = "/api/v1/auth";
+    /** Path used before REFRESH_TOKEN_COOKIE_PATH; still expired so old browser sessions do not keep a stale copy. */
+    static final String LEGACY_REFRESH_TOKEN_COOKIE_PATH = "/";
 
     public void setAccessTokenCookie(HttpServletResponse response, String token) {
         int accessTokenMaxAge = (int) (jwtConfig.getAccessToken().getExpiration() / 1000);
@@ -38,7 +42,8 @@ public class CookieUtils {
     public void setRefreshTokenCookie(HttpServletResponse response, String token, boolean rememberMe) {
         long expirationMs = rememberMe ? jwtConfig.getRefreshToken().getRememberMeExpiration() : jwtConfig.getRefreshToken().getExpiration();
         int refreshTokenMaxAge = (int) (expirationMs / 1000);
-        Cookie cookie = createSecureCookie(REFRESH_TOKEN_COOKIE, token, refreshTokenMaxAge, "/");
+        clearCookie(response, REFRESH_TOKEN_COOKIE, LEGACY_REFRESH_TOKEN_COOKIE_PATH);
+        Cookie cookie = createSecureCookie(REFRESH_TOKEN_COOKIE, token, refreshTokenMaxAge, REFRESH_TOKEN_COOKIE_PATH);
         response.addCookie(cookie);
         addSameSiteAttribute(response, REFRESH_TOKEN_COOKIE, cookieConfig.getSameSite());
         log.debug("Refresh token cookie set with SameSite={}, maxAge={}s, rememberMe={}", cookieConfig.getSameSite(), refreshTokenMaxAge, rememberMe);
@@ -54,7 +59,8 @@ public class CookieUtils {
 
         public void clearAuthCookies(HttpServletResponse response) {
         clearCookie(response, ACCESS_TOKEN_COOKIE, "/");
-        clearCookie(response, REFRESH_TOKEN_COOKIE, "/");
+        clearCookie(response, REFRESH_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE_PATH);
+        clearCookie(response, REFRESH_TOKEN_COOKIE, LEGACY_REFRESH_TOKEN_COOKIE_PATH);
         log.debug("Authentication cookies cleared");
     }
 

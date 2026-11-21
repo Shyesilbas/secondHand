@@ -1,6 +1,7 @@
 package com.serhat.secondhand.auth.application;
 
 import lombok.RequiredArgsConstructor;
+import com.serhat.secondhand.core.redis.ExpiringCounter;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class LoginAttemptService {
     static final String IP_KEY_PREFIX = "auth:login-fail:ip:";
 
     private final StringRedisTemplate redisTemplate;
+    private final ExpiringCounter expiringCounter;
 
     public boolean isBlocked(String email, String clientIp) {
         List<String> counts = redisTemplate.opsForValue().multiGet(List.of(accountKey(email, clientIp), ipKey(clientIp)));
@@ -45,10 +47,8 @@ public class LoginAttemptService {
         redisTemplate.delete(accountKey(email, clientIp));
     }
 
-    // SET NX with the TTL first, then INCR (which keeps the TTL): a counter never lives without an expiry.
     private void increment(String key) {
-        redisTemplate.opsForValue().setIfAbsent(key, "0", WINDOW);
-        redisTemplate.opsForValue().increment(key);
+        expiringCounter.increment(key, WINDOW);
     }
 
     private static boolean atLeast(String value, int limit) {

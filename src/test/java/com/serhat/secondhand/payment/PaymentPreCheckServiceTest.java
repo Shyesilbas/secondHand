@@ -16,7 +16,9 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,5 +48,61 @@ class PaymentPreCheckServiceTest {
         assertThat(result.isError()).isTrue();
         assertThat(result.getErrorCode()).isEqualTo(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED.getCode());
         verify(verificationService).generateAndSendVerification(payer);
+    }
+
+    @Test
+    void clientMembershipPaymentWithAutoRenewalCodeStillRequiresAgreementsAndOtp() {
+        User payer = new User();
+        PaymentRequest request = membershipRequest().verificationCode("AUTO_RENEWAL").build();
+        when(userService.findById(1L)).thenReturn(Result.success(payer));
+        when(paymentValidator.validatePaymentAgreements(request)).thenReturn(Result.success());
+        when(verificationService.isVerificationRequired("AUTO_RENEWAL")).thenReturn(false);
+        when(verificationService.validateCode(eq(payer), eq("AUTO_RENEWAL")))
+                .thenReturn(Result.error(PaymentErrorCodes.INVALID_VERIFICATION_CODE.toString(), "Invalid verification code."));
+
+        Result<PaymentPreCheckService.PreCheckContext> result = service.preCheck(1L, request);
+
+        assertThat(result.isError()).isTrue();
+        verify(paymentValidator).validatePaymentAgreements(request);
+        verify(verificationService).validateCode(payer, "AUTO_RENEWAL");
+    }
+
+    @Test
+    void systemInitiatedMembershipRenewalSkipsAgreementsAndOtp() {
+        User payer = new User();
+        PaymentRequest request = membershipRequest().systemInitiated(true).build();
+        when(userService.findById(1L)).thenReturn(Result.success(payer));
+        when(validationHelper.validatePaymentRequest(any(), any(), any())).thenReturn(Result.success());
+
+        Result<PaymentPreCheckService.PreCheckContext> result = service.preCheck(1L, request);
+
+        assertThat(result.isSuccess()).isTrue();
+        verify(paymentValidator, never()).validatePaymentAgreements(any());
+        verify(verificationService, never()).validateCode(any(), any());
+    }
+
+    @Test
+    void systemInitiatedFlagDoesNotSkipOtpForOtherTransactionTypes() {
+        User payer = new User();
+        PaymentRequest request = membershipRequest()
+                .transactionType(PaymentTransactionType.ITEM_PURCHASE)
+                .systemInitiated(true)
+                .build();
+        when(userService.findById(1L)).thenReturn(Result.success(payer));
+        when(paymentValidator.validatePaymentAgreements(request)).thenReturn(Result.success());
+        when(verificationService.isVerificationRequired(null)).thenReturn(true);
+
+        Result<PaymentPreCheckService.PreCheckContext> result = service.preCheck(1L, request);
+
+        assertThat(result.isError()).isTrue();
+        verify(verificationService).generateAndSendVerification(payer);
+    }
+
+    private PaymentRequest.PaymentRequestBuilder membershipRequest() {
+        return PaymentRequest.builder()
+                .amount(new BigDecimal("100.00"))
+                .currency("TRY")
+                .providerName("EWALLET")
+                .transactionType(PaymentTransactionType.MEMBERSHIP_PAYMENT);
     }
 }

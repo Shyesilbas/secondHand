@@ -3,6 +3,7 @@ package com.serhat.secondhand.auth;
 import com.serhat.secondhand.auth.application.LoginAttemptService;
 import com.serhat.secondhand.auth.domain.dto.response.AuthClientResponse;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
+import com.serhat.secondhand.core.redis.ExpiringCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -22,20 +23,23 @@ class LoginAttemptServiceTest {
 
     private final Map<String, Long> store = new HashMap<>();
     private LoginAttemptService service;
+    private ExpiringCounter counter;
+    private ValueOperations<String, String> ops;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
     void setUp() {
         StringRedisTemplate redis = mock(StringRedisTemplate.class);
-        ValueOperations<String, String> ops = mock(ValueOperations.class);
-        when(redis.opsForValue()).thenReturn(ops);
-        when(ops.setIfAbsent(anyString(), eq("0"), any(Duration.class)))
-                .thenAnswer(inv -> store.putIfAbsent(inv.getArgument(0), 0L) == null);
-        when(ops.increment(anyString())).thenAnswer(inv -> store.merge(inv.getArgument(0), 1L, Long::sum));
-        when(ops.multiGet(anyList())).thenAnswer(inv -> ((List<String>) inv.getArgument(0)).stream()
+        ValueOperations<String, String> redisOps = mock(ValueOperations.class);
+        when(redis.opsForValue()).thenReturn(redisOps);
+        counter = mock(ExpiringCounter.class);
+        when(counter.increment(anyString(), any(Duration.class)))
+                .thenAnswer(inv -> store.merge(inv.getArgument(0), 1L, Long::sum));
+        when(redisOps.multiGet(anyList())).thenAnswer(inv -> ((List<String>) inv.getArgument(0)).stream()
                 .map(k -> store.containsKey(k) ? store.get(k).toString() : null).toList());
         when(redis.delete(anyString())).thenAnswer(inv -> store.remove((String) inv.getArgument(0)) != null);
-        service = new LoginAttemptService(redis);
+        ops = redisOps;
+        service = new LoginAttemptService(redis, counter);
     }
 
     private void fail(String email, String ip, int times) {
@@ -95,5 +99,15 @@ class LoginAttemptServiceTest {
         assertThat(body.plan()).isEqualTo("PREMIUM");
         assertThat(Arrays.stream(AuthClientResponse.class.getRecordComponents()).map(c -> c.getName()))
                 .noneMatch(name -> name.toLowerCase().contains("token"));
+    }
+
+    @Test
+    void failedLogin_countsWithTheAtomicCounterSoNoKeyLivesWithoutExpiry() {
+        service.loginFailed("a@b.com", "10.0.0.1");
+
+        verify(counter, times(2)).increment(anyString(), eq(Duration.ofMinutes(15)));
+        // SET NX + INCR as two commands could leave a counter with no TTL (a permanent lockout).
+        verify(ops, never()).setIfAbsent(anyString(), anyString(), any(Duration.class));
+        verify(ops, never()).increment(anyString());
     }
 }

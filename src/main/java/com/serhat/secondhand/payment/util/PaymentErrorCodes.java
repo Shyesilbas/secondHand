@@ -14,6 +14,7 @@ public enum PaymentErrorCodes implements ErrorCode {
     LISTING_NOT_FOUND("LISTING_NOT_FOUND", "Listing not found", HttpStatus.NOT_FOUND),
     PAYMENT_VERIFICATION_REQUIRED("PAYMENT_VERIFICATION_REQUIRED", "Verification code required. Code sent via email", HttpStatus.PRECONDITION_REQUIRED),
     INVALID_VERIFICATION_CODE("INVALID_VERIFICATION_CODE", "Invalid or expired verification code", HttpStatus.BAD_REQUEST),
+    PAYMENT_VERIFICATION_LOCKED("PAYMENT_VERIFICATION_LOCKED", "Too many invalid verification codes. Request a new code", HttpStatus.TOO_MANY_REQUESTS),
     EMPTY_PAYMENT_BATCH("EMPTY_PAYMENT_BATCH", "No payments to process", HttpStatus.BAD_REQUEST),
     INVALID_TXN_TYPE("INVALID_TXN_TYPE", "Invalid transaction type in batch", HttpStatus.BAD_REQUEST),
     INVALID_DIRECTION("INVALID_DIRECTION", "Invalid payment direction in batch", HttpStatus.BAD_REQUEST),

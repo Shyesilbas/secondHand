@@ -14,7 +14,11 @@ public interface IVerificationService {
 
     List<Verification> findAllActiveVerifications(User user, CodeType codeType);
     
-    boolean validateVerificationCode(User user, String code, CodeType codeType);
+    /**
+     * Marks the matching active code as used and returns true, or returns false when no active code matches.
+     * Runs in the caller's transaction, so a rolled-back payment leaves the code usable.
+     */
+    boolean consumeVerificationCode(User user, String code, CodeType codeType);
     
     void markVerificationAsUsed(Verification verification);
     

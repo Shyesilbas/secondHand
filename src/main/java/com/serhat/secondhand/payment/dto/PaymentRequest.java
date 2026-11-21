@@ -30,6 +30,11 @@ public record PaymentRequest(
         String idempotencyKey,
         PaymentStatus status,
         UUID orderId,
-        String description
+        String description,
+        /*
+         * Set only by server-side flows (membership auto-renewal). Never bound from a client
+         * request: every client-facing builder leaves it false, so OTP and agreements stay required.
+         */
+        boolean systemInitiated
 ) {
 }

@@ -13,10 +13,9 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
+import com.serhat.secondhand.core.redis.ExpiringCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -24,6 +23,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class PasswordServiceTest {
@@ -32,16 +32,13 @@ class PasswordServiceTest {
     private final IVerificationService verificationService = mock(IVerificationService.class);
     private final PasswordEncoder encoder = mock(PasswordEncoder.class);
     private final UserNotificationService notificationService = mock(UserNotificationService.class);
-    private final StringRedisTemplate redisTemplate = mock(StringRedisTemplate.class);
-    @SuppressWarnings("unchecked")
-    private final ValueOperations<String, String> valueOps = mock(ValueOperations.class);
+    private final ExpiringCounter counter = mock(ExpiringCounter.class);
     private PasswordService service;
 
     @BeforeEach
     void setUp() {
-        when(redisTemplate.opsForValue()).thenReturn(valueOps);
         service = new PasswordService(userService, mock(TokenService.class), encoder,
-                verificationService, notificationService, redisTemplate);
+                verificationService, notificationService, counter);
     }
 
     @Test
@@ -76,7 +73,7 @@ class PasswordServiceTest {
 
     @Test
     void forgotPassword_overLimit_returnsGenericSuccessWithoutSendingCode() {
-        when(valueOps.increment(anyString())).thenReturn(4L);
+        when(counter.increment(anyString(), any(java.time.Duration.class))).thenReturn(4L);
 
         Result<String> result = service.forgotPassword(new ForgotPasswordRequest("a@b.com"));
 
@@ -87,7 +84,7 @@ class PasswordServiceTest {
 
     @Test
     void forgotPassword_firstRequest_setsWindowAndSendsCode() {
-        when(valueOps.increment(anyString())).thenReturn(1L);
+        when(counter.increment(anyString(), any(java.time.Duration.class))).thenReturn(1L);
         User user = new User();
         user.setAccountStatus(AccountStatus.ACTIVE);
         when(userService.findOptionalByEmail("a@b.com")).thenReturn(Optional.of(user));
@@ -96,7 +93,8 @@ class PasswordServiceTest {
         Result<String> result = service.forgotPassword(new ForgotPasswordRequest("a@b.com"));
 
         assertThat(result.isSuccess()).isTrue();
-        verify(redisTemplate).expire(anyString(), any(java.time.Duration.class));
+        // One atomic call sets the count and the one-hour window; a separate EXPIRE could be lost.
+        verify(counter).increment(anyString(), eq(java.time.Duration.ofHours(1)));
         verify(notificationService).sendPasswordResetCodeNotification(user, "654321");
     }
 }

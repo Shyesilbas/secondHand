@@ -4,6 +4,7 @@ import com.serhat.secondhand.auth.domain.dto.request.ChangePasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ResetPasswordRequest;
 import com.serhat.secondhand.auth.util.AuthErrorCodes;
+import com.serhat.secondhand.core.redis.ExpiringCounter;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
@@ -13,7 +14,6 @@ import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class PasswordService {
     private final PasswordEncoder passwordEncoder;
     private final IVerificationService verificationService;
     private final UserNotificationService userNotificationService;
-    private final StringRedisTemplate redisTemplate;
+    private final ExpiringCounter expiringCounter;
 
     /** Reset codes one email may receive per window; each code has its own 3 attempts. */
     static final int MAX_RESET_CODES_PER_WINDOW = 3;
@@ -109,14 +109,7 @@ public class PasswordService {
 
     private boolean tryConsumeResetRequest(String email) {
         String key = RESET_REQUEST_KEY_PREFIX + sha256Hex(email == null ? "" : email.trim().toLowerCase(Locale.ROOT));
-        Long count = redisTemplate.opsForValue().increment(key);
-        if (count == null) {
-            throw new IllegalStateException("Redis INCR returned null for password reset limiter");
-        }
-        if (count == 1L) {
-            redisTemplate.expire(key, RESET_CODE_WINDOW);
-        }
-        return count <= MAX_RESET_CODES_PER_WINDOW;
+        return expiringCounter.increment(key, RESET_CODE_WINDOW) <= MAX_RESET_CODES_PER_WINDOW;
     }
 
     private static String sha256Hex(String value) {

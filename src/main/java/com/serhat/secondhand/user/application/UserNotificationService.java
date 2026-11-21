@@ -8,11 +8,9 @@ import com.serhat.secondhand.email.application.event.model.GenericEmailData;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
-import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.user.application.event.UserRegisteredEvent;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
@@ -28,39 +26,26 @@ public class UserNotificationService {
     private final EmailConfig emailConfig;
     private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
-    private final IVerificationService verificationService;
 
     public UserNotificationService(
             EmailEventPublisher emailEventPublisher,
             EmailConfig emailConfig,
             NotificationEventPublisher notificationEventPublisher,
-            NotificationTemplateCatalog notificationTemplateCatalog,
-            @Lazy IVerificationService verificationService) {
+            NotificationTemplateCatalog notificationTemplateCatalog) {
         this.emailEventPublisher = emailEventPublisher;
         this.emailConfig = emailConfig;
         this.notificationEventPublisher = notificationEventPublisher;
         this.notificationTemplateCatalog = notificationTemplateCatalog;
-        this.verificationService = verificationService;
     }
 
+    /**
+     * Sends only the welcome email. The account verification code is sent when the user asks for it
+     * on the verification page ({@code VerificationService.sendAccountVerificationCode}).
+     */
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onUserRegistered(UserRegisteredEvent event) {
         sendWelcomeNotification(event.user());
-        try {
-            var verificationOpt = verificationService.findLatestActiveVerification(event.user(), com.serhat.secondhand.core.verification.CodeType.ACCOUNT_VERIFICATION);
-            String code;
-            if (verificationOpt.isPresent()) {
-                code = verificationOpt.get().getCode();
-            } else {
-                code = verificationService.generateCode();
-                verificationService.generateVerification(event.user(), code, com.serhat.secondhand.core.verification.CodeType.ACCOUNT_VERIFICATION);
-            }
-            sendVerificationCodeNotification(event.user(), code);
-            log.info("Account verification code email sent on registration for user: {}", event.user().getEmail());
-        } catch (Exception e) {
-            log.warn("Failed to send account verification email on registration for user {}: {}", event.user().getEmail(), e.getMessage());
-        }
     }
 
     public void sendWelcomeNotification(User user) {

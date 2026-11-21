@@ -5,7 +5,6 @@ import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.util.AuthErrorCodes;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.user.application.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,14 +17,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RegistrationValidator {
 
-    private final IUserService userService;
     private final AgreementRequirementService agreementRequirementService;
 
+    /**
+     * Checks only what the client can see in its own request. Email/phone uniqueness is handled in
+     * RegistrationService, which answers the same way for taken and new accounts.
+     */
     public Result<Void> validate(RegisterRequest request) {
-        Result<Void> validationResult = userService.validateUniqueUser(request.getEmail(), request.getPhoneNumber());
-        if (validationResult.isError()) {
-            return validationResult;
-        }
 
         if (Boolean.FALSE.equals(request.getAgreementsAccepted())) {
             return Result.error(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);

@@ -28,8 +28,10 @@ public class PaymentPreCheckService {
         User fromUser = userResult.getData();
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
 
-        boolean isAutoRenewal = paymentRequest.transactionType() == com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT
-                && "AUTO_RENEWAL".equals(paymentRequest.verificationCode());
+        // Only the server-built renewal request may skip OTP and agreements; a client-supplied
+        // verification code never does.
+        boolean isAutoRenewal = paymentRequest.systemInitiated()
+                && paymentRequest.transactionType() == com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT;
 
         if (!isAutoRenewal) {
             Result<Void> agreementsResult = paymentValidator.validatePaymentAgreements(paymentRequest);

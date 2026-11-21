@@ -31,18 +31,35 @@ public class RegistrationService {
     private final ApplicationEventPublisher eventPublisher;
     private final RegistrationValidator registrationValidator;
 
+    /** Error code UserService.save returns when a concurrent registration took the email or phone first. */
+    private static final String USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
+
+    /**
+     * Answers a taken email or phone exactly like a new account (same body, same password hashing cost),
+     * so the endpoint cannot be used to find out which emails or phone numbers are registered.
+     */
     @Transactional
     public Result<RegisterResponse> register(RegisterRequest request) {
-        log.info("User registration attempt: {}", request.getEmail());
+        log.info("User registration attempt");
 
         Result<Void> validationResult = registrationValidator.validate(request);
         if (validationResult.isError()) {
             return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
         }
 
+        if (userService.validateUniqueUser(request.getEmail(), request.getPhoneNumber()).isError()) {
+            // Spend the same BCrypt time a real registration spends before answering.
+            passwordEncoder.encode(request.getPassword());
+            log.info("Registration skipped: email or phone already registered");
+            return Result.success(response(request));
+        }
+
         User user = userMapper.toEntity(request, passwordEncoder);
         Result<Void> saveResult = userService.save(user);
         if (saveResult.isError()) {
+            if (USER_ALREADY_EXISTS.equals(saveResult.getErrorCode())) {
+                return Result.success(response(request));
+            }
             return Result.error(saveResult.getMessage(), saveResult.getErrorCode());
         }
 
@@ -54,17 +71,19 @@ public class RegistrationService {
             }
         }
 
-        log.info("User registered successfully: {}", user.getEmail());
-
+        log.info("User registered successfully: {}", user.getId());
         eventPublisher.publishEvent(new UserRegisteredEvent(user));
+        return Result.success(response(request));
+    }
 
-        return Result.success(new RegisterResponse(
-                "Registration Successful.",
-                "Account verification is a must for publish listing. Your account status is " + user.getAccountStatus(),
-                "Your built in email account also created.",
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
-                user.getSurname()));
+    private static RegisterResponse response(RegisterRequest request) {
+        return new RegisterResponse(
+                "Registration request received.",
+                "If this email is new, your account is ready: log in with your email and password. "
+                        + "If you already have an account, log in or reset your password.",
+                "Account verification is required to publish listings.",
+                request.getEmail(),
+                request.getName(),
+                request.getSurname());
     }
 }
