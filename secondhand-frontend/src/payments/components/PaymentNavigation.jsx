@@ -1,167 +1,85 @@
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useEffect, useState } from "react";
-import { ArrowDownCircle, ArrowUpCircle, ShoppingCart, Wallet, X } from "lucide-react";
-import DataPagination from '../../common/components/ui/DataPagination.jsx';
-import { Card } from '../../common/components/ui/index.js';
+import { useCallback } from "react";
+import { X } from "lucide-react";
+import Button from '../../common/components/ui/Button.jsx';
+import { inputNormal } from '../../common/components/forms/inputStyles.js';
 import { useEscapeKey } from '../../common/hooks/useEscapeKey.js';
-import { PAGE_SIZE_OPTIONS_5_10_20_50 } from '../../common/constants/pagination.js';
-import { DEFAULT_CURRENCY_SYMBOL, DEFAULT_PAYMENT_FILTERS, PAYMENT_DIRECTIONS, PAYMENT_TRANSACTION_TYPES, PAYMENT_TYPES } from "../paymentSchema.js";
+import { DEFAULT_CURRENCY_SYMBOL, PAYMENT_TRANSACTION_TYPES, transactionTypeLabel } from "../paymentSchema.js";
+const FIELD_LABEL = 'mb-1.5 block text-sm font-medium text-text-primary';
+
+// Type, date and amount filters. Direction and the text search live in the page toolbar, so they are
+// not repeated here; every change applies at once (React Query refetches).
 const PaymentFilterSidebar = ({
  isOpen,
  onClose,
  filters,
  onFilterChange,
- onReset
+ onReset,
+ hasActiveFilters
 }) => {
  const {
  t
  } = useTranslation();
- const [localFilters, setLocalFilters] = useState(filters);
- useEffect(() => {
- setLocalFilters(filters);
- }, [filters]);
  useEscapeKey(onClose, isOpen);
- const handleInputChange = useCallback((field, value) => {
- setLocalFilters(prev => ({
- ...prev,
- [field]: value
- }));
- onFilterChange(field, value);
- }, [onFilterChange]);
- const handleReset = useCallback(() => {
- setLocalFilters(DEFAULT_PAYMENT_FILTERS);
- onReset();
- }, [onReset]);
+ const set = useCallback((field) => (e) => onFilterChange(field, e.target.value), [onFilterChange]);
+ const dateInvalid = filters.dateFrom && filters.dateTo && filters.dateFrom > filters.dateTo;
+ const amountInvalid = filters.amountMin !== '' && filters.amountMax !== '' && Number(filters.amountMin) > Number(filters.amountMax);
  return <>
  {isOpen && <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={onClose} />}
- <div className={`fixed left-0 top-0 h-screen w-80 bg-background-primary shadow-md z-50 border-r border-border-light flex flex-col
+ <aside aria-label={t("filters")} className={`fixed left-0 top-0 z-50 flex h-screen w-80 flex-col border-r border-border-light bg-background-primary shadow-md lg:top-16 lg:bottom-0 lg:z-30 lg:h-auto lg:shadow-none
  transform transition-transform duration-300 ease-in-out
  ${isOpen ? 'translate-x-0' : '-translate-x-full'}
  `}>
- <div className="border-b border-border-light bg-background-primary px-4 py-4 flex-shrink-0">
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("filters")}</h2>
- <p className="text-sm text-text-tertiary mt-0.5">{t("refine_payment_history_with_precision")}</p>
- </div>
+ <div className="flex shrink-0 items-center justify-between border-b border-border-light px-5 py-4">
+ <h2 className="text-lg font-semibold text-text-primary">{t("filters")}</h2>
  <button type="button" onClick={onClose} aria-label={t("close")} className="rounded p-2 text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
  <X className="h-4 w-4" strokeWidth={1.5} />
  </button>
  </div>
- </div>
 
- <div className="flex-1 overflow-y-auto bg-background-secondary overscroll-contain">
- <div className="p-4 space-y-4">
- <Card padding="compact" border="light" shadow={false}>
- <h3 className="text-sm font-medium text-text-primary mb-3">{t("quick_filters")}</h3>
- <div className="space-y-2">
- <button onClick={() => handleInputChange('paymentDirection', localFilters.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? '' : PAYMENT_DIRECTIONS.INCOMING)} className={`w-full p-2.5 rounded border transition-all duration-200 text-left ${localFilters.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'border-secondary-400 bg-background-secondary text-text-primary' : 'border-border-light bg-background-primary text-text-secondary hover:border-card-border-hover'}`}>
- <span className="text-sm font-medium inline-flex items-center gap-2">
- <ArrowDownCircle className="w-4 h-4" />{t("incoming")}</span>
- </button>
- <button onClick={() => handleInputChange('paymentDirection', localFilters.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING ? '' : PAYMENT_DIRECTIONS.OUTGOING)} className={`w-full p-2.5 rounded border transition-all duration-200 text-left ${localFilters.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING ? 'border-status-error bg-background-secondary text-status-error-text' : 'border-border-light bg-background-primary text-text-secondary hover:border-card-border-hover'}`}>
- <span className="text-sm font-medium inline-flex items-center gap-2">
- <ArrowUpCircle className="w-4 h-4" />{t("outgoing")}</span>
- </button>
- <button onClick={() => handleInputChange('transactionType', localFilters.transactionType === PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE ? '' : PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE)} className={`w-full p-2.5 rounded border transition-all duration-200 text-left ${localFilters.transactionType === PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE ? 'border-primary bg-background-tertiary text-primary' : 'border-border-light bg-background-primary text-text-secondary hover:border-card-border-hover'}`}>
- <span className="text-sm font-medium inline-flex items-center gap-2">
- <ShoppingCart className="w-4 h-4" />{t("purchases")}</span>
- </button>
- <button onClick={() => handleInputChange('providerName', localFilters.providerName === PAYMENT_TYPES.EWALLET ? '' : PAYMENT_TYPES.EWALLET)} className={`w-full p-2.5 rounded border transition-all duration-200 text-left ${localFilters.providerName === PAYMENT_TYPES.EWALLET ? 'border-card-border-hover bg-primary text-text-inverse' : 'border-border-light bg-background-primary text-text-secondary hover:border-card-border-hover'}`}>
- <span className="text-sm font-medium inline-flex items-center gap-2">
- <Wallet className="w-4 h-4" />{t("ewallet")}</span>
- </button>
- </div>
- </Card>
-
- <Card padding="compact" border="light" shadow={false}>
- <h3 className="text-sm font-medium text-text-primary mb-3">{t("seller")}</h3>
- <div className="relative">
- <input type="text" placeholder={t("search_seller")} value={localFilters.seller || ''} onChange={e => handleInputChange('seller', e.target.value)} className="w-full pl-8 pr-2 py-2.5 bg-background-secondary border border-border-light rounded text-sm focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all" />
- <svg className="absolute left-2 top-3 w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
- </svg>
- </div>
- </Card>
-
- <Card padding="compact" border="light" shadow={false}>
- <h3 className="text-sm font-medium text-text-primary mb-3">{t("transaction_type")}</h3>
- <select value={localFilters.transactionType || ''} onChange={e => handleInputChange('transactionType', e.target.value)} className="w-full px-2 py-2.5 bg-background-secondary border border-border-light rounded text-sm focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all">
+ <div className="flex-1 space-y-6 overflow-y-auto overscroll-contain p-5">
+ <div>
+ <label htmlFor="payment-filter-type" className={FIELD_LABEL}>{t("transaction_type")}</label>
+ <select id="payment-filter-type" value={filters.transactionType || ''} onChange={set('transactionType')} className={inputNormal}>
  <option value="">{t("all_transaction_types")}</option>
- <option value={PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE}>{t("item_purchase")}</option>
- <option value={PAYMENT_TRANSACTION_TYPES.LISTING_CREATION}>{t("listing_creation")}</option>
- <option value={PAYMENT_TRANSACTION_TYPES.SHOWCASE_PAYMENT}>{t("showcase_payment")}</option>
- <option value={PAYMENT_TRANSACTION_TYPES.REFUND}>{t("refund")}</option>
+ {Object.values(PAYMENT_TRANSACTION_TYPES).map(type => <option key={type} value={type}>{transactionTypeLabel(t, type)}</option>)}
  </select>
- </Card>
-
- <Card padding="compact" border="light" shadow={false}>
- <h3 className="text-sm font-medium text-text-primary mb-3">{t("payment_method")}</h3>
- <select value={localFilters.transactionType || ''} onChange={e => handleInputChange('transactionType', e.target.value)} className="w-full px-2 py-2.5 bg-background-secondary border border-border-light rounded text-sm focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all">
- <option value="">{t("all_payment_methods")}</option>
- <option value={PAYMENT_TYPES.EWALLET}>{t("ewallet")}</option>
- </select>
- </Card>
-
- <Card padding="compact" border="light" shadow={false}>
- <h3 className="text-sm font-medium text-text-primary mb-3">{t("payment_direction")}</h3>
- <select value={localFilters.paymentDirection || ''} onChange={e => handleInputChange('paymentDirection', e.target.value)} className="w-full px-2 py-2.5 bg-background-secondary border border-border-light rounded text-sm focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all">
- <option value="">{t("all_directions")}</option>
- <option value={PAYMENT_DIRECTIONS.INCOMING}>{t("incoming")}</option>
- <option value={PAYMENT_DIRECTIONS.OUTGOING}>{t("outgoing")}</option>
- </select>
- </Card>
-
- <Card padding="compact" border="light" shadow={false}>
- <h3 className="text-sm font-medium text-text-primary mb-3">{t("date_range")}</h3>
- <div className="space-y-2">
- <div>
- <label className="text-xs text-text-secondary mb-1 block">{t("from_date")}</label>
- <input type="date" value={localFilters.dateFrom || ''} onChange={e => handleInputChange('dateFrom', e.target.value)} className="w-full px-2 py-2.5 bg-background-secondary border border-border-light rounded text-sm focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all" />
- </div>
- <div>
- <label className="text-xs text-text-secondary mb-1 block">{t("to_date")}</label>
- <input type="date" value={localFilters.dateTo || ''} onChange={e => handleInputChange('dateTo', e.target.value)} className="w-full px-2 py-2.5 bg-background-secondary border border-border-light rounded text-sm focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all" />
- </div>
- </div>
- </Card>
-
- <Card padding="compact" border="light" shadow={false}>
- <h3 className="text-sm font-medium text-text-primary mb-3">{t("amount_range")}</h3>
- <div className="space-y-2">
- <div className="relative">
- <input type="number" placeholder={t("min")} min="0" step="0.01" value={localFilters.amountMin || ''} onChange={e => handleInputChange('amountMin', e.target.value)} className="w-full pl-6 pr-2 py-2.5 bg-background-secondary border border-border-light rounded text-sm focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all" />
- <span className="absolute left-2 top-3 text-text-muted text-sm">{DEFAULT_CURRENCY_SYMBOL}</span>
- </div>
- <div className="relative">
- <input type="number" placeholder={t("max")} min="0" step="0.01" value={localFilters.amountMax || ''} onChange={e => handleInputChange('amountMax', e.target.value)} className="w-full pl-6 pr-2 py-2.5 bg-background-secondary border border-border-light rounded text-sm focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all" />
- <span className="absolute left-2 top-3 text-text-muted text-sm">{DEFAULT_CURRENCY_SYMBOL}</span>
- </div>
- </div>
- </Card>
- </div>
  </div>
 
- <div className="border-t border-border-light bg-background-primary px-4 py-3 flex-shrink-0">
- <div className="flex flex-col gap-2">
- <button onClick={handleReset} className="w-full px-3 py-2 text-text-secondary text-sm font-medium hover:text-text-primary hover:bg-background-secondary rounded transition-colors">{t("reset_all")}</button>
+ <fieldset>
+ <legend className={FIELD_LABEL}>{t("date_range")}</legend>
+ <div className="grid grid-cols-2 gap-2">
+ <label className="text-sm text-text-secondary">
+ <span className="mb-1 block">{t("from_date")}</span>
+ <input type="date" value={filters.dateFrom || ''} max={filters.dateTo || undefined} onChange={set('dateFrom')} className={inputNormal} />
+ </label>
+ <label className="text-sm text-text-secondary">
+ <span className="mb-1 block">{t("to_date")}</span>
+ <input type="date" value={filters.dateTo || ''} min={filters.dateFrom || undefined} onChange={set('dateTo')} className={inputNormal} />
+ </label>
  </div>
+ {dateInvalid && <p className="mt-1.5 text-sm text-status-error-text">{t("payments_filter_date_invalid")}</p>}
+ </fieldset>
+
+ <fieldset>
+ <legend className={FIELD_LABEL}>{t("amount_range")}</legend>
+ <div className="grid grid-cols-2 gap-2">
+ {[['amountMin', t("min")], ['amountMax', t("max")]].map(([field, label]) => <div key={field} className="relative">
+ <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-tertiary">{DEFAULT_CURRENCY_SYMBOL}</span>
+ <input type="number" inputMode="decimal" min="0" step="0.01" placeholder={label} aria-label={label} value={filters[field] || ''} onChange={set(field)} className={`${inputNormal} pl-7 tabular-nums`} />
+ </div>)}
  </div>
+ {amountInvalid && <p className="mt-1.5 text-sm text-status-error-text">{t("payments_filter_amount_invalid")}</p>}
+ </fieldset>
  </div>
+
+ <div className="flex shrink-0 gap-2 border-t border-border-light px-5 py-4">
+ <Button variant="secondary" className="flex-1" onClick={onReset} disabled={!hasActiveFilters}>{t("reset_all")}</Button>
+ <Button className="flex-1 lg:hidden" onClick={onClose}>{t("show_results")}</Button>
+ </div>
+ </aside>
  </>;
 };
-const PaymentPagination = React.memo(({
- currentPage,
- totalPages,
- pageSize,
- totalItems,
- onPageChange,
- onPageSizeChange
-}) => {
- const startItem = totalItems === 0 ? 0 : currentPage * pageSize + 1;
- const endItem = Math.min((currentPage + 1) * pageSize, totalItems);
- return <DataPagination shouldShowPagination={true} currentPage={currentPage} totalPages={totalPages} startItem={startItem} endItem={endItem} totalItems={totalItems} pageSize={pageSize} pageSizeOptions={PAGE_SIZE_OPTIONS_5_10_20_50} onPageChange={onPageChange} onPageSizeChange={onPageSizeChange} />;
-});
 const PaymentNavigation = ({
  showFilters,
  onCloseFilters,
@@ -171,4 +89,3 @@ const PaymentNavigation = ({
  hasActiveFilters
 }) => <PaymentFilterSidebar isOpen={showFilters} onClose={onCloseFilters} filters={filters} onFilterChange={onFilterChange} onReset={onResetFilters} hasActiveFilters={hasActiveFilters} />;
 export default PaymentNavigation;
-export { PaymentPagination };

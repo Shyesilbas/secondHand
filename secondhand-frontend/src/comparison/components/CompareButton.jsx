@@ -92,7 +92,7 @@ const CompareButton = memo(({ listing, size = 'sm', className = '', variant = 'r
       onClick={handleClick}
       disabled={isDisabled || isLimitReached}
       className={`${variant === 'square' ? 'h-10 w-10' : sizeClasses[size]} rounded flex items-center justify-center transition-colors duration-150 ${isAdded
-          ? 'border border-primary bg-primary text-white'
+          ? 'border border-accent-teal bg-accent-teal-50 text-accent-teal-800'
           : 'border border-border bg-background-primary text-text-secondary hover:border-card-border-hover hover:text-text-primary'
         } ${(isDisabled || isLimitReached) && !isAdded ? 'opacity-50 cursor-not-allowed' : ''
         } ${className}`}

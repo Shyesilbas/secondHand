@@ -5,6 +5,7 @@ import { offerService } from '../../offer/services/offerService.js';
 import { Tag as FiTag, CheckCircle2 as FiCheckCircle, XCircle as FiXCircle, Clock as FiClock, ShoppingBag as FiShoppingBag, ArrowRight as FiArrowRight } from 'lucide-react';
 import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { formatCurrency } from '../../common/formatters.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 
 export const InChatOfferCard = ({ message, currentUserId }) => {
     const { t } = useTranslation();
@@ -39,30 +40,30 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
         switch (status) {
             case 'ACCEPTED':
                 return {
-                    bg: 'bg-background-tertiary border-card-border-hover',
+                    bg: 'bg-background-tertiary border-border',
                     badge: 'bg-primary-hover text-white',
-                    icon: <FiCheckCircle className="w-4 h-4 text-text-primary" />,
+                    icon: <FiCheckCircle className="w-4 h-4 text-text-primary" strokeWidth={1.5} />,
                     label: t("status_accepted")
                 };
             case 'REJECTED':
                 return {
                     bg: 'bg-background-secondary border-border',
                     badge: 'bg-status-error text-white',
-                    icon: <FiXCircle className="w-4 h-4 text-status-error-text" />,
+                    icon: <FiXCircle className="w-4 h-4 text-status-error-text" strokeWidth={1.5} />,
                     label: t("status_rejected")
                 };
             case 'EXPIRED':
                 return {
                     bg: 'bg-background-secondary border-border',
                     badge: 'bg-secondary-500 text-white',
-                    icon: <FiClock className="w-4 h-4 text-text-tertiary" />,
+                    icon: <FiClock className="w-4 h-4 text-text-tertiary" strokeWidth={1.5} />,
                     label: t("status_expired")
                 };
             default:
                 return {
-                    bg: 'bg-background-tertiary border-card-border-hover',
+                    bg: 'bg-background-tertiary border-border',
                     badge: 'bg-primary text-white',
-                    icon: <FiTag className="w-4 h-4 text-text-primary" />,
+                    icon: <FiTag className="w-4 h-4 text-text-primary" strokeWidth={1.5} />,
                     label: t("status_pending")
                 };
         }
@@ -71,9 +72,9 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
     const statusConfig = getStatusConfig();
 
     return (
-        <div className={`my-2 p-4 rounded-md border shadow-sm max-w-sm w-full transition-all duration-200 ${statusConfig.bg}`}>
+        <div className={`my-2 p-4 rounded border shadow-sm max-w-sm w-full transition duration-150 ${statusConfig.bg}`}>
             {/* Header / Badge */}
-            <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-border">
+            <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-border-light">
                 <div className="flex items-center gap-2">
                     {statusConfig.icon}
                     <span className="text-xs font-semibold text-text-secondary">
@@ -108,18 +109,18 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                     <button
                         onClick={() => offerId && acceptMutation.mutate(offerId)}
                         disabled={acceptMutation.isPending || !offerId}
-                        className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
+                        className={buttonClasses('primary', 'sm')}
                     >
-                        <FiCheckCircle className="w-3.5 h-3.5" />
+                        <FiCheckCircle className="w-3.5 h-3.5" strokeWidth={1.5} />
                         {acceptMutation.isPending ? t("processing") : t("accept")}
                     </button>
 
                     <button
                         onClick={() => offerId && rejectMutation.mutate(offerId)}
                         disabled={rejectMutation.isPending || !offerId}
-                        className="inline-flex h-9 items-center justify-center gap-1.5 rounded bg-status-error px-3 text-sm font-medium text-white transition-all hover:bg-status-error disabled:opacity-50"
+                        className="inline-flex h-9 items-center justify-center gap-1.5 rounded bg-status-error px-3 text-sm font-medium text-white transition hover:bg-status-error disabled:opacity-50"
                     >
-                        <FiXCircle className="w-3.5 h-3.5" />
+                        <FiXCircle className="w-3.5 h-3.5" strokeWidth={1.5} />
                         {rejectMutation.isPending ? t("processing") : t("reject")}
                     </button>
                 </div>
@@ -130,11 +131,11 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                     <button
                         onClick={() => navigate(`/checkout?offerId=${offerId}`)}
                         disabled={!canCheckout}
-                        className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-full"
+                        className={`${buttonClasses('primary', 'sm')} w-full`}
                     >
-                        <FiShoppingBag className="w-4 h-4" />
+                        <FiShoppingBag className="w-4 h-4" strokeWidth={1.5} />
                         <span>{t("proceed_to_checkout")}</span>
-                        <FiArrowRight className="w-3.5 h-3.5" />
+                        <FiArrowRight className="w-3.5 h-3.5" strokeWidth={1.5} />
                     </button>
                 </div>
             )}

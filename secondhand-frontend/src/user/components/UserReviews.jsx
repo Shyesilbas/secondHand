@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { AlertCircle, ChevronLeft, ChevronRight, LayoutGrid, Loader2, Sparkles, Star } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight, LayoutGrid, Loader2, Star } from 'lucide-react';
 import ReviewCard from '../../reviews/components/ReviewCard.jsx';
 import AuraSummary from '../../common/components/AuraSummary.jsx';
 import { RatingStarsDisplay } from '../../reviews/components/RatingStarsDisplay.jsx';
@@ -29,7 +29,7 @@ const StarBreakdown = ({ stats }) => {
 
   return (
     <div className="space-y-2 mt-5">
-      <p className="text-xs font-semibold text-text-muted">{t("rating_mix", "Puan Dağılımı")}</p>
+      <p className="text-xs font-medium text-text-tertiary">{t("rating_mix", "Puan Dağılımı")}</p>
       <ul className="space-y-1.5">
         {BREAKDOWN.map(({ key, label, bar }) => {
           const count = Number(stats[key]) || 0;
@@ -42,7 +42,7 @@ const StarBreakdown = ({ stats }) => {
               </span>
               <div className="flex-1 min-w-0 h-1.5 rounded-full bg-background-tertiary overflow-hidden">
                 <div
-                  className={`h-full rounded-full ${bar} transition-all duration-300 ease-out`}
+                  className={`h-full rounded-full ${bar} transition-colors duration-150 ease-out`}
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -147,13 +147,12 @@ const UserReviews = ({
 
   return (
     <div className="space-y-6 min-w-0 max-w-full">
-      <section className="flex min-w-0 max-w-full flex-col rounded border border-border bg-background-primary overflow-hidden">
+      <section className="flex min-w-0 max-w-full flex-col overflow-hidden rounded border border-border-light bg-background-primary shadow-sm">
         {/* Rating summary banner */}
-        <div className="shrink-0 min-w-0 p-5 sm:p-6 bg-background-secondary border-b border-border">
+        <div className="shrink-0 min-w-0 p-5 sm:p-6 bg-background-secondary border-b border-border-light">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 min-w-0 w-full">
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-status-warning mb-1.5">
-                <Sparkles className="w-3.5 h-3.5" aria-hidden />
+              <div className="mb-1.5 text-sm font-medium text-text-tertiary">
                 <span>{t("buyer_feedback", "Alıcı Geri Bildirimleri")}</span>
               </div>
               <h2 className="text-base sm:text-lg font-semibold text-text-primary tracking-tight">
@@ -166,7 +165,7 @@ const UserReviews = ({
               </p>
             </div>
 
-            <div className="shrink-0 flex flex-col items-start sm:items-end gap-1.5 w-full min-w-0 lg:w-auto lg:min-w-52 rounded border border-border bg-background-primary px-4 py-3.5">
+            <div className="shrink-0 flex flex-col items-start sm:items-end gap-1.5 w-full min-w-0 lg:w-auto lg:min-w-52 rounded border border-border-light bg-background-primary px-4 py-3.5">
               {totalReviewsStat > 0 ? (
                 <>
                   <div className="flex items-baseline gap-1.5">
@@ -178,14 +177,14 @@ const UserReviews = ({
                   <div className="flex items-center gap-0.5 justify-end" aria-label={`${roundedDisplay} / 5`}>
                     <RatingStarsDisplay value={averageRating} iconClassName="w-4 h-4" mode="round" />
                   </div>
-                  <p className="text-xs text-text-muted mt-0.5 tabular-nums">
+                  <p className="text-xs text-text-tertiary mt-0.5 tabular-nums">
                     {t("based_on", "Toplam")}{' '}
                     <strong className="text-text-primary font-semibold">{totalReviewsStat}</strong>{' '}
                     {t("reviews", "değerlendirme")}
                   </p>
                 </>
               ) : (
-                <p className="text-xs text-text-muted py-2">
+                <p className="text-sm text-text-muted py-2">
                   {t("no_reviews_yet_average_will_show_after_t", "Henüz değerlendirme bulunmuyor")}
                 </p>
               )}
@@ -201,7 +200,7 @@ const UserReviews = ({
         </div>
 
         {/* Filter bar and controls */}
-        <div className="shrink-0 min-w-0 w-full px-5 sm:px-6 py-3.5 border-b border-border bg-background-primary space-y-3">
+        <div className="shrink-0 min-w-0 w-full px-5 sm:px-6 py-3.5 border-b border-border-light bg-background-primary space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
             <div className="min-w-0 flex-1">
               <h3 className="text-sm font-medium text-text-primary tracking-tight">
@@ -229,7 +228,7 @@ const UserReviews = ({
                   value={pagination.size}
                   onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                   aria-label={t("per_page", "Sayfa başı değerlendirme")}
-                  className="h-8 rounded border border-border bg-background-primary px-2.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-border cursor-pointer"
+                  className="h-8 rounded border border-border bg-background-primary px-2.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-border cursor-pointer"
                 >
                   <option value={10}>10</option>
                   <option value={15}>15</option>
@@ -241,10 +240,10 @@ const UserReviews = ({
 
           {totalReviewsStat > 0 ? (
             <div className="min-w-0 pt-1">
-              <p className="text-xs font-medium text-text-muted mb-2 flex items-center gap-1.5">
+              <p className="text-xs font-medium text-text-tertiary mb-2 flex items-center gap-1.5">
                 <LayoutGrid className="w-3.5 h-3.5" strokeWidth={1.5} aria-hidden />
                 <span>{t("filter_by_listing", "İlana Göre Filtrele")}</span>
-                {indexFetching ? <Loader2 className="w-3 h-3 animate-spin text-status-warning" aria-hidden /> : null}
+                {indexFetching ? <Loader2 className="w-3 h-3 animate-spin text-status-warning" aria-hidden strokeWidth={1.5} /> : null}
               </p>
               <div
                 className="min-w-0 w-full overflow-x-auto overflow-y-hidden pb-1 -mx-1 px-1 [scrollbar-width:thin]"
@@ -257,7 +256,7 @@ const UserReviews = ({
                     onClick={() => setListingFilter(ALL_LISTINGS)}
                     className={`flex-none inline-flex items-center gap-2 rounded border px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
                       !filterActive
-                        ? 'border-primary bg-primary text-white'
+                        ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800'
                         : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
                     }`}
                   >
@@ -265,7 +264,7 @@ const UserReviews = ({
                     {totalReviewsStat > 0 ? (
                       <span
                         className={`tabular-nums px-1.5 py-0.5 rounded-sm text-xs ${
-                          !filterActive ? 'bg-background-primary/20 text-white' : 'bg-background-secondary text-text-muted border border-border'
+                          !filterActive ? 'bg-accent-teal-100 text-accent-teal-800' : 'bg-background-secondary text-text-tertiary'
                         }`}
                       >
                         {totalReviewsStat}
@@ -305,7 +304,7 @@ const UserReviews = ({
                 </div>
               </div>
               {indexLoadError ? (
-                <p className="mt-1.5 text-xs text-status-warning">{t("listing_filter_incomplete", "Filtre verisi eksik:")} {indexLoadError}</p>
+                <p className="mt-1.5 text-xs text-status-warning-text">{t("listing_filter_incomplete", "Filtre verisi eksik:")} {indexLoadError}</p>
               ) : null}
             </div>
           ) : null}
@@ -314,14 +313,14 @@ const UserReviews = ({
         {/* Reviews list */}
         <div className="relative bg-background-secondary">
           {pagingLoading && !filterActive ? (
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 bg-primary/20 animate-pulse" aria-hidden />
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 bg-secondary-300 animate-pulse" aria-hidden />
           ) : null}
 
           {initialListLoading ? (
             <div className="p-5 sm:p-6" aria-busy="true">
               <ul className="space-y-3">
                 {[...Array(4)].map((_, i) => (
-                  <li key={i} className="rounded border border-border bg-background-primary p-4 animate-pulse">
+                  <li key={i} className="rounded border border-border-light bg-background-primary p-4 animate-pulse">
                     <div className="flex gap-4">
                       <div className="h-10 w-10 shrink-0 rounded-full bg-background-secondary" />
                       <div className="flex-1 space-y-2.5">
@@ -336,7 +335,7 @@ const UserReviews = ({
             </div>
           ) : receivedReviewsError ? (
             <div className="p-5 sm:p-6">
-              <div className="rounded border border-border bg-background-primary px-6 py-12 text-center">
+              <div className="rounded border border-border-light bg-background-primary px-6 py-12 text-center">
                 <AlertCircle className="mx-auto mb-3 block h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
                 <p className="mb-1 text-sm font-semibold text-text-primary">{t("couldn_t_load_reviews", "Değerlendirmeler yüklenemedi")}</p>
                 <p className="text-sm text-text-secondary">{receivedReviewsError}</p>
@@ -380,10 +379,10 @@ const UserReviews = ({
 
               {!filterActive && pagination && pagination.totalPages > 1 ? (
                 <nav
-                  className="mt-5 flex shrink-0 flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="mt-5 flex shrink-0 flex-col gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center sm:justify-between"
                   aria-label={t("reviews_pagination", "Değerlendirme sayfalandırma")}
                 >
-                  <p className="order-2 text-xs tabular-nums text-text-muted sm:order-1">
+                  <p className="order-2 text-xs tabular-nums text-text-tertiary sm:order-1">
                     {t("page", "Sayfa")} {page + 1} {t("of", "/")} {pagination.totalPages}
                     {pagination.totalElements ? (
                       <span className="text-text-muted"> · {pagination.totalElements} {t("total", "toplam")}</span>
@@ -409,7 +408,7 @@ const UserReviews = ({
                       <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
                     </button>
                     {pagingLoading ? (
-                      <Loader2 className="ml-1.5 h-4 w-4 animate-spin text-status-warning" aria-label={t("loading", "Yükleniyor")} />
+                      <Loader2 className="ml-1.5 h-4 w-4 animate-spin text-status-warning" aria-label={t("loading", "Yükleniyor")} strokeWidth={1.5} />
                     ) : null}
                   </div>
                 </nav>
@@ -417,10 +416,10 @@ const UserReviews = ({
 
               {filterActive && filteredAll.length > 0 && filterTotalPages > 1 ? (
                 <nav
-                  className="mt-5 flex shrink-0 flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="mt-5 flex shrink-0 flex-col gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center sm:justify-between"
                   aria-label={t("filtered_reviews_pagination", "Filtrelenmiş değerlendirme sayfalandırma")}
                 >
-                  <p className="text-xs tabular-nums text-text-muted">
+                  <p className="text-xs tabular-nums text-text-tertiary">
                     {t("page", "Sayfa")} {filterPage + 1} {t("of", "/")} {filterTotalPages} · {filteredAll.length} {t("reviews", "değerlendirme")}
                   </p>
                   <div className="flex items-center justify-center gap-2">

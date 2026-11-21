@@ -34,13 +34,10 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  Eye,
   Minus,
   Package,
   Plus,
   RotateCw,
-  Search,
-  Sparkles,
   Wallet
 } from 'lucide-react';
 
@@ -55,30 +52,6 @@ const STEPS = [
   { step: 1, label: 'Süre Seçimi', labelKey: 'step_duration_selection', hint: 'Vitrin süresini ve paketi belirleyin', hintKey: 'step_duration_hint' },
   { step: 2, label: 'Onay & Bakiye', labelKey: 'step_confirmation_balance', hint: 'Ödeme özetini ve sözleşmeleri onaylayın', hintKey: 'step_confirmation_hint' },
   { step: 3, label: 'Doğrulama', labelKey: 'step_verification', hint: 'E-posta adresinize gönderilen kodu girin', hintKey: 'step_verification_hint' }
-];
-
-const BENEFITS = [
-  {
-    icon: Search,
-    title: 'Üst Sıra Görünürlüğü',
-    titleKey: 'benefit_top_visibility_title',
-    desc: 'Ana sayfa vitrininde ve arama sonuçlarında öncelikli gösterim',
-    descKey: 'benefit_top_visibility_desc'
-  },
-  {
-    icon: Eye,
-    title: 'Daha Fazla Etkileşim',
-    titleKey: 'benefit_more_engagement_title',
-    desc: 'Standart ilanlara kıyasla daha yüksek görüntülenme ve mesaj oranı',
-    descKey: 'benefit_more_engagement_desc'
-  },
-  {
-    icon: Sparkles,
-    title: 'Vitrin İşareti',
-    titleKey: 'benefit_showcase_badge_title',
-    desc: 'İlan kartında öne çıkarıldığını belirten vitrin etiketi',
-    descKey: 'benefit_showcase_badge_desc'
-  }
 ];
 
 const ErrorLine = ({ children }) => (
@@ -313,9 +286,9 @@ const ShowcaseModal = ({
   };
 
   const renderListingPreviewStrip = () => (
-    <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary p-3">
+    <div className="flex items-center justify-between gap-3 rounded bg-background-secondary p-3">
       <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-primary">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded bg-secondary-200">
           {resolvedImage ? (
             <img src={resolvedImage} alt="" className="h-full w-full object-cover" />
           ) : (
@@ -323,7 +296,7 @@ const ShowcaseModal = ({
           )}
         </div>
         <div className="min-w-0">
-          <span className="block text-xs text-text-tertiary">
+          <span className="block text-sm text-text-tertiary">
             {isExtension ? t('listing_to_extend', 'Süresi Uzatılacak İlan') : t('listing_to_promote', 'Vitrine Çıkacak İlan')}
           </span>
           <h4 className="truncate text-sm font-medium text-text-primary">{resolvedTitle}</h4>
@@ -331,7 +304,7 @@ const ShowcaseModal = ({
       </div>
 
       {listing?.listingNo && (
-        <span className="shrink-0 rounded-sm border border-border-light bg-background-primary px-2 py-0.5 font-mono text-xs text-text-secondary">
+        <span className="shrink-0 text-sm tabular-nums text-text-tertiary">
           #{listing.listingNo}
         </span>
       )}
@@ -345,11 +318,11 @@ const ShowcaseModal = ({
       {/* Duration Presets */}
       <fieldset>
         <div className="mb-2.5 flex items-center justify-between">
-          <legend className="text-xs font-semibold text-text-secondary">
+          <legend className="text-sm font-medium text-text-primary">
             {t('preset_showcase_packages', 'Hazır Vitrin Paketleri')}
           </legend>
           {enums?.showcasePricingConfig && (
-            <span className="text-xs tabular-nums text-text-tertiary">
+            <span className="text-sm tabular-nums text-text-tertiary">
               {t('daily_price_with_vat', 'Günlük {{amount}} (KDV dahil)', { amount: formatCurrency(enums.showcasePricingConfig.totalDailyCost, 'TRY') })}
             </span>
           )}
@@ -366,8 +339,8 @@ const ShowcaseModal = ({
                 type="button"
                 onClick={() => setDays(opt.days)}
                 aria-pressed={isSelected}
-                className={`relative flex flex-col justify-between rounded border p-3 text-left transition-colors duration-150 cursor-pointer ${isSelected
-                  ? 'border-primary bg-background-secondary ring-1 ring-primary'
+                className={`relative flex flex-col justify-between rounded border p-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${isSelected
+                  ? 'border-accent-teal bg-accent-teal-50 ring-1 ring-accent-teal'
                   : 'border-border-light bg-background-primary hover:border-border'
                   }`}
               >
@@ -376,7 +349,7 @@ const ShowcaseModal = ({
                     {t('days_count', { count: opt.days, defaultValue: '{{count}} Gün' })}
                   </span>
                   {isSelected ? (
-                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white">
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-accent-teal text-white">
                       <Check className="h-2.5 w-2.5" strokeWidth={2} aria-hidden />
                     </span>
                   ) : opt.badge ? (
@@ -390,8 +363,8 @@ const ShowcaseModal = ({
                   <span className="block text-base font-semibold tabular-nums text-text-primary">
                     {optionTotal != null ? formatCurrency(optionTotal, 'TRY') : '—'}
                   </span>
-                  <span className="mt-0.5 block text-xs text-text-tertiary">
-                    {opt.badge && isSelected ? opt.badge : t('vat_included', 'KDV dahil')}
+                  <span className="mt-0.5 block text-sm text-text-tertiary">
+                    {opt.badge && isSelected ? t(opt.badgeKey, opt.badge) : t('vat_included', 'KDV dahil')}
                   </span>
                 </div>
               </button>
@@ -401,7 +374,7 @@ const ShowcaseModal = ({
       </fieldset>
 
       {/* Custom Days Stepper */}
-      <div className="flex items-center justify-between gap-4 rounded border border-border-light px-3.5 py-2.5">
+      <div className="flex items-center justify-between gap-4 rounded bg-background-secondary px-3.5 py-3">
         <div className="min-w-0">
           <label
             htmlFor="showcase-days"
@@ -409,7 +382,7 @@ const ShowcaseModal = ({
           >
             {t('custom_duration', 'Özel Süre Belirle')}
           </label>
-          <p className="text-xs text-text-tertiary">
+          <p className="text-sm text-text-tertiary">
             {t('custom_duration_hint', '1 ile 30 gün arasında dilediğiniz süreyi seçebilirsiniz')}
           </p>
         </div>
@@ -420,12 +393,12 @@ const ShowcaseModal = ({
             onClick={() => setDays((d) => clampDays(d - 1))}
             disabled={days <= 1}
             aria-label={t('decrease_days', 'Günü azalt')}
-            className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary transition-colors hover:border-border hover:text-text-primary disabled:opacity-40 cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded border border-border bg-background-primary text-text-secondary transition-colors duration-150 hover:border-card-border-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Minus className="h-3.5 w-3.5" strokeWidth={1.5} />
           </button>
 
-          <div className="flex h-8 items-center gap-1 rounded border border-border bg-background-primary px-2.5">
+          <div className="flex h-9 items-center gap-1 rounded border border-border bg-background-primary px-2.5 focus-within:border-border-focus focus-within:ring-2 focus-within:ring-border-focus">
             <input
               id="showcase-days"
               type="number"
@@ -435,7 +408,7 @@ const ShowcaseModal = ({
               onChange={handleDaysChange}
               className="w-8 bg-transparent text-center text-sm font-semibold tabular-nums text-text-primary focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
-            <span className="text-xs text-text-tertiary">{t('days_short', 'gün')}</span>
+            <span className="text-sm text-text-tertiary">{t('days_short', 'gün')}</span>
           </div>
 
           <button
@@ -443,36 +416,11 @@ const ShowcaseModal = ({
             onClick={() => setDays((d) => clampDays(d + 1))}
             disabled={maxDays != null && days >= maxDays}
             aria-label={t('increase_days', 'Günü artır')}
-            className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary transition-colors hover:border-border hover:text-text-primary disabled:opacity-40 cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded border border-border bg-background-primary text-text-secondary transition-colors duration-150 hover:border-card-border-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
           </button>
         </div>
-      </div>
-
-      {/* Benefits Strip */}
-      <div className="grid grid-cols-1 gap-2.5 border-t border-border-light pt-4 sm:grid-cols-3">
-        {BENEFITS.map((benefit) => {
-          const Icon = benefit.icon;
-          return (
-            <div
-              key={benefit.titleKey || benefit.title}
-              className="flex items-start gap-2.5 rounded border border-border-light bg-background-secondary p-3"
-            >
-              <Icon
-                className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary"
-                strokeWidth={1.5}
-                aria-hidden
-              />
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-text-primary">{benefit.titleKey ? t(benefit.titleKey, benefit.title) : benefit.title}</p>
-                <p className="mt-0.5 text-sm leading-snug text-text-tertiary">
-                  {benefit.descKey ? t(benefit.descKey, benefit.desc) : benefit.desc}
-                </p>
-              </div>
-            </div>
-          );
-        })}
       </div>
 
       {isQuoteError && (
@@ -482,12 +430,12 @@ const ShowcaseModal = ({
       {/* Step 1 Footer */}
       <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center">
         <div>
-          <span className="block text-xs text-text-tertiary">{t('total_amount_to_pay', 'Toplam Ödenecek Tutar')}</span>
+          <span className="block text-sm text-text-tertiary">{t('total_amount_to_pay', 'Toplam Ödenecek Tutar')}</span>
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-semibold tabular-nums text-text-primary">
               {totalCost != null ? formatCurrency(totalCost, 'TRY') : '—'}
             </span>
-            <span className="text-xs text-text-tertiary">
+            <span className="text-sm text-text-tertiary">
               ({days} {t('days_short', 'gün')} · {t('vat_included', 'KDV dahil')})
             </span>
           </div>
@@ -512,7 +460,7 @@ const ShowcaseModal = ({
 
       {/* Price Breakdown */}
       <div>
-        <h4 className="mb-2 text-xs font-semibold text-text-secondary">{t('fee_breakdown', 'Ücret Dökümü')}</h4>
+        <h4 className="mb-2 text-sm font-medium text-text-primary">{t('fee_breakdown', 'Ücret Dökümü')}</h4>
         <dl className="divide-y divide-border-light rounded border border-border-light px-4 text-sm">
           <div className="flex justify-between gap-4 py-2.5">
             <dt className="text-text-secondary">{t('selected_showcase_duration', 'Seçilen Vitrin Süresi')}</dt>
@@ -551,11 +499,11 @@ const ShowcaseModal = ({
 
       {/* E-Wallet Balance Card */}
       <div>
-        <h4 className="mb-2 text-xs font-semibold text-text-secondary">{t('payment_method', 'Ödeme Yöntemi')}</h4>
-        <div className="rounded border border-border-light bg-background-secondary p-3.5">
+        <h4 className="mb-2 text-sm font-medium text-text-primary">{t('payment_method', 'Ödeme Yöntemi')}</h4>
+        <div className="rounded border border-border-light p-3.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-background-secondary text-text-secondary">
                 <Wallet className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               </div>
               <div>
@@ -640,7 +588,7 @@ const ShowcaseModal = ({
   const renderStep3 = () => (
     <div className="space-y-5">
       {/* Compact Transaction Summary Bar */}
-      <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary px-3.5 py-2.5 text-sm">
+      <div className="flex items-center justify-between gap-3 rounded bg-background-secondary px-3.5 py-2.5 text-sm">
         <span className="truncate font-medium text-text-primary">
           {resolvedTitle} · <span className="tabular-nums text-text-secondary">{days} {t('showcase_days', 'Gün Vitrin')}</span>
         </span>
@@ -657,7 +605,7 @@ const ShowcaseModal = ({
           {t('enter_6_digit_code_to_complete_payment', 'Ödemeyi tamamlamak için e-posta adresinize gönderilen 6 haneli doğrulama kodunu girin.')}
         </p>
 
-        <div className="mt-2.5 flex items-center justify-center gap-3 text-xs">
+        <div className="mt-2.5 flex items-center justify-center gap-3 text-sm">
           {otpTtlActive && (
             <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 font-medium tabular-nums text-text-secondary">
               <span>{t('time_remaining_label', 'Kalan Süre')}: {otpTtlFormatted}</span>
@@ -667,9 +615,9 @@ const ShowcaseModal = ({
             type="button"
             onClick={handleRequestVerificationCode}
             disabled={loading}
-            className="inline-flex items-center gap-1 font-medium text-text-secondary transition-colors hover:text-text-primary disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1 rounded font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50"
           >
-            <RotateCw className="h-3 w-3" strokeWidth={1.5} aria-hidden />
+            <RotateCw className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
             <span>{t('send_new_code', 'Yeni Kod Gönder')}</span>
           </button>
         </div>
@@ -816,22 +764,22 @@ const ShowcaseModal = ({
                 className="min-w-0"
               >
                 <div
-                  className={`h-1 rounded-sm transition-colors ${isActive || isDone ? 'bg-primary' : 'bg-background-tertiary'
+                  className={`h-1 rounded-full transition-colors duration-150 ${isActive || isDone ? 'bg-accent-teal' : 'bg-border'
                     }`}
                 />
                 <div className="mt-2 flex items-center gap-1.5">
                   <span
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums ${isDone
-                      ? 'bg-primary text-white'
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums ${isDone
+                      ? 'bg-accent-teal text-white'
                       : isActive
-                        ? 'border border-primary text-text-primary'
+                        ? 'border border-accent-teal text-accent-teal-800'
                         : 'border border-border text-text-muted'
                       }`}
                   >
-                    {isDone ? <Check className="h-2.5 w-2.5" strokeWidth={2} /> : item.step}
+                    {isDone ? <Check className="h-3 w-3" strokeWidth={2} /> : item.step}
                   </span>
                   <span
-                    className={`truncate text-xs ${isActive
+                    className={`truncate text-sm ${isActive
                       ? 'font-semibold text-text-primary'
                       : isDone
                         ? 'font-medium text-text-secondary'

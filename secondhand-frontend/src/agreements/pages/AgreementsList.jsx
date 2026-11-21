@@ -55,16 +55,16 @@ const AgreementsList = ({
  status: 'pending',
  text: 'Pending',
  icon: ClockIcon,
- color: 'text-status-warning',
- bgColor: 'bg-background-secondary',
+ color: 'text-status-warning-text',
+ bgColor: 'bg-status-warning-bg',
  borderColor: 'border-status-warning-border'
  };
  if (ua.isAcceptedTheLastVersion) return {
  status: 'accepted',
  text: 'Accepted',
  icon: CheckIcon,
- color: 'text-status-success',
- bgColor: 'bg-background-secondary',
+ color: 'text-status-success-text',
+ bgColor: 'bg-status-success-bg',
  borderColor: 'border-status-success-border',
  acceptedDate: ua.acceptedDate
  };
@@ -72,8 +72,8 @@ const AgreementsList = ({
  status: 'pending',
  text: 'Pending',
  icon: ClockIcon,
- color: 'text-status-warning',
- bgColor: 'bg-background-secondary',
+ color: 'text-status-warning-text',
+ bgColor: 'bg-status-warning-bg',
  borderColor: 'border-status-warning-border'
  };
  };
@@ -115,14 +115,14 @@ const AgreementsList = ({
  }
  return <div>
  {/* Filter tabs */}
- <div className="flex items-center gap-1 mb-6 p-1 bg-background-secondary rounded w-fit">
+ <div className="mb-6 flex w-fit items-center gap-1 rounded border border-border bg-background-secondary p-1">
  {FILTER_TABS.map(tab => {
  const isActive = filter === tab.key;
  const count = counts[tab.key] ?? 0;
- return <button key={tab.key} type="button" onClick={() => setFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded text-sm font-semibold transition-all duration-200 ${isActive ? 'bg-background-primary text-text-primary' : 'text-text-muted hover:text-text-secondary'}`}>
+ return <button key={tab.key} type="button" onClick={() => setFilter(tab.key)} className={`inline-flex items-center gap-1.5 rounded-sm px-3.5 py-1.5 text-sm font-medium transition duration-150 ${isActive ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>
  {tab.dotColor && <span className={`w-1.5 h-1.5 rounded-full ${tab.dotColor}`} />}
  {tab.label}
- <span className={`tabular-nums ${isActive ? 'text-text-muted' : 'text-text-muted'}`}>
+ <span className="tabular-nums text-text-tertiary">
  {count}
  </span>
  </button>;

@@ -41,7 +41,7 @@ const SearchResults = ({
  icon: Inbox
  }];
  return <div className="py-1">
- <div className="px-4 py-2 border-b border-border-light bg-secondary-50">
+ <div className="px-4 py-2 border-b border-border-light bg-background-secondary">
  <span className="text-xs font-semibold text-text-muted">{t("quick_navigation")}</span>
  </div>
  {quickLinks.map((link, index) => {
@@ -50,31 +50,31 @@ const SearchResults = ({
  return <div key={link.id} onClick={() => onResultSelect({
  id: link.id,
  type: 'link'
- })} className={`w-full flex items-center gap-3.5 px-4 py-3 text-left cursor-pointer transition-all duration-150 ${isSelected ? 'bg-primary text-white' : 'text-text-secondary hover:bg-secondary-50'}`}>
- <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'bg-background-primary/15 text-white' : 'bg-secondary-100 text-text-muted'}`}>
- <Icon className="w-4 h-4" />
+ })} className={`w-full flex items-center gap-3.5 px-4 py-3 text-left cursor-pointer transition-colors duration-150 ${isSelected ? 'bg-background-tertiary' : 'hover:bg-background-secondary'}`}>
+ <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'bg-background-primary text-text-primary' : 'bg-background-tertiary text-text-tertiary'}`}>
+ <Icon className="w-4 h-4" strokeWidth={1.5} aria-hidden />
  </div>
  <div className="flex-1 min-w-0">
- <div className={`text-sm font-semibold truncate ${isSelected ? 'text-white' : 'text-text-primary'}`}>
+ <div className="text-sm font-semibold truncate text-text-primary">
  {link.label}
  </div>
- <div className={`text-xs truncate mt-0.5 ${isSelected ? 'text-white/60' : 'text-text-muted font-medium'}`}>
+ <div className={`text-xs truncate mt-0.5 text-text-tertiary`}>
  {link.desc}
  </div>
  </div>
  {isSelected && <div className="shrink-0 animate-fade-in">
- <ChevronRight className="w-3.5 h-3.5 text-white/40" />
+ <ChevronRight className="w-3.5 h-3.5 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  </div>}
  </div>;
  })}
  {/* Footer */}
- <div className="px-4 py-2.5 text-xs text-text-muted font-medium bg-secondary-50 border-t border-border-light flex items-center justify-between">
+ <div className="px-4 py-2.5 text-xs text-text-muted font-medium bg-background-secondary border-t border-border-light flex items-center justify-between">
  <div>{t("navigate_enter_open_esc_close")}</div>
  <div className="hidden sm:block">{t("ctrl_tab_switch_mode")}</div>
  </div>
  </div>;
  };
- const renderUserResult = (user, index) => <div key={user.id} onClick={() => onResultSelect(user)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-secondary-50 ${index === selectedIndex ? 'bg-secondary-100' : ''}`}>
+ const renderUserResult = (user, index) => <div key={user.id} onClick={() => onResultSelect(user)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-background-secondary ${index === selectedIndex ? 'bg-background-tertiary' : ''}`}>
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 bg-primary rounded flex items-center justify-center text-white font-semibold text-sm">
  {user.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -89,7 +89,7 @@ const SearchResults = ({
  </div>
  </div>
  </div>;
- const renderListingResult = (listing, index) => <div key={listing.id} onClick={() => onResultSelect(listing)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-secondary-50 ${index === selectedIndex ? 'bg-secondary-100' : ''}`}>
+ const renderListingResult = (listing, index) => <div key={listing.id} onClick={() => onResultSelect(listing)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-background-secondary ${index === selectedIndex ? 'bg-background-tertiary' : ''}`}>
  <div className="flex items-center gap-3">
  <div className="w-12 h-12 bg-background-tertiary rounded overflow-hidden flex-shrink-0">
  {listing.imageUrl ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-contain" /> : <div className="w-full h-full flex items-center justify-center">
@@ -112,9 +112,9 @@ const SearchResults = ({
  </div>
  </div>;
 
- const renderPageResult = (page, index) => <div key={`page-${page.key}`} onClick={() => onResultSelect(page)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-secondary-50 flex items-center gap-3 ${index === selectedIndex ? 'bg-secondary-100' : ''}`}>
- <div className="w-8 h-8 rounded bg-secondary-100 text-text-muted flex items-center justify-center shrink-0">
- <ArrowRight className="w-4 h-4" />
+ const renderPageResult = (page, index) => <div key={`page-${page.key}`} onClick={() => onResultSelect(page)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-background-secondary flex items-center gap-3 ${index === selectedIndex ? 'bg-background-tertiary' : ''}`}>
+ <div className="w-8 h-8 rounded bg-background-tertiary text-text-muted flex items-center justify-center shrink-0">
+ <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
  </div>
  <div className="flex-1 min-w-0 text-sm font-medium text-text-primary truncate">
  {t(page.labelKey)}
@@ -131,7 +131,7 @@ const SearchResults = ({
  if (results.length > 0) {
  return <>
  {pageHits.length > 0 && <>
- <div className="px-4 py-2 bg-secondary-50 border-b border-border-light">
+ <div className="px-4 py-2 bg-background-secondary border-b border-border-light">
  <div className="text-sm font-medium text-text-secondary">{t("search_pages", "Sayfalar")}</div>
  </div>
  {results.map((result, index) => result.type === 'link' ? renderPageResult(result, index) : null)}
@@ -139,7 +139,7 @@ const SearchResults = ({
 
  {itemResults.length > 0 && <>
  {/* Tab Header */}
- <div className="px-4 py-2 bg-secondary-50 border-b border-border-light flex items-center justify-between">
+ <div className="px-4 py-2 bg-background-secondary border-b border-border-light flex items-center justify-between">
  <div className="text-sm font-medium text-text-secondary capitalize">
  {activeTab} {t("results")}</div>
  <div className="text-xs text-text-muted">
@@ -151,7 +151,7 @@ const SearchResults = ({
  </>}
 
  {/* Footer */}
- <div className="px-4 py-2 text-xs text-text-muted bg-secondary-50 border-t border-border-light flex items-center justify-between">
+ <div className="px-4 py-2 text-xs text-text-muted bg-background-secondary border-t border-border-light flex items-center justify-between">
  <div>{t("navigate_enter_select_esc_close")}</div>
  <div>{t("ctrl_tab_switch")}</div>
  </div>

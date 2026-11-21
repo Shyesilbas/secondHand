@@ -27,8 +27,8 @@ const PageLoader = () => {
 const PageError = ({ error, onBack }) => {
  const { t } = useTranslation();
  return (
- <div className="min-h-screen bg-background-secondary flex items-center justify-center p-4">
- <div className="w-full max-w-md rounded border border-border bg-background-primary p-6 text-center">
+ <div className="min-h-screen bg-background-page flex items-center justify-center p-4">
+ <div className="w-full max-w-md rounded border border-border-light bg-background-primary p-6 text-center shadow-sm">
  <AlertTriangle className="mx-auto mb-3 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
  <h3 className="text-lg font-semibold text-text-primary">{t("something_went_wrong")}</h3>
  <p className="mt-1 text-sm text-text-secondary">{error}</p>

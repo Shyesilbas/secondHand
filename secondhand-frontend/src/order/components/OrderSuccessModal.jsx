@@ -7,7 +7,7 @@ import { CheckCircle2, Package, Copy, Check, MapPin, Truck, ShieldCheck, FileTex
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { useRequiredAgreements } from '../../agreements/hooks/useAgreements.js';
-import { AGREEMENT_TYPE_LABELS } from '../../agreements/agreements.js';
+import { agreementLabel } from '../../agreements/agreements.js';
 import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 
 const DetailRow = ({ label, children }) => (
@@ -60,7 +60,7 @@ const OrderSuccessModal = ({
     : t('order_success_cargo_body', 'Ödemeniz alındı ve güvenli havuza aktarıldı. Satıcı ürününüzü kargoya vermek üzere hazırlıyor.');
 
   return (
-    <div className="w-full overflow-hidden rounded-md border border-border bg-background-primary shadow-sm">
+    <div className="w-full overflow-hidden rounded border border-border-light bg-background-primary shadow-sm">
       <div className="border-b border-border-light p-6 text-center sm:p-8">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-status-success-border bg-status-success-bg text-status-success-text">
           <CheckCircle2 className="h-6 w-6" strokeWidth={1.75} aria-hidden />
@@ -77,13 +77,13 @@ const OrderSuccessModal = ({
         )}
 
         {orderNumber && (
-          <div className="mt-5 inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm">
+          <div className="mt-5 inline-flex items-center gap-2 rounded border border-border px-3 py-1.5 text-sm">
             <span className="text-text-secondary">{t('order_success_number', 'Sipariş no')}</span>
             <span className="tabular-nums text-text-primary">#{orderNumber}</span>
             <button
               type="button"
               onClick={handleCopyOrderNumber}
-              className="-m-1 rounded-md p-2 text-text-tertiary transition-colors hover:text-text-primary"
+              className="-m-1 rounded p-2 text-text-tertiary transition-colors hover:text-text-primary"
               aria-label={t('order_success_copy_number', 'Sipariş numarasını kopyala')}
             >
               {copied ? <Check className="h-4 w-4" strokeWidth={1.5} /> : <Copy className="h-4 w-4" strokeWidth={1.5} />}
@@ -214,7 +214,7 @@ const OrderSuccessModal = ({
             </p>
             <div className="space-y-2">
               {agreements.map((agreement) => {
-                const agreementName = AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType;
+                const agreementName = agreementLabel(t, agreement.agreementType);
                 return (
                   <div
                     key={agreement.agreementId}

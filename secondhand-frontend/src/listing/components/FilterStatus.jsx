@@ -232,94 +232,89 @@ const mapGroupToTag = (group, filters, enums) => {
  return `${label}: ${val}`;
 };
 
+// Active filter chips and the sort control. The result count and category live in the page header,
+// so this row only renders when there is something to show.
 const FilterStatus = ({
   totalElements,
   filters,
-  getListingTypeLabel,
   onResetFilters,
   hasActiveFilters,
   getActiveFilterCount,
-  updateFilters
+  updateFilters,
+  sortable = true,
+  trailing = null
 }) => {
   const { t } = useTranslation();
   const { enums } = useEnums();
 
-  const resolvedCount = typeof getActiveFilterCount === 'function' ? getActiveFilterCount(filters) : computeActiveFilterCount(filters);
+  const activeCount = typeof getActiveFilterCount === 'function' ? getActiveFilterCount(filters) : computeActiveFilterCount(filters);
   const hasResults = Number(totalElements) > 0;
-  const activeCount = resolvedCount;
-  const hasActive = typeof hasActiveFilters === 'boolean' ? hasActiveFilters : activeCount > 0;
-  const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
+  const hasActive = (typeof hasActiveFilters === 'boolean' ? hasActiveFilters : activeCount > 0) && activeCount > 0;
   const activeTags = GROUPED_FILTERS.map(group => mapGroupToTag(group, filters, enums)).filter(tag => tag !== null);
+  const showSort = sortable && hasResults;
+  if (!hasActive && !showSort && !trailing) return null;
 
-  const FilterBadge = () => hasActive && activeCount > 0 ? (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-medium bg-background-tertiary text-text-primary border border-border-light">
-        <SlidersHorizontal className="w-3 h-3 text-text-primary" strokeWidth={1.5} />
-        {activeCount} {t("filter", "filtre")}
-      </span>
-
-      {activeTags.map((tag, i) => (
-        <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-medium bg-background-tertiary text-text-secondary border border-border-light">
-          {tag}
-        </span>
-      ))}
-
-      <button
-        type="button"
-        onClick={onResetFilters}
-        className="inline-flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium text-text-muted hover:text-text-primary hover:bg-background-tertiary transition-colors ml-1 cursor-pointer"
-      >
-        <X className="w-3.5 h-3.5" strokeWidth={1.5} />
-        {t("clear_all", "Temizle")}
-      </button>
-    </div>
-  ) : null;
+  const currentSortBy = filters.sortBy || LISTING_DEFAULTS.SORT_BY;
+  const currentDirection = filters.sortDirection || LISTING_DEFAULTS.SORT_DIRECTION;
+  const sortOptions = [
+    { key: LISTING_SORT_FIELDS.DATE, direction: LISTING_DEFAULTS.SORT_DIRECTION, label: t("sort_newest", "En yeni") },
+    { key: LISTING_SORT_FIELDS.PRICE, direction: 'ASC', label: t("sort_price_asc", "En ucuz") },
+    { key: LISTING_SORT_FIELDS.PRICE, direction: 'DESC', label: t("sort_price_desc", "En pahalı") }
+  ];
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-1">
-      <div className="flex flex-wrap items-center gap-2.5">
-        <div className="flex items-center gap-2">
-          <span className={`w-1.5 h-1.5 rounded-full inline-block shrink-0 ${hasResults ? 'bg-primary' : 'bg-text-muted'}`} />
-          <span className="text-sm font-semibold text-text-primary tabular-nums">
-            {totalElements || 0} {t("listing", "İlan")}
+    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      {hasActive ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-1.5 rounded-sm border border-accent-teal bg-accent-teal-50 px-2.5 py-1 text-sm font-medium text-accent-teal-800">
+            <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+            {activeCount} {t("filter", "filtre")}
           </span>
-          {categoryLabel && (
-            <span className="text-xs font-medium text-text-secondary bg-background-tertiary px-2 py-0.5 rounded-sm border border-border-light">
-              {categoryLabel}
+          {activeTags.map((tag, i) => (
+            <span key={i} className="inline-flex items-center rounded-sm border border-border-light bg-background-primary px-2.5 py-1 text-sm text-text-secondary">
+              {tag}
             </span>
-          )}
+          ))}
+          <button
+            type="button"
+            onClick={onResetFilters}
+            className="ml-1 inline-flex items-center gap-1 rounded-sm px-2 py-1 text-sm font-medium text-text-tertiary transition-colors duration-150 hover:bg-background-tertiary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+          >
+            <X className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+            {t("clear_all", "Temizle")}
+          </button>
         </div>
-        <FilterBadge />
-      </div>
+      ) : <span aria-hidden />}
 
-      {hasResults && (
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1 text-xs font-medium text-text-tertiary">
-            <ArrowUpDown className="w-3.5 h-3.5" strokeWidth={1.5} />
-            <span>{t("sort", "Sırala")}:</span>
-          </div>
-          <div className="flex items-center bg-background-tertiary rounded p-0.5 gap-0.5 border border-border-light">
-            {[
-              { key: LISTING_SORT_FIELDS.DATE, direction: LISTING_DEFAULTS.SORT_DIRECTION, label: t("sort_newest", "En yeni") },
-              { key: LISTING_SORT_FIELDS.PRICE, direction: 'ASC', label: t("sort_price_asc", "En ucuz") },
-              { key: LISTING_SORT_FIELDS.PRICE, direction: 'DESC', label: t("sort_price_desc", "En pahalı") }
-            ].map(({ key, direction, label }) => (
-              <button
-                key={`${key}-${direction}`}
-                type="button"
-                aria-pressed={filters.sortBy === key && (filters.sortDirection || LISTING_DEFAULTS.SORT_DIRECTION) === direction}
-                onClick={() => updateFilters({
-                  sortBy: key,
-                  sortDirection: direction
+      {(showSort || trailing) && (
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          {showSort && (
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="flex items-center gap-1.5 text-sm text-text-tertiary">
+                <ArrowUpDown className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                {t("sort", "Sırala")}
+              </span>
+              <div className="flex items-center gap-0.5 rounded border border-border bg-background-secondary p-0.5">
+                {sortOptions.map(({ key, direction, label }) => {
+                  const active = currentSortBy === key && currentDirection === direction;
+                  return (
+                    <button
+                      key={`${key}-${direction}`}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => updateFilters({ sortBy: key, sortDirection: direction })}
+                      className={`rounded-sm px-2.5 py-1 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                        active ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-tertiary hover:text-text-primary'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
                 })}
-                className={`px-2.5 py-1 rounded text-sm font-medium transition-colors cursor-pointer ${
-                  filters.sortBy === key && (filters.sortDirection || LISTING_DEFAULTS.SORT_DIRECTION) === direction ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-tertiary hover:text-text-primary'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+              </div>
+            </div>
+          )}
+          {trailing}
         </div>
       )}
     </div>

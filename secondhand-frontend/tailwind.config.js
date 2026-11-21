@@ -43,8 +43,8 @@ export default {
         card: theme.colors.card,
         button: theme.colors.button,
         
-        'app-bg': theme.colors.background.secondary,
-        'main-bg': theme.colors.background.secondary,
+        'app-bg': theme.colors.background.page,
+        'main-bg': theme.colors.background.page,
         'sidebar-bg': theme.colors.background.tertiary,
         'sidebar-border': theme.colors.border.DEFAULT,
         'header-bg': theme.colors.background.secondary,
@@ -93,6 +93,8 @@ export default {
       // Named ratios for image frames and the icon stroke from restrained-ui-design-standard, so pages need no arbitrary values.
       aspectRatio: { '4/3': '4 / 3', '3/4': '3 / 4', '16/10': '16 / 10', '16/11': '16 / 11' },
       strokeWidth: { 1.5: '1.5' },
+      // Listing grids fill by card width (about 216-240px), so columns follow the space left by the filter sidebar.
+      gridTemplateColumns: { listing: 'repeat(auto-fill, minmax(13.5rem, 1fr))' },
       fontFamily: theme.typography.fontFamily,
       fontSize: theme.typography.fontSize,
     },

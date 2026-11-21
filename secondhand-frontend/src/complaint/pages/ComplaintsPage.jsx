@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileSearch, ShieldAlert } from 'lucide-react';
+import { FileSearch } from 'lucide-react';
 import PageContainer from '@/common/components/layout/PageContainer';
 import { Alert, Button, EmptyState, PageHeader, Skeleton, Tabs } from '../../common/components/ui/index.js';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import { useMyComplaints, useReceivedComplaints } from '../hooks/useComplaints.js';
 import { getComplaintErrorMessage } from '../utils/complaintError.js';
 import { COMPLAINT_TABS } from '../complaintConstants.js';
@@ -29,11 +30,10 @@ const ComplaintsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background-secondary">
+    <div className="min-h-screen bg-background-page">
       <div className="border-b border-border-light bg-background-secondary">
-        <PageContainer className="py-4">
+        <PageContainer className="py-8">
           <PageHeader
-            icon={ShieldAlert}
             title={t('my_complaints')}
             subtitle={t('track_and_manage_your_submissions_to_our')}
           />
@@ -56,11 +56,7 @@ const ComplaintsPage = () => {
             {[0, 1, 2].map((i) => <Skeleton key={i} className="h-56 w-full" />)}
           </div>
         ) : query.isError ? (
-          <Alert
-            type="error"
-            message={getComplaintErrorMessage(query.error, t('unable_to_load_complaints'))}
-            action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>{t('try_again')}</Button>}
-          />
+          <ErrorState title={t('unable_to_load_complaints')} description={getComplaintErrorMessage(query.error, t('error_state_desc'))} onRetry={query.refetch} />
         ) : complaints.length === 0 ? (
           <EmptyState
             icon={FileSearch}

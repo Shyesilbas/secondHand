@@ -133,7 +133,7 @@ const ImageUpload = ({
                   onClick={handleRemoveImage}
                   className="inline-flex items-center gap-1 rounded border border-border-light bg-background-primary px-2.5 py-1 text-xs font-semibold text-status-error transition-colors hover:bg-background-secondary"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3.5 w-3.5" strokeWidth={1.5} />
                   <span>{t("remove", "Kaldır")}</span>
                 </button>
               </div>
@@ -157,17 +157,17 @@ const ImageUpload = ({
               <div className="flex flex-col items-center text-center">
                 <div className="mb-3 h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
                 <p className="text-sm font-semibold text-text-primary">{t("uploading", "Yükleniyor...")}</p>
-                <p className="mt-0.5 text-xs text-text-muted">{t("compressing_and_uploading_your_image", "Görsel işleniyor ve yükleniyor")}</p>
+                <p className="mt-0.5 text-xs text-text-tertiary">{t("compressing_and_uploading_your_image", "Görsel işleniyor ve yükleniyor")}</p>
               </div>
             ) : (
               <div className="flex flex-col items-center p-4 text-center">
                 <div className="mb-2 flex h-9 w-9 items-center justify-center rounded bg-background-tertiary text-text-secondary">
-                  {dragActive ? <Upload className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
+                  {dragActive ? <Upload className="h-4 w-4" strokeWidth={1.5} /> : <ImageIcon className="h-4 w-4" strokeWidth={1.5} />}
                 </div>
                 <p className="text-sm font-semibold text-text-primary">
                   {dragActive ? t("drop_to_upload", "Yüklemek için bırakın") : t("drag_drop_click", "Görsel yüklemek için sürükleyin veya seçin")}
                 </p>
-                <p className="mt-0.5 text-xs text-text-muted">{t("png_jpg_or_gif_max_10mb", "PNG, JPG veya GIF (maks. 10MB)")}</p>
+                <p className="mt-0.5 text-xs text-text-tertiary">{t("png_jpg_or_gif_max_10mb", "PNG, JPG veya GIF (maks. 10MB)")}</p>
               </div>
             )}
           </div>
@@ -176,7 +176,7 @@ const ImageUpload = ({
 
       {error && (
         <div className="mt-2.5 flex items-start gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-status-error">
-          <X className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <X className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
           <span>{error}</span>
         </div>
       )}

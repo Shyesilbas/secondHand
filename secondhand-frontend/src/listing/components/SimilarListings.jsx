@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
 import ListingCard from './ListingCard.jsx';
-import Skeleton, { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
+import Skeleton, { SkeletonCard } from '../../common/components/ui/Skeleton.jsx';
+import { LISTING_GRID_GAP, LISTING_ROW_COLUMNS, LISTING_ROW_SIZE, listingRowItemClass } from './listingGridLayout.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 
 const SimilarListings = ({
@@ -52,8 +53,8 @@ const SimilarListings = ({
             try {
                 const response = await listingService.filterListings(filters);
                 const list = response?.content || [];
-                // Filter out current listing and limit to 4
-                return list.filter(item => item.id !== currentListing.id).slice(0, 4);
+                // Filter out the current listing and keep one preview row
+                return list.filter(item => item.id !== currentListing.id).slice(0, LISTING_ROW_SIZE);
             } catch (err) {
                 console.error('Failed to fetch similar listings', err);
                 return [];
@@ -70,7 +71,9 @@ const SimilarListings = ({
     if (isLoading) {
         return <section ref={containerRef} className="border-t border-border-light pt-8" aria-busy="true">
             <Skeleton className="mb-4 h-6 w-40" />
-            <SkeletonGrid count={4} columns="grid-cols-2 md:grid-cols-4 gap-4" />
+            <div className={`grid ${LISTING_ROW_COLUMNS} ${LISTING_GRID_GAP}`}>
+                {Array.from({ length: LISTING_ROW_SIZE }, (_, i) => <div key={i} className={listingRowItemClass(i)}><SkeletonCard /></div>)}
+            </div>
         </section>;
     }
     if (error || !data || data.length === 0) return null;
@@ -79,8 +82,8 @@ const SimilarListings = ({
             <h2 id="similar-listings-title" className="text-lg font-semibold text-text-primary">{t("similar_listings", "Benzer ilanlar")}</h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {data.map(listing => <ListingCard key={listing.id} listing={listing} showActions={false} isOwner={user?.id === listing.sellerId} currentUserId={user?.id} />)}
+        <div className={`grid ${LISTING_ROW_COLUMNS} ${LISTING_GRID_GAP}`}>
+            {data.map((listing, i) => <div key={listing.id} className={`min-w-0 ${listingRowItemClass(i)}`}><ListingCard listing={listing} showActions={false} isOwner={user?.id === listing.sellerId} currentUserId={user?.id} /></div>)}
         </div>
     </section>;
 };

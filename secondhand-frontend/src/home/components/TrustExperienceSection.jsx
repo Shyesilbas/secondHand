@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import HomeSection from './HomeSection.jsx';
 import { QrCode, Wallet, MessageSquare, Star, CheckCircle } from 'lucide-react';
 
 const TRUST_FEATURES = [
@@ -57,41 +58,32 @@ const TRUST_FEATURES = [
 const TrustExperienceSection = () => {
   const { t } = useTranslation();
 
+  // Static feature descriptions: white cards at rest, no hover state because they are not links.
   return (
-    <section className="py-16 bg-background-primary border-t border-border-light">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8">
-        <div className="max-w-2xl mb-12">
-          <p className="text-xs font-semibold text-status-success mb-2">{t("built_in_protection")}</p>
-          <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("real_product_capabilities_ensuring_safe_")}</h2>
-          <p className="text-text-secondary text-sm mt-3 leading-relaxed font-medium">{t("we_prioritize_real_working_technology_ov")}</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TRUST_FEATURES.map((feat) => {
-            const Icon = feat.icon;
-            return (
-              <div key={feat.id} className="group border border-border-light rounded p-6 bg-background-secondary transition-all duration-200 hover:bg-background-primary hover:border-border flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between gap-3 flex-wrap">
-                    <Icon className="h-5 w-5 shrink-0 text-text-secondary group-hover:text-status-success-text" strokeWidth={1.5} aria-hidden />
-                    <span className="text-xs font-semibold text-text-secondary bg-secondary-light px-2 py-0.5 rounded-md border border-border-light">
-                      {t(feat.badgeKey, feat.badge)}
-                    </span>
-                  </div>
-
-                  <h3 className="text-sm font-medium text-text-primary tracking-tight mt-4 group-hover:text-text-primary transition-colors">
-                    {t(feat.titleKey, feat.title)}
-                  </h3>
-                  <p className="text-body text-text-secondary leading-relaxed mt-2.5 font-medium">
-                    {t(feat.descKey, feat.desc)}
-                  </p>
-                </div>
+    <HomeSection
+      title={t("real_product_capabilities_ensuring_safe_")}
+      description={t("we_prioritize_real_working_technology_ov")}
+    >
+      <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+        {TRUST_FEATURES.map((feat) => {
+          const Icon = feat.icon;
+          return (
+            <li key={feat.id} className="flex flex-col rounded border border-border-light bg-background-primary p-5 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-background-secondary text-text-secondary">
+                  <Icon className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+                </span>
+                <span className="rounded-sm bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
+                  {t(feat.badgeKey, feat.badge)}
+                </span>
               </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
+              <h3 className="mt-4 text-base font-semibold text-text-primary">{t(feat.titleKey, feat.title)}</h3>
+              <p className="mt-2 text-sm text-text-secondary">{t(feat.descKey, feat.desc)}</p>
+            </li>
+          );
+        })}
+      </ul>
+    </HomeSection>
   );
 };
 

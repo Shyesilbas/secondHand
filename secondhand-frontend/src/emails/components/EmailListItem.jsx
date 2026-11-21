@@ -29,7 +29,7 @@ const EmailListItem = ({
         }
       }}
       onClick={() => onSelect(email)}
-      className={`group relative cursor-pointer border-b border-border-light border-l-2 px-3.5 py-2.5 sm:px-4 sm:py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-border-focus ${isSelected
+      className={`group relative cursor-pointer border-b border-border-light border-l-2 px-3.5 py-2.5 sm:px-4 sm:py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus ${isSelected
         ? 'border-l-primary bg-background-tertiary'
         : isUnread
           ? 'border-l-transparent bg-background-primary hover:bg-background-secondary'

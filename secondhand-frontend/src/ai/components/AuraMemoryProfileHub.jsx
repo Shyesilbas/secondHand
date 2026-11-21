@@ -197,7 +197,7 @@ export default function AuraMemoryProfileHub() {
             <span key={interest} className="inline-flex items-center gap-1.5 text-xs font-medium bg-background-tertiary border border-border-light px-2.5 py-1 rounded-sm text-text-primary">
               {interest}
               <button type="button" onClick={() => handleRemoveInterest(interest)} aria-label={t('remove_interest_item', '{{item}} kaldır', { item: interest })} className="text-text-muted hover:text-status-error transition-colors">
-                <X className="w-3 h-3" />
+                <X className="w-3 h-3" strokeWidth={1.5} />
               </button>
             </span>
           ))}
@@ -228,7 +228,7 @@ export default function AuraMemoryProfileHub() {
             <span key={brand} className="inline-flex items-center gap-1.5 text-xs font-medium bg-background-tertiary border border-border-light px-2.5 py-1 rounded-sm text-text-primary">
               {brand}
               <button type="button" onClick={() => handleRemoveBrand(brand)} aria-label={t('remove_brand_item', '{{item}} kaldır', { item: brand })} className="text-text-muted hover:text-status-error transition-colors">
-                <X className="w-3 h-3" />
+                <X className="w-3 h-3" strokeWidth={1.5} />
               </button>
             </span>
           ))}

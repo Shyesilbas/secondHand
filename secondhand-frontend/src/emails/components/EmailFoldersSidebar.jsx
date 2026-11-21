@@ -33,7 +33,7 @@ export const EmailFoldersSidebar = ({
 
   return (
     <aside className="hidden min-h-0 w-full min-w-0 flex-col border-r border-border bg-background-secondary lg:flex">
-      <div className="flex h-11 shrink-0 items-center justify-between border-b border-border bg-background-secondary px-3">
+      <div className="flex h-11 shrink-0 items-center justify-between border-b border-border-light bg-background-secondary px-3">
         <div className="flex min-w-0 items-center gap-2">
           {!embedded && (
             <button
@@ -87,7 +87,7 @@ export const EmailFoldersSidebar = ({
 };
 
 export const EmailMobileFolderTabs = ({ filterType, onSelectFolder }) => (
-  <div className="shrink-0 border-b border-border bg-background-secondary px-3 py-2 lg:hidden">
+  <div className="shrink-0 border-b border-border-light bg-background-secondary px-3 py-2 lg:hidden">
     <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
       {EMAIL_FOLDER_ITEMS.map((item) => (
         <button

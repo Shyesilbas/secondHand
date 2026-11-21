@@ -10,7 +10,7 @@ const ChoiceButton = ({
  onClick,
  children
 }) => {
- return <button type="button" onClick={onClick} disabled={disabled} aria-pressed={active} className={`h-10 rounded border px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${active ? 'border-primary text-text-primary ring-1 ring-primary' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'}`}>
+ return <button type="button" onClick={onClick} disabled={disabled} aria-pressed={active} className={`h-10 rounded border px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${active ? 'border-accent-teal text-text-primary ring-1 ring-accent-teal' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'}`}>
  {children}
  </button>;
 };

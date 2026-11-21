@@ -7,6 +7,7 @@ import { listingService } from '../../../listing/services/listingService.js';
 import { ROUTES } from '../../constants/routes.js';
 import { matchAppPages } from '../../constants/appPages.js';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue.js';
+import { Loader2, Search } from 'lucide-react';
 import SearchResults from './SearchResults.jsx';
 const NO_RESULTS = [];
 const UnifiedSearchBar = ({
@@ -149,26 +150,33 @@ const UnifiedSearchBar = ({
  };
  return <div ref={searchRef} className={`relative ${className}`}>
  <div className="relative">
- <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={activeTab === 'users' ? t('search_users_placeholder', 'Kullanıcı ara...') : t('search_listings_placeholder', 'İlan ara...')} className="w-full h-11 pl-10 pr-44 text-sm bg-secondary-50 border border-border-light rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:bg-background-primary transition-all placeholder:text-text-muted text-text-primary" />
- 
- <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
- {isLoading ? <svg className="animate-spin h-4 w-4 text-text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
- <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
- <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
- </svg> : <svg className="h-4 w-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
- </svg>}
+ <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={activeTab === 'users' ? t('search_users_placeholder', 'Kullanıcı ara...') : t('search_listings_placeholder', 'İlan ara...')} className="h-9 w-full rounded border border-border bg-background-primary pl-9 pr-44 text-sm text-text-primary placeholder:text-text-muted transition-colors duration-150 hover:border-card-border-hover focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" />
+
+ <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+ {isLoading
+ ? <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} aria-hidden />
+ : <Search className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
  </div>
 
- <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center">
- <div className="flex items-center bg-secondary-100 p-0.5 rounded-md">
- <button onClick={() => handleTabChange('listings')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${activeTab === 'listings' ? 'text-text-primary bg-background-primary' : 'text-text-muted hover:text-text-secondary'}`} type="button">{t("listings")}</button>
- <button onClick={() => handleTabChange('users')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${activeTab === 'users' ? 'text-text-primary bg-background-primary' : 'text-text-muted hover:text-text-secondary'}`} type="button">{t("users")}</button>
+ {/* Segmented scope toggle: 6px chips inside the 8px field so the inner corners never outgrow the outer one. */}
+ <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center">
+ <div className="flex items-center rounded-sm bg-background-tertiary p-0.5" role="group" aria-label={t('search_scope', 'Arama kapsamı')}>
+ {[['listings', t("listings")], ['users', t("users")]].map(([tab, label]) => (
+ <button
+ key={tab}
+ type="button"
+ onClick={() => handleTabChange(tab)}
+ aria-pressed={activeTab === tab}
+ className={`rounded-sm px-2.5 py-0.5 text-xs font-medium transition-colors duration-150 ${activeTab === tab ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-tertiary hover:text-text-primary'}`}
+ >
+ {label}
+ </button>
+ ))}
  </div>
  </div>
  </div>
 
- {isVisible && <div className="absolute top-full left-0 right-0 mt-1.5 bg-background-primary border border-border-light rounded shadow-md z-50 max-h-80 sm:max-h-96 overflow-y-auto">
+ {isVisible && <div className="absolute top-full left-0 right-0 z-dropdown mt-1.5 max-h-80 rounded border border-border bg-background-primary shadow-md sm:max-h-96 overflow-y-auto">
  <SearchResults results={results} activeTab={activeTab} selectedIndex={selectedIndex} isLoading={isLoading} query={query} onResultSelect={handleResultSelect} />
  </div>}
  </div>;

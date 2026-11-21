@@ -35,7 +35,7 @@ const ActiveDeliveriesTracker = ({ activeDeliveries = [] }) => {
               )}
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm text-text-primary">{delivery.listingTitle}</p>
-                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-text-tertiary">
+                <p className="mt-0.5 flex items-center gap-1.5 text-sm text-text-tertiary">
                   <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} aria-hidden />
                   <span className="text-text-secondary">{t(`dash_status_${status.key.toLowerCase()}`, status.label)}</span>
                   {delivery.sellerName && <span className="truncate">· {delivery.sellerName}</span>}

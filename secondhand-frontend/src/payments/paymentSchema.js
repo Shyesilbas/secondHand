@@ -112,6 +112,10 @@ export const TRANSACTION_TYPE_LABELS = {
  [PAYMENT_TRANSACTION_TYPES.MEMBERSHIP_PAYMENT]: 'Membership Payment'
 };
 
+// Localized label: `transaction_type_<type>` from the locale files, English label as the fallback.
+export const transactionTypeLabel = (t, type) =>
+ t(`transaction_type_${String(type || '').toLowerCase()}`, TRANSACTION_TYPE_LABELS[type] || String(type || ''));
+
 export const createListingFeePaymentRequest = (data) => {
  // Mirrors backend ListingFeePaymentRequest; the fee amount is set by the backend.
  return {

@@ -9,7 +9,7 @@ Core foundation for the frontend application: HTTP networking, authentication in
 > - **Architecture Deep Dive:** [`docs/frontend-architecture-and-state-management.md`](../../../docs/frontend-architecture-and-state-management.md)
 
 ## 1. Overview & Purpose
-Cross-cutting frontend infrastructure: the Axios client (`request.js`, `config.js`, `interceptors.js` with CSRF and silent 401 refresh), route guards, layouts (`MainLayout`, `AuthLayout`, `PageContainer`), UI primitives (`Button`, `Modal`, `Alert`, `Skeleton`, `EmptyState`, `PageHeader`, `Badge`, `Tabs`, `Card`, `DataPagination`) and shared hooks (`useDebouncedValue`, `useWebSocket`, `useEnums`, `useClickOutside`).
+Cross-cutting frontend infrastructure: the Axios client (`request.js`, `config.js`, `interceptors.js` with CSRF and silent 401 refresh), route guards, layouts (`MainLayout`, `AuthLayout`, `PageContainer`, `BrandMark` as the only logo), UI primitives (`Button`, `Modal`, `Alert`, `Skeleton`, `EmptyState`, `PageHeader`, `Badge`, `Tabs`, `Card`, `DataPagination`) and shared hooks (`useDebouncedValue`, `useWebSocket`, `useEnums`, `useClickOutside`).
 
 ## 2. Route Map & Entry Points
 

@@ -15,3 +15,8 @@ export const AGREEMENT_TYPE_LABELS = {
  [AGREEMENT_TYPES.PAYMENT_TERMS]: 'Payment Terms Agreement',
 };
 
+// Localized agreement name: `agreement_<type>` from the locale files, English label as the fallback.
+export const agreementLabel = (t, type) =>
+ t(`agreement_${String(type).toLowerCase()}`, AGREEMENT_TYPE_LABELS[type] || String(type));
+
+

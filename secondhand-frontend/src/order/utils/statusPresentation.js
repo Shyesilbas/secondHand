@@ -88,7 +88,7 @@ export const getOrderStatusTextClass = (status) => {
   const value = statusUpper(status);
 
   if ([ORDER_STATUSES.COMPLETED, ORDER_STATUSES.DELIVERED].includes(value)) {
-    return 'text-status-success';
+    return 'text-status-success-text';
   }
   if ([
     ORDER_STATUSES.CONFIRMED,
@@ -98,7 +98,7 @@ export const getOrderStatusTextClass = (status) => {
     ORDER_STATUSES.HANDOVER_CONFIRMED,
     ORDER_STATUSES.PENDING
   ].includes(value)) {
-    return 'text-status-warning';
+    return 'text-status-warning-text';
   }
   if ([
     ORDER_STATUSES.CANCELLED,
@@ -135,7 +135,7 @@ export const getPaymentStatusTextClass = (status) => {
     return 'text-text-secondary';
   }
   if ([PAYMENT_STATUSES.ESCROW, PAYMENT_STATUSES.PARTIALLY_REFUNDED].includes(s)) {
-    return 'text-status-warning';
+    return 'text-status-warning-text';
   }
   if ([PAYMENT_STATUSES.FAILED, PAYMENT_STATUSES.CANCELLED, PAYMENT_STATUSES.REFUNDED].includes(s)) {
     return 'text-status-error';

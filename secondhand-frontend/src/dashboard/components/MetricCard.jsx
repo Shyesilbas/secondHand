@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown } from 'lucide-react';
-import { Card } from '../../common/components/ui/index.js';
+import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react';
 
 /**
- * One KPI: label, value, optional change against the previous period and a short note.
- * With `to` the whole card links to the page where the number can be acted on.
+ * One KPI cell inside `MetricGrid`: label, value, optional change against the previous period and a
+ * short note. With `to` the cell links to the page where the number can be acted on.
  */
 const MetricCard = ({ title, value, trend, subtitle, to, emphasis = false }) => {
   const { t } = useTranslation();
@@ -14,31 +13,40 @@ const MetricCard = ({ title, value, trend, subtitle, to, emphasis = false }) => 
 
   const body = (
     <>
-      <p className="text-xs text-text-tertiary">{title}</p>
+      <p className="flex items-center justify-between gap-2 text-sm text-text-secondary">
+        <span className="flex items-center gap-1.5">
+          {emphasis && <span className="h-1.5 w-1.5 rounded-full bg-status-warning" aria-hidden />}
+          {title}
+        </span>
+        {to && <ChevronRight className="h-4 w-4 shrink-0 text-text-muted transition-colors duration-150 group-hover:text-text-secondary" strokeWidth={1.5} aria-hidden />}
+      </p>
       <p className={`mt-2 text-2xl font-semibold tracking-tight tabular-nums ${emphasis ? 'text-status-warning-text' : 'text-text-primary'}`}>
         {value}
       </p>
-      <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-tertiary">
-        {hasTrend && (
-          <span className={`inline-flex items-center gap-1 font-medium tabular-nums ${trend > 0 ? 'text-status-success-text' : 'text-status-error-text'}`}>
-            <TrendIcon className="h-3 w-3" strokeWidth={2} aria-hidden />
-            {`${Math.abs(trend).toFixed(1)}%`}
-            <span className="font-normal text-text-tertiary">{t('dash_vs_previous', 'önceki döneme göre')}</span>
-          </span>
-        )}
-        {subtitle && <span>{subtitle}</span>}
-      </div>
+      {(hasTrend || subtitle) && (
+        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-tertiary">
+          {hasTrend && (
+            <span className={`inline-flex items-center gap-1 font-medium tabular-nums ${trend > 0 ? 'text-status-success-text' : 'text-status-error-text'}`}>
+              <TrendIcon className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+              {`${Math.abs(trend).toFixed(1)}%`}
+              <span className="font-normal text-text-tertiary">{t('dash_vs_previous', 'önceki döneme göre')}</span>
+            </span>
+          )}
+          {subtitle && <span>{subtitle}</span>}
+        </div>
+      )}
     </>
   );
 
-  const borderClass = emphasis ? 'border-status-warning-border' : '';
-
   return to ? (
-    <Card as={Link} to={to} interactive className={`block ${borderClass}`}>
+    <Link
+      to={to}
+      className="group block bg-background-primary p-5 transition-colors duration-150 hover:bg-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus"
+    >
       {body}
-    </Card>
+    </Link>
   ) : (
-    <Card className={borderClass}>{body}</Card>
+    <div className="bg-background-primary p-5">{body}</div>
   );
 };
 

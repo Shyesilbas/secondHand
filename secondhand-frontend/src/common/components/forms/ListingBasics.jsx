@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useAuthState } from '../../../auth/AuthContext.jsx';
 import { formatCurrency, parsePrice } from '../../formatters.js';
 import { PriceInput } from '../ui/PriceInput.jsx';
-import { Type, DollarSign, Info } from 'lucide-react';
-import { FieldError, SectionCard } from './FormPrimitives.jsx';
+import { Info } from 'lucide-react';
+import { FieldError, OptionToggle, SectionCard, SectionStack } from './FormPrimitives.jsx';
 import { inputError, inputNormal } from './inputStyles.js';
 
 const ListingBasics = ({
@@ -27,8 +27,8 @@ const ListingBasics = ({
   const currentPrice = formData.price ? parsePrice(formData.price) : null;
 
   return (
-    <div className="space-y-8">
-      <SectionCard title={t("general_information", "Genel bilgiler")} description={t("basic_listing_details", "Alıcının ilk göreceği bilgiler.")} icon={Type}>
+    <SectionStack>
+      <SectionCard title={t("general_information", "Genel bilgiler")} description={t("basic_listing_details", "Alıcının ilk göreceği bilgiler.")}>
         <div className="space-y-4">
           <div>
             <div className="mb-1.5 flex items-center justify-between">
@@ -75,13 +75,13 @@ const ListingBasics = ({
         </div>
       </SectionCard>
 
-      <SectionCard title={t("pricing", "Fiyat")} description={t("set_price_and_quantity", "Satış fiyatı ve stok adedi.")} icon={DollarSign}>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <SectionCard title={t("pricing", "Fiyat")} description={t("set_price_and_quantity", "Satış fiyatı ve stok adedi.")}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-text-primary">
               {t("price", "Price")} <span className="text-status-error">*</span>
             </label>
-            <div className="flex rounded border border-border-light bg-background-primary transition-colors focus-within:border-border-focus focus-within:ring-2 focus-within:ring-border-focus">
+            <div className={`flex rounded border bg-background-primary transition-colors focus-within:ring-2 focus-within:ring-border-focus ${errors.price ? 'border-status-error' : 'border-border hover:border-card-border-hover focus-within:border-border-focus'}`}>
               <PriceInput
                 value={currentPrice}
                 onChange={n => onInputChange({
@@ -140,67 +140,36 @@ const ListingBasics = ({
             </div>
           )}
 
-          <div className="md:col-span-2 pt-2">
-            <label className="flex items-start gap-3 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                name="canSendMessage"
-                checked={Boolean(formData.canSendMessage ?? defaultCanSendMessage)}
-                onChange={e => onInputChange({
-                  target: {
-                    name: 'canSendMessage',
-                    checked: e.target.checked,
-                    type: 'checkbox'
-                  }
-                })}
-                className="mt-0.5 h-4 w-4 rounded border-border-light text-primary focus:ring-primary"
-              />
-              <div className="min-w-0 flex-1">
-                <span className="block text-sm font-medium text-text-primary">
-                  {t("allow_buyers_to_message", "Alıcılar bu ilan için mesaj gönderebilsin")}
-                </span>
-                <span className="block text-xs text-text-secondary mt-0.5">
-                  {t("allow_buyers_to_message_hint", "Kapatırsanız bu ilan için yeni ve mevcut tüm sohbetlerde mesajlaşma kilitlenir.")}
-                </span>
-              </div>
-            </label>
-          </div>
+        </div>
+      </SectionCard>
 
-          <div className="md:col-span-2 pt-2">
-            <label className="flex items-start gap-3 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                name="allowMeetup"
-                checked={Boolean(formData.allowMeetup)}
-                onChange={e => onInputChange({
-                  target: {
-                    name: 'allowMeetup',
-                    checked: e.target.checked,
-                    type: 'checkbox'
-                  }
-                })}
-                className="mt-0.5 h-4 w-4 rounded border-border-light text-primary focus:ring-primary"
-              />
-              <div className="min-w-0 flex-1">
-                <span className="block text-sm font-medium text-text-primary">
-                  {t("sadece_kendi_ehrimde_elden_teslimat_yapm", "Sadece kendi şehrimde elden teslimat yapmayı onaylıyorum.")}
-                </span>
-                <span className="block text-xs text-text-secondary mt-0.5">
-                  {t("al_c_yla_g_venli_bulu_ma_noktas_nda_bulu", "Alıcıyla güvenli buluşma noktasında buluşarak ürünü elden teslim etme seçeneğini aktif hale getirir.")}
-                </span>
-                <div className="mt-2 flex items-start gap-2 rounded border border-border-light bg-background-secondary p-2.5">
-                  <Info className="h-4 w-4 shrink-0 text-text-muted mt-0.5" strokeWidth={1.5} aria-hidden />
-                  <p className="text-sm text-text-secondary leading-relaxed">
-                    {t("bu_alan_i_aretledi_inizde_r_n_n_z_sipari", "Bu alanı işaretlediğinizde, ürününüz sipariş edilirse telefon numaranız alıcıya, alıcının telefon numarası ise size gösterilir.")}
-                  </p>
-                </div>
-              </div>
-            </label>
+      <SectionCard title={t("sale_options", "Satış seçenekleri")} description={t("sale_options_desc", "Alıcıların seninle nasıl iletişim kuracağı ve teslimat şekli.")}>
+        <div className="space-y-3">
+          <OptionToggle
+            name="canSendMessage"
+            checked={Boolean(formData.canSendMessage ?? defaultCanSendMessage)}
+            onChange={checked => onInputChange({ target: { name: 'canSendMessage', checked, type: 'checkbox' } })}
+            label={t("allow_buyers_to_message", "Alıcılar bu ilan için mesaj gönderebilsin")}
+            description={t("allow_buyers_to_message_hint", "Kapatırsanız bu ilan için yeni ve mevcut tüm sohbetlerde mesajlaşma kilitlenir.")}
+          />
+          <div data-field="allowMeetup">
+            <OptionToggle
+              name="allowMeetup"
+              checked={Boolean(formData.allowMeetup)}
+              onChange={checked => onInputChange({ target: { name: 'allowMeetup', checked, type: 'checkbox' } })}
+              label={t("sadece_kendi_ehrimde_elden_teslimat_yapm", "Sadece kendi şehrimde elden teslimat yapmayı onaylıyorum.")}
+              description={t("al_c_yla_g_venli_bulu_ma_noktas_nda_bulu", "Alıcıyla güvenli buluşma noktasında buluşarak ürünü elden teslim etme seçeneğini aktif hale getirir.")}
+            >
+              <span className="mt-2 flex items-start gap-1.5 text-sm text-text-tertiary">
+                <Info className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+                <span>{t("bu_alan_i_aretledi_inizde_r_n_n_z_sipari", "Bu alanı işaretlediğinizde, ürününüz sipariş edilirse telefon numaranız alıcıya, alıcının telefon numarası ise size gösterilir.")}</span>
+              </span>
+            </OptionToggle>
             <FieldError error={errors.allowMeetup} />
           </div>
         </div>
       </SectionCard>
-    </div>
+    </SectionStack>
   );
 };
 export default ListingBasics;

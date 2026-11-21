@@ -5,9 +5,10 @@ import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
 import { formatCurrency } from '../../common/formatters.js';
-import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
+import { LISTING_STATUS, LISTING_TYPES, NON_PURCHASABLE_TYPES } from '../types/index.js';
 import { MapPin, Image as ImageIcon, Star, Eye, ShoppingBag, HandCoins, Zap, TrendingDown, Award, Check } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
+import { useLoginPrompt } from '../../auth/hooks/useLoginPrompt.js';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
@@ -18,8 +19,11 @@ const ListingInfoModal = lazy(() => import('./ListingInfoModal.jsx'));
 const MakeOfferModal = lazy(() => import('../../offer/components/MakeOfferModal.jsx'));
 
 const LOW_STOCK_LIMIT = 10;
-const IMAGE_BADGE = 'inline-flex items-center gap-1 rounded-sm border border-border bg-background-primary px-2 py-0.5 text-xs font-medium';
-const HOVER_ACTION = 'flex h-8 w-8 items-center justify-center rounded border border-border bg-background-primary text-text-secondary transition-colors duration-150 hover:border-card-border-hover hover:text-text-primary';
+// Location decides a vehicle or property visit; for shippable goods the card shows the rating instead.
+const LOCATION_TYPES = [LISTING_TYPES.VEHICLE, LISTING_TYPES.REAL_ESTATE];
+// Badges over the photo are white chips with a shadow, not bordered boxes: a border on a photo adds a line without adding contrast.
+const IMAGE_BADGE = 'inline-flex items-center gap-1 rounded-sm bg-background-primary px-2 py-0.5 text-xs font-medium shadow-sm';
+const HOVER_ACTION = 'flex h-8 w-8 items-center justify-center rounded border border-border bg-background-primary text-text-secondary shadow-sm transition-colors duration-150 hover:border-card-border-hover hover:text-text-primary';
 
 // Browse card: photo first, then price, title and one line of metadata. Seller details, favorite
 // counts and social proof live on the listing page, so the card stays scannable in a dense grid.
@@ -39,12 +43,14 @@ const ListingCard = ({
   const [showInfo, setShowInfo] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const promptLogin = useLoginPrompt();
   const stockCount = listing?.quantity != null ? Number(listing.quantity) : null;
   const isOutOfStock = stockCount === 0;
-  const isPurchasable = Boolean(currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing?.type) && listing?.status === LISTING_STATUS.ACTIVE);
-  const canAddToCart = isPurchasable && !isOutOfStock;
-  const { addToCart, isAddingToCart, isInCart } = useCart({ loadCartItems: canAddToCart });
-  const itemIsInCart = canAddToCart && isInCart(listing?.id);
+  const isPurchasableListing = Boolean(!isOwner && !NON_PURCHASABLE_TYPES.includes(listing?.type) && listing?.status === LISTING_STATUS.ACTIVE);
+  const isPurchasable = Boolean(currentUserId && isPurchasableListing);
+  const canAddToCart = isPurchasableListing && !isOutOfStock;
+  const { addToCart, isAddingToCart, isInCart } = useCart({ loadCartItems: Boolean(currentUserId && canAddToCart) });
+  const itemIsInCart = Boolean(currentUserId && canAddToCart && isInCart(listing?.id));
   const { isInComparison } = useComparison();
 
   if (!listing) return null;
@@ -63,23 +69,29 @@ const ListingCard = ({
     [LISTING_STATUS.PENDING]: t('status_pending', 'Beklemede')
   }[listing.status] ?? listing.status;
   const showImage = listing.imageUrl && !imageFailed;
+  const showLocation = Boolean(listing.city) && LOCATION_TYPES.includes(listing.type);
+  const showRating = reviewCount > 0;
   const stop = e => {
     e.preventDefault();
     e.stopPropagation();
   };
 
   return <div
-    className={`group relative flex h-full flex-col overflow-hidden rounded border bg-background-primary shadow-sm transition-all duration-200 hover:shadow
- ${isSelectable && isInShowcase ? 'opacity-40 grayscale cursor-not-allowed' : ''}
- ${isSelected || isInCompare ? 'border-primary ring-2 ring-primary/20' : 'border-border hover:border-card-border-hover'}
+    className={`group relative flex h-full flex-col overflow-hidden rounded border bg-background-primary shadow-sm transition duration-150 hover:shadow-md
+ ${isSelected || isInCompare ? 'border-accent-teal ring-1 ring-accent-teal' : 'border-border-light hover:border-border'}
  `}>
-    {isSelectable && <div className="absolute inset-0 z-40 cursor-pointer" onClick={e => {
+    {/* Select mode: the whole card toggles selection; the check mirrors the state for sighted users. */}
+    {isSelectable && <button type="button" aria-pressed={isSelected} aria-label={listing.title || listing.listingNo} className="absolute inset-0 z-40 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus" onClick={e => {
       stop(e);
       onSelectToggle?.(listing.id);
-    }} />}
+    }}>
+      <span className={`absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-sm border shadow-sm transition-colors duration-150 ${isSelected ? 'border-accent-teal bg-accent-teal text-white' : 'border-border bg-background-primary text-transparent'}`} aria-hidden>
+        <Check className="h-4 w-4" strokeWidth={2} />
+      </span>
+    </button>}
 
     {/* Image */}
-    <div className="relative aspect-4/3 shrink-0 overflow-hidden border-b border-border-light bg-background-tertiary">
+    <div className="relative aspect-4/3 shrink-0 overflow-hidden border-b border-border-light bg-secondary-200">
       <Link to={detailPath} tabIndex={-1} aria-hidden className="block h-full w-full">
         {showImage ? (
           <img
@@ -115,20 +127,11 @@ const ListingCard = ({
 
       {/* Top-right actions: owner menu always; quick actions on desktop hover */}
       <div className="absolute right-2 top-2 z-20 flex flex-col items-end gap-1.5">
-        {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
+        {/* Owner gear: hidden until hover or keyboard focus on pointer devices; touch screens have no hover, so it stays visible there. */}
+        {showActions && isOwner && <div className="transition-opacity duration-150 group-focus-within:opacity-100 motion-reduce:transition-none [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100">
+          <ListingCardActions listing={listing} onChanged={onDeleted} />
+        </div>}
         <div className="hidden max-w-[72px] flex-wrap justify-end gap-1.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none md:flex">
-          {canAddToCart && <button type="button" onClick={e => {
-            stop(e);
-            if (!itemIsInCart) addToCart(listing.id);
-          }} disabled={isAddingToCart || itemIsInCart} className={`${HOVER_ACTION} ${itemIsInCart ? 'cursor-default' : ''}`} title={itemIsInCart ? t("in_cart") : t("add_to_cart")} aria-label={itemIsInCart ? t("in_cart") : t("add_to_cart")}>
-            {isAddingToCart ? (
-              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            ) : itemIsInCart ? (
-              <Check className="h-4 w-4 text-status-success" strokeWidth={1.5} aria-hidden />
-            ) : (
-              <ShoppingBag className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-            )}
-          </button>}
           {isPurchasable && <button type="button" onClick={e => {
             stop(e);
             setIsOfferModalOpen(true);
@@ -144,12 +147,12 @@ const ListingCard = ({
       <button type="button" onClick={e => {
         stop(e);
         setShowInfo(true);
-      }} className="absolute bottom-2 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded border border-border bg-background-primary px-3 py-1.5 text-xs font-medium text-text-primary opacity-0 transition-opacity duration-150 hover:border-card-border-hover focus-visible:opacity-100 group-hover:opacity-100 motion-reduce:transition-none md:flex">
+      }} className="absolute bottom-2 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded border border-border bg-background-primary px-3 py-1.5 text-xs font-medium text-text-primary shadow-sm opacity-0 transition-opacity duration-150 hover:border-card-border-hover focus-visible:opacity-100 group-hover:opacity-100 motion-reduce:transition-none md:flex">
         <Eye className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.5} aria-hidden />{t("quick_view")}</button>
     </div>
 
     {/* Body */}
-    <div className="flex flex-1 flex-col gap-1 p-3 sm:p-4">
+    <div className="flex flex-1 flex-col gap-1 p-3.5">
       <Link to={detailPath} className="flex flex-col gap-1">
         <p className="flex flex-wrap items-baseline gap-x-2">
           <span className={`text-lg font-semibold tabular-nums tracking-tight ${isOutOfStock ? 'text-text-tertiary' : 'text-text-price'}`}>
@@ -160,28 +163,31 @@ const ListingCard = ({
           </span>}
         </p>
 
-        <h3 className="line-clamp-2 min-h-10 text-sm leading-snug text-text-primary">
+        <h3 className="line-clamp-2 min-h-11 text-sm text-text-primary">
           {listing.title}
         </h3>
       </Link>
 
-      <div className="mt-auto flex items-center justify-between gap-2 pt-2 text-xs text-text-tertiary">
-        <Link to={detailPath} className="flex min-w-0 flex-1 items-center gap-1">
-          {listing.city && <>
+      <div className="mt-auto flex items-center justify-between gap-2 pt-2 text-sm text-text-tertiary">
+        <Link to={detailPath} className="flex min-w-0 flex-1 items-center gap-1 tabular-nums">
+          {showLocation && <>
             <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
             <span className="truncate">{listing.city}</span>
           </>}
-          {isLowStock && !isOwner && <span className="shrink-0 tabular-nums text-status-warning-text">
-            {listing.city ? '· ' : ''}{t('only_x_left', { count: stockCount, defaultValue: `Son ${stockCount} adet` })}
+          {showRating && <span className={`inline-flex shrink-0 items-center gap-1 ${showLocation ? 'ml-1' : ''}`}>
+            <Star className="h-3.5 w-3.5 fill-current text-status-warning" strokeWidth={1.5} aria-hidden />
+            <span className="font-medium text-text-primary" aria-hidden>{averageRating.toFixed(1)}</span>
+            <span aria-hidden>({reviewCount})</span>
+            <span className="sr-only">
+              {t('listing_rating_aria', { defaultValue: '{{rating}} puan, {{count}} değerlendirme', rating: averageRating.toFixed(1), count: reviewCount })}
+            </span>
+          </span>}
+          {isLowStock && !isOwner && <span className="shrink-0 text-status-warning-text">
+            {showLocation || showRating ? '· ' : ''}{t('only_x_left', { count: stockCount, defaultValue: `Son ${stockCount} adet` })}
           </span>}
         </Link>
-        <span className="flex shrink-0 items-center gap-1.5">
+        <span className="flex shrink-0 items-center gap-1">
           {listing.sellerGreatSellerEligible && <Award className="h-3.5 w-3.5 text-status-warning" strokeWidth={1.5} aria-label={t("great_seller")} />}
-          {averageRating > 0 && <span className="inline-flex items-center gap-1 tabular-nums">
-            <Star className="h-3.5 w-3.5 fill-current text-status-warning" strokeWidth={1.5} aria-hidden />
-            <span className="font-medium text-text-secondary">{averageRating.toFixed(1)}</span>
-            {reviewCount > 0 && <span>({reviewCount})</span>}
-          </span>}
           <FavoriteButton
             listingId={listing.id}
             listing={listing}
@@ -189,8 +195,35 @@ const ListingCard = ({
             initialCount={getListingFavoriteCount(listing)}
             size="sm"
             showCount={false}
-            className="min-h-8 min-w-8"
+            variant="ghost"
           />
+          {canAddToCart && <button
+            type="button"
+            onClick={e => {
+              stop(e);
+              if (!currentUserId) {
+                promptLogin();
+                return;
+              }
+              if (!itemIsInCart) addToCart(listing.id);
+            }}
+            disabled={isAddingToCart || itemIsInCart}
+            className={`flex h-8 w-8 items-center justify-center rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+              itemIsInCart
+                ? 'cursor-default text-status-success'
+                : 'text-text-tertiary hover:bg-background-tertiary hover:text-text-primary'
+            } ${isAddingToCart ? 'opacity-50' : ''}`}
+            title={itemIsInCart ? t("in_cart") : t("add_to_cart")}
+            aria-label={itemIsInCart ? t("in_cart") : t("add_to_cart")}
+          >
+            {isAddingToCart ? (
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            ) : itemIsInCart ? (
+              <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            ) : (
+              <ShoppingBag className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            )}
+          </button>}
         </span>
       </div>
     </div>
@@ -212,6 +245,8 @@ ListingCard.displayName = 'ListingCard';
 export default memo(ListingCard, (prevProps, nextProps) =>
   prevProps.listing?.id === nextProps.listing?.id &&
   prevProps.listing?.sellerId === nextProps.listing?.sellerId &&
+  prevProps.listing?.status === nextProps.listing?.status &&
+  prevProps.listing?.quantity === nextProps.listing?.quantity &&
   prevProps.listing?.sellerGreatSellerEligible === nextProps.listing?.sellerGreatSellerEligible &&
   prevProps.listing?.reviewStats?.totalReviews === nextProps.listing?.reviewStats?.totalReviews &&
   prevProps.listing?.reviewStats?.averageRating === nextProps.listing?.reviewStats?.averageRating &&

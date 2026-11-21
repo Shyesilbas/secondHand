@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Truck, Package, Calendar, MapPin, ArrowRight } from 'lucide-react';
+import { Clock, Package, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { ROUTES } from '../../../common/constants/routes.js';
 import Badge from '../../../common/components/ui/Badge.jsx';
 import { formatDateTime, resolveEnumLabel } from '../../../common/formatters.js';
@@ -64,8 +64,7 @@ export const ShippingDetailsSection = React.memo(({
     return (
         <CardComponent className="p-5">
             <div className="mb-5 flex items-center justify-between border-b border-border-light pb-3">
-                <h3 className="flex items-center gap-2 text-base font-semibold text-text-primary">
-                    <Truck className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+                <h3 className="text-base font-semibold text-text-primary">
                     {t("shipping_details", "Kargo & Teslimat Bilgileri")}
                 </h3>
                 <Badge variant={shippingVariant} dot>
@@ -111,7 +110,7 @@ export const ShippingDetailsSection = React.memo(({
                                 ) : null}
                             </div>
                             {useInternalLinks && shipping.trackingUrl ? (
-                                <p className="mt-2 text-xs text-text-tertiary">
+                                <p className="mt-2 text-sm text-text-tertiary">
                                     {t("full_tracking_page_also_offers_the_carri", "Detaylı takip sayfasında kargo firması sitesi de açılabilir.")}
                                 </p>
                             ) : null}

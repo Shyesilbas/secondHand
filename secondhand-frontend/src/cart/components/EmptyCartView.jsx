@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingBag } from 'lucide-react';
 import ListingCard from '../../listing/components/ListingCard.jsx';
-import { Button, Card, EmptyState, SkeletonGrid } from '../../common/components/ui/index.js';
+import { Button, Card, EmptyState, SkeletonCard } from '../../common/components/ui/index.js';
+import { LISTING_GRID_GAP, LISTING_ROW_COLUMNS, LISTING_ROW_SIZE, listingRowItemClass } from '../../listing/components/listingGridLayout.js';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_MESSAGES } from '../cartConstants.js';
@@ -58,11 +59,13 @@ const EmptyCartView = ({
             </Link>
           </div>
           {favoritesLoading ? (
-            <SkeletonGrid count={4} columns="grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4" />
+            <div className={`grid ${LISTING_ROW_COLUMNS} ${LISTING_GRID_GAP}`}>
+              {Array.from({ length: LISTING_ROW_SIZE }, (_, i) => <div key={i} className={listingRowItemClass(i)}><SkeletonCard /></div>)}
+            </div>
           ) : favoriteListings.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
-              {favoriteListings.map((listing, index) => (
-                <div key={listing.id} className="min-w-0 max-w-full">
+            <div className={`grid ${LISTING_ROW_COLUMNS} ${LISTING_GRID_GAP}`}>
+              {favoriteListings.slice(0, LISTING_ROW_SIZE).map((listing, index) => (
+                <div key={listing.id} className={`min-w-0 max-w-full ${listingRowItemClass(index)}`}>
                   <ListingCard
                     listing={listing}
                     isOwner={userId === listing.sellerId}

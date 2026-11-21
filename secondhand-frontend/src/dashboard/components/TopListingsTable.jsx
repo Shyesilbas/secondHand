@@ -23,7 +23,7 @@ const TopListingsTable = ({ listings = [] }) => {
             to={ROUTES.LISTING_DETAIL(listing.listingId)}
             className="-mx-2 flex items-center gap-3 rounded px-2 py-2.5 transition-colors duration-150 hover:bg-background-secondary"
           >
-            <span className="w-4 shrink-0 text-right text-xs tabular-nums text-text-tertiary">{index + 1}</span>
+            <span className="w-4 shrink-0 text-right text-sm tabular-nums text-text-tertiary">{index + 1}</span>
             {listing.mainImageUrl ? (
               <img
                 src={optimizeCloudinaryUrl(listing.mainImageUrl, { width: 80, height: 80, crop: 'fill' })}
@@ -37,7 +37,7 @@ const TopListingsTable = ({ listings = [] }) => {
             )}
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm text-text-primary">{listing.title}</p>
-              <p className="text-xs tabular-nums text-text-tertiary">
+              <p className="text-sm tabular-nums text-text-tertiary">
                 {t('dash_sale_count', { defaultValue: '{{count}} satış', count: listing.orderCount || 0 })}
                 {listing.averageRating > 0 && ` · ${listing.averageRating.toFixed(1)} puan`}
               </p>

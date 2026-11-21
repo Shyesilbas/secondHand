@@ -25,7 +25,8 @@ const ListingsContent = React.memo(({
   onListingChanged,
   isSelectable = false,
   selectedIds = new Set(),
-  onToggleSelect = null
+  onToggleSelect = null,
+  sortable = true
 }) => {
   const { t } = useTranslation();
   const hasSearch = Boolean(searchTerm) && searchMode !== 'none';
@@ -37,19 +38,21 @@ const ListingsContent = React.memo(({
     return Array.isArray(v) ? v.length > 0 : (v !== null && v !== undefined && v !== '' && v !== 0 && v !== false);
   }));
 
+  // w-full: this sits in a flex column, where mx-auto alone would shrink it to its content.
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-[60vh]">
+    <div className="mx-auto w-full max-w-7xl px-4 pb-12 pt-6 sm:px-6 lg:px-8 min-h-[60vh]">
       {!isLoading && (!searchTerm || searchMode === 'none') && (
-        <div className="mb-6">
-          <FilterStatus
-            totalElements={totalElements}
-            filters={filters}
-            getListingTypeLabel={getListingTypeLabel}
-            onResetFilters={onResetFilters}
-            updateFilters={updateFilters}
-            hasActiveFilters={isFiltering}
-          />
-        </div>
+        <FilterStatus
+          totalElements={totalElements}
+          filters={filters}
+          onResetFilters={onResetFilters}
+          updateFilters={updateFilters}
+          hasActiveFilters={isFiltering}
+          sortable={sortable}
+          trailing={totalPages > 1 ? (
+            <Pagination variant="compact" page={currentPage || 0} totalPages={totalPages} onPageChange={onPageChange} />
+          ) : null}
+        />
       )}
 
       {isLoading ? (
@@ -102,11 +105,7 @@ const ListingsContent = React.memo(({
       )}
 
       {!isLoading && (!searchTerm || searchMode === 'none') && totalPages > 1 && (
-        <div className="mt-10 flex justify-center">
-          <div className="rounded-md border border-border-light bg-background-primary shadow-xs">
-            <Pagination page={currentPage || 0} totalPages={totalPages || 0} onPageChange={onPageChange} />
-          </div>
-        </div>
+        <Pagination className="mt-10" page={currentPage || 0} totalPages={totalPages || 0} onPageChange={onPageChange} />
       )}
     </div>
   );

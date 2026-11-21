@@ -43,6 +43,16 @@ export const COMPLAINT_MESSAGES = Object.freeze({
 });
 
 /** [i18n key, default label] pairs; backend enums are the keys. */
+export const COMPLAINT_REASON_LABELS = Object.freeze({
+  INAPPROPRIATE_CONTENT: ['complaint_reason_inappropriate_content', 'Inappropriate content'],
+  HARASSMENT: ['complaint_reason_harassment', 'Harassment / Abuse'],
+  SCAM_FRAUD: ['complaint_reason_scam_fraud', 'Scam / Fraudulent listing'],
+  FALSE_ADVERTISING: ['complaint_reason_false_advertising', 'False advertising'],
+  COPYRIGHT_VIOLATION: ['complaint_reason_copyright_violation', 'Copyright violation'],
+  SPAM: ['complaint_reason_spam', 'Spam'],
+  OTHER: ['complaint_reason_other', 'Other'],
+});
+
 export const COMPLAINT_STATUS_LABELS = Object.freeze({
   PENDING: ['complaint_status_pending', 'Waiting for review'],
   INVESTIGATING: ['complaint_status_investigating', 'Under review'],

@@ -10,6 +10,7 @@ import Button from '../../common/components/ui/Button.jsx';
 import Card from '../../common/components/ui/Card.jsx';
 import PageHeader from '../../common/components/ui/PageHeader.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
@@ -88,11 +89,7 @@ const MyCouponsPage = () => {
     );
   } else if (isError) {
     content = (
-      <Alert
-        type="error"
-        message={t('campaign_load_error', 'Kampanyalar yüklenemedi.')}
-        action={<Button variant="secondary" size="sm" onClick={() => refetch()}>{t('try_again', 'Tekrar dene')}</Button>}
-      />
+      <ErrorState title={t('campaign_load_error', 'Kampanyalar yüklenemedi')} onRetry={refetch} />
     );
   } else if (campaigns.length === 0) {
     content = (
@@ -114,7 +111,7 @@ const MyCouponsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background-secondary">
+    <div className="min-h-screen bg-background-page">
       <PageContainer className="space-y-6 py-8">
         <PageHeader
           title={t('campaign_page_title', 'Kampanyalar')}

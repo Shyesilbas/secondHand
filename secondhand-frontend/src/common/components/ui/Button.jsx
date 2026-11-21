@@ -1,8 +1,8 @@
 const VARIANTS = {
  primary: 'bg-primary text-white hover:bg-primary-hover',
  secondary: 'border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary',
- ghost: 'text-text-secondary hover:bg-background-secondary hover:text-text-primary',
- danger: 'text-status-error-text hover:bg-background-secondary',
+ ghost: 'text-text-secondary hover:bg-background-tertiary hover:text-text-primary',
+ danger: 'text-status-error-text hover:bg-status-error-bg',
 };
 
 const SIZES = {

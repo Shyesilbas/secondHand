@@ -6,18 +6,11 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { API_BASE_URL } from '../../common/constants/apiEndpoints.js';
 import { inputError, inputNormal } from '../../common/components/forms/inputStyles.js';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
+import BrandMark from '../../common/components/layout/BrandMark.jsx';
 import { PASSWORD_RULES } from '../utils/passwordRules.js';
 
-/** Wordmark linking home; the one brand mark on every auth screen. */
-export const AuthBrand = () => {
-  const { t } = useTranslation();
-  return (
-    <Link to={ROUTES.HOME} className="mb-10 inline-flex items-center gap-2 self-start">
-      <span className="flex h-7 w-7 items-center justify-center rounded bg-primary text-xs font-semibold text-white" aria-hidden>S</span>
-      <span className="text-sm font-semibold tracking-tight text-text-primary">{t('secondhand', 'SecondHand')}</span>
-    </Link>
-  );
-};
+/** The shared wordmark, spaced for the top of every auth screen. */
+export const AuthBrand = () => <BrandMark className="mb-10 self-start" />;
 
 export const AuthHeader = ({ title, subtitle, children }) => (
   <div className="mb-8">
@@ -126,6 +119,6 @@ export const GoogleButton = () => {
 /** Centered card for auth screens that live inside the main layout (verify account, change password). */
 export const AuthCard = ({ children }) => (
   <div className="flex items-start justify-center bg-background-secondary px-4 py-12 sm:py-16">
-    <div className="w-full max-w-md rounded border border-border bg-background-primary p-6 sm:p-8">{children}</div>
+    <div className="w-full max-w-md rounded border border-border-light bg-background-primary p-6 sm:p-8 shadow-sm">{children}</div>
   </div>
 );

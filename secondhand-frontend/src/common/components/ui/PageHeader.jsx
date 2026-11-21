@@ -1,9 +1,9 @@
 // Standard page header: keeps H1 size, tracking, subtitle rhythm and action alignment uniform across pages.
+// No decorative icon next to the title (icon diet); the title carries the page.
 const PageHeader = ({
   title,
   subtitle,
   eyebrow,
-  icon: Icon,
   badge,
   back,
   actions,
@@ -17,13 +17,9 @@ const PageHeader = ({
     <div className={`${borderClass} ${className}`.trim()}>
       {back && <div className="mb-2">{back}</div>}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-        <div className="flex min-w-0 items-start gap-3">
-          {Icon && (
-            <Icon className="mt-1 h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-          )}
-          <div className="min-w-0">
+        <div className="min-w-0">
             {eyebrow && (
-              <p className="mb-1 text-xs font-medium text-text-tertiary">{eyebrow}</p>
+              <p className="mb-1.5 text-sm font-medium text-text-tertiary">{eyebrow}</p>
             )}
             <div className="flex flex-wrap items-center gap-2">
               <h1 className={`text-2xl font-semibold tracking-tight text-text-primary ${titleClassName}`.trim()}>
@@ -32,9 +28,8 @@ const PageHeader = ({
               {badge}
             </div>
             {subtitle && (
-              <p className="mt-1 text-sm text-text-secondary">{subtitle}</p>
+              <p className="mt-2 max-w-2xl text-base text-text-secondary">{subtitle}</p>
             )}
-          </div>
         </div>
         {actions && (
           <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>

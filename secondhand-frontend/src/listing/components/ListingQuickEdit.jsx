@@ -72,7 +72,7 @@ export const ListingQuickEdit = ({
             className={btnCls}
             title={t("save_quantity")}
           >
-            {savingQty ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+            {savingQty ? <Loader2 className="w-3.5 h-3.5 animate-spin" strokeWidth={1.5} /> : <Check className="w-3.5 h-3.5" strokeWidth={1.5} />}
           </button>
         </div>
       )}
@@ -100,7 +100,7 @@ export const ListingQuickEdit = ({
           className={btnCls}
           title={t("save_price")}
         >
-          {savingPrice ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+          {savingPrice ? <Loader2 className="w-3.5 h-3.5 animate-spin" strokeWidth={1.5} /> : <Check className="w-3.5 h-3.5" strokeWidth={1.5} />}
         </button>
       </div>
     </div>

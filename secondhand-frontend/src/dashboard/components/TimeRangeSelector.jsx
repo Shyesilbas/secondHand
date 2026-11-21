@@ -2,17 +2,17 @@ import { useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const PRESETS = [
-  { label: '7 gün', days: 7 },
-  { label: '30 gün', days: 30 },
-  { label: '3 ay', days: 90 },
-  { label: '6 ay', days: 180 },
-  { label: '1 yıl', days: 365 },
+  { labelKey: 'dash_preset_7d', fallback: '7 gün', days: 7 },
+  { labelKey: 'dash_preset_30d', fallback: '30 gün', days: 30 },
+  { labelKey: 'dash_preset_3m', fallback: '3 ay', days: 90 },
+  { labelKey: 'dash_preset_6m', fallback: '6 ay', days: 180 },
+  { labelKey: 'dash_preset_1y', fallback: '1 yıl', days: 365 },
 ];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const toInputValue = (date) => (date ? date.toISOString().split('T')[0] : '');
 
-const dateInputClass = 'h-8 rounded border border-border bg-background-primary px-2 text-xs text-text-secondary focus:border-border-focus focus:outline-none';
+const dateInputClass = 'h-9 rounded border border-border bg-background-primary px-2.5 text-sm text-text-primary transition-colors hover:border-card-border-hover focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus';
 
 const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateChange, onPresetSelect }) => {
   const { t } = useTranslation();
@@ -39,7 +39,7 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="inline-flex rounded border border-border bg-background-primary p-0.5" role="group" aria-label={t('dash_period', 'Dönem')}>
+      <div className="inline-flex rounded border border-border bg-background-secondary p-0.5" role="group" aria-label={t('dash_period', 'Dönem')}>
         {PRESETS.map((preset) => {
           const active = activePreset === preset.days;
           return (
@@ -48,11 +48,11 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
               type="button"
               aria-pressed={active}
               onClick={() => handlePresetClick(preset.days)}
-              className={`h-7 rounded-sm px-2.5 text-xs transition-colors duration-150 ${
-                active ? 'bg-background-tertiary font-medium text-text-primary' : 'text-text-tertiary hover:text-text-primary'
+              className={`h-8 rounded-sm px-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                active ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'
               }`}
             >
-              {preset.label}
+              {t(preset.labelKey, preset.fallback)}
             </button>
           );
         })}
@@ -67,7 +67,7 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
           onChange={(e) => onStartDateChange(e.target.value ? new Date(e.target.value) : null)}
           className={dateInputClass}
         />
-        <span className="text-xs text-text-muted">–</span>
+        <span className="text-sm text-text-muted">–</span>
         <input
           type="date"
           aria-label={t('dash_end_date', 'Bitiş')}

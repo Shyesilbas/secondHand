@@ -39,9 +39,9 @@ const HeaderListingsMenu = ({ isOpen, onToggle, onClose, orderCount }) => {
         type="button"
         onClick={onToggle}
         aria-label={toShipCount > 0 ? toShipLabel : t('orders', 'Siparişler')}
-        className="group relative p-2.5 text-text-secondary hover:text-text-primary transition-all duration-300 ease-in-out rounded hover:bg-background-tertiary"
+        className="group relative p-2.5 text-text-secondary hover:text-text-primary transition-colors duration-150 ease-in-out rounded hover:bg-background-tertiary"
       >
-        <Package className="w-5 h-5 stroke-1.5" />
+        <Package className="w-5 h-5 stroke-1.5" strokeWidth={1.5} />
         {toShipCount > 0 ? (
           <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-status-error text-xs font-semibold leading-none text-white">
             !

@@ -4,7 +4,7 @@ import { CheckCircle2, FileCheck2, Package } from 'lucide-react';
 import { Button, Modal } from '../../common/components/ui/index.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { useRequiredAgreements } from '../../agreements/hooks/useAgreements.js';
-import { AGREEMENT_TYPE_LABELS } from '../../agreements/agreements.js';
+import { agreementLabel } from '../../agreements/agreements.js';
 import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 
 const ShowcaseSuccessModal = ({
@@ -116,9 +116,7 @@ const ShowcaseSuccessModal = ({
                         aria-hidden
                       />
                       <span className="truncate text-text-primary">
-                        {AGREEMENT_TYPE_LABELS[agreement.agreementType] ||
-                          agreement.agreementTypeDisplayName ||
-                          agreement.agreementType}
+                        {agreementLabel(t, agreement.agreementType)}
                       </span>
                     </div>
                     <button

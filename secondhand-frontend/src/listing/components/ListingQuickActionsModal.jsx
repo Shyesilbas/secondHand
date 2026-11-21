@@ -13,8 +13,7 @@ import {
   Power,
   PowerOff,
   Sparkles,
-  Trash2,
-  Zap
+  Trash2
 } from 'lucide-react';
 import { Button, Modal } from '../../common/components/ui/index.js';
 import { PriceInput } from '../../common/components/ui/PriceInput.jsx';
@@ -45,13 +44,11 @@ const ActionRow = ({ icon: Icon, title, description, onClick, danger = false }) 
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded px-3 py-3 text-left transition-colors duration-150 hover:bg-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+      className="group flex w-full items-center gap-3 rounded px-3 py-2.5 text-left transition-colors duration-150 hover:bg-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
     >
-      <Icon
-        className={`h-5 w-5 shrink-0 ${danger ? 'text-status-error-text' : 'text-text-secondary'}`}
-        strokeWidth={1.5}
-        aria-hidden
-      />
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded ${danger ? 'bg-status-error-bg text-status-error-text' : 'bg-background-secondary text-text-secondary group-hover:bg-background-tertiary'}`}>
+        <Icon className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+      </span>
       <span className="min-w-0 flex-1">
         <span className={`block text-sm font-medium ${danger ? 'text-status-error-text' : 'text-text-primary'}`}>{title}</span>
         {description && <span className="block text-sm text-text-tertiary">{description}</span>}
@@ -64,7 +61,7 @@ const ActionRow = ({ icon: Icon, title, description, onClick, danger = false }) 
 const ActionGroup = ({ title, children }) => (
   <section className="space-y-1">
     <h3 className="px-3 text-sm font-medium text-text-tertiary">{title}</h3>
-    <ul>{children}</ul>
+    <ul className="-mx-0.5">{children}</ul>
   </section>
 );
 
@@ -205,7 +202,7 @@ export const ListingQuickActionsModal = ({
       >
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-tertiary">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded bg-secondary-200">
               {imageUrl ? (
                 <img src={optimizeCloudinaryUrl(imageUrl, { width: 120 })} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -223,7 +220,17 @@ export const ListingQuickActionsModal = ({
                     <span className="tabular-nums text-text-tertiary">#{listing.listingNo}</span>
                   </>
                 )}
+                {listingInShowcase && (
+                  <>
+                    <span className="text-text-muted" aria-hidden>·</span>
+                    <span className="inline-flex items-center gap-1 text-accent-teal-800">
+                      <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                      {t('featured', 'Vitrinde')}
+                    </span>
+                  </>
+                )}
               </p>
+              <p className="mt-0.5 text-sm font-semibold tabular-nums text-text-price">{formatCurrency(baseline.price, currency)}</p>
             </div>
           </div>
 
@@ -253,8 +260,8 @@ export const ListingQuickActionsModal = ({
                           type="button"
                           onClick={() => setPriceVal(selected ? baseline.price : target)}
                           aria-pressed={selected}
-                          className={`h-8 rounded-sm border px-2.5 text-xs font-medium tabular-nums transition-colors duration-150 ${selected
-                            ? 'border-primary bg-primary text-white'
+                          className={`h-8 rounded-sm border px-2.5 text-sm font-medium tabular-nums transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${selected
+                            ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800'
                             : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary hover:text-text-primary'
                             }`}
                         >
@@ -303,7 +310,7 @@ export const ListingQuickActionsModal = ({
                         onChange={e => setQtyText(e.target.value.replace(/\D/g, ''))}
                         onKeyDown={e => e.key === 'Enter' && handleSave()}
                         aria-invalid={qtyDirty && !qtyValid}
-                        className="h-11 w-full min-w-0 rounded border border-border bg-background-primary px-3 text-center text-sm tabular-nums text-text-primary focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus sm:h-10"
+                        className="h-11 w-full min-w-0 rounded border border-border bg-background-primary px-3 text-center text-sm tabular-nums text-text-primary transition-colors hover:border-card-border-hover focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus sm:h-10"
                       />
                       <button
                         type="button"
@@ -323,78 +330,13 @@ export const ListingQuickActionsModal = ({
             </section>
           )}
 
-          {!isSold && (
-            <section className="space-y-3 border-t border-border-light pt-5">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-text-tertiary">
-                  {t('showcase', 'Vitrin')}
-                </h3>
-                {listingInShowcase && (
-                  <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
-                    <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
-                    <span>{t('featured', 'Vitrinde')}</span>
-                  </span>
-                )}
-              </div>
-
-              <div className="rounded border border-border-light bg-background-secondary p-3.5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary">
-                      <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-text-primary">
-                        {listingInShowcase
-                          ? t('showcase_extended_title', 'İlanınız vitrinde')
-                          : t('add_to_showcase', 'Vitrine ekle')}
-                      </p>
-                      <p className="mt-0.5 text-sm text-text-secondary">
-                        {listingInShowcase
-                          ? (activeShowcase?.endDate
-                            ? `${t('expires', 'Bitiş')}: ${formatDate(activeShowcase.endDate)}`
-                            : t('showcase_desc', 'Anasayfa vitrininde göster'))
-                          : t('showcase_desc', 'Anasayfa vitrininde göster')}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-2">
-                    {listingInShowcase ? (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setIsShowcaseModalOpen(true)}
-                      >
-                        <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                        <span>{t('extend_showcase_title', 'Vitrin Süresini Uzat')}</span>
-                      </Button>
-                    ) : isActive ? (
-                      <Button
-                        size="sm"
-                        onClick={() => setIsShowcaseModalOpen(true)}
-                      >
-                        <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                        <span>{t('add_to_showcase', 'Vitrine ekle')}</span>
-                      </Button>
-                    ) : (
-                      <span className="text-xs text-text-muted">
-                        {t('status_inactive', 'Pasif')}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
-
           <div className="space-y-4 border-t border-border-light pt-5">
             {!isSold && (
               <ActionGroup title={t('promote', 'Öne çıkar')}>
                 {!listingInShowcase ? (
                   isActive && (
                     <ActionRow
-                      icon={Zap}
+                      icon={Sparkles}
                       title={t('add_to_showcase', 'Vitrine ekle')}
                       description={t('showcase_desc', 'Anasayfa vitrininde göster')}
                       onClick={() => setIsShowcaseModalOpen(true)}
@@ -404,7 +346,9 @@ export const ListingQuickActionsModal = ({
                   <ActionRow
                     icon={Sparkles}
                     title={t('extend_showcase_title', 'Vitrin süresini uzat')}
-                    description={t('showcase_duration', 'Vitrin süresi')}
+                    description={activeShowcase?.endDate
+                      ? `${t('expires', 'Bitiş')}: ${formatDate(activeShowcase.endDate)}`
+                      : t('showcase_duration', 'Vitrin süresi')}
                     onClick={() => setIsShowcaseModalOpen(true)}
                   />
                 )}

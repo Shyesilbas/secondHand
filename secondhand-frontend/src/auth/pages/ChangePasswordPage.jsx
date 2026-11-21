@@ -96,7 +96,7 @@ const ChangePasswordPage = () => {
             {t('cancel', 'Vazgeç')}
           </Link>
           <Button type="submit" className="flex-1" disabled={isLoading}>
-            {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden strokeWidth={1.5} />}
             {isLoading ? t('auth_saving', 'Kaydediliyor…') : t('auth_save_password', 'Şifreyi güncelle')}
           </Button>
         </div>

@@ -12,6 +12,7 @@ import { formatDate } from '../../common/formatters.js';
 import { FAVORITE_DEFAULTS, FAVORITES_PAGE_TABS } from '../favoriteConstants.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { getListingFavoriteCount } from '../favorites.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 const FavoritesPage = () => {
     const {
         t
@@ -64,9 +65,9 @@ const FavoritesPage = () => {
     const handleRefresh = useCallback(() => {
         fetchFavorites();
     }, [fetchFavorites]);
-    return <div className="min-h-screen bg-background-secondary">
-        <PageContainer className="py-6 sm:py-8">
-            <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
+    return <div className="min-h-screen bg-background-page">
+        <PageContainer className="py-8">
+            <div className="overflow-hidden rounded border border-border-light bg-background-primary">
                 <div className="border-b border-border-light bg-background-secondary px-4 py-4 sm:px-5">
                     <PageHeader
                         title={t("favorites")}
@@ -88,9 +89,9 @@ const FavoritesPage = () => {
 
                     <div className="flex flex-wrap items-center gap-2">
                         {activeTab === FAVORITES_PAGE_TABS.LISTS && <button type="button" onClick={() => setShowCreateListModal(true)} className="inline-flex items-center gap-1.5 rounded bg-btn-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-btn-primary-hover">
-                            <Plus className="h-4 w-4" />{t("new_list")}</button>}
-                        {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <button type="button" onClick={handleRefresh} disabled={isLoading} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
-                            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />{t("refresh")}</button>}
+                            <Plus className="h-4 w-4" strokeWidth={1.5} />{t("new_list")}</button>}
+                        {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <button type="button" onClick={handleRefresh} disabled={isLoading} className={buttonClasses('secondary', 'sm')}>
+                            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} strokeWidth={1.5} />{t("refresh")}</button>}
                     </div>
                 </div>
             </div>
@@ -102,12 +103,12 @@ const FavoritesPage = () => {
                         title={t("no_saved_listings_yet")}
                         description={t("tap_the_heart_on_a_listing_to_save_it_he")}
                     >
-                        <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-6">{t("browse_listings")}</Link>
+                        <Link to={ROUTES.LISTINGS} className={`${buttonClasses()} mt-6`}>{t("browse_listings")}</Link>
                     </EmptyState> : <>
                         <div className="mb-6">
                             <ListingGrid listings={favoritedListings} isLoading={false} error={null} />
                         </div>
-                        {pagination.totalPages > 1 ? <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
+                        {pagination.totalPages > 1 ? <div className="overflow-hidden rounded border border-border-light bg-background-primary">
                             <Pagination page={pagination.number} totalPages={pagination.totalPages} onPageChange={handlePageChange} />
                         </div> : null}
                     </>}
@@ -120,7 +121,7 @@ const FavoritesPage = () => {
                         description={t("create_a_list_to_group_favorites_by_them")}
                     >
                         <button type="button" onClick={() => setShowCreateListModal(true)} className="mt-6 inline-flex items-center gap-2 rounded bg-btn-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-btn-primary-hover">
-                            <Plus className="h-5 w-5" />{t("create_your_first_list")}</button>
+                            <Plus className="h-5 w-5" strokeWidth={1.5} />{t("create_your_first_list")}</button>
                     </EmptyState> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {myLists.map(list => <FavoriteListCard key={list.id} list={list} />)}
                     </div>}

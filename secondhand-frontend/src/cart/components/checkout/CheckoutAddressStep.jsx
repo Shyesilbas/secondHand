@@ -16,16 +16,19 @@ const PREDEFINED_HUBS = [
   'Konak Vapur İskelesi (İzmir)'
 ];
 
+// The radio inputs are visually hidden, so the card shows their keyboard focus.
+const FOCUS = 'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-border-focus';
+
 const optionClass = (selected, disabled = false) => {
   if (disabled) return 'cursor-not-allowed border-border bg-background-secondary opacity-50';
   return selected
-    ? 'cursor-pointer border-primary ring-1 ring-primary'
-    : 'cursor-pointer border-border hover:border-card-border-hover';
+    ? `cursor-pointer border-accent-teal ring-1 ring-accent-teal ${FOCUS}`
+    : `cursor-pointer border-border hover:border-card-border-hover ${FOCUS}`;
 };
 
 const RadioDot = ({ selected }) => (
   <span
-    className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${selected ? 'border-primary bg-primary' : 'border-border-dark'}`}
+    className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${selected ? 'border-accent-teal bg-accent-teal' : 'border-border-dark'}`}
     aria-hidden
   >
     {selected && <span className="h-1.5 w-1.5 rounded-full bg-background-primary" />}
@@ -156,13 +159,18 @@ const CheckoutAddressStep = ({
 
   return (
     <div>
+      {/* Same step header as the payment and verification steps. */}
+      <div className="border-b border-border-light px-5 py-5 sm:px-6 sm:py-6">
+        <h2 className="text-base font-semibold text-text-primary">{t('checkout_delivery_title', 'Teslimat')}</h2>
+        <p className="mt-1 text-sm text-text-secondary">{t('checkout_delivery_desc', 'Ürünlerin nasıl ve nereye ulaşacağını seç.')}</p>
+      </div>
       <div className="divide-y divide-border-light">
         <Section title={t('delivery_method', 'Teslimat yöntemi')}>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" role="radiogroup">
             {deliveryOptions.map(option => {
               const selected = deliveryMethod === option.value;
               return (
-                <label key={option.value} className={`flex items-start gap-3 rounded-md border p-4 transition-colors duration-150 ${optionClass(selected, option.disabled)}`}>
+                <label key={option.value} className={`flex items-start gap-3 rounded border p-4 transition-colors duration-150 ${optionClass(selected, option.disabled)}`}>
                   <input
                     type="radio"
                     name="deliveryMethod"
@@ -197,8 +205,8 @@ const CheckoutAddressStep = ({
                         setMeetupLocation(hub);
                         setCustomLocationActive(false);
                       }}
-                      className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors duration-150 ${
-                        selected ? 'border-primary bg-primary text-text-inverse' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
+                      className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm transition-colors duration-150 ${
+                        selected ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
                       }`}
                     >
                       {selected && <Check className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />}
@@ -213,8 +221,8 @@ const CheckoutAddressStep = ({
                     setCustomLocationActive(true);
                     if (PREDEFINED_HUBS.includes(meetupLocation)) setMeetupLocation('');
                   }}
-                  className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors duration-150 ${
-                    customLocationActive ? 'border-primary bg-primary text-text-inverse' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
+                  className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm transition-colors duration-150 ${
+                    customLocationActive ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
                   }`}
                 >
                   <MapPin className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
@@ -241,7 +249,7 @@ const CheckoutAddressStep = ({
           action={hasAddresses ? addAddressButton : null}
         >
           {!hasAddresses ? (
-            <div className="rounded-md border border-dashed border-border p-6 text-center">
+            <div className="rounded border border-dashed border-border p-6 text-center">
               <p className="text-sm font-medium text-text-primary">{t('no_saved_addresses', 'Kayıtlı adresin yok')}</p>
               <p className="mt-1 text-sm text-text-secondary">{t('checkout_add_first_address', 'Siparişi tamamlamak için bir adres ekle.')}</p>
               <Button size="sm" className="mt-4" onClick={() => setIsAddAddressModalOpen(true)}>
@@ -255,7 +263,7 @@ const CheckoutAddressStep = ({
                 {addresses.map(address => {
                   const selected = String(selectedShippingAddressId) === String(address.id);
                   return (
-                    <label key={address.id} className={`flex items-start gap-3 rounded-md border p-4 transition-colors duration-150 ${optionClass(selected)}`}>
+                    <label key={address.id} className={`flex items-start gap-3 rounded border p-4 transition-colors duration-150 ${optionClass(selected)}`}>
                       <input
                         type="radio"
                         name="shipping"
@@ -269,7 +277,7 @@ const CheckoutAddressStep = ({
                         <span className="flex items-center gap-2">
                           <span className="truncate text-sm font-medium text-text-primary">{address.title || t('address', 'Adres')}</span>
                           {address.mainAddress && (
-                            <span className="inline-flex shrink-0 items-center rounded border border-border px-1.5 py-0.5 text-xs font-medium text-text-secondary bg-background-secondary">
+                            <span className="inline-flex shrink-0 items-center rounded-sm border border-border bg-background-secondary px-1.5 py-0.5 text-xs font-medium text-text-secondary">
                               {t('default', 'Varsayılan')}
                             </span>
                           )}
@@ -291,7 +299,7 @@ const CheckoutAddressStep = ({
                       type="checkbox"
                       checked={billingSameAsShipping}
                       onChange={handleBillingToggle}
-                      className="h-4 w-4 rounded-sm border-border text-primary focus:ring-border-focus"
+                      className="h-4 w-4 rounded-sm border-border accent-accent-teal focus-visible:ring-2 focus-visible:ring-border-focus"
                     />
                     {t('billing_same_as_shipping', 'Fatura adresi teslimat adresiyle aynı')}
                   </label>

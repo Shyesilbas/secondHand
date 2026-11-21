@@ -24,8 +24,9 @@ import { useOrderDetails } from '../hooks/useOrderDetails.js';
 import { orderItemIds, useOrderItemReviews } from '../hooks/useOrderItemReviews.js';
 import { OrderDetailsSkeleton } from './orderDetails/OrderDetailsSkeleton.jsx';
 
+// Cards inside the white dialog: light edge only, no shadow (shadows are for cards on the page canvas).
 const OrderCard = React.memo(({ children, className = '' }) => (
- <Card className={className}>{children}</Card>
+ <Card shadow={false} className={className}>{children}</Card>
 ));
 OrderCard.displayName = 'OrderCard';
 
@@ -148,11 +149,11 @@ const OrderDetailsModal = React.memo(({
  const orderDisplayNumber = selectedOrder?.orderNumber || selectedOrder?.orderNo || (selectedOrder?.id ? `#${selectedOrder.id}` : '');
 
 const header = (
- <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
+ <div className="flex items-center justify-between gap-4 border-b border-border-light px-5 py-4">
  <div className="min-w-0 flex-1">
  <div className="mb-1 flex flex-wrap items-center gap-2">
  {orderDisplayNumber && (
- <span className="inline-flex items-center rounded-sm border border-border bg-background-secondary px-2 py-0.5 text-xs font-semibold tabular-nums text-text-secondary">
+ <span className="inline-flex items-center rounded-sm border border-border bg-background-secondary px-2 py-0.5 text-xs font-medium tabular-nums text-text-secondary">
  {String(orderDisplayNumber).startsWith('#') ? orderDisplayNumber : `#${orderDisplayNumber}`}
  </span>
  )}
@@ -245,7 +246,7 @@ const header = (
  ) : selectedOrder ? (
  <div className="space-y-6">
  {/* Stepper (Horizontal Progress Tracker) */}
- <Card surface="secondary" padding="compact">
+ <Card surface="secondary" padding="compact" shadow={false}>
  <OrderStepper currentStatus={selectedOrder.status} deliveryMethod={selectedOrder.deliveryMethod} />
  <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-border-light pt-2 text-xs tabular-nums text-text-tertiary">
  <span>

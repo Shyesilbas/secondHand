@@ -33,7 +33,7 @@ const ViewStatisticsCard = ({
         color: 'text-status-warning',
         bg: 'bg-background-secondary'
     }];
-    return <div className="rounded-md border border-border-light bg-background-primary overflow-hidden mb-5">
+    return <div className="rounded border border-border-light bg-background-primary overflow-hidden mb-5">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border-light bg-background-secondary">
             <div className="flex items-center gap-2">
@@ -41,7 +41,7 @@ const ViewStatisticsCard = ({
                 <span className="text-sm font-semibold text-text-secondary">{t("view_statistics")}</span>
             </div>
             <div className="flex items-center gap-1 text-xs text-text-muted">
-                <Calendar className="w-3 h-3" />
+                <Calendar className="w-3 h-3" strokeWidth={1.5} />
                 <span>{t("last")}{periodDays || 7}{t("days")}</span>
             </div>
         </div>
@@ -56,7 +56,7 @@ const ViewStatisticsCard = ({
                 bg
             }) => <div key={label} className="flex flex-col items-center justify-center py-4 px-2 gap-1.5">
                     <div className={`w-8 h-8 rounded ${bg} flex items-center justify-center`}>
-                        <Icon className={`w-4 h-4 ${color}`} />
+                        <Icon className={`w-4 h-4 ${color}`} strokeWidth={1.5} />
                     </div>
                     <span className={`text-xl font-semibold tracking-tight ${color}`}>{value}</span>
                     <span className="text-xs text-text-muted font-medium text-center leading-tight">{label}</span>

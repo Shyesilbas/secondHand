@@ -7,7 +7,7 @@ const TYPE_ICON = {
  success: [CheckCircle2, 'text-status-success'],
  error: [XCircle, 'text-status-error'],
  warning: [AlertTriangle, 'text-status-warning'],
- info: [Info, 'text-text-tertiary']
+ info: [Info, 'text-status-info-icon']
 };
 
 // Without a close button the dialog only closes through its actions (e.g. a confirm that must reset caller state).

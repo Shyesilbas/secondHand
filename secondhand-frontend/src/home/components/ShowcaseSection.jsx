@@ -5,10 +5,11 @@ import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import ListingCard from '../../listing/components/ListingCard.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import Button from '../../common/components/ui/Button.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import HomeSection from './HomeSection.jsx';
-import { HOME_GRID_COLUMNS, HOME_GRID_SIZE } from './homeLayout.js';
+import { HOME_GRID_COLUMNS, HOME_GRID_GAP, HOME_GRID_SIZE } from './homeLayout.js';
 
 const ShowcaseSection = () => {
   const { t } = useTranslation();
@@ -20,11 +21,7 @@ const ShowcaseSection = () => {
     content = <HomeSection.Skeleton />;
   } else if (error) {
     content = (
-      <Alert
-        type="error"
-        message={t('home_showcase_load_failed', 'Vitrin ilanları yüklenemedi.')}
-        action={<Button variant="secondary" size="sm" onClick={() => refetch()}>{t('try_again', 'Tekrar dene')}</Button>}
-      />
+      <ErrorState title={t('home_showcase_load_failed', 'Vitrin ilanları yüklenemedi')} onRetry={refetch} />
     );
   } else if (showcases.length === 0) {
     content = (
@@ -37,7 +34,7 @@ const ShowcaseSection = () => {
     );
   } else {
     content = (
-      <div className={`grid gap-4 ${HOME_GRID_COLUMNS}`}>
+      <div className={`grid ${HOME_GRID_GAP} ${HOME_GRID_COLUMNS}`}>
         {showcases.map(showcase => (
           <ListingCard
             key={showcase.id}

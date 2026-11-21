@@ -89,7 +89,7 @@ const CompareModal = memo(() => {
  {
  const boolVal = field.invert ? !rawValue : rawValue;
  return boolVal ? <span className="inline-flex items-center gap-1 text-text-primary">
- <Check className="w-3.5 h-3.5" />{t("yes")}</span> : <span className="text-text-tertiary">{t("no")}</span>;
+ <Check className="w-3.5 h-3.5" strokeWidth={1.5} />{t("yes")}</span> : <span className="text-text-tertiary">{t("no")}</span>;
  }
  case 'date':
  return formatDate(rawValue);
@@ -110,10 +110,10 @@ const CompareModal = memo(() => {
  };
  const getHighlightIcon = field => {
  if (field.highlight === HIGHLIGHT_RULES.LOWEST) {
- return <TrendingDown className="w-3 h-3 text-status-success" />;
+ return <TrendingDown className="w-3 h-3 text-status-success" strokeWidth={1.5} />;
  }
  if (field.highlight === HIGHLIGHT_RULES.HIGHEST || field.highlight === HIGHLIGHT_RULES.BOOLEAN_TRUE) {
- return <Award className="w-3 h-3 text-status-success" />;
+ return <Award className="w-3 h-3 text-status-success" strokeWidth={1.5} />;
  }
  return null;
  };
@@ -134,12 +134,12 @@ const CompareModal = memo(() => {
  {items.map(item => <th key={item.id} className="min-w-44 p-3 sm:p-4 border-l border-border-light align-bottom">
  <div className="flex flex-col items-center gap-2">
  <div className="relative group w-full max-w-28">
- <div className="aspect-square overflow-hidden rounded-md border border-border-light bg-background-tertiary">
+ <div className="aspect-square overflow-hidden rounded border border-border-light bg-background-tertiary">
  {item.imageUrl ? <img src={item.imageUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">
  <ImageIcon className="h-5 w-5 text-text-muted" strokeWidth={1.5} />
  </div>}
  </div>
- <button type="button" onClick={() => removeFromComparison(item.id)} className="absolute right-1 top-1 rounded-md border border-border bg-background-primary p-1 text-text-secondary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus" aria-label={t("remove_from_comparison")}>
+ <button type="button" onClick={() => removeFromComparison(item.id)} className="absolute right-1 top-1 rounded border border-border bg-background-primary p-1 text-text-secondary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus" aria-label={t("remove_from_comparison")}>
  <X className="h-4 w-4" strokeWidth={1.5} />
  </button>
  </div>

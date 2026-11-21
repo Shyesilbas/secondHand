@@ -31,7 +31,7 @@ const Toast = ({
  setVisible(false);
  setTimeout(onClose, 200);
  }} className="flex-shrink-0 p-1 text-text-muted hover:text-text-secondary rounded" aria-label={t("close")}>
- <XMarkIcon className="w-5 h-5" />
+ <XMarkIcon className="w-5 h-5" strokeWidth={1.5} />
  </button>
  </div>;
 };

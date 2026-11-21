@@ -37,7 +37,7 @@ const CategoryBreakdown = ({ data = {}, currency = DASHBOARD_CURRENCY, label }) 
             <span className="truncate text-text-secondary">{categoryLabel(entry.key, t)}</span>
             <span className="shrink-0 tabular-nums text-text-primary">
               {formatCurrency(entry.value, currency)}
-              <span className="ml-2 text-xs text-text-tertiary">{`${Math.round((entry.value / total) * 100)}%`}</span>
+              <span className="ml-2 text-sm text-text-tertiary">{`${Math.round((entry.value / total) * 100)}%`}</span>
             </span>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-background-tertiary" aria-hidden>

@@ -38,14 +38,14 @@ const AdminCouponsTable = ({
           <div className="flex flex-col gap-2 border-b border-border-light bg-background-secondary px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <label className="relative block min-w-0 flex-1 sm:max-w-sm">
               <span className="sr-only">{t('filter_by_coupon_code')}</span>
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" aria-hidden />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" aria-hidden strokeWidth={1.5} />
               <input
                 type="search"
                 value={codeFilter}
                 onChange={(e) => onCodeFilterChange(e.target.value)}
                 placeholder={t('filter_by_code')}
                 autoComplete="off"
-                className="w-full rounded border border-border-light bg-background-primary py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+                className="w-full rounded border border-border-light bg-background-primary py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
               />
             </label>
             {normalizedCodeQuery ? (
@@ -120,7 +120,7 @@ const AdminCouponsTable = ({
                                 audienceType === 'NEVER_ORDERED_FIRST_ORDER'
                                   ? 'font-medium text-primary'
                                   : audienceType === 'ALL_USERS'
-                                    ? 'font-medium text-status-success'
+                                    ? 'font-medium text-status-success-text'
                                     : 'text-text-primary'
                               }
                             >
@@ -144,7 +144,7 @@ const AdminCouponsTable = ({
                             onClick={() => onOpenEdit(row)}
                             className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-hover"
                           >
-                            <Pencil className="h-3.5 w-3.5" />
+                            <Pencil className="h-3.5 w-3.5" strokeWidth={1.5} />
                             {t('edit')}
                           </button>
                         </td>

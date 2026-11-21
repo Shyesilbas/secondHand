@@ -90,7 +90,7 @@ const CancelRefundModal = ({
  {allItemsSelected ? t("deselect_all", "Seçimi Kaldır") : t("select_all", "Tümünü Seç")}
  </button>}
  </div>
- <div className="max-h-48 divide-y divide-border-light overflow-y-auto rounded-md border border-border">
+ <div className="max-h-48 divide-y divide-border-light overflow-y-auto rounded border border-border">
  {openItems.map(item => <label key={item.id} className="flex cursor-pointer items-center gap-3 px-3 py-2.5 hover:bg-background-secondary">
  <input type="checkbox" checked={selectedItems.includes(item.id)} onChange={() => handleItemToggle(item.id)} className="h-4 w-4 rounded-sm border-border text-primary focus:ring-border-focus" />
  <span className="min-w-0 flex-1">

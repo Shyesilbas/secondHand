@@ -23,7 +23,7 @@ const ListingSellerCard = ({ listing, isOwner }) => {
   const profilePath = ROUTES.USER_PROFILE(listing.sellerId);
 
   return (
-    <section className="rounded border border-border bg-background-secondary p-5" aria-label={t('seller_information', 'Satıcı bilgileri')}>
+    <section className="rounded border border-border-light bg-background-primary p-5 shadow-sm" aria-label={t('seller_information', 'Satıcı bilgileri')}>
       <div className="flex items-center justify-between gap-3">
         <Link to={profilePath} className="group flex min-w-0 items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background-tertiary text-sm font-semibold text-text-primary">

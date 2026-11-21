@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import Alert from '../../../common/components/ui/Alert.jsx';
+import ErrorState from '../../../common/components/ui/ErrorState.jsx';
 import Button from '../../../common/components/ui/Button.jsx';
 import Skeleton from '../../../common/components/ui/Skeleton.jsx';
 import { attributeLabel, formatAttributeValue, listingLevelDefinitions } from './attributeValues.js';
@@ -19,10 +20,7 @@ const ListingAttributeDetails = ({ section, listing, renderRow }) => {
 	}
 	if (query.isError) {
 		return (
-			<Alert
-				message={t('condition_info_failed_load', 'Durum bilgileri yüklenemedi.')}
-				action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>{t('retry', 'Tekrar dene')}</Button>}
-			/>
+			<ErrorState size="compact" title={t('condition_info_failed_load', 'Durum bilgileri yüklenemedi')} onRetry={query.refetch} />
 		);
 	}
 

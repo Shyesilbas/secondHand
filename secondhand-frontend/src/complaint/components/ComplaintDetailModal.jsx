@@ -5,22 +5,12 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { formatDate, formatDateTime } from '../../common/formatters.js';
 import {
   APPEAL_STATUS_LABELS,
+  COMPLAINT_REASON_LABELS,
   COMPLAINT_STATUS_LABELS,
   PENALTY_LABELS,
   VIOLATION_LABELS,
   labelOf,
 } from '../complaintConstants.js';
-import { ComplaintReason } from '../types/complaintTypes.js';
-
-const REASON_LABELS = {
-  [ComplaintReason.INAPPROPRIATE_CONTENT]: 'Inappropriate Content',
-  [ComplaintReason.HARASSMENT]: 'Harassment',
-  [ComplaintReason.SCAM_FRAUD]: 'Scam/Fraud Listing',
-  [ComplaintReason.FALSE_ADVERTISING]: 'False Advertising',
-  [ComplaintReason.COPYRIGHT_VIOLATION]: 'Copyright Violation',
-  [ComplaintReason.SPAM]: 'Spam',
-  [ComplaintReason.OTHER]: 'Other',
-};
 
 const SectionTitle = ({ children }) => (
   <h4 className="mb-2 text-xs font-medium text-text-tertiary">{children}</h4>
@@ -49,7 +39,7 @@ const ComplaintDetailModal = ({ complaint, side = 'filed', isOpen, onClose }) =>
       <div className="space-y-6 text-sm">
         <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
           <span className="inline-flex items-center rounded-sm bg-background-secondary px-2 py-0.5 font-medium">
-            {REASON_LABELS[complaint.reason] || complaint.reason}
+            {labelOf(COMPLAINT_REASON_LABELS, complaint.reason, t)}
           </span>
           <span>{labelOf(COMPLAINT_STATUS_LABELS, complaint.status, t)}</span>
           <span className="tabular-nums text-text-tertiary">{formatDate(complaint.createdAt) || '-'}</span>

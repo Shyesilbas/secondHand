@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import PageContainer from '../../common/components/layout/PageContainer.jsx';
 import { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
-import { HOME_GRID_COLUMNS, HOME_GRID_SIZE } from './homeLayout.js';
+import { HOME_GRID_COLUMNS, HOME_GRID_GAP, HOME_GRID_SIZE } from './homeLayout.js';
 
 
 /** Home page section: title, optional one-line description, optional "see all" link. */
@@ -30,7 +30,7 @@ const HomeSection = ({ title, description, linkTo, linkLabel, children }) => (
 );
 
 HomeSection.Skeleton = function HomeGridSkeleton() {
-  return <SkeletonGrid count={HOME_GRID_SIZE} columns={HOME_GRID_COLUMNS} />;
+  return <SkeletonGrid count={HOME_GRID_SIZE} columns={HOME_GRID_COLUMNS} gap={HOME_GRID_GAP} />;
 };
 
 export default HomeSection;

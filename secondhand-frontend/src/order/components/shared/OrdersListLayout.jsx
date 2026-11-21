@@ -27,6 +27,7 @@ import { Badge, Card, PageHeader, Tabs } from '../../../common/components/ui/ind
 import EmptyState from '../../../common/components/ui/EmptyState.jsx';
 import Skeleton from '../../../common/components/ui/Skeleton.jsx';
 import Alert from '../../../common/components/ui/Alert.jsx';
+import ErrorState from '../../../common/components/ui/ErrorState.jsx';
 import {
     BarChart3,
     ChevronRight,
@@ -36,13 +37,14 @@ import {
     Package,
     RefreshCw,
     Search,
+    ShieldCheck,
     Star,
     Truck,
     X
 } from 'lucide-react';
 
-// Header, summary and list share one column width so everything lines up.
-const LIST_WIDTH = 'max-w-4xl';
+// Same 7xl shell as every page: the list takes eight columns, the summary panel four (sticky on lg).
+const PANEL = 'rounded border border-border-light bg-background-primary shadow-sm';
 
 const useOrdersCopy = () => {
     const { t, i18n } = useTranslation();
@@ -95,7 +97,10 @@ const useOrdersCopy = () => {
         shipDeadlineNoteBody: t('orders_ui_ship_deadline_note_body', 'Süre siparişin verildiği andan başlar. 72 saat içinde kargoya verilmeyen siparişler otomatik iptal edilir ve alıcıya ücret iadesi yapılır.'),
         shipTimeLeft: (hours, minutes) => t('orders_ui_ship_time_left', { defaultValue: 'Kargolamak için kalan süre: {{hours}} sa {{minutes}} dk', hours, minutes }),
         shipTimeLeftMinutes: minutes => t('orders_ui_ship_time_left_minutes', { defaultValue: 'Kargolamak için kalan süre: {{minutes}} dk', minutes }),
-        shipTimeExpired: t('orders_ui_ship_time_expired', 'Kargolama süresi doldu, sipariş iptal ediliyor')
+        shipTimeExpired: t('orders_ui_ship_time_expired', 'Kargolama süresi doldu, sipariş iptal ediliyor'),
+        summaryTitle: t('orders_ui_summary_title', 'Özet'),
+        buyerNoteTitle: t('orders_ui_buyer_note_title', 'Ödemen güvencede'),
+        buyerNoteBody: t('orders_ui_buyer_note_body', 'Ürünü teslim aldığını onaylayana kadar ödemen satıcıya aktarılmaz.')
     }), [t, i18n.language]);
 };
 
@@ -127,75 +132,82 @@ const getListPaginationSlice = (pagination) => {
 
 const ViewSwitch = ({ uiCopy }) => {
     const linkClass = ({ isActive }) =>
-        `inline-flex h-9 items-center rounded px-3 text-sm transition-colors duration-150 ${isActive ? 'bg-background-primary font-medium text-text-primary' : 'text-text-secondary hover:text-text-primary'
+        `inline-flex h-9 items-center rounded-sm px-3 text-sm font-medium transition duration-150 ${isActive ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'
         }`;
     return (
-        <nav className="inline-flex rounded-md border border-border bg-background-tertiary p-0.5" aria-label={uiCopy.bought + ' / ' + uiCopy.sold}>
+        <nav className="inline-flex rounded border border-border bg-background-secondary p-0.5" aria-label={uiCopy.bought + ' / ' + uiCopy.sold}>
             <NavLink to={ROUTES.MY_ORDERS} className={linkClass} end>{uiCopy.bought}</NavLink>
             <NavLink to={ROUTES.I_SOLD} className={linkClass} end>{uiCopy.sold}</NavLink>
         </nav>
     );
 };
 
-const Header = ({ title, subtitle, onAnalytics, analyticsLabel, onRefresh, loading, uiCopy }) => {
-    const { t } = useTranslation();
-    return (
-        <div className="space-y-4">
-            <PageHeader
-                title={title}
-                subtitle={subtitle}
-                actions={
-                    <>
-                        {onAnalytics ? (
-                            <Button variant="secondary" size="sm" onClick={onAnalytics}>
-                                <BarChart3 className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
-                                <span className="hidden sm:inline">{analyticsLabel}</span>
-                            </Button>
-                        ) : null}
-                        <Button variant="secondary" size="sm" className="w-9 !px-0" onClick={onRefresh} disabled={loading} aria-label={t("refresh", "Yenile")}>
-                            <RefreshCw className={`h-4 w-4 ${loading ? 'motion-safe:animate-spin' : ''}`} strokeWidth={1.5} aria-hidden />
-                        </Button>
-                    </>
-                }
-            />
-            <ViewSwitch uiCopy={uiCopy} />
-        </div>
-    );
-};
+// Title on the left, the bought/sold switch as the only header action. Refresh lives in the filter
+// row and analytics in the summary panel, so the header carries one decision.
+const Header = ({ title, subtitle, uiCopy }) => (
+    <PageHeader title={title} subtitle={subtitle} actions={<ViewSwitch uiCopy={uiCopy} />} />
+);
 
-/* ── Seller summary ─────────────────────────────────────── */
+/* ── Summary panel ──────────────────────────────────────── */
 
 const SummaryStat = ({ label, value, loading }) => (
-    <div className="min-w-0 px-4 py-3 sm:px-5 sm:py-4">
-        <p className="truncate text-sm text-text-tertiary">{label}</p>
-        {loading ? (
-            <Skeleton className="mt-1 h-6 w-16" />
-        ) : (
-            <p className="mt-0.5 truncate text-lg font-semibold tabular-nums text-text-primary">{value}</p>
-        )}
+    <div className="flex min-w-0 flex-col gap-0.5 px-4 py-3 lg:flex-row lg:items-baseline lg:justify-between lg:gap-3 lg:px-5">
+        <dt className="truncate text-sm text-text-tertiary">{label}</dt>
+        <dd className="truncate text-lg font-semibold tabular-nums text-text-primary">
+            {loading ? <Skeleton className="h-6 w-16" /> : value}
+        </dd>
     </div>
 );
 
-const SellerSummary = ({ flow, uiCopy }) => {
-    const { statusCounts, countsError } = flow.tabs;
+// Buyer: what needs attention and where the money is; seller: what to ship and what is held in escrow.
+const SummaryPanel = ({ flow, uiCopy, isBuyerView, onAnalytics, analyticsLabel }) => {
+    const { statusCounts, countsError, getTabCount } = flow.tabs;
     // On a failed count request show a dash instead of an endless skeleton.
-    const countsLoading = !countsError && flow.tabs.getTabCount(ORDER_LIST_TABS.ALL) == null;
+    const countsLoading = !countsError && getTabCount(ORDER_LIST_TABS.ALL) == null;
+    const count = tab => (countsError ? '—' : getTabCount(tab) ?? 0);
     const toShip = countsError ? '—' : SELLER_TO_SHIP_STATUSES.reduce((sum, s) => sum + (statusCounts[s] || 0), 0);
+
+    const stats = isBuyerView
+        ? [
+            { key: 'action', label: uiCopy.tabs[ORDER_LIST_TABS.ACTION], value: count(ORDER_LIST_TABS.ACTION), loading: countsLoading },
+            { key: 'delivery', label: uiCopy.tabs[ORDER_LIST_TABS.IN_DELIVERY], value: count(ORDER_LIST_TABS.IN_DELIVERY), loading: countsLoading },
+            { key: 'done', label: uiCopy.tabs[ORDER_LIST_TABS.COMPLETED], value: count(ORDER_LIST_TABS.COMPLETED), loading: countsLoading },
+        ]
+        : [
+            { key: 'ship', label: uiCopy.summaryToShip, value: toShip, loading: countsLoading },
+            { key: 'escrow', label: uiCopy.summaryEscrow, value: formatCurrency(flow.escrow.pendingEscrowAmount), loading: flow.escrow.isLoading },
+            { key: 'done', label: uiCopy.summaryCompleted, value: countsError ? '—' : statusCounts[ORDER_STATUSES.COMPLETED] || 0, loading: countsLoading },
+        ];
+    const noteTitle = isBuyerView ? uiCopy.buyerNoteTitle : uiCopy.shipDeadlineNoteTitle;
+    const noteBody = isBuyerView ? uiCopy.buyerNoteBody : uiCopy.shipDeadlineNoteBody;
+    const NoteIcon = isBuyerView ? ShieldCheck : Clock;
+    const urgent = !isBuyerView && toShip > 0;
+
     return (
-        <>
-            <div className="mb-4 flex items-start gap-3 rounded border border-border bg-background-primary p-4" role="note">
-                <Clock className={`mt-0.5 h-5 w-5 shrink-0 ${toShip > 0 ? 'text-status-warning-text' : 'text-text-tertiary'}`} strokeWidth={1.5} aria-hidden />
+        <section className={PANEL} aria-label={uiCopy.summaryTitle}>
+            <h2 className="hidden border-b border-border-light px-5 py-3 text-sm font-semibold text-text-primary lg:block">{uiCopy.summaryTitle}</h2>
+            <dl className="grid grid-cols-3 divide-x divide-border-light lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
+                {stats.map(stat => <SummaryStat key={stat.key} {...stat} />)}
+            </dl>
+            <div className="flex items-start gap-2.5 border-t border-border-light px-4 py-3 lg:px-5" role="note">
+                <NoteIcon className={`mt-0.5 h-4 w-4 shrink-0 ${urgent ? 'text-status-warning-text' : 'text-text-tertiary'}`} strokeWidth={1.5} aria-hidden />
                 <div className="min-w-0">
-                    <p className="text-sm font-medium text-text-primary">{uiCopy.shipDeadlineNoteTitle}</p>
-                    <p className="mt-0.5 text-sm text-text-secondary">{uiCopy.shipDeadlineNoteBody}</p>
+                    <p className="text-sm font-medium text-text-primary">{noteTitle}</p>
+                    <p className="mt-0.5 text-sm text-text-secondary">{noteBody}</p>
                 </div>
             </div>
-            <div className="mb-6 grid grid-cols-1 divide-y divide-border-light rounded border border-border bg-background-primary sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-                <SummaryStat label={uiCopy.summaryToShip} value={toShip} loading={countsLoading} />
-                <SummaryStat label={uiCopy.summaryEscrow} value={formatCurrency(flow.escrow.pendingEscrowAmount)} loading={flow.escrow.isLoading} />
-                <SummaryStat label={uiCopy.summaryCompleted} value={countsError ? '—' : statusCounts[ORDER_STATUSES.COMPLETED] || 0} loading={countsLoading} />
-            </div>
-        </>
+            {onAnalytics ? (
+                <div className="border-t border-border-light p-2">
+                    <Button variant="ghost" size="sm" className="w-full justify-between" onClick={onAnalytics}>
+                        <span className="inline-flex items-center gap-2">
+                            <BarChart3 className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+                            {analyticsLabel}
+                        </span>
+                        <ChevronRight className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+                    </Button>
+                </div>
+            ) : null}
+        </section>
     );
 };
 
@@ -272,7 +284,7 @@ const SearchBox = ({ search, onSubmit, uiCopy }) => {
 
 const OrderRowSkeleton = () => (
     <Card className="flex items-start gap-4 sm:p-5">
-        <Skeleton className="h-16 w-16 shrink-0 rounded-md" />
+        <Skeleton className="h-16 w-16 shrink-0 rounded" />
         <div className="flex-1 space-y-2.5 pt-0.5">
             <Skeleton className="h-4 w-52 max-w-full" />
             <Skeleton className="h-4 w-64 max-w-full" />
@@ -308,7 +320,7 @@ const ShipDeadline = ({ deadline, uiCopy }) => {
     const leftMs = new Date(deadline).getTime() - now;
     if (leftMs <= 0) {
         return (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-status-error">
+            <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-status-error-text">
                 <Clock className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
                 {uiCopy.shipTimeExpired}
             </p>
@@ -317,7 +329,7 @@ const ShipDeadline = ({ deadline, uiCopy }) => {
     const totalMinutes = Math.floor(leftMs / ORDER_TIME.MINUTE_MS);
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    const tone = leftMs <= ORDER_TIME.SHIP_DEADLINE_URGENT_MS ? 'text-status-error' : leftMs <= ORDER_TIME.SHIP_DEADLINE_WARNING_MS ? 'text-status-warning-text' : 'text-text-secondary';
+    const tone = leftMs <= ORDER_TIME.SHIP_DEADLINE_URGENT_MS ? 'text-status-error-text' : leftMs <= ORDER_TIME.SHIP_DEADLINE_WARNING_MS ? 'text-status-warning-text' : 'text-text-secondary';
     return (
         <p className={`mt-2 inline-flex items-center gap-1.5 text-sm font-medium tabular-nums ${tone}`}>
             <Clock className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
@@ -399,10 +411,10 @@ const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highl
                 }
             }}
             aria-label={`${title}, ${statusLabel}`}
-            className={`group flex cursor-pointer gap-4 rounded border bg-background-primary p-4 shadow-sm hover:shadow transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:p-5 ${highlighted ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'
+            className={`group flex cursor-pointer gap-4 rounded border bg-background-primary p-4 shadow-sm transition duration-150 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:p-5 ${highlighted ? 'border-accent-teal ring-1 ring-accent-teal' : 'border-border-light hover:border-border'
                 }`}
         >
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-light bg-background-secondary">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-secondary">
                 {imageUrl && !imgFailed ? (
                     <img src={optimizeCloudinaryUrl(imageUrl, { width: 160, height: 160, crop: 'fill', gravity: 'auto' })} alt="" loading="lazy" onError={() => setImgFailed(true)} className="h-full w-full object-cover" />
                 ) : (
@@ -517,11 +529,7 @@ const OrdersListLayout = ({
         );
     } else if (flow.error) {
         body = (
-            <Alert
-                type="error"
-                message={flow.error}
-                action={<Button variant="secondary" size="sm" onClick={flow.refreshAll}>{t("try_again", "Tekrar dene")}</Button>}
-            />
+            <ErrorState title={t('orders_load_failed', 'Siparişler yüklenemedi')} description={flow.error} onRetry={flow.refreshAll} />
         );
     } else if (!orders.length) {
         body = search.isSearchMode ? (
@@ -572,57 +580,54 @@ const OrdersListLayout = ({
     }
 
     return (
-        <div className="min-h-screen bg-background-secondary pb-20">
-            <div className="bg-background-primary border-b border-border-light">
-                <PageContainer className={`pt-6 pb-5 ${LIST_WIDTH}`}>
-                    <Header
-                        title={title}
-                        subtitle={subtitle}
-                        onAnalytics={onAnalytics}
-                        analyticsLabel={analyticsLabel}
-                        onRefresh={flow.refreshAll}
-                        loading={flow.loading}
-                        uiCopy={uiCopy}
-                    />
-                </PageContainer>
-            </div>
+        <div className="min-h-screen bg-background-page">
+            <PageContainer className="py-8">
+                <Header title={title} subtitle={subtitle} uiCopy={uiCopy} />
 
-            <PageContainer className={LIST_WIDTH}>
-                {!isBuyerView && <SellerSummary flow={flow} uiCopy={uiCopy} />}
+                <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
+                    <aside className="lg:sticky lg:top-24 lg:col-span-4 lg:col-start-9 lg:row-start-1">
+                        <SummaryPanel flow={flow} uiCopy={uiCopy} isBuyerView={isBuyerView} onAnalytics={onAnalytics} analyticsLabel={analyticsLabel} />
+                    </aside>
 
-                <div className="mb-5 flex flex-col gap-3 border-b border-border-light lg:flex-row lg:items-end lg:justify-between">
-                    <StatusTabs
-                        activeTab={tabs.activeTab}
-                        onChange={tab => {
-                            if (search.isSearchMode) search.clearSearch();
-                            tabs.setActiveTab(tab);
-                        }}
-                        getTabCount={tabs.getTabCount}
-                        disabled={search.isSearchMode}
-                        uiCopy={uiCopy}
-                    />
-                    <div className="flex items-center gap-2 pb-3">
-                        <DeliverySelect value={flow.deliveryMethodFilter} onChange={flow.setDeliveryMethodFilter} uiCopy={uiCopy} />
-                        <SearchBox search={search} onSubmit={search.handleSearch} uiCopy={uiCopy} />
+                    <div className="min-w-0 lg:col-span-8 lg:row-start-1">
+                        <div className="mb-5 flex flex-col gap-3 border-b border-border-light xl:flex-row xl:items-end xl:justify-between">
+                            <StatusTabs
+                                activeTab={tabs.activeTab}
+                                onChange={tab => {
+                                    if (search.isSearchMode) search.clearSearch();
+                                    tabs.setActiveTab(tab);
+                                }}
+                                getTabCount={tabs.getTabCount}
+                                disabled={search.isSearchMode}
+                                uiCopy={uiCopy}
+                            />
+                            <div className="flex items-center gap-2 pb-3">
+                                <DeliverySelect value={flow.deliveryMethodFilter} onChange={flow.setDeliveryMethodFilter} uiCopy={uiCopy} />
+                                <SearchBox search={search} onSubmit={search.handleSearch} uiCopy={uiCopy} />
+                                <Button variant="secondary" className="w-10 shrink-0 !px-0" onClick={flow.refreshAll} disabled={flow.loading} aria-label={t("refresh", "Yenile")}>
+                                    <RefreshCw className={`h-4 w-4 ${flow.loading ? 'motion-safe:animate-spin' : ''}`} strokeWidth={1.5} aria-hidden />
+                                </Button>
+                            </div>
+                        </div>
+
+                        {body}
+
+                        {!flow.loading && slice && (
+                            <DataPagination
+                                shouldShowPagination
+                                currentPage={slice.currentPage}
+                                totalPages={slice.totalPages}
+                                startItem={slice.startItem}
+                                endItem={slice.endItem}
+                                totalItems={slice.totalElements}
+                                pageSize={slice.pageSize}
+                                pageSizeOptions={ORDER_DEFAULTS.PAGE_SIZE_OPTIONS}
+                                onPageChange={flow.loadPage}
+                                onPageSizeChange={size => flow.fetchOrders(0, size, flow.sortField, flow.sortDirection)}
+                            />
+                        )}
                     </div>
                 </div>
-
-                {body}
-
-                {!flow.loading && slice && (
-                    <DataPagination
-                        shouldShowPagination
-                        currentPage={slice.currentPage}
-                        totalPages={slice.totalPages}
-                        startItem={slice.startItem}
-                        endItem={slice.endItem}
-                        totalItems={slice.totalElements}
-                        pageSize={slice.pageSize}
-                        pageSizeOptions={ORDER_DEFAULTS.PAGE_SIZE_OPTIONS}
-                        onPageChange={flow.loadPage}
-                        onPageSizeChange={size => flow.fetchOrders(0, size, flow.sortField, flow.sortDirection)}
-                    />
-                )}
             </PageContainer>
 
             <PaymentReceiptModal

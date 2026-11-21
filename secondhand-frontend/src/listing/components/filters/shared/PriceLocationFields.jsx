@@ -8,7 +8,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { districtsQuery, useLocationOptions } from '../../../../common/hooks/useLocationOptions.js';
 import { useAuthState } from '../../../../auth/AuthContext.jsx';
 import { userService } from '../../../../user/services/userService.js';
-const inp = 'w-full rounded border border-border-light bg-background-primary px-3 py-2.5 text-sm tabular-nums text-text-primary placeholder:text-text-muted transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed appearance-none pr-8';
+import { buttonClasses } from '../../../../common/components/ui/Button.jsx';
+const inp = 'w-full rounded border border-border-light bg-background-primary px-3 py-2.5 text-sm tabular-nums text-text-primary placeholder:text-text-muted transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-border-focus disabled:opacity-60 disabled:cursor-not-allowed appearance-none pr-8';
 const selectWrapper = 'relative flex items-center';
 const dropdownIcon = <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted flex items-center justify-center">
  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -118,7 +119,7 @@ const PriceLocationFields = ({
  <Skeleton className="h-10 w-full rounded" />
  ) : (
  <div className={selectWrapper}>
- <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" />
+ <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" strokeWidth={1.5} />
  <select value={filters.cityKey ?? ''} onChange={handleCityChange} className={`${inp} pl-10`}>
  <option value="">{t("select_city_i_l")}</option>
  {cities.map(c => <option key={c.key} value={c.key}>
@@ -137,7 +138,7 @@ const PriceLocationFields = ({
  <Skeleton className="h-10 w-full rounded" />
  ) : (
  <div className={selectWrapper}>
- <Map className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" />
+ <Map className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" strokeWidth={1.5} />
  <select value={filters.districtKey ?? ''} onChange={handleDistrictChange} disabled={!filters.cityKey} className={`${inp} pl-10`}>
  <option value="">{t("select_district_i_l_e")}</option>
  {districts.map(d => <option key={d.key} value={d.key}>
@@ -156,7 +157,7 @@ const PriceLocationFields = ({
  <Skeleton className="h-10 w-full rounded" />
  ) : (
  <div className={selectWrapper}>
- <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" />
+ <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted z-10" strokeWidth={1.5} />
  <select value={filters.neighborhoodKey ?? ''} onChange={handleNeighborhoodChange} disabled={!filters.districtKey} className={`${inp} pl-10`}>
  <option value="">{t("select_neighborhood_mahalle")}</option>
  {neighborhoods.map(n => <option key={n.key} value={n.key}>
@@ -181,7 +182,7 @@ const PriceLocationFields = ({
  </span>
  <input type="number" inputMode="decimal" value={maxVal} onChange={e => onPriceChange('maxPrice', e.target.value)} placeholder={t("max")} min="0" className={`${inp} min-w-0 flex-1 pr-3`} />
  </div>
- <p className="mt-1 text-xs font-medium text-text-muted">{t("leave_blank_for_no_limit")}</p>
+ <p className="mt-1 text-xs font-medium text-text-tertiary">{t("leave_blank_for_no_limit")}</p>
  </div>
  <div>
  <span className={fieldLabel}>{t("currency")}</span>
@@ -191,12 +192,12 @@ const PriceLocationFields = ({
 
  <div className="space-y-3 border-t border-border-light pt-4">
  <div className="flex items-center gap-2 text-text-secondary">
- <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+ <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden strokeWidth={1.5} />
  <span className="text-xs font-semibold">{t("location")}</span>
  </div>
 
- <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 w-full">
- {loadingLocation ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Navigation className="h-4 w-4" strokeWidth={1.5} />}{t("bana_yak_n_i_lanlar_g_ster")}</button>
+ <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className={`${buttonClasses('secondary')} w-full`}>
+ {loadingLocation ? <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5} /> : <Navigation className="h-4 w-4" strokeWidth={1.5} />}{t("bana_yak_n_i_lanlar_g_ster")}</button>
  {(nearMeError || locationError) && <p role="alert" className="mt-1 text-center text-xs text-status-error-text">
  {nearMeError || locationError}
  </p>}
@@ -208,7 +209,7 @@ const PriceLocationFields = ({
  return <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
  <Card border="light" shadow={false}>
  <div className="mb-4 flex items-center gap-2 text-text-primary">
- <Landmark className="h-4 w-4 text-primary" />
+ <Landmark className="h-4 w-4 text-primary" strokeWidth={1.5} />
  <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("price_range")}</h3>
  </div>
  <div className="space-y-4">
@@ -224,11 +225,11 @@ const PriceLocationFields = ({
  <Card border="light" shadow={false}>
  <div className="mb-4 flex items-center justify-between gap-2 text-text-primary">
  <div className="flex items-center gap-2">
- <MapPin className="h-4 w-4 text-primary" />
+ <MapPin className="h-4 w-4 text-primary" strokeWidth={1.5} />
  <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("location")}</h3>
  </div>
- <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
- {loadingLocation ? <Loader2 className="h-3 w-3 animate-spin" /> : <Navigation className="h-4 w-4" strokeWidth={1.5} />}{t("bana_yak_n_i_lanlar")}</button>
+ <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className={buttonClasses('secondary', 'sm')}>
+ {loadingLocation ? <Loader2 className="h-3 w-3 animate-spin" strokeWidth={1.5} /> : <Navigation className="h-4 w-4" strokeWidth={1.5} />}{t("bana_yak_n_i_lanlar")}</button>
  </div>
  {(nearMeError || locationError) && <p role="alert" className="mb-2 text-right text-xs text-status-error-text">
  {nearMeError || locationError}

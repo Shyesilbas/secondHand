@@ -12,6 +12,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import logger from '../../common/utils/logger.js';
 import { Badge, PageHeader } from '../../common/components/ui/index.js';
 import { FAVORITE_LIST_LISTING_STATUS, FAVORITE_LIST_MESSAGES } from '../favoriteListConstants.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 const FavoriteListDetailPage = () => {
     const {
         t
@@ -90,11 +91,11 @@ const FavoriteListDetailPage = () => {
         }
     };
     if (isLoading) {
-        return <div className="min-h-screen bg-background-secondary">
-            <PageContainer className="p-4 sm:p-6">
+        return <div className="min-h-screen bg-background-page">
+            <PageContainer className="py-8">
                 <div className="animate-pulse space-y-6">
                     <div className="h-8 w-40 rounded bg-secondary-200" />
-                    <div className="space-y-4 rounded-md border border-border-light bg-background-primary p-6">
+                    <div className="space-y-4 rounded border border-border-light shadow-sm bg-background-primary p-6">
                         <div className="h-6 w-1/2 rounded bg-secondary-200" />
                         <div className="h-4 w-3/4 rounded bg-secondary-200" />
                     </div>
@@ -112,23 +113,23 @@ const FavoriteListDetailPage = () => {
         </div>;
     }
     if (error || !list) {
-        return <div className="flex min-h-screen items-center justify-center bg-background-secondary px-4">
+        return <div className="flex min-h-screen items-center justify-center bg-background-page px-4">
             <div className="text-center">
                 <Package className="mx-auto mb-4 block h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
                 <h2 className="text-lg font-semibold text-text-primary">{FAVORITE_LIST_MESSAGES.NOT_FOUND_TITLE}</h2>
                 <p className="mt-2 text-sm text-text-tertiary">{FAVORITE_LIST_MESSAGES.NOT_FOUND_BODY}</p>
-                <button type="button" onClick={() => navigate(-1)} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-6">
+                <button type="button" onClick={() => navigate(-1)} className={`${buttonClasses()} mt-6`}>
                     {FAVORITE_LIST_MESSAGES.BACK}
                 </button>
             </div>
         </div>;
     }
-    return <div className="min-h-screen bg-background-secondary">
+    return <div className="min-h-screen bg-background-page">
         <PageContainer className="space-y-6 p-4 sm:p-6">
             <button type="button" onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary transition hover:text-text-primary">
-                <ArrowLeft className="h-4 w-4" />{t("back")}</button>
+                <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />{t("back")}</button>
 
-            <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
+            <div className="overflow-hidden rounded border border-border-light bg-background-primary">
                 <div className="border-b border-border-light bg-background-secondary px-4 py-5 sm:px-6">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0 flex-1">
@@ -149,7 +150,7 @@ const FavoriteListDetailPage = () => {
                                     {list.itemCount} {list.itemCount === 1 ? 'item' : 'items'}
                                 </span>
                                 {list.isPublic ? <span className="inline-flex items-center gap-1">
-                                    <Heart className="h-4 w-4 text-status-error" />
+                                    <Heart className="h-4 w-4 text-status-error" strokeWidth={1.5} />
                                     {list.likeCount} {list.likeCount === 1 ? 'like' : 'likes'}
                                 </span> : null}
                             </div>
@@ -157,33 +158,33 @@ const FavoriteListDetailPage = () => {
 
                         <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
                             <div className="text-right">
-                                <p className="text-xs font-semibold text-text-tertiary">{t("total_value")}</p>
+                                <p className="text-xs font-medium text-text-tertiary">{t("total_value")}</p>
                                 <p className="text-xl font-semibold tabular-nums text-text-primary sm:text-2xl">
                                     {formatCurrency(list.totalPrice, list.currency)}
                                 </p>
                             </div>
 
-                            {list.isPublic && !isOwner && user ? <button type="button" onClick={handleLikeToggle} className={`flex h-11 w-11 items-center justify-center rounded-full transition-all ${isLiked ? 'bg-status-error text-white' : 'bg-background-tertiary text-text-secondary hover:bg-secondary-200'}`} aria-label={isLiked ? 'Unlike list' : 'Like list'}>
-                                <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
+                            {list.isPublic && !isOwner && user ? <button type="button" onClick={handleLikeToggle} className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${isLiked ? 'bg-status-error text-white' : 'bg-background-tertiary text-text-secondary hover:bg-secondary-200'}`} aria-label={isLiked ? 'Unlike list' : 'Like list'}>
+                                <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} strokeWidth={1.5} />
                             </button> : null}
 
                             {list.isPublic ? <button type="button" onClick={handleShare} className="flex h-11 w-11 items-center justify-center rounded bg-background-tertiary text-text-secondary transition hover:bg-secondary-200" aria-label={t("share_list")}>
-                                <Share2 className="h-5 w-5" />
+                                <Share2 className="h-5 w-5" strokeWidth={1.5} />
                             </button> : null}
 
                             {isOwner ? <div className="relative">
                                 <button type="button" onClick={() => setShowMenu(!showMenu)} className="flex h-11 w-11 items-center justify-center rounded bg-background-tertiary text-text-secondary transition hover:bg-secondary-200" aria-label={t("list_actions")}>
-                                    <MoreVertical className="h-5 w-5" />
+                                    <MoreVertical className="h-5 w-5" strokeWidth={1.5} />
                                 </button>
 
-                                {showMenu ? <div className="absolute right-0 top-full z-10 mt-2 min-w-40 rounded border border-border-light bg-background-primary py-1 shadow-md">
+                                {showMenu ? <div className="absolute right-0 top-full z-10 mt-2 min-w-40 rounded border border-border bg-background-primary py-1 shadow-md">
                                     <button type="button" onClick={() => {
                                         setShowEditModal(true);
                                         setShowMenu(false);
                                     }} className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-text-secondary hover:bg-background-secondary">
-                                        <Pencil className="h-4 w-4" />{t("edit")}</button>
+                                        <Pencil className="h-4 w-4" strokeWidth={1.5} />{t("edit")}</button>
                                     <button type="button" onClick={handleDelete} className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-status-error-text hover:bg-background-secondary">
-                                        <Trash2 className="h-4 w-4" />{t("delete")}</button>
+                                        <Trash2 className="h-4 w-4" strokeWidth={1.5} />{t("delete")}</button>
                                 </div> : null}
                             </div> : null}
                         </div>
@@ -195,7 +196,7 @@ const FavoriteListDetailPage = () => {
                 {list.items.map(item => <div key={item.id} className="group overflow-hidden rounded border border-border-light bg-background-primary transition">
                     <div className="relative aspect-square bg-background-tertiary">
                         {item.listingImageUrl ? <img src={item.listingImageUrl} alt={item.listingTitle} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center">
-                            <Package className="h-12 w-12 text-secondary-300" />
+                            <Package className="h-12 w-12 text-secondary-300" strokeWidth={1.5} />
                         </div>}
 
                         {item.listingStatus !== FAVORITE_LIST_LISTING_STATUS.ACTIVE ? <div className="absolute inset-0 flex items-center justify-center bg-black/50">
@@ -206,10 +207,10 @@ const FavoriteListDetailPage = () => {
 
                         <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                             <Link to={ROUTES.LISTING_DETAIL(item.listingId)} className="flex h-8 w-8 items-center justify-center rounded bg-background-primary shadow-md transition hover:bg-background-secondary" aria-label={t("open_listing")}>
-                                <ExternalLink className="h-4 w-4 text-text-secondary" />
+                                <ExternalLink className="h-4 w-4 text-text-secondary" strokeWidth={1.5} />
                             </Link>
                             {isOwner ? <button type="button" onClick={() => handleRemoveItem(item.listingId)} className="flex h-8 w-8 items-center justify-center rounded bg-background-primary shadow-md transition hover:bg-background-secondary" aria-label={t("remove_from_list")}>
-                                <X className="h-4 w-4 text-status-error" />
+                                <X className="h-4 w-4 text-status-error" strokeWidth={1.5} />
                             </button> : null}
                         </div>
                     </div>
@@ -222,12 +223,12 @@ const FavoriteListDetailPage = () => {
                             {formatCurrency(item.listingPrice, item.listingCurrency)}
                         </p>
                         {item.note ? <p className="mt-1 flex items-start gap-1 truncate text-xs text-text-tertiary">
-                            <StickyNote className="mt-0.5 h-3 w-3 shrink-0 text-text-muted" />
+                            <StickyNote className="mt-0.5 h-3 w-3 shrink-0 text-text-muted" strokeWidth={1.5} />
                             <span className="truncate">{item.note}</span>
                         </p> : null}
                     </Link>
                 </div>)}
-            </div> : <div className="rounded-md border border-dashed border-border-light bg-background-primary px-6 py-14 text-center">
+            </div> : <div className="rounded border border-dashed border-border-light bg-background-primary px-6 py-14 text-center">
                 <Package className="mx-auto mb-4 block h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
                 <h3 className="text-sm font-medium text-text-primary">{t("this_list_is_empty")}</h3>
                 <p className="mt-2 text-sm text-text-tertiary">

@@ -51,9 +51,9 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
 
   return (
     <div
-      className={`flex flex-col justify-between rounded-md border p-4 shadow-sm hover:shadow transition-all ${
+      className={`flex flex-col justify-between rounded border p-4 shadow-sm hover:shadow-md transition ${
         address.mainAddress
-          ? 'border-primary ring-1 ring-primary bg-background-primary'
+          ? 'border-accent-teal ring-1 ring-accent-teal bg-background-primary'
           : 'border-border bg-background-primary hover:border-card-border-hover'
       }`}
     >
@@ -79,7 +79,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
             <button
               type="button"
               onClick={() => onEdit(address)}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-primary"
+              className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-primary"
               title={t('update_address', 'Adresi düzenle')}
               aria-label={t('update_address', 'Adresi düzenle')}
             >
@@ -89,7 +89,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
             <button
               type="button"
               onClick={() => onDelete(address.id, address.addressType)}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-status-error-bg hover:text-status-error-text"
+              className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:bg-status-error-bg hover:text-status-error-text"
               title={t('delete_address', 'Adresi sil')}
               aria-label={t('delete_address', 'Adresi sil')}
             >
@@ -102,7 +102,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
           <p className="font-medium text-text-primary leading-snug">{address.addressLine}</p>
           {locationParts.length > 0 && <p>{locationParts.join(', ')}</p>}
           {postalCountryParts.length > 0 && (
-            <p className="text-xs text-text-muted tabular-nums">
+            <p className="text-xs text-text-tertiary tabular-nums">
               {postalCountryParts.join(' · ')}
             </p>
           )}

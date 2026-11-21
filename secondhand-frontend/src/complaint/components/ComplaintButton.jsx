@@ -46,7 +46,7 @@ const ComplaintButton = ({
  });
  };
  return <>
- <button type="button" onClick={handleReportClick} className={variant === "ghost" ? `${buttonClasses('ghost', 'sm')} ${className}` : `inline-flex items-center gap-2 px-3 py-2 bg-secondary-600 text-white rounded hover:bg-secondary-700 transition-colors text-sm ${className}`} title={`Report ${targetUserName}`}>
+ <button type="button" onClick={handleReportClick} className={variant === "ghost" ? `${buttonClasses('ghost', 'sm')} ${className}` : `inline-flex items-center gap-2 px-3 py-2 bg-secondary-600 text-white rounded hover:bg-secondary-700 transition-colors text-sm ${className}`} title={t('report_target_title', 'Report {{name}}', { name: targetUserName })}>
  <ExclamationTriangleIcon className="w-4 h-4" strokeWidth={1.5} aria-hidden />{t("report")}</button>
 
  <ComplaintModal isOpen={showModal} onClose={() => setShowModal(false)} onSubmit={handleComplaint} targetUserName={targetUserName} targetUserId={targetUserId} listingId={listingId} listingTitle={listingTitle} isLoading={createMutation.isPending} />

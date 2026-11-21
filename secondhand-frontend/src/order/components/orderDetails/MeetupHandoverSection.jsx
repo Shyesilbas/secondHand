@@ -141,7 +141,7 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
     };
 
     return (
-        <section className="rounded border border-border bg-background-primary p-5">
+        <section className="rounded border border-border-light bg-background-primary p-5">
             <div className="mb-4 border-b border-border-light pb-4">
                 <h3 className="text-base font-semibold text-text-primary">{t("elden_g_venli_teslimat_detaylar", "Elden Güvenli Buluşma")}</h3>
                 <p className="mt-1 text-sm text-text-secondary">{t("g_venli_bulu_ma_noktas_nda_y_z_y_ze_al_v", "Güvenli buluşma noktasında yüz yüze teslimat ve PIN doğrulama.")}</p>

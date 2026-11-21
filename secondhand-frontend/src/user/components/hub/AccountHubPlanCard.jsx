@@ -9,7 +9,7 @@ const DetailRow = ({ label, value, hint }) => (
     <span className="text-text-secondary">{label}</span>
     <span className="text-right font-medium tabular-nums text-text-primary">
       {value}
-      {hint ? <span className="ml-1.5 text-xs font-normal text-text-tertiary">{hint}</span> : null}
+      {hint ? <span className="ml-1.5 text-sm font-normal text-text-tertiary">{hint}</span> : null}
     </span>
   </div>
 );
@@ -34,7 +34,7 @@ const AccountHubPlanCard = ({
   const { t } = useTranslation();
 
   return (
-    <Card as="section" shadow={false} className="flex flex-col justify-between">
+    <Card as="section" className="flex flex-col justify-between">
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-2 border-b border-border-light pb-3">
           <div>
@@ -112,7 +112,7 @@ const AccountHubPlanCard = ({
             onClick={onOpenUpgrade}
           >
             <Sparkles className="h-4 w-4" strokeWidth={1.5} />
-            <span>{trEn('Premium Avantajları için tıklayın', 'Click for Premium Privileges')}</span>
+            <span>{trEn("Premium'a geç", 'Upgrade to Premium')}</span>
           </Button>
         )}
       </div>

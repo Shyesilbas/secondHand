@@ -11,7 +11,7 @@ const CreateListingPage = () => {
  const navigate = useNavigate();
  const location = useLocation();
  const st = location.state;
- const { enums } = useEnums();
+ const { enums, isLoading: enumsLoading } = useEnums();
  const { data: restriction } = useMyRestriction();
  const creationBlocked = restriction?.canCreateListings === false;
 
@@ -26,16 +26,17 @@ const CreateListingPage = () => {
  listingType && SelectedForm && isCreateSelectionComplete(listingType, selection, enums),
  );
 
+ // Selection rules and the form's catalog lookups read the enums, so wait for them before deciding.
  useLayoutEffect(() => {
- if (complete) return;
+ if (enumsLoading || complete) return;
  navigate(ROUTES.LISTINGS_PREFILTER_CREATE, { replace: true });
- }, [complete, navigate]);
+ }, [complete, enumsLoading, navigate]);
 
  if (creationBlocked) {
  return <div className="mx-auto max-w-2xl p-6"><RestrictionBanner /></div>;
  }
 
- if (!complete || !SelectedForm) {
+ if (enumsLoading || !complete || !SelectedForm) {
  return null;
  }
 

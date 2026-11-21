@@ -44,7 +44,7 @@ const ListingAttributeSection = ({ section, ctx, title, description }) => {
 		switch (def.dataType) {
 			case 'ENUM_MAP':
 				return (
-					<div key={def.key} className="md:col-span-2 lg:col-span-3">
+					<div key={def.key} className="sm:col-span-2">
 						<DamageMapField definition={def} value={value} label={label} onChange={(v) => setAttribute(def.key, v)} />
 						<FieldError error={error} />
 					</div>
@@ -55,7 +55,7 @@ const ListingAttributeSection = ({ section, ctx, title, description }) => {
 				const multiple = def.dataType === 'MULTI_ENUM';
 				const isBoolean = def.dataType === 'BOOLEAN';
 				return (
-					<div key={def.key} className={multiple ? 'md:col-span-2' : undefined}>
+					<div key={def.key} className={multiple ? 'sm:col-span-2' : undefined}>
 						<EnumDropdown
 							label={label}
 							options={isBoolean ? BOOLEAN_OPTIONS : valueOptions(def)}
@@ -99,7 +99,7 @@ const ListingAttributeSection = ({ section, ctx, title, description }) => {
 	return (
 		<SectionCard title={title} description={description}>
 			{query.isLoading && (
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-busy="true">
 					{[0, 1, 2].map((i) => <Skeleton key={i} className="h-16" />)}
 				</div>
 			)}
@@ -110,7 +110,7 @@ const ListingAttributeSection = ({ section, ctx, title, description }) => {
 				/>
 			)}
 			{!query.isLoading && !query.isError && (
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					{definitions.map(renderInput)}
 				</div>
 			)}

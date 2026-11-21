@@ -129,7 +129,7 @@ const ProfileAccountStatus = ({ user }) => {
           disabled={updateSettings.isPending}
           onClick={() => updateSettings.mutate({ canSendMessage: !messagingOn })}
           aria-label={t('messaging_preference', 'Mesajlaşma Tercihi (Global)')}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
             messagingOn ? 'bg-status-success' : 'bg-border'
           }`}
         >

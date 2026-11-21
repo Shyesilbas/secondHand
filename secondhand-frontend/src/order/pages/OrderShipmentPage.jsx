@@ -12,10 +12,11 @@ import { orderService } from '../services/orderService.js';
 import { formatDateTime, formatCurrency } from '../../common/formatters.js';
 import { ShippingDetailsSection } from '../components/orderDetails/ShippingDetailsSection.jsx';
 import { Badge, PageHeader } from '../../common/components/ui/index.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 const Panel = ({
  children,
  className = ''
-}) => <div className={`rounded-md border border-border-light bg-background-primary shadow-sm ${className}`}>
+}) => <div className={`rounded border border-border-light bg-background-primary shadow-sm ${className}`}>
  {children}
  </div>;
 
@@ -70,7 +71,7 @@ const OrderShipmentPage = () => {
  <PageContainer narrow className="pt-8 sm:pt-10 space-y-6">
  <div className="flex items-center gap-3">
  <button type="button" onClick={() => navigate(backPath)} className="inline-flex items-center gap-2 text-sm font-semibold text-text-secondary hover:text-text-primary py-2">
- <ArrowLeft className="w-4 h-4" />{t("back_to_orders")}</button>
+ <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />{t("back_to_orders")}</button>
  </div>
 
  <PageHeader
@@ -80,7 +81,7 @@ const OrderShipmentPage = () => {
  />
 
  {isLoading ? <Panel className="p-12 flex flex-col items-center justify-center animate-pulse">
- <Package className="w-10 h-10 text-secondary-300 mb-3" />
+ <Package className="w-10 h-10 text-secondary-300 mb-3" strokeWidth={1.5} />
  <span className="text-sm font-medium text-text-muted">{t("loading_shipment")}</span>
  </Panel> : null}
 
@@ -101,14 +102,14 @@ const OrderShipmentPage = () => {
  </Panel> : null}
 
  {order.shipping ? <ShippingDetailsSection shipping={order.shipping} deliveryAddress={order.shippingAddress} CardComponent={Panel} /> : <Panel className="p-10 text-center">
- <Package className="w-12 h-12 text-secondary-300 mx-auto mb-4" />
+ <Package className="w-12 h-12 text-secondary-300 mx-auto mb-4" strokeWidth={1.5} />
  <p className="text-sm font-semibold text-text-primary">{t("no_shipment_yet")}</p>
  <p className="text-sm text-text-tertiary mt-1">{t("shipping_details_appear_after_the_seller")}</p>
  </Panel>}
 
  {order.shipping?.trackingNumber ? <div className="flex flex-wrap items-center gap-3">
- <button type="button" onClick={copyTracking} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
- <Copy className="w-3.5 h-3.5" />{t("copy_tracking_number")}</button>
+ <button type="button" onClick={copyTracking} className={buttonClasses('secondary', 'sm')}>
+ <Copy className="w-3.5 h-3.5" strokeWidth={1.5} />{t("copy_tracking_number")}</button>
  </div> : null}
 
  <div className="pt-4 text-center border-t border-border-light">

@@ -20,9 +20,9 @@ import Button from '../../common/components/ui/Button.jsx';
 import { validationRegistry } from '../validation/ValidationRegistry.js';
 import { resolveEnumLabel, toDisplayText } from '../utils/listingDisplayFormat.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { ImageIcon, MapPin, Package, FileText, Check } from 'lucide-react';
+import { MapPin, Package, FileText } from 'lucide-react';
 import { cacheService } from '../../common/services/cacheService.js';
-import { FieldError, SectionCard } from '../../common/components/forms/FormPrimitives.jsx';
+import { FieldError, OptionToggle, SectionCard, SectionStack } from '../../common/components/forms/FormPrimitives.jsx';
 import ListingAttributeSection from './attributes/ListingAttributeSection.jsx';
 import ListingAttributeSummary from './attributes/ListingAttributeSummary.jsx';
 import { inputError, inputNormal } from '../../common/components/forms/inputStyles.js';
@@ -37,48 +37,7 @@ const ToggleCardField = ({
   value,
   onToggle
 }) => (
-  <div
-    className={`flex cursor-pointer select-none items-start gap-3 rounded border p-3.5 transition-colors ${value
-        ? 'border-primary bg-background-secondary'
-        : 'border-border-light bg-background-primary hover:border-card-border-hover'
-      }`}
-    onClick={onToggle}
-    role="button"
-    tabIndex={0}
-    onKeyDown={e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onToggle();
-      }
-    }}
-  >
-    <div
-      className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors ${value
-          ? 'border-primary bg-primary text-text-inverse'
-          : 'border-border bg-background-primary'
-        }`}
-    >
-      {value && <Check className="h-3 w-3 stroke-[2.5]" />}
-    </div>
-    <input
-      id={name}
-      type="checkbox"
-      name={name}
-      checked={Boolean(value)}
-      onChange={() => onToggle()}
-      className="sr-only"
-    />
-    <div className="min-w-0 flex-1">
-      <label htmlFor={name} className="block cursor-pointer text-sm font-medium text-text-primary">
-        {label}
-      </label>
-      {description && (
-        <p className="mt-0.5 text-sm text-text-secondary">
-          {description}
-        </p>
-      )}
-    </div>
-  </div>
+  <OptionToggle name={name} checked={Boolean(value)} onChange={() => onToggle()} label={label} description={description} />
 );
 
 /* ── Input Classes ─────────────────────────────────────────── */
@@ -279,15 +238,17 @@ const GenericListingForm = ({
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData, formSchema]);
+  }, [formData, formSchema, enums]);
 
+  // Effects re-run when the enums arrive too: catalog facts (e.g. a model's specs) live in the enums,
+  // and the form can mount before they load.
   useEffect(() => {
     if (!formSchema?.effects?.length) return;
     formSchema.effects.forEach(fn => {
       if (typeof fn === 'function') fn(ctx);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData, formSchema]);
+  }, [formData, formSchema, enums]);
 
   /* ── Field Renderer ────────────────────────────────────── */
 
@@ -378,7 +339,7 @@ const GenericListingForm = ({
     }
     if (field.type === 'textarea') {
       return (
-        <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
+        <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'sm:col-span-2' : undefined}>
           <label className="mb-1.5 block text-sm font-medium text-text-primary">{label}</label>
           <textarea
             name={field.name}
@@ -407,7 +368,7 @@ const GenericListingForm = ({
           step={field.step}
           placeholder={field.placeholder || ''}
           disabled={inputDisabled}
-          className={`${error ? inputError : inputNormal}${inputDisabled ? ' cursor-not-allowed opacity-60' : ''}`}
+          className={`${error ? inputError : inputNormal}${inputDisabled ? ' cursor-not-allowed bg-background-secondary hover:border-border' : ''}`}
         />
         {fieldHint(field) && <p className="mt-1 text-xs text-text-tertiary">{formText(fieldHint(field))}</p>}
         <FieldError error={error} />
@@ -417,20 +378,22 @@ const GenericListingForm = ({
 
   /* ── Step Renderers ────────────────────────────────────── */
 
+  // Display label of a chosen option. Never falls back to the raw id: an unresolved value is left out.
   const optionLabelFor = (field, value) => {
     const options = (typeof field.getOptions === 'function' ? field.getOptions(ctx) : null) || enums?.[field.enumKey] || [];
     const opt = options.find(o => String(o?.id ?? o?.value ?? '') === String(value));
-    return opt?.label || opt?.name || resolveEnumLabel(enums, field.enumKey, value) || String(value);
+    return opt?.label || opt?.name || resolveEnumLabel(enums, field.enumKey, value) || '';
   };
   const renderLockedSummary = step => {
     const fields = (step?.sections || []).flatMap(section => section.fields || []).filter(f => lockedFieldNames.has(f.name));
-    if (!fields.length) return null;
+    const labels = fields.map(f => optionLabelFor(f, formData?.[f.name])).filter(Boolean);
+    if (!labels.length) return null;
     return (
-      <div className="flex items-start justify-between gap-4 rounded border border-border-light bg-background-secondary px-4 py-3">
+      <div className="flex items-center justify-between gap-4 rounded bg-background-secondary px-4 py-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium text-text-tertiary">{t('your_selections', 'Seçimlerin')}</p>
-          <p className="mt-0.5 text-sm text-text-primary">
-            {fields.map(f => optionLabelFor(f, formData?.[f.name])).filter(Boolean).join(' · ')}
+          <p className="text-sm text-text-tertiary">{t('your_selections', 'Seçimlerin')}</p>
+          <p className="mt-0.5 text-sm font-medium text-text-primary">
+            {labels.join(' · ')}
           </p>
         </div>
         <Button variant="ghost" size="sm" onClick={onBack} className="shrink-0">{t('change', 'Değiştir')}</Button>
@@ -440,8 +403,9 @@ const GenericListingForm = ({
   const renderDetailsStep = step => {
     const sections = step?.sections || [];
     return (
-      <div className="space-y-8">
+      <div className="space-y-6">
         {renderLockedSummary(step)}
+        <SectionStack>
         {sections.map(section => {
           const isVisible = typeof section.visibleWhen === 'function' ? section.visibleWhen(ctx) : true;
           if (!isVisible) return null;
@@ -459,28 +423,35 @@ const GenericListingForm = ({
           if (!(section.fields || []).some(isFieldShown)) return null;
           return (
             <SectionCard key={section.id || section.title} title={formText(section.title)} description={formText(section.description)}>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {(section.fields || []).map(renderField)}
               </div>
             </SectionCard>
           );
         })}
+        </SectionStack>
       </div>
     );
   };
   const renderMediaLocationStep = () => {
     return (
-      <div className="space-y-8">
-        <SectionCard title={t("photos", "Görseller")} description={t("photos_description", "Net ve iyi ışıklı bir fotoğraf ekle.")} icon={ImageIcon}>
+      <SectionStack>
+        <SectionCard title={t("photos", "Görseller")} description={t("photos_description", "Net ve iyi ışıklı bir fotoğraf ekle.")}>
           <ImageUpload onImageUpload={imageUrl => ctx.setValue('imageUrl', imageUrl)} onImageRemove={() => ctx.setValue('imageUrl', '')} imageUrl={formData?.imageUrl} disabled={false} />
         </SectionCard>
-        <SectionCard title={t("location", "Konum")} description={t("location_description", "Ürün nerede bulunuyor?")} icon={MapPin}>
+        <SectionCard title={t("location", "Konum")} description={t("location_description", "Ürün nerede bulunuyor?")}>
           <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
         </SectionCard>
-      </div>
+      </SectionStack>
     );
   };
+  // Fields with their own option list (catalog variants, official colors, filtered models) are not in
+  // the enums map, so their label comes from that list; an unresolved id is left out, never shown raw.
   const formatSummaryValue = (field, rawValue) => {
+    if (rawValue == null || rawValue === '') return '';
+    if (typeof rawValue === 'boolean') return rawValue ? t('yes', 'Evet') : t('no', 'Hayır');
+    const label = field?.type === 'enum' || field?.type === 'searchable' ? optionLabelFor(field, rawValue) : '';
+    if (label || typeof field?.getOptions === 'function') return label;
     const text = toDisplayText(rawValue, enums, field?.enumKey);
     return text ?? '';
   };

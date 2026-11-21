@@ -14,11 +14,11 @@ const DraftListingsList = ({
  return (
  <div className="lg:col-span-7 xl:col-span-7 space-y-4">
  {/* Section Header */}
- <div className="flex items-center justify-between pb-2 border-b border-border">
+ <div className="flex items-center justify-between pb-2 border-b border-border-light">
  <div>
  <h2 className="text-lg font-semibold text-text-primary tracking-tight flex items-center gap-2">
  <span>{t("draft_listings")}</span>
- <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-sm text-xs font-semibold bg-secondary-200/80 text-text-primary border border-card-border-hover">
+ <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-sm text-xs font-semibold bg-secondary-200 text-text-primary border border-border">
  {listings.length}
  </span>
  </h2>
@@ -42,9 +42,9 @@ const DraftListingsList = ({
  exit={{ opacity: 0, scale: 0.98 }}
  transition={{ duration: 0.25, delay: index * 0.04 }}
  onClick={() => onSelectListing(listing)}
- className={`group relative rounded-md p-4 cursor-pointer transition-all duration-200 border ${
+ className={`group relative rounded p-4 cursor-pointer transition-colors duration-150 border ${
  isSelected
- ? 'border-secondary-700 bg-white ring-2 ring-primary/10'
+ ? 'border-accent-teal bg-background-primary ring-1 ring-accent-teal'
  : 'border-border bg-white hover:border-secondary-400'
  }`}
  >
@@ -52,7 +52,7 @@ const DraftListingsList = ({
  {/* Radio Selector Icon */}
  <div className="pt-0.5 flex-shrink-0">
  <div
- className={`h-5 w-5 rounded-full border flex items-center justify-center transition-all ${
+ className={`h-5 w-5 rounded-full border flex items-center justify-center transition-colors ${
  isSelected
  ? 'border-primary bg-primary'
  : 'border-card-border-hover bg-background-secondary group-hover:border-secondary-400'
@@ -73,7 +73,7 @@ const DraftListingsList = ({
  {listing.title}
  </h3>
 
- <span className="font-semibold text-sm text-text-primary bg-background-tertiary px-2 py-0.5 rounded-md border border-card-border-hover flex-shrink-0">
+ <span className="font-semibold text-sm text-text-primary bg-background-tertiary px-2 py-0.5 rounded border border-border flex-shrink-0">
  {formatPaymentAmount(listing.price, listing.currency)}
  </span>
  </div>
@@ -90,8 +90,7 @@ const DraftListingsList = ({
  {listing.city}
  </span>
  )}
- <span className="inline-flex items-center gap-1 text-status-warning-text bg-background-secondary px-2 py-0.5 rounded font-semibold border border-border">
- <span className="w-1.5 h-1.5 rounded-full bg-status-warning" />
+ <span className="inline-flex items-center rounded-sm border border-border bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
  {t("draft")}
  </span>
  <span className="ml-auto text-text-muted">

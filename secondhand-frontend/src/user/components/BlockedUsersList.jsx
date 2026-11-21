@@ -5,6 +5,7 @@ import { useBlockedUsers, useUnblockUser } from '../hooks/useBlocking.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import Button from '../../common/components/ui/Button.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { formatDate } from '../../common/formatters.js';
@@ -24,11 +25,7 @@ const BlockedUsersList = ({ isActive = true }) => {
   }
   if (isError) {
     return (
-      <Alert
-        type="error"
-        message={t('failed_to_load_blocked_users', 'Engellenen kullanıcılar yüklenemedi.')}
-        action={<Button variant="secondary" size="sm" onClick={() => refetch()}>{t('try_again', 'Tekrar dene')}</Button>}
-      />
+      <ErrorState size="compact" title={t('failed_to_load_blocked_users', 'Engellenen kullanıcılar yüklenemedi')} onRetry={refetch} />
     );
   }
   if (blocked.length === 0) {

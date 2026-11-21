@@ -21,7 +21,7 @@ const CategoryGrid = () => {
           <li key={value}>
             <Link
               to={`${ROUTES.LISTINGS}?category=${value}`}
-              className="flex h-full flex-col items-center gap-3 rounded border border-border bg-background-primary px-3 py-5 text-center shadow-sm transition-all duration-200 hover:border-card-border-hover hover:shadow"
+              className="flex h-full flex-col items-center gap-3 rounded border border-border-light bg-background-primary px-3 py-5 text-center shadow-sm transition duration-150 hover:border-border hover:shadow-md"
             >
               {Icon && (
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-background-tertiary text-text-secondary">

@@ -63,7 +63,7 @@ export const useRegisterForm = () => {
                 acceptedAgreementIds: Array.from(agreementsApi.acceptedAgreements),
             };
             await authService.register(registerData);
-            navigate(ROUTES.LOGIN, { state: { message: t('account_created_login_hint', 'Hesabın oluşturuldu. Şimdi e-posta ve şifrenle giriş yapabilirsin.') } });
+            navigate(ROUTES.LOGIN, { state: { message: t('registration_received_login_hint', 'Kayıt isteğin alındı. E-posta ve şifrenle giriş yapabilirsin; bu e-postayla zaten bir hesabın varsa giriş yap ya da şifreni sıfırla.') } });
             return true;
         } catch (error) {
             setErrors({ submit: getErrorMessage(error, t('registration_failed_retry', 'Kayıt tamamlanamadı. Lütfen tekrar dene.')) });

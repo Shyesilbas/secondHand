@@ -50,3 +50,9 @@ Generated from code; the hook files are the source of truth.
 ### Publishing Flow & Fee Settlement
 - `GenericListingForm` submits with intent `DRAFT` or `PUBLISH`; a draft returns to `/my-listings`.
 - Publishing a new listing (or a draft) always continues to `/payments/listing-fee?listingId=<id>` (`ROUTES.PAY_LISTING_FEE`).
+
+### My Listings Bulk Status
+- `MyListingsPage` select mode puts `ListingCard` in `isSelectable` mode; `MyListingsBulkBar` offers select all for the visible page and the batch status actions.
+- Selection maps id to status and survives page changes; "select all my listings" loads every match of the current filter from `listingService.getMyListingSelection`. A selection belongs to the filter it was made under and reads as empty once the filter changes.
+- An action is enabled only when every selected listing allows its transition, because `listingService.updateBatchStatus` is all or nothing on the backend.
+- "Update status" in the header opens `MyListingsStatusModal`: reactivate every inactive listing or deactivate every active one (`listingService.reactivateAllInactive` / `deactivateAllActive`), independent of select mode and paging.

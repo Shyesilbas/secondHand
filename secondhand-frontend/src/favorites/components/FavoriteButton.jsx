@@ -17,6 +17,9 @@ const FavoriteButton = ({
  onToggle,
  size = 'md',
  showCount = true,
+ // 'outline' is the bordered icon button; 'ghost' is borderless for use inside a card body.
+ variant = 'outline',
+ // Replaces the variant classes entirely (layout, border, colors); the favorited color stays on the icon.
  className = ''
  }) => {
 
@@ -89,7 +92,11 @@ const FavoriteButton = ({
  }
  };
 
- const defaultButtonClass = size === 'sm'
+ const ghostButtonClass = `${config.button} rounded flex items-center justify-center transition-colors duration-150 hover:bg-background-tertiary ${
+ isFavorited ? '' : 'text-text-tertiary hover:text-status-error'
+ }`;
+
+ const defaultButtonClass = variant === 'ghost' ? ghostButtonClass : size === 'sm'
  ? `h-8 w-8 rounded border border-border bg-background-primary flex items-center justify-center transition-colors duration-150 ${
  isFavorited
  ? 'text-status-error hover:border-card-border-hover'
@@ -113,7 +120,7 @@ const FavoriteButton = ({
  title={isFavorited ? "Remove from favorites" : "Add to favorites"}
  >
  <Heart
- className={`${size === 'sm' ? 'w-4 h-4' : config.icon} ${isFavorited ? 'fill-current' : ''} ${isLoading ? 'animate-pulse' : ''}`}
+ className={`${size === 'sm' ? 'w-4 h-4' : config.icon} ${isFavorited ? 'fill-current text-status-error' : ''} ${isLoading ? 'animate-pulse' : ''}`}
  strokeWidth={1.5}
  />
  </button>

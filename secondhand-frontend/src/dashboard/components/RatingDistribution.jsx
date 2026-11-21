@@ -24,7 +24,7 @@ const RatingDistribution = ({ ratingDistribution = {}, averageRating = 0, totalR
             />
           ))}
         </div>
-        <p className="mt-1 text-xs tabular-nums text-text-tertiary">
+        <p className="mt-1 text-sm tabular-nums text-text-tertiary">
           {t('dash_review_count', { defaultValue: '{{count}} değerlendirme', count: totalReviews })}
         </p>
       </div>

@@ -32,7 +32,7 @@ const RecentlyViewedSection = ({ currentListingId = null, className = '' }) => {
           <li key={item.id} className="relative w-40 shrink-0 snap-start sm:w-44">
             <Link
               to={`/listings/${item.id}`}
-              className="group block overflow-hidden rounded border border-border bg-background-primary transition-colors duration-150 hover:border-card-border-hover"
+              className="group block overflow-hidden rounded border border-border-light bg-background-primary shadow-sm transition duration-150 hover:border-border hover:shadow-md"
             >
               <div className="flex h-28 items-center justify-center bg-background-tertiary">
                 {item.coverImage ? (

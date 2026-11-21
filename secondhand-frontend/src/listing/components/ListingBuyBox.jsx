@@ -47,7 +47,7 @@ const ListingBuyBox = ({
   const viewCount = listing.viewCount ?? listing.viewStats?.totalViews ?? 0;
 
   return (
-    <section className="rounded border border-border bg-background-secondary p-5" aria-label={t('listing_summary', 'İlan özeti')}>
+    <section className="rounded border border-border-light bg-background-primary p-5 shadow-sm" aria-label={t('listing_summary', 'İlan özeti')}>
       <h1 className="text-xl font-semibold leading-snug text-text-primary sm:text-2xl">{listing.title}</h1>
 
       <p className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">

@@ -1,16 +1,21 @@
 import { useTranslation } from "react-i18next";
 import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useListingEngine } from '../hooks/useListingEngine.js';
 import ListingsModuleLayout from '../components/ListingsModuleLayout.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { listingService } from '../services/listingService.js';
+import { parseError } from '../../common/errorHandler.js';
 import { ListingQuickEdit } from '../components/ListingQuickEdit.jsx';
 import { PriceInput } from '../../common/components/ui/PriceInput.jsx';
 import { formatCurrency, parsePrice } from '../../common/formatters.js';
-import { AlertTriangle, ChevronDown, Pencil, Plus, X } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ListChecks, Pencil, Plus, RefreshCcw, X } from 'lucide-react';
+import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
+import MyListingsBulkBar from '../components/MyListingsBulkBar.jsx';
+import MyListingsStatusModal from '../components/MyListingsStatusModal.jsx';
 const LowStockCard = ({
   listing,
   onRefresh,
@@ -39,7 +44,7 @@ const LowStockCard = ({
           <div className="flex items-center gap-2 min-w-0">
             <h4 className="text-sm font-medium text-text-primary truncate">{listing.title}</h4>
           </div>
-          <p className="text-xs text-text-muted tabular-nums truncate">{listing.listingNo}</p>
+          <p className="text-xs text-text-tertiary tabular-nums truncate">{listing.listingNo}</p>
         </div>
       </div>
 
@@ -54,7 +59,7 @@ const LowStockCard = ({
           to={ROUTES.EDIT_LISTING(listing.id)}
           className="shrink-0 inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium text-text-secondary bg-background-secondary hover:bg-secondary-200 hover:text-text-primary border border-border-light rounded transition-colors"
         >
-          <Pencil className="w-3.5 h-3.5" />
+          <Pencil className="w-3.5 h-3.5" strokeWidth={1.5} />
           <span>{t("edit")}</span>
         </Link>
       </div>
@@ -72,6 +77,7 @@ const MyListingsPage = () => {
     showSuccess,
     showError
   } = useNotification();
+  const queryClient = useQueryClient();
   const engine = useListingEngine({
     initialListingType: null,
     mode: 'mine'
@@ -82,6 +88,62 @@ const MyListingsPage = () => {
   const [bulkValue, setBulkValue] = useState('');
   const [saving, setSaving] = useState(false);
   const listings = useMemo(() => lowStock?.listings ?? [], [lowStock]);
+
+  // Select mode for batch status changes. The selection maps id -> status, so it survives page changes and
+  // "select all" can hold listings that are not on screen. It belongs to the filter it was made under
+  // (status, category, title): once the filter changes it reads as empty, so an action never reaches
+  // listings selected under a filter the seller has left.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selection, setSelection] = useState(() => ({ scope: '', items: new Map() }));
+  const [selectingAll, setSelectingAll] = useState(false);
+  const selectionFilter = useMemo(() => ({
+    status: engine.mine?.status || null,
+    listingType: engine.filters?.listingType || null,
+    title: engine.filters?.title || null
+  }), [engine.mine?.status, engine.filters?.listingType, engine.filters?.title]);
+  const selectionScope = `${selectionFilter.status}|${selectionFilter.listingType}|${selectionFilter.title}`;
+  const selectedItems = useMemo(
+    () => (selection.scope === selectionScope ? selection.items : new Map()),
+    [selection, selectionScope]
+  );
+  const selectedIdSet = useMemo(() => new Set(selectedItems.keys()), [selectedItems]);
+  const visibleListings = useMemo(() => engine.filteredListings ?? [], [engine.filteredListings]);
+  const updateSelection = useCallback(change => setSelection(prev => {
+    const items = new Map(prev.scope === selectionScope ? prev.items : []);
+    change(items);
+    return { scope: selectionScope, items };
+  }), [selectionScope]);
+  const toggleStatusSelect = useCallback(id => {
+    const listing = visibleListings.find(item => item.id === id);
+    if (!listing) return;
+    updateSelection(items => (items.has(id) ? items.delete(id) : items.set(id, listing.status)));
+  }, [visibleListings, updateSelection]);
+  const selectPage = useCallback(() => updateSelection(items => {
+    visibleListings.forEach(listing => items.set(listing.id, listing.status));
+  }), [visibleListings, updateSelection]);
+  const selectAllListings = useCallback(async () => {
+    setSelectingAll(true);
+    try {
+      const all = await listingService.getMyListingSelection(selectionFilter);
+      setSelection({ scope: selectionScope, items: new Map(all.map(item => [item.id, item.status])) });
+    } catch (err) {
+      const parsed = parseError(err);
+      showError(t('bulk_select_all_failed'), parsed.message, { errorCode: parsed.errorCode });
+    } finally {
+      setSelectingAll(false);
+    }
+  }, [selectionFilter, selectionScope, showError, t]);
+  const clearStatusSelection = useCallback(() => setSelection({ scope: selectionScope, items: new Map() }), [selectionScope]);
+  const exitSelectMode = useCallback(() => {
+    setSelectMode(false);
+    setSelection({ scope: '', items: new Map() });
+  }, []);
+  // A batch change can touch listings on every page, so all cached My Listings pages are refetched.
+  const handleBulkDone = useCallback(() => {
+    setSelection({ scope: '', items: new Map() });
+    queryClient.invalidateQueries({ queryKey: ['listings', 'mine'] });
+  }, [queryClient]);
+  // Low-stock batch quantity/price picker (separate from the status select mode above).
   const toggleSelect = useCallback(id => setSelectedIds(prev => {
     const s = new Set(prev);
     s.has(id) ? s.delete(id) : s.add(id);
@@ -92,23 +154,6 @@ const MyListingsPage = () => {
     setSelectedIds(new Set());
     setBulkValue('');
   }, []);
-  const totalValueStats = useMemo(() => {
-    const list = engine.filteredListings || engine.listings || [];
-    let totalVal = 0;
-    let activeCount = 0;
-    list.forEach(item => {
-      if (item.status === 'ACTIVE' || item.status === 'DRAFT') {
-        const price = Number(item.price) || 0;
-        const qty = Number(item.quantity) || 1;
-        totalVal += price * qty;
-        activeCount++;
-      }
-    });
-    return {
-      totalVal,
-      activeCount
-    };
-  }, [engine.filteredListings, engine.listings]);
   const applyBulk = useCallback(async () => {
     const ids = Array.from(selectedIds);
     if (!ids.length) {
@@ -132,35 +177,33 @@ const MyListingsPage = () => {
       setSaving(false);
     }
   }, [bulkMode, bulkValue, selectedIds, showSuccess, showError, clearBulk, engine]);
+  // Seller-wide status changes (all inactive -> active, all active -> inactive), independent of select mode.
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const handleStatusUpdated = useCallback(() => {
+    setSelection({ scope: '', items: new Map() });
+    queryClient.invalidateQueries({ queryKey: ['listings', 'mine'] });
+  }, [queryClient]);
+
   const extraActions = (
-    <div className="flex flex-wrap sm:flex-nowrap items-center justify-between sm:justify-end gap-2.5 sm:gap-3 w-full sm:w-auto">
-      <div className="flex items-center gap-2.5 sm:gap-3 py-1.5 px-3 rounded bg-background-secondary border border-border-light text-xs">
-        <div className="flex flex-col text-left sm:text-right">
-          <span className="text-text-muted font-medium">{t("portfolio_performance")}</span>
-          <span className="text-sm font-semibold text-text-primary tabular-nums">
-            {formatCurrency(totalValueStats.totalVal, 'TRY')}
-          </span>
-        </div>
-        <div className="h-6 w-px bg-border-light hidden sm:block" />
-        <div className="flex sm:flex-col items-center sm:items-start gap-2 sm:gap-0.5 text-text-secondary">
-          <span className="inline-flex items-center gap-1.5 font-medium text-text-primary tabular-nums">
-            <span className="w-1.5 h-1.5 rounded-full bg-status-success" />
-            {totalValueStats.activeCount} <span className="font-normal text-text-secondary">{t("active")}</span>
-          </span>
-          <span className="text-border sm:hidden">·</span>
-          <span className="tabular-nums text-text-muted">
-            {engine.listings?.length || 0} {t("total")}
-          </span>
-        </div>
-      </div>
-      <Link
-        to={ROUTES.CREATE_LISTING}
-        className="inline-flex items-center justify-center gap-1.5 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 sm:h-10 px-3.5 sm:px-4 shrink-0"
+    <>
+      <Button
+        variant="secondary"
+        onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
+        aria-pressed={selectMode}
+        className="shrink-0"
       >
-        <Plus className="w-4 h-4" strokeWidth={2.5} />
+        <ListChecks className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+        {selectMode ? t("bulk_done") : t("bulk_select")}
+      </Button>
+      <Button variant="secondary" onClick={() => setStatusModalOpen(true)} className="shrink-0">
+        <RefreshCcw className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+        {t("status_update")}
+      </Button>
+      <Link to={ROUTES.CREATE_LISTING} className={`${buttonClasses('primary', 'md')} shrink-0`}>
+        <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
         {t("new_listing")}
       </Link>
-    </div>
+    </>
   );
 
   const topSlot = useMemo(() => {
@@ -203,7 +246,7 @@ const MyListingsPage = () => {
                   </button>
                 </div>
               )}
-              <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${lowStock.isOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${lowStock.isOpen ? 'rotate-180' : ''}`} strokeWidth={1.5} />
             </div>
           </div>
 
@@ -257,14 +300,14 @@ const MyListingsPage = () => {
                       onClick={clearBulk}
                       className="p-1.5 rounded text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4" strokeWidth={1.5} />
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-60 overflow-y-auto">
                     {listings.map(listing => (
                       <label
                         key={listing.id}
-                        className={`flex items-center gap-2.5 p-2.5 rounded border transition-colors cursor-pointer ${selectedIds.has(listing.id) ? 'bg-secondary-light border-primary' : 'bg-background-primary border-border-light hover:border-border'}`}
+                        className={`flex items-center gap-2.5 p-2.5 rounded border transition-colors cursor-pointer ${selectedIds.has(listing.id) ? 'bg-background-tertiary border-primary' : 'bg-background-primary border-border-light hover:border-border'}`}
                       >
                         <input
                           type="checkbox"
@@ -289,8 +332,23 @@ const MyListingsPage = () => {
       </div>
     );
   }, [lowStock, bulkMode, bulkValue, selectedIds, saving, applyBulk, clearBulk, listings, toggleSelect, engine.refresh, showSuccess, showError, t]);
-  return <div className="min-h-screen bg-background-secondary">
-    <ListingsModuleLayout mode="mine" title={t("my_listings")} getListingTypeLabel={getListingTypeLabel} engine={engine} extraActions={extraActions} topSlot={topSlot} disableSticky={true} isSelectable={false} />
+  return <div className={`min-h-screen bg-background-page ${selectMode ? 'pb-32' : ''}`}>
+    <ListingsModuleLayout mode="mine" title={t("my_listings")} getListingTypeLabel={getListingTypeLabel} engine={engine} extraActions={extraActions} topSlot={topSlot} isSelectable={selectMode} selectedIds={selectedIdSet} onToggleSelect={toggleStatusSelect} />
+    <MyListingsStatusModal isOpen={statusModalOpen} onClose={() => setStatusModalOpen(false)} onDone={handleStatusUpdated} />
+    {selectMode ? (
+      <MyListingsBulkBar
+        selectedItems={selectedItems}
+        visibleListings={visibleListings}
+        totalCount={engine.totalElements || 0}
+        isFiltered={Boolean(selectionFilter.status || selectionFilter.listingType || selectionFilter.title)}
+        selectingAll={selectingAll}
+        onSelectPage={selectPage}
+        onSelectAll={selectAllListings}
+        onClear={clearStatusSelection}
+        onClose={exitSelectMode}
+        onDone={handleBulkDone}
+      />
+    ) : null}
   </div>;
 };
 export default MyListingsPage;

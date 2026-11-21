@@ -46,11 +46,11 @@ const discountPercent = (original, sale) => {
 
 /* ── Sub-components ──────────────────────────────────────── */
 
-const CARD = 'rounded border border-border-light bg-background-secondary';
+const CARD = 'rounded border border-border-light bg-background-primary shadow-sm';
 
 // Mirrors the final geometry: gallery + sections on the left, buy box + seller card on the right.
 const DetailSkeleton = () => (
-  <div className="min-h-screen bg-background-primary pb-24">
+  <div className="min-h-screen bg-background-page pb-24">
     <PageContainer className="pt-4">
       <Skeleton className="mb-4 h-5 w-64" />
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 xl:gap-8">
@@ -73,7 +73,7 @@ const DetailSkeleton = () => (
 const DetailError = ({ error }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background-primary p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background-page p-4">
       <div className={`${CARD} w-full max-w-md p-8 text-center`}>
         <AlertTriangle className="mx-auto mb-4 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
         <h1 className="mb-2 text-lg font-semibold text-text-primary">
@@ -244,7 +244,7 @@ const ListingDetailPage = () => {
   const showMobileBar = !isOwner;
 
   return (
-    <div className={`min-h-screen bg-background-primary text-text-primary ${showMobileBar ? 'pb-28 lg:pb-16' : 'pb-16'}`}>
+    <div className={`min-h-screen bg-background-page text-text-primary ${showMobileBar ? 'pb-28 lg:pb-16' : 'pb-16'}`}>
       {isOfferModalOpen && (
         <Suspense fallback={null}>
           <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />

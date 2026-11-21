@@ -12,7 +12,8 @@ export const theme = {
             800: '#292524',
             900: '#1C1917',
             DEFAULT: '#292524',
-            hover: '#3A3531',
+            // One step lighter than DEFAULT (1.5:1) so hover on dark fills is visible; 700 was 1.25:1.
+            hover: '#44403C',
             light: '#FAFAF9',
             dark: '#1C1917',
         },
@@ -52,6 +53,7 @@ export const theme = {
                 500: '#14B8A6',
                 600: '#0D9488',
                 700: '#0F766E',
+                800: '#115E59',
             },
             indigo: {
                 DEFAULT: '#4338CA',
@@ -84,6 +86,8 @@ export const theme = {
             },
         },
         background: {
+            // Page canvas: one step below white (1.12:1) so white cards read as plates without heavy borders.
+            page: '#F3F2F0',
             primary: '#FFFFFF',
             secondary: '#FAFAF9',
             tertiary: '#F5F5F4',
@@ -93,17 +97,21 @@ export const theme = {
             primary: '#1C1917',
             secondary: '#44403C',
             tertiary: '#6B6560',
-            muted: '#78716C',
+            // Same value as tertiary: the old #78716C was indistinguishable from it (1.2:1) and fell
+            // to 4.4:1 on tertiary surfaces. Keep the name for placeholders and disabled copy.
+            muted: '#6B6560',
             inverse: '#FFFFFF',
-            link: '#292524',
-            linkHover: '#44403C',
+            // Inline links use the single accent so they are distinguishable from body text.
+            link: '#0F766E',
+            linkHover: '#115E59',
             price: '#0F766E',
         },
         border: {
             light: '#E7E5E4',
             DEFAULT: '#D6D3D1',
             dark: '#6B6560',
-            focus: '#292524',
+            // Focus rings, focused inputs and selected items share the accent.
+            focus: '#0F766E',
         },
         status: {
             success: {
@@ -127,12 +135,13 @@ export const theme = {
                 icon: '#D97706',
                 DEFAULT: '#D97706',
             },
+            // Distinct hue so an info message never looks like a neutral card or draft badge.
             info: {
-                bg: '#F5F5F4',
-                border: '#D6D3D1',
-                text: '#3A3531',
-                icon: '#292524',
-                DEFAULT: '#292524',
+                bg: '#F0F9FF',
+                border: '#BAE6FD',
+                text: '#075985',
+                icon: '#0284C7',
+                DEFAULT: '#0284C7',
             },
         },
         card: {
@@ -145,7 +154,7 @@ export const theme = {
         button: {
             primary: {
                 bg: '#292524',
-                hover: '#3A3531',
+                hover: '#44403C',
                 text: '#FFFFFF',
             },
             secondary: {
@@ -155,12 +164,12 @@ export const theme = {
             },
             dark: {
                 bg: '#292524',
-                hover: '#3A3531',
+                hover: '#44403C',
                 text: '#FFFFFF',
             },
             ghost: {
                 bg: 'transparent',
-                hover: '#FAFAF9',
+                hover: '#F5F5F4',
                 text: '#44403C',
             },
         },
@@ -183,16 +192,17 @@ export const theme = {
         full: '9999px',
     },
     shadows: {
-        sm: '0 1px 2px 0 rgba(41, 37, 36, 0.05)',
-        DEFAULT: '0 1px 3px 0 rgba(41, 37, 36, 0.08), 0 1px 2px -1px rgba(41, 37, 36, 0.08)',
-        md: '0 4px 6px -1px rgba(41, 37, 36, 0.08), 0 2px 4px -2px rgba(41, 37, 36, 0.05)',
+        // Resting cards rely on shadow-sm plus a light border; hover lifts to shadow-md.
+        sm: '0 1px 2px 0 rgba(41, 37, 36, 0.06), 0 1px 3px 0 rgba(41, 37, 36, 0.04)',
+        DEFAULT: '0 2px 6px -1px rgba(41, 37, 36, 0.08), 0 1px 3px 0 rgba(41, 37, 36, 0.06)',
+        md: '0 8px 20px -6px rgba(41, 37, 36, 0.14), 0 2px 6px -2px rgba(41, 37, 36, 0.06)',
         lg: '0 10px 15px -3px rgba(41, 37, 36, 0.08), 0 4px 6px -4px rgba(41, 37, 36, 0.05)',
         xl: '0 20px 25px -5px rgba(41, 37, 36, 0.08), 0 8px 10px -6px rgba(41, 37, 36, 0.05)',
         '2xl': '0 25px 50px -12px rgba(41, 37, 36, 0.15)',
     },
     transitions: {
         fast: '150ms',
-        DEFAULT: '200ms',
+        DEFAULT: '150ms',
         slow: '300ms',
         slower: '500ms',
     },
@@ -206,16 +216,18 @@ export const theme = {
             sans: ['Plus Jakarta Sans', 'Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],
             mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
         },
+        // Premium scale: 15px UI text, 13px captions, display sizes with negative tracking built in.
         fontSize: {
-            body: ['0.875rem', { lineHeight: '1.25rem' }],
-            caption: ['0.75rem', { lineHeight: '1.125rem' }],
-            sm: ['0.875rem', { lineHeight: '1.25rem' }],
-            base: ['1rem', { lineHeight: '1.5rem' }],
-            lg: ['1.125rem', { lineHeight: '1.75rem' }],
-            xl: ['1.25rem', { lineHeight: '1.75rem' }],
-            '2xl': ['1.5rem', { lineHeight: '2rem' }],
-            '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-            '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+            caption: ['0.8125rem', { lineHeight: '1.125rem' }],
+            body: ['0.9375rem', { lineHeight: '1.375rem' }],
+            xs: ['0.8125rem', { lineHeight: '1.125rem' }],
+            sm: ['0.9375rem', { lineHeight: '1.375rem' }],
+            base: ['1rem', { lineHeight: '1.625rem' }],
+            lg: ['1.125rem', { lineHeight: '1.75rem', letterSpacing: '-0.005em' }],
+            xl: ['1.3125rem', { lineHeight: '1.875rem', letterSpacing: '-0.01em' }],
+            '2xl': ['1.75rem', { lineHeight: '2.25rem', letterSpacing: '-0.015em' }],
+            '3xl': ['2.25rem', { lineHeight: '2.625rem', letterSpacing: '-0.02em' }],
+            '4xl': ['2.875rem', { lineHeight: '3.25rem', letterSpacing: '-0.025em' }],
         },
     },
 };

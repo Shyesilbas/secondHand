@@ -63,7 +63,7 @@ const EmailContent = ({
   return (
     <div className="flex h-full min-h-0 flex-col bg-background-primary">
       {/* Editorial Reading Header */}
-      <header className="shrink-0 border-b border-border bg-background-primary px-4 py-2.5 sm:px-6 sm:py-3">
+      <header className="shrink-0 border-b border-border-light bg-background-primary px-4 py-2.5 sm:px-6 sm:py-3">
         {/* Top Meta & Actions Row */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 text-xs text-text-secondary">

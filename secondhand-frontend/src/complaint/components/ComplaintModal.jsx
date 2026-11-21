@@ -4,7 +4,7 @@ import { COMPLAINT_REASONS } from '../types/complaintTypes.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { Button, Modal } from '../../common/components/ui/index.js';
 import logger from '../../common/utils/logger.js';
-import { COMPLAINT_DEFAULTS, COMPLAINT_MESSAGES } from '../complaintConstants.js';
+import { COMPLAINT_DEFAULTS, COMPLAINT_MESSAGES, COMPLAINT_REASON_LABELS, labelOf } from '../complaintConstants.js';
 import EvidenceImagePicker from './EvidenceImagePicker.jsx';
 const FIELD = 'w-full rounded border bg-background-primary px-3 text-sm text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-border-focus';
 const ComplaintModal = ({
@@ -41,12 +41,12 @@ const ComplaintModal = ({
  const validateForm = () => {
  const newErrors = {};
  if (!formData.reason.trim()) {
- newErrors.reason = COMPLAINT_MESSAGES.REASON_REQUIRED;
+ newErrors.reason = t('complaint_reason_required', COMPLAINT_MESSAGES.REASON_REQUIRED);
  }
  if (!formData.description.trim()) {
- newErrors.description = COMPLAINT_MESSAGES.DESCRIPTION_REQUIRED;
+ newErrors.description = t('complaint_description_required', COMPLAINT_MESSAGES.DESCRIPTION_REQUIRED);
  } else if (formData.description.trim().length < COMPLAINT_DEFAULTS.MIN_DESCRIPTION_LENGTH) {
- newErrors.description = COMPLAINT_MESSAGES.DESCRIPTION_TOO_SHORT;
+ newErrors.description = t('complaint_description_too_short', COMPLAINT_MESSAGES.DESCRIPTION_TOO_SHORT);
  }
  setErrors(newErrors);
  return Object.keys(newErrors).length === 0;
@@ -91,14 +91,14 @@ const ComplaintModal = ({
  }));
  }
  };
- return <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title={reportedMessage ? t('report_message', 'Report message') : listingId ? 'Report listing' : 'Report user'} size="sm" footer={<>
+ return <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title={reportedMessage ? t('report_message', 'Report message') : listingId ? t('report_listing', 'Report listing') : t('report_user', 'Report user')} size="sm" footer={<>
  <Button variant="secondary" onClick={onClose} disabled={isLoading}>{t("cancel")}</Button>
  <Button type="submit" form="complaint-form" disabled={isLoading || !formData.reason || !formData.description.trim()}>
  {isLoading ? t("submitting") : t("submit_complaint")}
  </Button>
  </>}>
  <p className="mb-4 text-sm text-text-secondary">
- {t("you_are_reporting")}<span className="font-medium text-text-primary">{listingId && listingTitle ? listingTitle : targetUserName}</span>
+ {t("you_are_reporting")}{' '}<span className="font-medium text-text-primary">{listingId && listingTitle ? listingTitle : targetUserName}</span>
  </p>
  {reportedMessage && <blockquote className="mb-4 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-secondary">
  <span className="mb-1 block text-xs text-text-tertiary">{t('reported_message', 'Reported message')}</span>
@@ -110,7 +110,7 @@ const ComplaintModal = ({
  <select id="complaint-reason" value={formData.reason} onChange={e => handleInputChange('reason', e.target.value)} aria-invalid={Boolean(errors.reason)} className={`h-10 ${FIELD} ${errors.reason ? 'border-status-error' : 'border-border'}`} disabled={isLoading}>
  <option value="">{t("select_a_reason")}</option>
  {COMPLAINT_REASONS.map(reason => <option key={reason.value} value={reason.value}>
- {reason.label}
+ {labelOf(COMPLAINT_REASON_LABELS, reason.value, t)}
  </option>)}
  </select>
  {errors.reason && <p className="mt-1 text-xs text-status-error-text">{errors.reason}</p>}

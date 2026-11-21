@@ -179,7 +179,7 @@ const AssistantMessage = ({ message, copied, onCopy }) => {
 
 const UserMessage = ({ message }) => (
   <div className="flex justify-end">
-    <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-md bg-background-tertiary px-4 py-2.5 text-sm leading-relaxed text-text-primary sm:max-w-[75%]">
+    <p className="max-w-[85%] whitespace-pre-wrap break-words rounded bg-background-tertiary px-4 py-2.5 text-sm leading-relaxed text-text-primary sm:max-w-[75%]">
       {message.content}
     </p>
   </div>
@@ -314,11 +314,11 @@ export const AuraChatPage = () => {
 
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background-primary text-text-primary">
-      <header className="shrink-0 border-b border-border">
+      <header className="shrink-0 border-b border-border-light">
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 px-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-2">
             <Sparkles className="h-4 w-4 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden />
-            <h1 className="truncate text-base font-semibold text-text-primary">Aura</h1>
+            <h1 className="truncate text-lg font-semibold text-text-primary">Aura</h1>
           </div>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="sm" onClick={() => setShowMemoryHub(true)} disabled={userId == null}>
@@ -389,7 +389,7 @@ export const AuraChatPage = () => {
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-border bg-background-primary">
+      <div className="shrink-0 border-t border-border-light bg-background-primary">
         <div className="mx-auto max-w-3xl px-4 py-3 sm:px-6">
           {quotaExhausted && (
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded border border-status-warning-border bg-status-warning-bg px-3 py-2 text-sm text-status-warning-text">

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Inbox, Bell, Mail, MessageSquare } from 'lucide-react';
+import { Inbox, Bell, Mail, MessageSquare, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useInAppNotificationsContext } from '../../../../notification/InAppNotificationContext.jsx';
 import HeaderDropdownPanel from './HeaderDropdownPanel.jsx';
@@ -9,7 +9,7 @@ const tabUrl = tab => `${ROUTES.INBOX}?tab=${tab}`;
 const countBadge = n => {
     const v = Number(n) || 0;
     if (v <= 0) return null;
-    return <span className="min-w-5 rounded-sm bg-secondary-200/90 px-2 py-0.5 text-center text-xs font-semibold tabular-nums text-text-secondary">
+    return <span className="min-w-5 rounded-sm bg-secondary-200 px-2 py-0.5 text-center text-xs font-semibold tabular-nums text-text-secondary">
         {v > 99 ? '99+' : v}
     </span>;
 };
@@ -29,8 +29,8 @@ const HeaderInboxMenu = ({
     const hubTotal = (Number(unreadCount) || 0) + (Number(emailCount) || 0) + (Number(chatCount) || 0);
     const rowClass = 'flex w-full items-center gap-3 rounded px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary';
     return <div className="relative">
-        <button type="button" onClick={onToggle} title={t("inbox")} className="group relative rounded p-2.5 text-text-secondary transition-all duration-300 ease-in-out hover:bg-background-tertiary hover:text-text-primary">
-            <Inbox className="h-5 w-5 stroke-1.5" />
+        <button type="button" onClick={onToggle} title={t("inbox")} className="group relative rounded p-2.5 text-text-secondary transition-colors duration-150 ease-in-out hover:bg-background-tertiary hover:text-text-primary">
+            <Inbox className="h-5 w-5 stroke-1.5" strokeWidth={1.5} />
             {hubTotal > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-sm bg-primary px-1 text-xs font-semibold leading-none text-white">
                 {hubTotal > 99 ? '99+' : hubTotal}
             </span>}
@@ -38,23 +38,28 @@ const HeaderInboxMenu = ({
 
         {isOpen && <HeaderDropdownPanel className="!right-0 !w-64">
             <div className="border-b border-border-light px-3 pb-2 pt-1">
-                <p className="text-xs font-semibold text-text-muted">{t("inbox")}</p>
+                <p className="text-xs font-medium text-text-tertiary">{t("inbox")}</p>
             </div>
             <nav className="flex flex-col gap-0.5 p-1.5">
                 <Link to={tabUrl(INBOX_TABS.EMAILS)} onClick={onClose} className={rowClass}>
-                    <Mail className="h-4 w-4 shrink-0 text-text-tertiary" />
+                    <Mail className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} />
                     <span className="min-w-0 flex-1 font-medium">{t("mail")}</span>
                     {countBadge(emailCount)}
                 </Link>
                 <Link to={tabUrl(INBOX_TABS.NOTIFICATIONS)} onClick={onClose} className={rowClass}>
-                    <Bell className="h-4 w-4 shrink-0 text-text-tertiary" />
+                    <Bell className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} />
                     <span className="min-w-0 flex-1 font-medium">{t("notifications")}</span>
                     {countBadge(unreadCount)}
                 </Link>
                 <Link to={tabUrl(INBOX_TABS.CHAT)} onClick={onClose} className={rowClass}>
-                    <MessageSquare className="h-4 w-4 shrink-0 text-text-tertiary" />
+                    <MessageSquare className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden="true" />
                     <span className="min-w-0 flex-1 font-medium">{t("chat")}</span>
                     {countBadge(chatCount)}
+                </Link>
+                <hr className="my-1 border-0 border-t border-border-light" />
+                <Link to={ROUTES.FORUM} onClick={onClose} className={rowClass}>
+                    <Users className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden="true" />
+                    <span className="min-w-0 flex-1 font-medium">{t("forum_community")}</span>
                 </Link>
             </nav>
         </HeaderDropdownPanel>}

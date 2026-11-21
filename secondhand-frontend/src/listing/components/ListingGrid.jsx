@@ -6,8 +6,7 @@ import { AlertCircle as ExclamationCircleIcon, Image as PhotoIcon } from 'lucide
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 import { useMyShowcases } from '../../showcase/hooks/useMyShowcases.js';
-export const LISTING_GRID_COLUMNS = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
-export const LISTING_GRID_GAP = 'gap-3 sm:gap-4 lg:gap-5';
+import { LISTING_GRID_COLUMNS, LISTING_GRID_GAP } from './listingGridLayout.js';
 const ListingGrid = memo(({
     listings,
     isLoading,

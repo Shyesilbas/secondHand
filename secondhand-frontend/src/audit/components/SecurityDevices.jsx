@@ -186,7 +186,7 @@ const SecurityDevices = ({
   return (
     <section
       aria-label={t('recognized_devices', 'Cihazlar ve Oturumlar')}
-      className="mb-6 overflow-hidden rounded border border-border bg-background-primary"
+      className="mb-6 overflow-hidden rounded border border-border-light bg-background-primary shadow-sm"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-light px-5 py-4">
         <div className="flex items-center gap-2.5">
@@ -225,7 +225,7 @@ const SecurityDevices = ({
             >
               <div className="flex min-w-0 items-start gap-3.5">
                 <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded border border-border-light bg-background-secondary">
-                  <DeviceIcon type={device.deviceType} />
+                  <DeviceIcon type={device.deviceType} strokeWidth={1.5} />
                 </div>
 
                 <div className="min-w-0">
@@ -296,7 +296,7 @@ const SecurityDevices = ({
                       onFilterByDevice(isFiltered ? '' : filterToken)
                     }
                     className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer ${isFiltered
-                        ? 'border-primary bg-primary text-white'
+                        ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800'
                         : 'border-border-light bg-background-primary text-text-secondary hover:border-border hover:text-text-primary'
                       }`}
                   >

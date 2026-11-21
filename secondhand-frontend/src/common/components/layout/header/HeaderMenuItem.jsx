@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const baseClassName = 'flex items-center gap-3 px-4 py-3 hover:bg-background-secondary transition-all duration-300 ease-in-out rounded';
+const baseClassName = 'flex items-center gap-3 px-4 py-3 hover:bg-background-secondary transition-colors duration-150 ease-in-out rounded';
 
 const HeaderMenuItem = ({ to, onClick, icon: Icon, label, labelKey, rightContent, compact = false }) => {
     const { t } = useTranslation();
     const className = compact
-        ? 'flex items-center px-4 py-2.5 text-sm text-text-secondary hover:bg-background-secondary hover:text-text-primary transition-all duration-300 ease-in-out rounded mx-1 cursor-pointer'
+        ? 'flex items-center px-4 py-2.5 text-sm text-text-secondary hover:bg-background-secondary hover:text-text-primary transition-colors duration-150 ease-in-out rounded mx-1 cursor-pointer'
         : baseClassName;
 
     const textToShow = labelKey ? t(labelKey) : (label ? t(label) : '');

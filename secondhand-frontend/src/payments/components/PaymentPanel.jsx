@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import PaymentAgreementsSection from './PaymentAgreementsSection.jsx';
 import { formatPaymentAmount } from '../utils/formatPaymentAmount.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 
 const PaymentPanel = ({
  selectedListing,
@@ -26,13 +27,13 @@ const PaymentPanel = ({
 
  return (
  <div className="lg:col-span-5 xl:col-span-5">
- <div className="sticky top-20 rounded-md border border-border bg-background-primary p-5 shadow-sm space-y-4">
+ <div className="sticky top-20 rounded border border-border-light bg-background-primary p-5 shadow-sm space-y-4">
  {/* Header */}
  <div className="flex items-center justify-between pb-3 border-b border-border-light">
  <h3 className="text-sm font-semibold text-text-primary">
  {t("payment_panel")}
  </h3>
- <span className="text-xs font-medium text-text-secondary bg-background-tertiary px-2 py-0.5 rounded-full border border-border">
+ <span className="text-xs font-medium text-text-secondary bg-background-secondary px-2 py-0.5 rounded-sm border border-border">
  {t("instant_activation")}
  </span>
  </div>
@@ -40,7 +41,7 @@ const PaymentPanel = ({
  {selectedListing ? (
  <div className="space-y-3.5">
  {/* Listing Summary Card */}
- <div className="rounded-md border border-border bg-background-secondary p-3.5 space-y-2">
+ <div className="rounded border border-border bg-background-secondary p-3.5 space-y-2">
  <div className="flex items-center justify-between gap-2">
  <span className="text-xs font-semibold text-text-muted">
  {t("chosen_listing")}
@@ -54,7 +55,7 @@ const PaymentPanel = ({
  </h4>
 
  {feeConfig && (
- <div className="pt-2 border-t border-border flex items-baseline justify-between">
+ <div className="pt-2 border-t border-border-light flex items-baseline justify-between">
  <span className="text-sm font-semibold text-text-secondary">
  {t("total_due")}
  </span>
@@ -66,9 +67,9 @@ const PaymentPanel = ({
  </div>
 
  {/* E-Wallet Balance Info */}
- <div className="rounded-md border border-border bg-background-primary p-3 flex items-center justify-between text-sm">
+ <div className="rounded border border-border bg-background-primary p-3 flex items-center justify-between text-sm">
  <div className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-md bg-secondary-200 text-text-primary flex items-center justify-center font-semibold">
+ <div className="w-7 h-7 rounded bg-secondary-200 text-text-primary flex items-center justify-center font-semibold">
  ₺
  </div>
  <div>
@@ -83,11 +84,11 @@ const PaymentPanel = ({
 
  {eWallet && (
  hasSufficientEWalletBalance ? (
- <span className="text-xs font-semibold text-text-primary bg-background-tertiary px-2 py-0.5 rounded border border-card-border-hover">
+ <span className="text-xs font-semibold text-text-primary bg-background-tertiary px-2 py-0.5 rounded border border-border">
  {t("sufficient_balance")}
  </span>
  ) : (
- <span className="text-xs font-semibold text-status-warning-text bg-background-secondary px-2 py-0.5 rounded border border-border">
+ <span className="rounded-sm border border-status-warning-border bg-status-warning-bg px-2 py-0.5 text-xs font-medium text-status-warning-text">
  {t("insufficient_balance")}
  </span>
  )
@@ -108,7 +109,7 @@ const PaymentPanel = ({
  <button
  onClick={onPayment}
  disabled={isButtonDisabled}
- className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 w-full"
+ className={`${buttonClasses()} w-full`}
  >
  {isProcessingPayment ? (
  <>

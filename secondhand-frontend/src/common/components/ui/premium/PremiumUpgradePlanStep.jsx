@@ -37,7 +37,7 @@ const PremiumUpgradePlanStep = ({
           <span className="text-sm font-semibold text-text-primary">
             {t('premium_plan_title', 'PRO Üyelik Planı')}
           </span>
-          <p className="mt-0.5 text-xs text-text-muted">
+          <p className="mt-0.5 text-xs text-text-tertiary">
             {t('auto_renews_monthly', 'Aylık yenilenir, dilediğiniz an tek tıkla iptal edilebilir.')}
           </p>
         </div>
@@ -57,7 +57,7 @@ const PremiumUpgradePlanStep = ({
           <div className="col-span-5 text-text-secondary">{t('privileges', 'Ayrıcalık')}</div>
           <div className="col-span-3 text-text-muted">{t('standard', 'Standart')}</div>
           <div className="col-span-4 flex items-center gap-1.5 text-text-primary">
-            <Sparkles className="h-3.5 w-3.5 text-text-secondary" />
+            <Sparkles className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.5} />
             <span>{t('pro_membership', 'PRO Plan')}</span>
           </div>
         </div>
@@ -92,7 +92,7 @@ const PremiumUpgradePlanStep = ({
                   type="checkbox"
                   checked={isChecked}
                   onChange={() => onAgreementToggle(agreement.agreementId)}
-                  className="mt-1 h-3.5 w-3.5 shrink-0 cursor-pointer rounded border-border text-primary accent-primary focus:ring-primary"
+                  className="mt-1 h-3.5 w-3.5 shrink-0 cursor-pointer rounded border-border text-primary accent-primary focus:ring-border-focus"
                 />
                 <span className="leading-snug">
                   <span className="font-medium text-text-primary">{getAgreementLabel(agreement, t)}</span>{' '}
@@ -107,7 +107,7 @@ const PremiumUpgradePlanStep = ({
               type="checkbox"
               checked={fallbackAccepted}
               onChange={(e) => onFallbackToggle(e.target.checked)}
-              className="mt-1 h-3.5 w-3.5 shrink-0 cursor-pointer rounded border-border text-primary accent-primary focus:ring-primary"
+              className="mt-1 h-3.5 w-3.5 shrink-0 cursor-pointer rounded border-border text-primary accent-primary focus:ring-border-focus"
             />
             <span className="leading-snug">
               <span className="font-medium text-text-primary">
@@ -119,7 +119,7 @@ const PremiumUpgradePlanStep = ({
         )}
       </div>
 
-      <p className="text-center text-xs text-text-tertiary">
+      <p className="text-center text-sm text-text-tertiary">
         {t('cancel_anytime_note', 'Dilediğiniz an tek tıkla iptal edebilirsiniz · Taahhüt yoktur')}
       </p>
     </div>

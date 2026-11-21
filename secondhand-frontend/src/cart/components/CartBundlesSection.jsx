@@ -83,7 +83,7 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
                     <div className="mt-2.5 space-y-1">
                       <div className="h-1.5 w-full overflow-hidden rounded-sm bg-background-tertiary">
                         <div
-                          className="h-full bg-primary transition-all duration-300"
+                          className="h-full bg-primary transition-colors duration-150"
                           style={{ width: `${Math.min(100, progress)}%` }}
                         />
                       </div>
@@ -100,7 +100,7 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
                     onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
                     className="shrink-0 self-start sm:self-center"
                   >
-                    <ShoppingBag className="h-3.5 w-3.5 text-text-secondary" />
+                    <ShoppingBag className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.5} />
                     <span>{t('complete_bundle', 'Paketi Tamamla')}</span>
                   </Button>
                 </div>

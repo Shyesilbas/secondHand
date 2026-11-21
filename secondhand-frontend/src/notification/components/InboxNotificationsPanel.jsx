@@ -7,6 +7,7 @@ import NotificationRow from './NotificationRow.jsx';
 import Button from '../../common/components/ui/Button.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import Tabs from '../../common/components/ui/Tabs.jsx';
 import { NOTIFICATION_VIEWS, groupNotificationsByTimeline } from '../notificationConstants.js';
@@ -55,11 +56,7 @@ const InboxNotificationsPanel = () => {
   } else if (isError) {
     content = (
       <div className="p-4">
-        <Alert
-          type="error"
-          message={t('notifications_load_failed', 'Bildirimler yüklenemedi.')}
-          action={<Button variant="secondary" size="sm" onClick={() => refetch()}>{t('try_again', 'Tekrar dene')}</Button>}
-        />
+        <ErrorState size="compact" bordered={false} title={t('notifications_load_failed', 'Bildirimler yüklenemedi')} onRetry={refetch} />
       </div>
     );
   } else if (notifications.length === 0) {
@@ -105,11 +102,11 @@ const InboxNotificationsPanel = () => {
   }
 
   return (
-    <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col overflow-hidden rounded border border-border bg-background-primary">
-      <header className="shrink-0 border-b border-border">
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col overflow-hidden rounded border border-border-light bg-background-primary shadow-sm">
+      <header className="shrink-0 border-b border-border-light">
         <div className="flex items-center justify-between gap-3 px-4 pt-3">
           <div className="min-w-0">
-            <h1 className="text-base font-semibold text-text-primary">{t('notifications', 'Bildirimler')}</h1>
+            <h1 className="text-lg font-semibold text-text-primary">{t('notifications', 'Bildirimler')}</h1>
             <p className="text-sm text-text-tertiary">
               {unreadCount > 0
                 ? t('unread_notifications_count', { defaultValue: '{{count}} okunmamış', count: unreadCount })

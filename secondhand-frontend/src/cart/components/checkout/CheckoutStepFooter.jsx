@@ -6,19 +6,22 @@ import Button from '../../../common/components/ui/Button.jsx';
 const CheckoutStepFooter = ({ onBack, backLabel, backDisabled = false, hint = null, children }) => {
   const { t } = useTranslation();
   return (
-    <div className="border-t border-border-light px-5 py-4 sm:px-6">
-      {hint && (
-        <div className="mb-3 flex items-center gap-1.5 text-xs text-text-secondary" role="status">
-          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-          <span>{hint}</span>
-        </div>
-      )}
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between [&>button]:w-full sm:[&>button]:w-auto">
+    <div className="border-t border-border-light px-5 py-5 sm:px-6">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-start sm:justify-between">
         <Button variant="ghost" onClick={onBack} disabled={backDisabled}>
           <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
           <span>{backLabel || t('back', 'Geri')}</span>
         </Button>
-        {children}
+        {/* The hint sits under the primary action it explains (why it is disabled). */}
+        <div className="flex flex-col gap-2 sm:items-end [&>button]:w-full sm:[&>button]:w-auto">
+          {children}
+          {hint && (
+            <p className="flex items-center gap-1.5 text-sm text-text-tertiary" role="status">
+              <AlertCircle className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+              <span>{hint}</span>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

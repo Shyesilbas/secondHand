@@ -31,7 +31,7 @@ export default function AuraPriceAdvisorGauge({
   const isHigh = status.toLowerCase().includes('high') || status.toLowerCase().includes('yüksek') || status.toLowerCase().includes('pahalı');
 
   return (
-    <div className="my-3 rounded-md border border-border bg-background-secondary p-4 shadow-sm">
+    <div className="my-3 rounded border border-border bg-background-secondary p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
           <Tag className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
@@ -68,7 +68,7 @@ export default function AuraPriceAdvisorGauge({
           />
           {/* Indicator Dot on the bar */}
           <div
-            className="absolute top-0 bottom-0 w-2.5 -ml-1 bg-primary rounded-full transition-all duration-300"
+            className="absolute top-0 bottom-0 w-2.5 -ml-1 bg-primary rounded-full transition-colors duration-150"
             style={{ left: `${currentPct}%` }}
           />
         </div>

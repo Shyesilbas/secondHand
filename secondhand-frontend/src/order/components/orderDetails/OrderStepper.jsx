@@ -50,7 +50,7 @@ const OrderStepper = ({ currentStatus, deliveryMethod }) => {
                 className={`flex h-7 w-7 items-center justify-center rounded-full border bg-background-primary text-xs tabular-nums font-semibold transition-colors duration-150 ${isDone
                     ? 'border-primary bg-primary text-white'
                     : isCurrent
-                      ? 'border-primary ring-2 ring-primary/20 text-text-primary'
+                      ? 'border-accent-teal ring-1 ring-accent-teal text-text-primary'
                       : 'border-border text-text-muted'
                   }`}
               >

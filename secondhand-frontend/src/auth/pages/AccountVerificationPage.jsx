@@ -88,14 +88,14 @@ const AccountVerificationPage = () => {
 
       {!codeSent ? (
         <Button className="w-full" onClick={sendCode} disabled={isSending}>
-          {isSending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+          {isSending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden strokeWidth={1.5} />}
           {isSending ? t('auth_sending', 'Gönderiliyor…') : t('auth_send_code', 'Kod gönder')}
         </Button>
       ) : (
         <form onSubmit={verify} className="space-y-5">
           <OtpDigitInputGroup value={code} onChange={(v) => { setCode(v); if (error) setError(''); }} dataSlotPrefix="verify" />
           <Button type="submit" className="w-full" disabled={isVerifying || code.length !== OTP_CODE_LENGTH}>
-            {isVerifying && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+            {isVerifying && <Loader2 className="h-4 w-4 animate-spin" aria-hidden strokeWidth={1.5} />}
             {isVerifying ? t('auth_verifying', 'Doğrulanıyor…') : t('auth_verify_submit', 'Doğrula')}
           </Button>
           <p className="text-center text-sm text-text-secondary">

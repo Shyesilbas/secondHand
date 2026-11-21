@@ -13,7 +13,7 @@ import { getPasswordError, isValidEmail } from '../utils/passwordRules.js';
 
 const SubmitLabel = ({ loading, loadingText, children }) => (
   <>
-    {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+    {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden strokeWidth={1.5} />}
     {loading ? loadingText : children}
   </>
 );

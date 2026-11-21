@@ -77,9 +77,9 @@ const GreatSellerProgress = ({ greatSeller }) => {
 };
 
 export const UserProfileHeaderSkeleton = () => (
- <div className="rounded border border-border bg-background-primary p-5 sm:p-6" aria-hidden>
+ <div className="rounded border border-border-light bg-background-primary p-5 sm:p-6 shadow-sm" aria-hidden>
  <div className="flex items-start gap-4">
- <Skeleton className="h-16 w-16 shrink-0 rounded-full" />
+ <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
  <div className="flex-1 space-y-2.5 pt-1">
  <Skeleton className="h-7 w-56 max-w-full" />
  <Skeleton className="h-4 w-72 max-w-full" />
@@ -102,17 +102,17 @@ const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activ
  const isGreatSeller = Boolean(greatSeller?.eligible);
 
  return (
- <section className="rounded border border-border bg-background-primary p-5 sm:p-6" aria-label={fullName}>
+ <section className="rounded border border-border-light bg-background-primary p-5 sm:p-6 shadow-sm" aria-label={fullName}>
  <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
  <div className="flex min-w-0 items-start gap-4">
- <span className="flex h-16 w-16 shrink-0 select-none items-center justify-center rounded-full bg-background-tertiary text-xl font-semibold text-text-primary">
- {initials}
+ <span className="flex h-20 w-20 shrink-0 select-none items-center justify-center overflow-hidden rounded-full bg-background-tertiary text-2xl font-semibold text-text-primary">
+ {user?.profilePicture ? <img src={user.profilePicture} alt="" className="h-full w-full object-cover" /> : initials}
  </span>
- <div className="min-w-0 pt-0.5">
+ <div className="min-w-0 pt-1.5">
  <div className="flex flex-wrap items-center gap-2">
  <h1 className="truncate text-2xl font-semibold text-text-primary">{fullName}</h1>
  {isOwnProfile && (
- <Badge variant="muted" size="sm">{t('you', 'Sen')}</Badge>
+ <Badge variant="muted" size="sm">{t('public_view', 'Herkese açık görünüm')}</Badge>
  )}
  </div>
  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-text-tertiary">
@@ -164,9 +164,16 @@ const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activ
  className="h-9 px-3"
  />
  <FollowButton userId={user.id} size="sm" />
- <Button variant="ghost" size="sm" disabled={blockMutation.isPending} onClick={() => blockMutation.mutate(user.id)}>
+ <Button
+ variant="ghost"
+ size="sm"
+ className="w-9 !px-0"
+ disabled={blockMutation.isPending}
+ onClick={() => blockMutation.mutate(user.id)}
+ aria-label={t('block_user', 'Kullanıcıyı Engelle')}
+ title={t('block_user', 'Kullanıcıyı Engelle')}
+ >
  <Ban className="h-4 w-4" strokeWidth={1.5} aria-hidden />
- {t('block_user', 'Kullanıcıyı Engelle')}
  </Button>
  <ComplaintButton targetUserId={user.id} targetUserName={fullName} targetUser={user} variant="ghost" />
  </>

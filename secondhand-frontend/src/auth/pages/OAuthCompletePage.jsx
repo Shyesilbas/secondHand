@@ -193,7 +193,7 @@ const OAuthCompletePage = () => {
  </div>
 
  <Button type="submit" className="w-full" disabled={submitting}>
- {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+ {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden strokeWidth={1.5} />}
  {submitting ? t('auth_saving', 'Kaydediliyor…') : t('auth_oauth_complete_submit', 'Kaydı tamamla')}
  </Button>
  </form>

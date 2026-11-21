@@ -4,7 +4,7 @@ const VARIANT_CLASSES = {
   success: 'border-status-success-border bg-status-success-bg text-status-success-text',
   warning: 'border-status-warning-border bg-status-warning-bg text-status-warning-text',
   error: 'border-status-error-border bg-status-error-bg text-status-error-text',
-  primary: 'border-border bg-primary-light text-primary',
+  primary: 'border-border bg-background-secondary text-primary',
 };
 
 const DOT_CLASSES = {

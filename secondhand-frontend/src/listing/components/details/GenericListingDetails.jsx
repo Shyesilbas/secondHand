@@ -68,9 +68,9 @@ const GenericListingDetails = ({ listing, flat = false }) => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveSection(tab.id)}
-                className={`px-3 py-1.5 text-sm rounded font-medium transition-colors cursor-pointer ${isActive
-                    ? 'bg-primary text-white'
-                    : 'bg-background-secondary text-text-secondary hover:text-text-primary hover:bg-background-tertiary border border-border-light'
+                className={`rounded border px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${isActive
+                  ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800'
+                  : 'border-border-light bg-background-secondary text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
                   }`}
               >
                 {tab.label}
@@ -110,7 +110,7 @@ const GenericListingDetails = ({ listing, flat = false }) => {
   }
 
   return (
-    <div className="rounded border border-border bg-background-primary p-6">
+    <div className="rounded border border-border-light bg-background-primary p-6 shadow-sm">
       {content}
     </div>
   );

@@ -11,9 +11,9 @@ Marketplace landing page, catalog discovery, trust assurances, seller highlights
 
 The `home` module serves as the primary storefront and brand entry point for the marketplace. It orchestrates product discovery, trust guarantees, and merchant recruitment:
 1. **Dynamic Marketplace Landing (`HomePage`):** Composed of modular marketing and product showcase sections designed for rapid discovery and low bounce rates.
-2. **Search & Category Shortcuts (`HeroSection`):** High-prominence search input, popular search suggestions, and direct shortcuts to the six catalog verticals.
-3. **Trust & Safety Assurances (`TrustBand`, `TrustExperienceSection`):** Visible educational sections detailing the escrow payment system, courier protection, and buyer dispute safeguards.
-4. **Curated Product Carousels:** Dynamic feeds for showcase-boosted listings (`ShowcaseSection`), newly arrived listings (`NewListingsSection`), and vetted top merchants (`GreatSellersSection`).
+2. **Guest Headline (`HeroSection`):** Shown to guests only: value proposition plus browse and sell links. Signed-in users get a screen-reader `h1` instead. Search lives in the header, not the hero.
+3. **Curated Product Carousels:** Dynamic feeds for recently viewed listings (`RecentlyViewedSection`), showcase-boosted listings (`ShowcaseSection`), best-selling active listings across all categories (`BestSellersSection`, `GET /api/v1/listings/best-sellers`), and vetted top merchants (`GreatSellersSection`).
+4. **Trust & Safety Assurances (`TrustExperienceSection`):** Visible educational sections detailing the escrow payment system, courier protection, and buyer dispute safeguards on `AboutPage`.
 5. **Corporate & Policy Information (`AboutPage`):** Dedicated route detailing company background, escrow safety mechanisms, and contact channels.
 
 ## 2. Route Map & Entry Points
@@ -27,7 +27,6 @@ The `home` module serves as the primary storefront and brand entry point for the
 
 - **Eager Route Loading:** `HomePage` and `AboutPage` are bundled in the core application bundle to ensure instantaneous First Contentful Paint (FCP) without lazy chunk delays.
 - **Image Optimization:** Off-screen carousel items utilize native `loading="lazy"` and Cloudinary responsive width parameters to prevent initial bandwidth bottlenecks.
-- **Dynamic Category Navigation:** Clicking category pills in `HeroSection` redirects to `/listings` with the selected vertical pre-filtered.
 
 ---
 
@@ -37,9 +36,5 @@ Generated from code; the hook files are the source of truth.
 
 | Query key | Defined in |
 |---|---|
-| `HOME_NEWEST_QUERY_KEY` | `NewListingsSection.jsx` |
+| `['listings', 'home', 'bestSellers', size, userId]` | `BestSellersSection.jsx` |
 | `['greatSellersHome', limit]` | `GreatSellersSection.jsx` |
-
-## 5. Form & Data Validation Rules
-
-- **Hero Search Input:** Trimmed string (1-100 characters). Submitting triggers navigation to `/listings?q={query}`.

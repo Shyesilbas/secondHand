@@ -216,7 +216,7 @@ const ShoppingCartPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background-secondary">
+      <div className="min-h-screen bg-background-page">
         <PageContainer className="space-y-4 py-8" aria-busy="true">
           <Skeleton className="h-8 w-48" />
           <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
@@ -235,7 +235,7 @@ const ShoppingCartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background-secondary">
+    <div className="min-h-screen bg-background-page">
       <PageContainer className="py-6 sm:py-8">
         <PageHeader
           back={
@@ -244,7 +244,7 @@ const ShoppingCartPage = () => {
               onClick={() => navigate(-1)}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary transition hover:text-text-primary"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
+              <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
               <span>{t('continue_shopping', 'Alışverişe Devam Et')}</span>
             </button>
           }
@@ -288,8 +288,7 @@ const ShoppingCartPage = () => {
                 >
                   <AlertTriangle
                     className={`mt-0.5 h-4 w-4 shrink-0 ${hasExpiredReservations ? 'text-status-error' : 'text-status-warning'
-                      }`}
-                  />
+                      }`} strokeWidth={1.5} />
                   <div>
                     <p className="font-semibold text-text-primary">
                       {hasExpiredReservations

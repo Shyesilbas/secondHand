@@ -20,18 +20,18 @@ const EvidenceImagePicker = ({ urls, onChange, disabled }) => {
     if (!file) return;
     setError(null);
     if (!file.type.startsWith('image/')) {
-      setError(COMPLAINT_MESSAGES.UPLOAD_NOT_IMAGE);
+      setError(t('complaint_upload_not_image', COMPLAINT_MESSAGES.UPLOAD_NOT_IMAGE));
       return;
     }
     if (file.size > COMPLAINT_DEFAULTS.MAX_EVIDENCE_FILE_BYTES) {
-      setError(COMPLAINT_MESSAGES.UPLOAD_TOO_LARGE);
+      setError(t('complaint_upload_too_large', COMPLAINT_MESSAGES.UPLOAD_TOO_LARGE));
       return;
     }
     try {
       const url = await upload.mutateAsync(file);
       onChange([...urls, url]);
     } catch (err) {
-      setError(getComplaintErrorMessage(err, COMPLAINT_MESSAGES.UPLOAD_FAILED_FALLBACK));
+      setError(getComplaintErrorMessage(err, t('complaint_upload_failed', COMPLAINT_MESSAGES.UPLOAD_FAILED_FALLBACK)));
     }
   };
 

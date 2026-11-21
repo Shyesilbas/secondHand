@@ -61,7 +61,7 @@ const ProfilePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background-secondary py-6 sm:py-8">
+    <div className="min-h-screen bg-background-page py-6 sm:py-8">
       <PageContainer className="max-w-4xl space-y-5">
         {/* 1. Profile Header Card */}
         <Card as="section" shadow={false} className="sm:p-6">
@@ -69,7 +69,7 @@ const ProfilePage = () => {
         </Card>
 
         {/* 2. Tabbed Settings Surface */}
-        <div className="rounded border border-border bg-background-primary overflow-hidden">
+        <div className="rounded border border-border-light bg-background-primary overflow-hidden shadow-sm">
           <div className="border-b border-border-light bg-background-primary px-4 sm:px-6">
             <Tabs
               items={tabs.map((tab) => ({ ...tab, id: `profile-tab-${tab.key}` }))}

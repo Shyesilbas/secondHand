@@ -11,7 +11,7 @@ const TrustBand = () => {
   ];
 
   return (
-    <section className="border-y border-border-light bg-background-secondary">
+    <section className="border-t border-border-light bg-background-primary">
       <PageContainer className="py-6">
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
           {features.map(({ key, icon: Icon, title, description }) => (

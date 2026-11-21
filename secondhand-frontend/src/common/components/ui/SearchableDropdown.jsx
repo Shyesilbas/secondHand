@@ -146,18 +146,18 @@ const SearchableDropdown = ({
         }
         return `${selectedValues.length} selected`;
     };
-    const dropdownContent = <motion.div key="searchable-dropdown" ref={usePortal ? portalRef : undefined} variants={dropdownVariants} initial="hidden" animate="visible" exit="exit" className="bg-background-primary rounded border border-border shadow-sm overflow-hidden" style={usePortal ? portalStyle : {}}>
+    const dropdownContent = <motion.div key="searchable-dropdown" ref={usePortal ? portalRef : undefined} variants={dropdownVariants} initial="hidden" animate="visible" exit="exit" className="bg-background-primary rounded border border-border shadow-md overflow-hidden" style={usePortal ? portalStyle : {}}>
         <div className="p-3 border-b border-border-light relative bg-background-secondary">
-            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-text-muted w-4 h-4" />
-            <input ref={searchInputRef} type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={searchPlaceholder} className="w-full pl-10 pr-4 py-2.5 bg-background-primary border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-secondary-400 text-sm transition-all tracking-tight hover:border-card-border-hover" />
+            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-text-muted w-4 h-4" strokeWidth={1.5} />
+            <input ref={searchInputRef} type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={searchPlaceholder} className="w-full pl-10 pr-4 py-2.5 bg-background-primary border border-border rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-secondary-400 text-sm transition tracking-tight hover:border-card-border-hover" />
         </div>
 
         <div className="max-h-60 overflow-y-auto p-1.5 overscroll-contain">
             {filteredOptions.length === 0 ? <div className="px-4 py-6 text-sm text-text-tertiary text-center flex flex-col items-center gap-2 tracking-tight">
-                <Search className="w-8 h-8 text-secondary-300" />{t("no_options_found")}</div> : filteredOptions.map(o => {
+                <Search className="w-8 h-8 text-secondary-300" strokeWidth={1.5} />{t("no_options_found")}</div> : filteredOptions.map(o => {
                     const optionValue = getOptionValue(o);
                     const isSelected = selectedValues.includes(optionValue);
-                    return <button key={optionValue} type="button" onClick={() => handleOptionClick(optionValue)} className={`w-full px-4 py-2.5 text-left text-sm rounded flex items-center justify-between transition-all duration-150 mb-0.5 tracking-tight ${isSelected ? 'bg-background-tertiary text-text-primary font-medium' : 'text-text-secondary hover:bg-background-secondary'}`}>
+                    return <button key={optionValue} type="button" onClick={() => handleOptionClick(optionValue)} className={`w-full px-4 py-2.5 text-left text-sm rounded flex items-center justify-between transition-colors duration-150 mb-0.5 tracking-tight ${isSelected ? 'bg-background-tertiary text-text-primary font-medium' : 'text-text-secondary hover:bg-background-secondary'}`}>
                         <span>{getOptionLabel(o)}</span>
                         {isSelected && <motion.span initial={{
                             scale: 0
@@ -168,7 +168,7 @@ const SearchableDropdown = ({
                             stiffness: 500,
                             damping: 25
                         }}>
-                            <Check className="w-4 h-4 text-text-primary" />
+                            <Check className="w-4 h-4 text-text-primary" strokeWidth={1.5} />
                         </motion.span>}
                     </button>;
                 })}
@@ -180,9 +180,9 @@ const SearchableDropdown = ({
         </div>}
     </motion.div>;
     return <div className={`relative ${className}`} ref={dropdownRef}>
-        {label && <label className="block text-sm font-semibold text-text-primary mb-3 tracking-tight">{label}</label>}
+        {label && <label className="mb-1.5 block text-sm font-medium text-text-primary">{label}</label>}
 
-        <button ref={buttonRef} type="button" onClick={toggleDropdown} disabled={disabled} aria-disabled={disabled} className={`w-full px-4 py-3 border rounded text-left flex items-center justify-between transition-all duration-200 tracking-tight focus:outline-none ${disabled ? 'border-border bg-background-secondary text-text-muted cursor-not-allowed' : isOpen ? 'border-secondary-400 ring-2' : 'border-border hover:border-card-border-hover'}`}>
+        <button ref={buttonRef} type="button" onClick={toggleDropdown} disabled={disabled} aria-disabled={disabled} className={`flex w-full items-center justify-between gap-2 rounded border bg-background-primary px-3 py-2 text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${disabled ? 'cursor-not-allowed border-border bg-background-secondary' : isOpen ? 'border-border-focus ring-2 ring-border-focus' : 'border-border hover:border-card-border-hover'}`}>
             <span className={`truncate text-sm ${selectedValues.length ? 'text-text-primary font-medium' : 'text-text-muted'}`}>
                 {getDisplayText()}
             </span>
@@ -191,9 +191,9 @@ const SearchableDropdown = ({
                     e.stopPropagation();
                     handleClearAll();
                 }} disabled={disabled} className="text-text-muted hover:text-status-error-text transition-colors p-1 hover:bg-background-secondary rounded-full" title={t("clear_all")}>
-                    <X className="w-4 h-4" />
+                    <X className="w-4 h-4" strokeWidth={1.5} />
                 </button>}
-                <ChevronDown className={`w-4 h-4 text-text-muted transition-transform duration-200 ${!disabled && isOpen ? 'rotate-180 text-text-secondary' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-text-muted transition-transform duration-200 ${!disabled && isOpen ? 'rotate-180 text-text-secondary' : ''}`} strokeWidth={1.5} />
             </div>
         </button>
 

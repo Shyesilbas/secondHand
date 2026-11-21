@@ -44,24 +44,21 @@ const AgreementsPage = () => {
         return agreements.filter(a => requiredIds.has(a.agreementId));
     }, [agreements, requiredIds]);
     const activeCat = CATEGORIES.find(c => c.key === category);
-    return <div className="min-h-screen bg-background-secondary">
+    return <div className="min-h-screen bg-background-page">
         {/* ── Page Header ─────────────────────────────────── */}
-        <div className="bg-background-primary border-b border-border-light">
-            <PageContainer className="py-8">
-                <PageHeader
-                    icon={FileText}
-                    title={t("legal_agreements")}
-                    subtitle={t("review_and_accept_required_legal_documen")}
-                />
-            </PageContainer>
-        </div>
+        <PageContainer className="pt-8">
+            <PageHeader
+                title={t("legal_agreements")}
+                subtitle={t("review_and_accept_required_legal_documen")}
+            />
+        </PageContainer>
 
         <PageContainer className="py-8">
             <div className="flex flex-col lg:flex-row gap-6">
 
                 {/* ── Left: Category Sidebar ──────────────── */}
                 <div className="lg:w-64 shrink-0">
-                    <nav className="bg-background-primary rounded-md border border-border-light overflow-hidden lg:sticky lg:top-6">
+                    <nav className="bg-background-primary rounded border border-border-light overflow-hidden lg:sticky lg:top-24">
                         <div className="px-4 py-3 border-b border-border-light">
                             <span className="text-xs font-semibold text-text-muted">{t("category")}</span>
                         </div>
@@ -72,15 +69,15 @@ const AgreementsPage = () => {
                                 return <button key={cat.key} type="button" onClick={() => {
                                     setCategory(cat.key);
                                     setFilter('all');
-                                }} className={`w-full flex items-center gap-3 px-3 py-3 rounded text-left transition-all duration-200 ${isActive ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'}`}>
-                                    <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${isActive ? 'bg-primary/20 text-primary' : 'bg-background-secondary text-text-muted'}`}>
-                                        <Icon className="w-4 h-4" />
+                                }} className={`w-full flex items-center gap-3 px-3 py-3 rounded text-left transition-colors duration-150 ${isActive ? 'bg-background-tertiary text-primary' : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'}`}>
+                                    <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${isActive ? 'bg-secondary-200 text-primary' : 'bg-background-secondary text-text-muted'}`}>
+                                        <Icon className="w-4 h-4" strokeWidth={1.5} />
                                     </div>
                                     <div className="min-w-0">
                                         <div className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-text-primary'}`}>
                                             {cat.label}
                                         </div>
-                                        <div className={`text-xs truncate mt-0.5 ${isActive ? 'text-primary/80' : 'text-text-muted'}`}>
+                                        <div className={`text-xs truncate mt-0.5 ${isActive ? 'text-text-secondary' : 'text-text-muted'}`}>
                                             {cat.description}
                                         </div>
                                     </div>
@@ -92,7 +89,7 @@ const AgreementsPage = () => {
 
                 {/* ── Right: Content Panel ────────────────── */}
                 <div className="flex-1 min-w-0">
-                    <div className="bg-background-primary rounded-md border border-border-light overflow-hidden">
+                    <div className="bg-background-primary rounded border border-border-light overflow-hidden">
                         <div className="px-6 py-5 border-b border-border-light">
                             <div className="flex items-center gap-3">
                                 {activeCat && <activeCat.icon className="h-5 w-5 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden />}

@@ -12,6 +12,7 @@ import { buildAuraWidgetUiContext } from '../utils/auraWidgetContext.js';
 import AuraSuggestedListingChips from './AuraSuggestedListingChips.jsx';
 import AuraMessageContent from './AuraMessageContent.jsx';
 import { cacheService } from '../../common/services/cacheService.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 
 const PremiumUpgradeModal = lazy(() => import('@/common/components/ui/PremiumUpgradeModal'));
 // The full-page chat replaces the widget; a separate component keeps hook order stable across routes.
@@ -111,8 +112,8 @@ const AuraChatWidgetPanel = () => {
     // Listing pages have a fixed purchase bar on mobile; sit above it instead of covering its buttons.
     const overPurchaseBar = /^\/listings\/(?!prefilter|create)[^/]+$/.test(location.pathname);
     return <div className={`fixed right-5 z-modal ${overPurchaseBar ? 'bottom-24 lg:bottom-5' : 'bottom-5'}`}>
-        <div className={`absolute bottom-16 right-0 origin-bottom-right transition-all duration-300 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-            <div className="w-96 max-w-[calc(100vw-1.5rem)] h-[min(580px,calc(100vh-6rem))] rounded-md border border-border-light bg-background-primary overflow-hidden flex flex-col">
+        <div className={`absolute bottom-16 right-0 origin-bottom-right transition duration-150 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+            <div className="w-96 max-w-[calc(100vw-1.5rem)] h-[min(580px,calc(100vh-6rem))] rounded border border-border bg-background-primary shadow-md overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-3.5 border-b border-border-light bg-primary text-white">
                     <button type="button" onClick={() => {
@@ -124,18 +125,18 @@ const AuraChatWidgetPanel = () => {
                     }} className="flex items-center gap-3 min-w-0 text-left group">
                         <div className="relative shrink-0">
                             <div className="relative flex h-10 w-10 items-center justify-center">
-                                <Sparkles className="w-5 h-5 text-white" strokeWidth={2} />
+                                <Sparkles className="w-5 h-5 text-white" strokeWidth={1.5} aria-hidden />
                             </div>
                         </div>
                         <div className="leading-tight min-w-0">
                             <div className="text-sm font-semibold tracking-tight truncate">{t("aura")}</div>
-                            <div className="text-xs text-primary/90 truncate">{t("your_marketplace_assistant")}</div>
+                            <div className="text-xs text-secondary-300 truncate">{t("your_marketplace_assistant")}</div>
                         </div>
                     </button>
                     <div className="flex items-center gap-1.5 shrink-0">
-                        {AI_AGENT_MODE_ENABLED ? <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`rounded-sm px-2.5 py-1 text-xs font-semibold transition ${agentMode ? 'bg-background-primary/15 text-white ring-1 ring-white/25' : 'bg-background-primary/5 text-primary/80 hover:bg-background-primary/10'}`}>{t("agent")}</button> : null}
-                        <button type="button" onClick={() => setIsOpen(false)} className="p-2 rounded hover:bg-background-primary/10 text-white/80 hover:text-white transition-colors" aria-label={t("close")}>
-                            <X className="w-4 h-4" />
+                        {AI_AGENT_MODE_ENABLED ? <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`rounded-sm px-2.5 py-1 text-xs font-semibold transition ${agentMode ? 'bg-primary-700 text-white ring-1 ring-primary-600' : 'text-secondary-300 hover:bg-primary-700 hover:text-white'}`}>{t("agent")}</button> : null}
+                        <button type="button" onClick={() => setIsOpen(false)} className="p-2 rounded text-secondary-300 transition-colors hover:bg-primary-700 hover:text-white" aria-label={t("close")}>
+                            <X className="w-4 h-4" strokeWidth={1.5} aria-hidden />
                         </button>
                     </div>
                 </div>
@@ -147,10 +148,10 @@ const AuraChatWidgetPanel = () => {
                             const isUser = m.role === 'user';
                             return <div key={m.id} className={`flex gap-2.5 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
                                 <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded border ${isUser ? 'border-border-light bg-background-primary text-text-secondary' : 'border-border-light bg-background-secondary text-primary'}`}>
-                                    {isUser ? <UserRound className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
+                                    {isUser ? <UserRound className="h-3.5 w-3.5" strokeWidth={1.5} /> : <Bot className="h-3.5 w-3.5" strokeWidth={1.5} />}
                                 </div>
                                 <div className={`min-w-0 max-w-[88%] ${isUser ? 'text-right' : ''}`}>
-                                    <div className={`inline-block rounded-md px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-white rounded-tr-sm' : 'border border-border bg-background-tertiary text-text-primary rounded-tl-sm'}`}>
+                                    <div className={`inline-block rounded px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-white rounded-tr-sm' : 'border border-border bg-background-tertiary text-text-primary rounded-tl-sm'}`}>
                                         {m.typing ? <div className="flex items-center gap-1.5 py-0.5">
                                             <span className="w-1.5 h-1.5 rounded-full bg-primary" style={{
                                                 animationDelay: '0ms'
@@ -180,19 +181,19 @@ const AuraChatWidgetPanel = () => {
 
                     <div className="shrink-0 border-t border-border-light bg-background-primary p-3">
                         <div className="flex items-end gap-2">
-                            <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded-md border border-border-light bg-background-secondary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary focus:bg-background-primary" rows={2} />
-                            <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 w-11" aria-label={t("send")}>
-                                <Send className="w-4 h-4" />
+                            <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded border border-border-light bg-background-secondary px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-border-focus focus:border-primary focus:bg-background-primary" rows={2} />
+                            <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className={`${buttonClasses()} w-11`} aria-label={t("send")}>
+                                <Send className="w-4 h-4" strokeWidth={1.5} />
                             </button>
                         </div>
-                        <p className="mt-2 text-xs text-text-muted leading-snug">{t("your_last_conversation_is_stored_on_this")}</p>
+                        <p className="mt-2 text-sm text-text-muted">{t("your_last_conversation_is_stored_on_this")}</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <button type="button" onClick={() => setIsOpen(v => !v)} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 relative w-14" aria-label={isOpen ? 'Close Aura chat' : 'Open Aura chat'} aria-expanded={isOpen}>
-            {isOpen ? <X className="w-6 h-6 relative z-10" /> : <MessageCircle className="w-6 h-6 relative z-10" />}
+        <button type="button" onClick={() => setIsOpen(v => !v)} className={`${buttonClasses()} relative w-14`} aria-label={isOpen ? 'Close Aura chat' : 'Open Aura chat'} aria-expanded={isOpen}>
+            {isOpen ? <X className="w-6 h-6 relative z-10" strokeWidth={1.5} /> : <MessageCircle className="w-6 h-6 relative z-10" strokeWidth={1.5} />}
         </button>
 
         {showUpgradeModal && (

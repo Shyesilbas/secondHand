@@ -9,7 +9,7 @@ import {listingService} from '../../listing/services/listingService.js';
 import {Loader2} from 'lucide-react';
 import { Card } from '../../common/components/ui/index.js';
 
-const listingFooterClass = 'group/footer w-full rounded border border-border-light bg-background-tertiary px-3 py-2.5 text-left transition-colors hover:border-primary/50 hover:bg-primary/5';
+const listingFooterClass = 'group/footer w-full rounded border border-border-light bg-background-tertiary px-3 py-2.5 text-left transition-colors hover:border-card-border-hover hover:bg-background-secondary';
 const labelBlock = (review, t) => <>
  <span className="shrink-0 text-xs font-semibold text-text-muted">{t("listed_item")}</span>
  <span className="min-w-0 truncate font-medium text-text-primary">{review.listingTitle || '—'}</span>
@@ -30,10 +30,10 @@ function ProfileReviewedListingLink({
  const row = <div className="relative flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
  {labelBlock(review, t)}
  <span className="sr-only">{t("open_listing")}</span>
- {busy ? <Loader2 className="absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-primary" aria-hidden /> : <span className="pointer-events-none ml-auto text-xs font-semibold text-primary opacity-0 transition-opacity group-hover/footer:opacity-100">{t("view")}</span>}
+ {busy ? <Loader2 className="absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-primary" aria-hidden strokeWidth={1.5} /> : <span className="pointer-events-none ml-auto text-xs font-semibold text-primary opacity-0 transition-opacity group-hover/footer:opacity-100">{t("view")}</span>}
  </div>;
  if (listingId) {
- return <Link to={ROUTES.LISTING_DETAIL(listingId)} className={`${listingFooterClass} block focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary/40`}>
+ return <Link to={ROUTES.LISTING_DETAIL(listingId)} className={`${listingFooterClass} block focus-visible:outline focus-visible:ring-2 focus-visible:ring-border-focus`}>
  {row}
  </Link>;
  }
@@ -64,11 +64,11 @@ const ReviewCard = ({
  t
  } = useTranslation();
  const isProfile = variant === 'profile';
- const cardClass = isProfile ? 'transition-all duration-300 hover:border-primary/50' : '';
+ const cardClass = isProfile ? 'transition-colors duration-150 hover:border-card-border-hover' : '';
  const initials = <span className={isProfile ? 'text-sm font-semibold text-white' : 'text-sm font-medium text-text-secondary'}>
  {review.reviewerName?.[0]?.toUpperCase() || '?'}
  </span>;
- const avatar = isProfile ? <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-primary text-white ring-2 ring-border-light">
+ const avatar = isProfile ? <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-primary text-white">
  {initials}
  </div> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background-tertiary">{initials}</div>;
  const nameLine = `${review.reviewerName || ''} ${review.reviewerSurname || ''}`.trim() || 'Buyer';
@@ -76,7 +76,7 @@ const ReviewCard = ({
  return <Card as="article" padding={isProfile ? 'normal' : 'compact'} border="light" shadow={false} className={cardClass}>
  <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
  <div className="flex min-w-0 items-start gap-3">
- {review.reviewerId && isProfile ? <Link to={ROUTES.USER_PROFILE(review.reviewerId)} className="shrink-0 rounded focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary/50" title={t("view_reviewer_profile")}>
+ {review.reviewerId && isProfile ? <Link to={ROUTES.USER_PROFILE(review.reviewerId)} className="shrink-0 rounded focus-visible:outline focus-visible:ring-2 focus-visible:ring-border-focus" title={t("view_reviewer_profile")}>
  {avatar}
  </Link> : avatar}
  <div className="min-w-0">

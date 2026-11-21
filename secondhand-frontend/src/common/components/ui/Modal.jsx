@@ -77,7 +77,7 @@ const Modal = ({ isOpen, onClose, title, description, header, footer, size = 'md
  type="button"
  onClick={onClose}
  aria-label="Close"
- className="rounded-md p-2 text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+ className="rounded p-2 text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
  >
  <X className="h-4 w-4" strokeWidth={1.5} />
  </button>

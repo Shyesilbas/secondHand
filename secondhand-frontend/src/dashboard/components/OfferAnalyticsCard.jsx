@@ -26,7 +26,7 @@ const OfferAnalyticsCard = ({ offerStats }) => {
     <dl className={`grid grid-cols-2 gap-4 ${isSeller ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
       {items.map(item => (
         <div key={item.id}>
-          <dt className="text-xs text-text-tertiary">{item.label}</dt>
+          <dt className="text-sm text-text-tertiary">{item.label}</dt>
           <dd className={`mt-1 text-xl font-semibold tabular-nums ${item.warn ? 'text-status-warning-text' : 'text-text-primary'}`}>
             {item.value}
           </dd>

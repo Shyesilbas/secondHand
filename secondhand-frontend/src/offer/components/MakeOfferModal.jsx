@@ -146,7 +146,7 @@ const MakeOfferModal = ({
  {recommendedOffers.map(rec => {
  const active = selectedPreset === rec.key;
  const saveVsList = listTotal != null ? roundMoney(listTotal - rec.amount) : null;
- return <button key={rec.key} type="button" aria-pressed={active} onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded-md border px-4 py-3 text-left transition-colors ${active ? 'border-primary ring-1 ring-primary bg-background-secondary' : 'border-border hover:border-card-border-hover'}`}>
+ return <button key={rec.key} type="button" aria-pressed={active} onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded border px-4 py-3 text-left transition-colors ${active ? 'border-accent-teal ring-1 ring-accent-teal bg-background-secondary' : 'border-border hover:border-card-border-hover'}`}>
  <span className="text-sm font-medium text-text-secondary">{rec.title}</span>
  <span className="mt-1 text-lg font-semibold tabular-nums text-text-price">{formatCurrency(rec.amount, currency)}</span>
  <span className="mt-1 text-xs text-text-tertiary">
@@ -156,7 +156,7 @@ const MakeOfferModal = ({
  </button>;
  })}
  </div>
- <p className="mt-2 text-xs text-text-tertiary">{t("each_option_fills_your_offer_with_a_tota")}</p>
+ <p className="mt-2 text-sm text-text-tertiary">{t("each_option_fills_your_offer_with_a_tota")}</p>
  </fieldset> : listingUnitPrice == null ? <p className="text-sm text-status-warning-text">{t("list_price_unavailable_enter_your_total_")}</p> : null}
 
  <p className="border-t border-border-light pt-4 text-sm text-text-secondary">{t("offering_for")}<span className="font-medium tabular-nums text-text-primary">{qtyNum}</span>{t("item_s")}{previewTotal != null && <>

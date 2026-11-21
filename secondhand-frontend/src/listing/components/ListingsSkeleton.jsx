@@ -1,5 +1,5 @@
 import { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
-import { LISTING_GRID_COLUMNS, LISTING_GRID_GAP } from './ListingGrid.jsx';
+import { LISTING_GRID_COLUMNS, LISTING_GRID_GAP } from './listingGridLayout.js';
 
 // Same columns and gap as ListingGrid, so results replace the placeholders in place.
 const ListingsSkeleton = () => (

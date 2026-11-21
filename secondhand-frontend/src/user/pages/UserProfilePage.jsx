@@ -10,11 +10,13 @@ import { useUserListings } from '../hooks/useUserListings.js';
 import { usePagedUserReceivedReviews, useUserReviewStats } from '../../reviews/index.js';
 import { useUserFavoriteLists, FavoriteListCard, FavoriteListModal } from '../../favoritelist/index.js';
 import ListingCard from '../../listing/components/ListingCard.jsx';
+import { LISTING_GRID_COLUMNS, LISTING_GRID_GAP } from '../../listing/components/listingGridLayout.js';
 import UserProfileHeader, { UserProfileHeaderSkeleton } from '../components/UserProfileHeader.jsx';
 import UserReviews from '../components/UserReviews.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import Skeleton, { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
 import Tabs from '../../common/components/ui/Tabs.jsx';
@@ -24,7 +26,7 @@ import { useGreatSellerStatus } from '../hooks/useGreatSellerStatus.js';
 
 // 12 fills the 2, 3 and 4 column grids without a ragged last row.
 const LISTINGS_PAGE_SIZE = 12;
-const LISTING_GRID = 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4';
+const LISTING_GRID = `grid ${LISTING_GRID_COLUMNS} ${LISTING_GRID_GAP}`;
 const LIST_SKELETON_KEYS = ['a', 'b', 'c'];
 
 const TABS = [
@@ -50,7 +52,7 @@ const ProfileTabs = ({ activeTab, onChange, counts }) => {
  const { t } = useTranslation();
  return (
  <Tabs
-  className="mb-5"
+  className="mb-6"
   activeKey={activeTab}
   onChange={onChange}
   ariaLabel={t('profile_sections', 'Profil bölümleri')}
@@ -108,11 +110,11 @@ const UserProfilePage = () => {
 
  if (userLoading || (!isOwnProfile && blockLoading)) {
  return (
- <div className="min-h-screen bg-background-secondary">
- <PageContainer className="space-y-6 py-6 sm:py-8" aria-busy="true" aria-label={t("loading_profile", "Profil yükleniyor")}>
+ <div className="min-h-screen bg-background-page">
+ <PageContainer className="space-y-6 py-8" aria-busy="true" aria-label={t("loading_profile", "Profil yükleniyor")}>
  <UserProfileHeaderSkeleton />
  <Skeleton className="h-11 w-full" />
- <SkeletonGrid count={LISTINGS_PAGE_SIZE} columns={LISTING_GRID} />
+ <SkeletonGrid count={LISTINGS_PAGE_SIZE} columns={LISTING_GRID_COLUMNS} gap={LISTING_GRID_GAP} />
  </PageContainer>
  </div>
  );
@@ -120,9 +122,9 @@ const UserProfilePage = () => {
 
  if (!isOwnProfile && blockStatus?.blockedMe) {
  return (
- <div className="min-h-screen bg-background-secondary">
+ <div className="min-h-screen bg-background-page">
  <PageContainer className="py-10">
- <div className="mx-auto max-w-md rounded border border-border bg-background-primary p-6 text-center">
+ <div className="mx-auto max-w-md rounded border border-border-light bg-background-primary p-6 text-center shadow-sm">
  <Ban className="mx-auto h-8 w-8 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  <p className="mt-3 text-base font-medium text-text-primary">
  {t('user_blocked_you', 'Bu kullanıcı sizi engelledi.')}
@@ -142,8 +144,8 @@ const UserProfilePage = () => {
 
  if (userError || !user) {
  return (
- <div className="flex min-h-screen items-center justify-center bg-background-secondary p-4">
- <div className="w-full max-w-sm rounded border border-border bg-background-primary p-6 text-center">
+ <div className="flex min-h-screen items-center justify-center bg-background-page p-4">
+ <div className="w-full max-w-sm rounded border border-border-light bg-background-primary p-6 text-center shadow-sm">
  <AlertCircle className="mx-auto mb-3 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
  <h1 className="mb-1 text-lg font-semibold text-text-primary">
  {t("user_not_found", "Kullanıcı bulunamadı")}
@@ -170,7 +172,7 @@ const UserProfilePage = () => {
  };
 
  return (
- <div className="min-h-screen bg-background-secondary pb-16">
+ <div className="min-h-screen bg-background-page pb-16">
  <PageContainer className="py-6 sm:py-8">
  <UserProfileHeader
  user={user}
@@ -182,7 +184,7 @@ const UserProfilePage = () => {
 
  <div className="mt-8">
  {isBlocked ? (
- <div className="rounded border border-border bg-background-primary p-8 text-center">
+ <div className="rounded border border-border-light bg-background-primary p-8 text-center shadow-sm">
  <Ban className="mx-auto h-8 w-8 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  <p className="mt-3 text-base font-medium text-text-primary">
  {blockedMe ? t('user_blocked_you', 'Bu kullanıcı sizi engelledi.') : t('you_blocked_user', 'Bu kullanıcıyı engellediniz.')}
@@ -201,13 +203,9 @@ const UserProfilePage = () => {
 
  {activeTab === 'listings' && (
  listingsLoading ? (
- <SkeletonGrid count={LISTINGS_PAGE_SIZE} columns={LISTING_GRID} />
+ <SkeletonGrid count={LISTINGS_PAGE_SIZE} columns={LISTING_GRID_COLUMNS} gap={LISTING_GRID_GAP} />
  ) : listingsError ? (
- <Alert
- type="error"
- message={t("failed_to_load_listings", "İlanlar yüklenemedi.")}
- action={<Button variant="secondary" size="sm" onClick={() => refetchListings()}>{t("try_again", "Tekrar dene")}</Button>}
- />
+ <ErrorState title={t("failed_to_load_listings", "İlanlar yüklenemedi")} onRetry={refetchListings} />
  ) : listings.length === 0 ? (
  <EmptyState
  icon={Package}
@@ -269,7 +267,7 @@ const UserProfilePage = () => {
  {listsLoading ? (
  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
  {LIST_SKELETON_KEYS.map(k => (
- <div key={k} className="space-y-3 rounded border border-border bg-background-primary p-4">
+ <div key={k} className="space-y-3 rounded border border-border-light bg-background-primary p-4 shadow-sm">
  <Skeleton className="aspect-4/3 w-full" />
  <Skeleton className="h-4 w-3/4" />
  <Skeleton className="h-4 w-1/2" />

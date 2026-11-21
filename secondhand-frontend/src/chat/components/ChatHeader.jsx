@@ -63,10 +63,10 @@ const ChatHeader = ({
         <div className="flex items-center space-x-4">
             <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-text-muted'}`}></div>
             <div>
-                {profileId ? <button type="button" onClick={handleUserClick} className="font-semibold text-base hover:text-text-secondary transition-all duration-300 ease-in-out tracking-tight" title={t("view_user_profile")}>
+                {profileId ? <button type="button" onClick={handleUserClick} className="font-semibold text-base hover:text-text-secondary transition-colors duration-150 ease-in-out tracking-tight" title={t("view_user_profile")}>
                     {getHeaderName()}
                 </button> : <span className="font-semibold text-base tracking-tight">{getHeaderName()}</span>}
-                {Boolean(listingLabel) && selectedChatRoom?.listingId && <button onClick={handleListingTitleClick} className="block text-xs text-text-tertiary hover:text-text-secondary hover:underline cursor-pointer transition-all duration-300 ease-in-out mt-0.5 tracking-tight" title={`View listing: ${listingLabel}`}>
+                {Boolean(listingLabel) && selectedChatRoom?.listingId && <button onClick={handleListingTitleClick} className="block text-xs text-text-tertiary hover:text-text-secondary hover:underline cursor-pointer transition-colors duration-150 ease-in-out mt-0.5 tracking-tight" title={`View listing: ${listingLabel}`}>
                     {listingLabel.length > CHAT_DEFAULTS.MAX_LISTING_TITLE_PREVIEW ? `${listingLabel.substring(0, CHAT_DEFAULTS.MAX_LISTING_TITLE_PREVIEW)}...` : listingLabel}
                 </button>}
                 <p className="text-xs font-medium text-text-tertiary mt-1 tracking-tight">
@@ -80,29 +80,29 @@ const ChatHeader = ({
                     type="button"
                     onClick={onOpenOfferModal}
                     disabled={!canMakeOffers || selectedChatRoom?.messagingDisabled}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-background-tertiary hover:bg-secondary-200 text-text-primary font-semibold text-sm rounded border border-card-border-hover transition-all"
+                    className="flex items-center gap-1 px-3 py-1.5 bg-background-tertiary hover:bg-secondary-200 text-text-primary font-semibold text-sm rounded border border-border transition-colors duration-150"
                     title={t("make_offer")}
                 >
                     {t("offer")}
                 </button>
             )}
             {(onDeleteConversation || profileId) && <div className="relative">
-                <button type="button" onClick={() => setShowOptions(!showOptions)} className="text-text-secondary hover:text-text-primary hover:bg-background-tertiary transition-all duration-300 ease-in-out p-2 rounded" title={t("options")}>
-                    <EllipsisVerticalIcon className="w-5 h-5" />
+                <button type="button" onClick={() => setShowOptions(!showOptions)} className="text-text-secondary hover:text-text-primary hover:bg-background-tertiary transition-colors duration-150 ease-in-out p-2 rounded" title={t("options")}>
+                    <EllipsisVerticalIcon className="w-5 h-5" strokeWidth={1.5} />
                 </button>
-                {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border-light rounded shadow-md z-10 min-w-36">
-                    {profileId && <button type="button" onClick={handleBlockUser} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
-                        <Ban className="w-4 h-4" />
+                {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border rounded shadow-md z-10 min-w-36">
+                    {profileId && <button type="button" onClick={handleBlockUser} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-background-secondary transition-colors duration-150 ease-in-out rounded mx-1 my-1 tracking-tight">
+                        <Ban className="w-4 h-4" strokeWidth={1.5} />
                         <span>{t('block_user', 'Kullanıcıyı Engelle')}</span>
                     </button>}
-                    {onDeleteConversation && <button type="button" onClick={handleDeleteConversation} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
-                        <TrashIcon className="w-4 h-4" />
+                    {onDeleteConversation && <button type="button" onClick={handleDeleteConversation} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-colors duration-150 ease-in-out rounded mx-1 my-1 tracking-tight">
+                        <TrashIcon className="w-4 h-4" strokeWidth={1.5} />
                         <span>{t("delete_chat")}</span>
                     </button>}
                 </div>}
             </div>}
-            <button type="button" onClick={onClose} className="text-text-secondary hover:text-text-primary hover:bg-background-tertiary transition-all duration-300 ease-in-out p-2 rounded">
-                <XMarkIcon className="w-5 h-5" />
+            <button type="button" onClick={onClose} className="text-text-secondary hover:text-text-primary hover:bg-background-tertiary transition-colors duration-150 ease-in-out p-2 rounded">
+                <XMarkIcon className="w-5 h-5" strokeWidth={1.5} />
             </button>
         </div>
     </div>;

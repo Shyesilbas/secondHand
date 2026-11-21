@@ -2,7 +2,7 @@ import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Star } from 'lucide-react';
+
 import PageHeader from '../../common/components/ui/PageHeader.jsx';
 import { ReviewsList, ReviewStats, useReviews, useReviewsByUser, useUserReviewStats } from '../index.js';
 const UserReviewsPage = () => {
@@ -72,7 +72,6 @@ const UserReviewsPage = () => {
  };
  return <PageContainer className="py-8">
  <PageHeader
- icon={Star}
  title={getPageTitle()}
  subtitle={isReceivedReviews ? t("see_reviews_you_have_received") : t("see_reviews_you_have_given")}
  bottomBorder

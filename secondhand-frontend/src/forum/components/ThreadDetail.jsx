@@ -5,7 +5,8 @@ import { CommentItem, CommentSkeleton } from './CommentItem.jsx';
 import { FORUM_MESSAGES, FORUM_REACTIONS, FORUM_THREAD_STATUS_OPTIONS, FORUM_THREAD_STATUSES } from '../forumConstants.js';
 import { formatForumDateTime } from '../utils/forumDateFormat.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-export const ThreadDetailSkeleton = () => <div className="rounded-md border border-border-light bg-background-primary overflow-hidden animate-pulse">
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
+export const ThreadDetailSkeleton = () => <div className="rounded border border-border-light bg-background-primary overflow-hidden animate-pulse">
  <div className="px-6 py-5 border-b border-border-light">
  <div className="h-6 w-2/3 bg-background-tertiary rounded mb-3" />
  <div className="h-4 w-1/3 bg-background-tertiary rounded" />
@@ -56,14 +57,14 @@ export const ThreadDetail = ({
  }, [currentUserId, thread?.userId]);
  const canManage = isOwner && !!thread?.id && !String(thread?.id || '').startsWith('temp-');
  if (!threadId) {
- return <div className="rounded-md border border-border bg-background-secondary p-10 text-center shadow-sm">
+ return <div className="rounded border border-border bg-background-secondary p-10 text-center shadow-sm">
  <MessageCircle className="mx-auto mb-5 block h-5 w-5 shrink-0 text-secondary-300" strokeWidth={1.5} aria-hidden />
  <p className="text-base font-semibold text-text-primary">{FORUM_MESSAGES.SELECT_THREAD_TITLE}</p>
  <p className="text-sm text-text-muted mt-1.5 max-w-xs mx-auto">{FORUM_MESSAGES.SELECT_THREAD_DESCRIPTION}</p>
  </div>;
  }
  const commentCount = commentsTree?.roots?.length || 0;
- return <div className="rounded-md border border-border bg-background-primary shadow-sm overflow-hidden">
+ return <div className="rounded border border-border-light bg-background-primary shadow-sm overflow-hidden">
 
  {/* ── Thread Header ─────────────────────────────────── */}
  <div className="px-6 py-5 border-b border-border-light">
@@ -74,7 +75,7 @@ export const ThreadDetail = ({
  </h2>
  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-muted">
  {thread?.authorDisplayName && <span className="inline-flex items-center gap-1.5">
- <User className="w-3 h-3" />
+ <User className="w-3 h-3" strokeWidth={1.5} />
  <span className="font-medium text-text-secondary">{thread.authorDisplayName}</span>
  </span>}
  <span className="tabular-nums">{formatForumDateTime(thread?.createdAt)}</span>
@@ -90,13 +91,13 @@ export const ThreadDetail = ({
  } finally {
  setStatusUpdating(false);
  }
- }} disabled={statusUpdating} className="h-9 rounded border border-border-light bg-background-primary px-3 text-sm font-medium text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-card-border-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all">
+ }} disabled={statusUpdating} className="h-9 rounded border border-border-light bg-background-primary px-3 text-sm font-medium text-text-secondary focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-card-border-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition">
  {FORUM_THREAD_STATUS_OPTIONS.map(statusOption => <option key={statusOption.id} value={statusOption.id}>{statusOption.label}</option>)}
  </select>
  <button type="button" onClick={() => showConfirmation(t("delete"), FORUM_MESSAGES.DELETE_THREAD_CONFIRM, () => onDeleteThread?.(threadId), {
  confirmLabel: t("delete")
- })} className="h-9 w-9 rounded border border-border-light bg-background-primary hover:bg-background-secondary hover:border-border text-text-muted hover:text-status-error-text inline-flex items-center justify-center transition-all duration-200" title={t("delete")}>
- <Trash2 className="w-4 h-4" />
+ })} className="h-9 w-9 rounded border border-border-light bg-background-primary hover:bg-background-secondary hover:border-border text-text-muted hover:text-status-error-text inline-flex items-center justify-center transition-colors duration-150" title={t("delete")}>
+ <Trash2 className="w-4 h-4" strokeWidth={1.5} />
  </button>
  </div>}
  </div>
@@ -110,14 +111,14 @@ export const ThreadDetail = ({
 
  {/* Voting bar */}
  <div className="mt-5 flex items-center gap-1">
- <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded border transition-all duration-200 ${isLiked ? 'border-card-border-hover bg-primary text-text-inverse' : 'border-border-light bg-background-primary text-text-muted hover:text-text-primary hover:border-border hover:bg-background-secondary'}`} onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.LIKE)} title={t("upvote")}>
- <ChevronUp className="w-5 h-5" />
+ <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded border transition-colors duration-150 ${isLiked ? 'border-primary bg-primary text-text-inverse' : 'border-border-light bg-background-primary text-text-muted hover:text-text-primary hover:border-border hover:bg-background-secondary'}`} onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.LIKE)} title={t("upvote")}>
+ <ChevronUp className="w-5 h-5" strokeWidth={1.5} />
  </button>
  <span className={`inline-flex items-center justify-center min-w-9 h-9 text-sm font-semibold tabular-nums ${netVotes > 0 ? 'text-text-primary' : netVotes < 0 ? 'text-status-error' : 'text-text-muted'}`}>
  {netVotes}
  </span>
- <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded border transition-all duration-200 ${isDisliked ? 'border-border bg-background-secondary text-status-error-text' : 'border-border-light bg-background-primary text-text-muted hover:text-status-error-text hover:border-border hover:bg-background-secondary'}`} onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.DISLIKE)} title={t("downvote")}>
- <ChevronDown className="w-5 h-5" />
+ <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded border transition-colors duration-150 ${isDisliked ? 'border-border bg-background-secondary text-status-error-text' : 'border-border-light bg-background-primary text-text-muted hover:text-status-error-text hover:border-border hover:bg-background-secondary'}`} onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.DISLIKE)} title={t("downvote")}>
+ <ChevronDown className="w-5 h-5" strokeWidth={1.5} />
  </button>
  </div>
  </div>
@@ -134,18 +135,18 @@ export const ThreadDetail = ({
  {draftComment?.parentCommentId ? <span className="text-xs text-text-primary font-medium ml-2">{t("replying")}<button type="button" className="ml-1.5 text-xs text-text-muted hover:text-text-secondary" onClick={() => onReplyTarget?.(null)}>{t("cancel")}</button>
  </span> : null}
  </div>
- <button type="button" onClick={() => setComposerOpen(v => !v)} className={`h-9 w-9 rounded border inline-flex items-center justify-center transition-all duration-200 ${composerOpen ? 'border-card-border-hover bg-primary text-text-inverse' : 'border-border-light bg-background-primary hover:bg-secondary-light text-text-muted hover:text-text-secondary'}`} title={composerOpen ? FORUM_MESSAGES.CLOSE : FORUM_MESSAGES.WRITE_COMMENT}>
- {composerOpen ? <X className="w-4 h-4" /> : <MessageSquarePlus className="w-4 h-4" />}
+ <button type="button" onClick={() => setComposerOpen(v => !v)} className={`h-9 w-9 rounded border inline-flex items-center justify-center transition-colors duration-150 ${composerOpen ? 'border-primary bg-primary text-text-inverse' : 'border-border-light bg-background-primary hover:bg-background-tertiary text-text-muted hover:text-text-secondary'}`} title={composerOpen ? FORUM_MESSAGES.CLOSE : FORUM_MESSAGES.WRITE_COMMENT}>
+ {composerOpen ? <X className="w-4 h-4" strokeWidth={1.5} /> : <MessageSquarePlus className="w-4 h-4" strokeWidth={1.5} />}
  </button>
  </div>
 
  {/* Comment composer */}
  {composerOpen && !draftComment?.parentCommentId && <div className="px-6 pb-5">
- <div className="rounded border border-border-light bg-secondary-light/60 overflow-hidden focus-within:border-card-border-hover focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-200">
+ <div className="rounded border border-border-light bg-background-secondary overflow-hidden focus-within:border-card-border-hover focus-within:ring-2 focus-within:ring-border-focus transition duration-150">
  <textarea value={draftComment?.content || ''} onChange={e => onDraftChange?.(e.target.value)} placeholder={t("share_your_thoughts")} className="w-full min-h-24 bg-transparent p-4 text-sm text-text-primary placeholder-text-muted focus:outline-none resize-none" />
  <div className="px-4 py-3 border-t border-border-light bg-background-primary flex items-center justify-end">
- <button type="button" onClick={onSubmitComment} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
- <Send className="w-3.5 h-3.5" />{t("post")}</button>
+ <button type="button" onClick={onSubmitComment} className={buttonClasses('primary', 'sm')}>
+ <Send className="w-3.5 h-3.5" strokeWidth={1.5} />{t("post")}</button>
  </div>
  </div>
  </div>}
@@ -173,7 +174,7 @@ export const ThreadDetail = ({
  </div>}
 
  {commentsHasMore && <div className="px-6 py-4 border-t border-border-light flex justify-center">
- <button type="button" onClick={onLoadMoreComments} disabled={commentsLoading} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4">
+ <button type="button" onClick={onLoadMoreComments} disabled={commentsLoading} className={buttonClasses('secondary')}>
  {commentsLoading ? 'Loading...' : FORUM_MESSAGES.LOAD_MORE}
  </button>
  </div>}

@@ -134,7 +134,7 @@ const LocationFields = ({
                 <p className="text-sm font-semibold text-text-primary">
                   {t("saved_addresses", "Kayıtlı Adreslerinizden Seçin")}
                 </p>
-                <p className="text-xs text-text-secondary">
+                <p className="text-sm text-text-secondary">
                   {t("saved_addresses_hint", "Konum bilgilerini otomatik doldurmak için tıklayın.")}
                 </p>
               </div>
@@ -189,7 +189,7 @@ const LocationFields = ({
             {t("city_i_l", "City")}<span className="text-status-error">*</span>
           </label>
           {loadingCities ? (
-            <Skeleton className="h-10 w-full rounded-md" />
+            <Skeleton className="h-10 w-full rounded" />
           ) : (
             <div className="relative">
               <select
@@ -216,7 +216,7 @@ const LocationFields = ({
             {t("district_i_l_e", "District")}<span className="text-status-error">*</span>
           </label>
           {loadingDistricts ? (
-            <Skeleton className="h-10 w-full rounded-md" />
+            <Skeleton className="h-10 w-full rounded" />
           ) : (
             <div className="relative">
               <select
@@ -245,7 +245,7 @@ const LocationFields = ({
             <span className="font-normal text-text-muted">({t("optional", "Optional")})</span>
           </label>
           {loadingNeighborhoods ? (
-            <Skeleton className="h-10 w-full rounded-md" />
+            <Skeleton className="h-10 w-full rounded" />
           ) : (
             <div className="relative">
               <select

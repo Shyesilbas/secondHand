@@ -27,7 +27,7 @@ const statusMeta = {
 };
 
 export const ThreadCardSkeleton = () => (
- <div className="rounded border border-border-light bg-background-primary p-4 animate-pulse">
+ <div className="rounded border border-border-light shadow-sm bg-background-primary p-4 animate-pulse">
  <div className="flex items-center gap-2 mb-3">
  <div className="h-5 w-16 bg-background-tertiary rounded-full" />
  <div className="h-4 w-12 bg-background-tertiary rounded" />
@@ -58,10 +58,10 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
  <button
  type="button"
  onClick={() => onSelect?.(thread?.id)}
- className={`group w-full text-left rounded border bg-background-primary transition-all duration-200 ${
+ className={`group w-full text-left rounded border bg-background-primary transition-colors duration-150 ${
  isSelected
- ? 'border-card-border-hover ring-2 ring-primary/10'
- : 'border-border-light hover:border-border-DEFAULT'
+ ? 'border-accent-teal ring-1 ring-accent-teal'
+ : 'border-border-light hover:border-border'
  }`}
  >
  <div className="p-4">
@@ -69,7 +69,7 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
  <div className="flex items-center justify-between gap-2 mb-2.5">
  <div className="flex items-center gap-2">
  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-semibold border ${catMeta.color}`}>
- <CatIcon className="w-3 h-3" />
+ <CatIcon className="w-3 h-3" strokeWidth={1.5} />
  {catMeta.label}
  </span>
  <span className="inline-flex items-center gap-1.5 text-xs text-text-muted font-medium">
@@ -80,7 +80,7 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
  </div>
 
  {/* Title */}
- <h3 className={`text-sm font-medium text-text-primary tracking-tight line-clamp-2 mb-1.5 transition-colors duration-200 ${ isSelected ? '' : ' group-' }`}>
+ <h3 className={`text-sm font-medium text-text-primary tracking-tight line-clamp-2 mb-1.5 transition-colors duration-150 ${ isSelected ? '' : ' group-' }`}>
  {thread?.title || 'Untitled'}
  </h3>
 
@@ -94,18 +94,18 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
  <div className="flex items-center gap-3">
  {/* Vote display */}
  <div className="inline-flex items-center gap-0.5 text-xs">
- <ChevronUp className={`w-3.5 h-3.5 ${isLiked ? 'text-text-primary' : 'text-text-muted'}`} />
+ <ChevronUp className={`w-3.5 h-3.5 ${isLiked ? 'text-text-primary' : 'text-text-muted'}`} strokeWidth={1.5} />
  <span className={`font-semibold tabular-nums min-w-4 text-center ${
  netVotes > 0 ? 'text-text-primary' : netVotes < 0 ? 'text-status-error' : 'text-text-muted'
  }`}>
  {netVotes}
  </span>
- <ChevronDown className={`w-3.5 h-3.5 ${isDisliked ? 'text-status-error' : 'text-text-muted'}`} />
+ <ChevronDown className={`w-3.5 h-3.5 ${isDisliked ? 'text-status-error' : 'text-text-muted'}`} strokeWidth={1.5} />
  </div>
 
  {/* Comment count placeholder */}
  <span className="inline-flex items-center gap-1 text-xs text-text-muted">
- <MessageCircle className="w-3 h-3" />
+ <MessageCircle className="w-3 h-3" strokeWidth={1.5} />
  <span className="tabular-nums font-medium">{Number(thread?.commentCount) || 0}</span>
  </span>
  </div>
@@ -118,7 +118,7 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
  </>
  )}
  <span className="inline-flex items-center gap-1 tabular-nums whitespace-nowrap">
- <Clock className="w-3 h-3" />
+ <Clock className="w-3 h-3" strokeWidth={1.5} />
  {formatForumDate(thread?.createdAt)}
  </span>
  </div>

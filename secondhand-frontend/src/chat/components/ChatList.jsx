@@ -4,6 +4,7 @@ import { MessageCircle, Search } from 'lucide-react';
 import ChatRoomListItem from './ChatRoomListItem.jsx';
 import { CHAT_MESSAGES } from '../chatConstants.js';
 import { Button, SkeletonList } from '../../common/components/ui/index.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 
 const ChatList = ({
  chatRooms,
@@ -47,11 +48,11 @@ const ChatList = ({
  </div>
  
  <div className="relative group">
- <input type="text" placeholder={t("search_conversations")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-4 py-3 pl-11 text-sm border border-border-light rounded focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary bg-background-primary transition-all duration-300 ease-in-out tracking-tight" />
+ <input type="text" placeholder={t("search_conversations")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-4 py-3 pl-11 text-sm border border-border-light rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary bg-background-primary transition duration-150 ease-in-out tracking-tight" />
  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
- <Search className="h-4 w-4 text-text-muted transition-colors duration-300 ease-in-out group-focus-within:text-primary" />
+ <Search className="h-4 w-4 text-text-muted transition-colors duration-150 ease-in-out group-focus-within:text-primary" strokeWidth={1.5} />
  </div>
- {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute inset-y-0 right-0 pr-3.5 flex items-center hover:bg-background-secondary rounded-r transition-colors duration-300 ease-in-out">
+ {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute inset-y-0 right-0 pr-3.5 flex items-center hover:bg-background-secondary rounded-r transition-colors duration-150 ease-in-out">
  <svg className="h-4 w-4 text-text-muted hover:text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
  </svg>
@@ -66,7 +67,7 @@ const ChatList = ({
  <MessageCircle className="mb-5 h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
  <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("no_messages_yet")}</h3>
  <p className="text-sm text-text-tertiary mb-5 tracking-tight">{t("start_a_conversation_with_a_seller_to_se")}</p>
- <button onClick={() => onBrowseListings?.()} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4">
+ <button onClick={() => onBrowseListings?.()} className={buttonClasses()}>
  {CHAT_MESSAGES.BROWSE_LISTINGS}
  </button>
  </div> : filteredChatRooms.length === 0 ? <div className="flex flex-col items-center justify-center h-64 text-center px-6">

@@ -60,23 +60,23 @@ const FollowButton = memo(({
  };
  return <div className={`relative ${className}`} ref={dropdownRef}>
  <button onClick={handleMainClick} disabled={isToggling} className={`${sizeClasses[size]}
- inline-flex items-center justify-center gap-2 font-medium rounded transition-all duration-200
- ${isFollowing ? 'bg-background-secondary text-text-primary hover:bg-secondary-light border border-border-light' : 'bg-primary text-white hover:bg-primary-hover'}
+ inline-flex items-center justify-center gap-2 font-medium rounded transition-colors duration-150
+ ${isFollowing ? 'bg-background-secondary text-text-primary hover:bg-background-tertiary border border-border-light' : 'bg-primary text-white hover:bg-primary-hover'}
  disabled:opacity-50 disabled:cursor-not-allowed
  `}>
- {isToggling ? <Loader2 className={`${iconSizes[size]} animate-spin`} /> : isFollowing ? <UserCheck className={iconSizes[size]} /> : <UserPlus className={iconSizes[size]} />}
+ {isToggling ? <Loader2 className={`${iconSizes[size]} animate-spin`} strokeWidth={1.5} /> : isFollowing ? <UserCheck className={iconSizes[size]} strokeWidth={1.5} /> : <UserPlus className={iconSizes[size]} strokeWidth={1.5} />}
  <span>{isFollowing ? 'Following' : 'Follow'}</span>
- {isFollowing && showDropdown && <ChevronDown className={`${iconSizes[size]} ml-0.5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />}
+ {isFollowing && showDropdown && <ChevronDown className={`${iconSizes[size]} ml-0.5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} strokeWidth={1.5} />}
  </button>
 
- {isFollowing && showDropdown && isDropdownOpen && <div className="absolute right-0 mt-2 w-48 bg-background-primary rounded shadow-md border border-border-light py-1 z-modal">
- <button onClick={handleToggleNotifications} disabled={isTogglingNotifications} className="w-full px-4 py-2.5 text-left text-sm text-text-primary hover:bg-secondary-light flex items-center gap-2.5 transition-colors">
- {isTogglingNotifications ? <Loader2 className="w-4 h-4 animate-spin" /> : notifyOnNewListing ? <Bell className="w-4 h-4 text-primary" /> : <BellOff className="w-4 h-4 text-text-muted" />}
+ {isFollowing && showDropdown && isDropdownOpen && <div className="absolute right-0 mt-2 w-48 bg-background-primary rounded shadow-md border border-border py-1 z-modal">
+ <button onClick={handleToggleNotifications} disabled={isTogglingNotifications} className="w-full px-4 py-2.5 text-left text-sm text-text-primary hover:bg-background-tertiary flex items-center gap-2.5 transition-colors">
+ {isTogglingNotifications ? <Loader2 className="w-4 h-4 animate-spin" strokeWidth={1.5} /> : notifyOnNewListing ? <Bell className="w-4 h-4 text-primary" strokeWidth={1.5} /> : <BellOff className="w-4 h-4 text-text-muted" strokeWidth={1.5} />}
  <span>{notifyOnNewListing ? 'Notifications On' : 'Notifications Off'}</span>
  </button>
  <div className="border-t border-border-light my-1" />
  <button onClick={handleUnfollow} className="w-full px-4 py-2.5 text-left text-sm text-status-error-text hover:bg-background-secondary flex items-center gap-2.5 transition-colors">
- <UserPlus className="w-4 h-4 rotate-45" />
+ <UserPlus className="w-4 h-4 rotate-45" strokeWidth={1.5} />
  <span>{t("unfollow")}</span>
  </button>
  </div>}

@@ -41,7 +41,7 @@ const OrderSuccessPage = () => {
   const orderItems = order?.orderItems || [];
 
   return (
-    <div className="min-h-screen bg-background-secondary py-10">
+    <div className="min-h-screen bg-background-page py-10">
       <PageContainer narrow>
         <OrderSuccessModal
           order={order}

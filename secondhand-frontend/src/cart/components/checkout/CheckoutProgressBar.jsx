@@ -20,7 +20,7 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
                 onClick={() => done && onStepChange(step.id)}
                 disabled={!done}
                 aria-current={current ? 'step' : undefined}
-                className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors duration-150 ${
+                className={`flex items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors duration-150 ${
                   current ? 'font-medium text-text-primary' : done ? 'text-text-secondary hover:text-text-primary' : 'cursor-default text-text-muted'
                 }`}
               >
@@ -29,7 +29,7 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
                     done
                       ? 'bg-primary text-text-inverse'
                       : current
-                      ? 'border-2 border-primary bg-background-primary text-primary font-semibold ring-2 ring-primary/20'
+                      ? 'border border-primary bg-background-primary text-primary font-semibold'
                       : 'border border-border text-text-muted'
                   }`}
                   aria-hidden
@@ -38,7 +38,7 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
                 </span>
                 <span className="whitespace-nowrap">{t(step.labelKey, step.label)}</span>
               </button>
-              {idx < steps.length - 1 && <span className="h-px w-6 shrink-0 bg-border lg:w-10" aria-hidden />}
+              {idx < steps.length - 1 && <span className={`h-px w-6 shrink-0 lg:w-10 ${done ? 'bg-primary' : 'bg-border'}`} aria-hidden />}
             </li>
           );
         })}
@@ -58,7 +58,7 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
             return (
               <span
                 key={step.id}
-                className={`h-1 flex-1 rounded-full transition-colors duration-200 ${
+                className={`h-1 flex-1 rounded-full transition-colors duration-150 ${
                   done || current ? 'bg-primary' : 'bg-border'
                 }`}
               />

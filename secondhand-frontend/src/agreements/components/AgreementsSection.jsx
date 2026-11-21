@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { FileText as DocumentTextIcon } from 'lucide-react';
-import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
+import { agreementLabel } from '../agreements.js';
 const AgreementsSection = ({
     agreements,
     acceptedAgreements,
@@ -35,14 +35,14 @@ const AgreementsSection = ({
                                 id={`agreement-${agreement.agreementId}`}
                                 checked={isChecked}
                                 onChange={() => onToggle(agreement.agreementId)}
-                                className="h-4 w-4 shrink-0 cursor-pointer rounded-sm border-border text-primary accent-primary focus:ring-primary"
+                                className="h-4 w-4 shrink-0 cursor-pointer rounded-sm border-border text-primary accent-primary focus:ring-border-focus"
                             />
                             <button
                                 type="button"
                                 onClick={() => onRead(agreement)}
                                 className="truncate text-left text-sm font-medium text-text-primary underline transition-colors hover:text-primary"
                             >
-                                {AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType}
+                                {agreementLabel(t, agreement.agreementType)}
                             </button>
                         </div>
                         <button
@@ -58,8 +58,8 @@ const AgreementsSection = ({
             })}
         </div>
 
-        {error && <div className="p-3 bg-background-secondary border border-border rounded">
-            <p className="text-status-error text-sm tracking-tight">{error}</p>
+        {error && <div role="alert" className="p-3 rounded border border-status-error-border bg-status-error-bg">
+            <p className="text-sm text-status-error-text">{error}</p>
         </div>}
     </div>;
 };

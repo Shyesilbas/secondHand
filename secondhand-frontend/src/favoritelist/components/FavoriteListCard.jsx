@@ -54,17 +54,17 @@ const FavoriteListCard = ({
  };
  return <>
  <Link to={ROUTES.FAVORITE_LIST_DETAIL(list.id)} className="block group">
- <div className="bg-background-primary rounded-md border border-border-light overflow-hidden transition-all duration-300">
+ <div className="bg-background-primary rounded border border-border-light overflow-hidden transition-colors duration-150">
  <div className="relative aspect-square bg-background-tertiary">
  {list.previewImageUrl || list.coverImageUrl ? <img src={list.previewImageUrl || list.coverImageUrl} alt={list.name} loading="lazy" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">
- <Package className="w-16 h-16 text-secondary-300" />
+ <Package className="w-16 h-16 text-secondary-300" strokeWidth={1.5} />
  </div>}
  
  <div className="absolute top-3 left-3">
  <div className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium ${list.isPublic ? 'bg-background-secondary text-status-success-text' : 'bg-background-tertiary text-text-secondary'}`}>
  {list.isPublic ? <>
- <Globe className="w-3 h-3" />{t("public")}</> : <>
- <Lock className="w-3 h-3" />{t("private")}</>}
+ <Globe className="w-3 h-3" strokeWidth={1.5} />{t("public")}</> : <>
+ <Lock className="w-3 h-3" strokeWidth={1.5} />{t("private")}</>}
  </div>
  </div>
 
@@ -74,26 +74,26 @@ const FavoriteListCard = ({
  e.stopPropagation();
  setShowMenu(!showMenu);
  }} className="w-8 h-8 bg-background-primary/90 rounded flex items-center justify-center hover:bg-background-primary transition-colors shadow-sm">
- <MoreVertical className="w-4 h-4 text-text-secondary" />
+ <MoreVertical className="w-4 h-4 text-text-secondary" strokeWidth={1.5} />
  </button>
  
- {showMenu && <div className="absolute top-full right-0 mt-1 bg-background-primary rounded shadow-md border border-border-light py-1 min-w-36 z-10" onClick={e => e.stopPropagation()}>
+ {showMenu && <div className="absolute top-full right-0 mt-1 bg-background-primary rounded shadow-md border border-border py-1 min-w-36 z-10" onClick={e => e.stopPropagation()}>
  <button onClick={e => {
  e.preventDefault();
  setShowEditModal(true);
  setShowMenu(false);
  }} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-text-secondary hover:bg-secondary">
- <Pencil className="w-4 h-4" />{t("edit")}</button>
+ <Pencil className="w-4 h-4" strokeWidth={1.5} />{t("edit")}</button>
  <button onClick={e => {
  e.preventDefault();
  handleDelete();
  }} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-status-error-text hover:bg-background-secondary">
- <Trash2 className="w-4 h-4" />{t("delete")}</button>
+ <Trash2 className="w-4 h-4" strokeWidth={1.5} />{t("delete")}</button>
  </div>}
  </div>}
 
- {list.isPublic && !isOwner && user && <button onClick={handleLikeToggle} className={`absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md ${isLiked ? 'bg-status-error text-white' : 'bg-background-primary/90 text-text-secondary hover:bg-background-primary'}`}>
- <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+ {list.isPublic && !isOwner && user && <button onClick={handleLikeToggle} className={`absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition shadow-md ${isLiked ? 'bg-status-error text-white' : 'bg-background-primary/90 text-text-secondary hover:bg-background-primary'}`}>
+ <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} strokeWidth={1.5} />
  </button>}
  </div>
 
@@ -112,7 +112,7 @@ const FavoriteListCard = ({
  {list.itemCount} {list.itemCount === 1 ? 'item' : 'items'}
  </span>
  {list.isPublic && <span className="flex items-center gap-1">
- <Heart className="w-4 h-4" />
+ <Heart className="w-4 h-4" strokeWidth={1.5} />
  {list.likeCount}
  </span>}
  </div>

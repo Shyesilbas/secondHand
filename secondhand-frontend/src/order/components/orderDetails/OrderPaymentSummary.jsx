@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import React, { useState } from 'react';
 import { Check, FileText, ShieldCheck } from 'lucide-react';
 import { useRequiredAgreements } from '../../../agreements/hooks/useAgreements.js';
-import { AGREEMENT_TYPE_LABELS } from '../../../agreements/agreements.js';
+import { agreementLabel } from '../../../agreements/agreements.js';
 import AgreementModal from '../../../agreements/components/AgreementModal.jsx';
 import { ORDER_STATUSES } from '../../constants/orderUiConstants.js';
 
@@ -75,7 +75,7 @@ export const OrderPaymentSummary = React.memo(({
         </div>
 
         {showEscrowNotice && (
-          <div className="mt-3 flex items-center gap-2 rounded-sm border border-border bg-background-secondary px-3 py-2 text-sm text-text-secondary">
+          <div className="mt-3 flex items-center gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-secondary">
             <ShieldCheck className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
             <span>{t("od_escrow_note", "Ödeme, teslimat onaylanana kadar escrow havuzunda tutulur.")}</span>
           </div>
@@ -88,11 +88,11 @@ export const OrderPaymentSummary = React.memo(({
             </p>
             <div className="space-y-2">
               {agreements.map((agreement) => {
-                const agreementName = AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType;
+                const agreementName = agreementLabel(t, agreement.agreementType);
                 return (
                   <div
                     key={agreement.agreementId}
-                    className="flex items-start justify-between gap-3 rounded border border-border bg-background-secondary px-3 py-2.5 text-sm"
+                    className="flex items-start justify-between gap-3 rounded border border-border-light bg-background-secondary px-3 py-2.5 text-sm"
                   >
                     <div className="flex min-w-0 items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />

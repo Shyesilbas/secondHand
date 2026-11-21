@@ -164,7 +164,7 @@ export const RegisterForm = ({
               {t('back', 'Geri')}
             </Button>
             <Button type="submit" className="flex-1" disabled={isLoading}>
-              {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden strokeWidth={1.5} />}
               {isLoading ? t('auth_creating_account', 'Hesap oluşturuluyor…') : t('auth_create_account', 'Hesabı oluştur')}
             </Button>
           </div>

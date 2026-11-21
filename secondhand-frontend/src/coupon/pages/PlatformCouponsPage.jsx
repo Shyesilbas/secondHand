@@ -3,13 +3,14 @@ import { useTranslation } from "react-i18next";
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, ExternalLink, RefreshCw, Ticket } from 'lucide-react';
+import { ArrowLeft, ExternalLink, RefreshCw } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatDateTime } from '../../common/formatters.js';
 import { couponService } from '../../cart/services/couponService.js';
 import { formatCouponDiscount, formatCouponKindLabel } from '../utils/couponUiFormat.js';
 import { SkeletonList } from '../../common/components/ui/Skeleton.jsx';
 import { PageHeader, Tabs } from '../../common/components/ui/index.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 const TABS = {
     ACTIVE: 'active',
     PARTICIPATED: 'participated'
@@ -79,23 +80,22 @@ const PlatformCouponsPage = () => {
     const loading = tab === TABS.ACTIVE ? activeQ.isLoading : participationsQ.isLoading;
     const error = tab === TABS.ACTIVE ? activeQ.error : participationsQ.error;
     const ordersHref = orderId => orderId != null ? `${ROUTES.MY_ORDERS}?orderId=${encodeURIComponent(String(orderId))}` : null;
-    const tableShell = 'rounded-md border border-border bg-background-primary shadow-sm overflow-hidden';
-    return <div className="min-h-screen bg-background-secondary">
-        <PageContainer className="pb-10">
-            <div className="sticky top-0 z-10 -mx-4 mb-4 bg-background-secondary px-4 pt-4">
+    const tableShell = 'rounded border border-border-light bg-background-primary shadow-sm overflow-hidden';
+    return <div className="min-h-screen bg-background-page">
+        <PageContainer className="py-8">
+            <div className="mb-4">
                 <PageHeader
                     bottomBorder
                     back={
                         <Link to={ROUTES.DASHBOARD} className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-primary">
-                            <ArrowLeft className="h-4 w-4" />{t("hesap")}
+                            <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />{t("hesap")}
                         </Link>
                     }
-                    icon={Ticket}
                     title={t("platform_kuponlar")}
                     subtitle={t("size_uygun_kodlar_ve_kullan_m_ge_mi_iniz")}
                     actions={
-                        <button type="button" onClick={() => refetch()} disabled={isFetching} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
-                            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />{t("yenile")}
+                        <button type="button" onClick={() => refetch()} disabled={isFetching} className={buttonClasses('secondary', 'sm')}>
+                            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} strokeWidth={1.5} />{t("yenile")}
                         </button>
                     }
                 />
@@ -118,13 +118,13 @@ const PlatformCouponsPage = () => {
                 <SkeletonList />
             </div>}
 
-            {!loading && error && <div className="rounded-md border border-border bg-background-secondary px-4 py-3 text-sm text-status-error-text">
+            {!loading && error && <div className="rounded border border-border bg-background-secondary px-4 py-3 text-sm text-status-error-text">
                 {error?.response?.data?.message || error?.message || 'Yüklenemedi.'}
             </div>}
 
-            {!loading && !error && tab === TABS.ACTIVE && activeList.length === 0 && <div className="rounded-md border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("u_an_size_atanm_kullan_labilir_kupon_yok")}</div>}
+            {!loading && !error && tab === TABS.ACTIVE && activeList.length === 0 && <div className="rounded border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("u_an_size_atanm_kullan_labilir_kupon_yok")}</div>}
 
-            {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length === 0 && <div className="rounded-md border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("hen_z_bir_sipari_te_kupon_kullanmad_n_z")}</div>}
+            {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length === 0 && <div className="rounded border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("hen_z_bir_sipari_te_kupon_kullanmad_n_z")}</div>}
 
             {!loading && !error && tab === TABS.ACTIVE && activeList.length > 0 && <div className={tableShell}>
                 <div className="overflow-x-auto">
@@ -152,11 +152,11 @@ const PlatformCouponsPage = () => {
                                     {c.description?.trim() && <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-text-secondary" title={c.description.trim()}>
                                         {c.description.trim()}
                                     </p>}
-                                    {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && <p className="mt-1 text-xs text-text-muted">{c.eligibleTypes.join(', ')}</p>}
+                                    {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && <p className="mt-1 text-xs text-text-tertiary">{c.eligibleTypes.join(', ')}</p>}
                                 </td>
                                 <td className="align-top whitespace-nowrap px-4 py-3">
                                     <span className="inline-flex flex-col gap-1">
-                                        <span className="w-fit rounded-full border border-border bg-background-tertiary px-2 py-0.5 text-xs font-medium text-text-secondary">
+                                        <span className="w-fit rounded-sm border border-border bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
                                             {formatCouponKindLabel(c.discountKind)}
                                         </span>
                                         <span className="text-sm font-semibold tabular-nums text-text-price">{formatCouponDiscount(c)}</span>
@@ -172,14 +172,14 @@ const PlatformCouponsPage = () => {
                                     <CouponPeriod startsAt={c.startsAt} endsAt={c.endsAt} />
                                 </td>
                                 <td className="align-top whitespace-nowrap px-4 py-3 text-right">
-                                    <Link to={ROUTES.CHECKOUT} className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-text-inverse hover:bg-primary-hover h-9 px-3">{t("deme")}<ExternalLink className="h-3.5 w-3.5 opacity-90" />
+                                    <Link to={ROUTES.CHECKOUT} className={buttonClasses('primary', 'sm')}>{t("deme")}<ExternalLink className="h-3.5 w-3.5 opacity-90" strokeWidth={1.5} />
                                     </Link>
                                 </td>
                             </tr>)}
                         </tbody>
                     </table>
                 </div>
-                <p className="border-t border-border-light bg-background-secondary px-4 py-2.5 text-xs text-text-muted">{t("genel_hak_kampanyan_n_t_m_kullan_c_lar_i")}</p>
+                <p className="border-t border-border-light bg-background-secondary px-4 py-2.5 text-sm text-text-muted">{t("genel_hak_kampanyan_n_t_m_kullan_c_lar_i")}</p>
             </div>}
 
             {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length > 0 && <div className={tableShell}>
@@ -208,7 +208,7 @@ const PlatformCouponsPage = () => {
                                 <td className="align-top whitespace-nowrap px-4 py-3 text-right text-sm font-semibold">
                                     {ordersHref(row.orderId) ? <Link to={ordersHref(row.orderId)} className="inline-flex items-center gap-1 text-primary hover:text-primary-hover hover:underline">
                                         {row.orderNumber ? `#${row.orderNumber}` : `#${row.orderId}`}
-                                        <ExternalLink className="h-3.5 w-3.5" />
+                                        <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5} />
                                     </Link> : <span className="text-text-muted font-normal">{t("ba_l_sipari_yok")}</span>}
                                 </td>
                             </tr>)}

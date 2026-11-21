@@ -62,7 +62,7 @@ const CartItemCard = ({
         {/* Thumbnail */}
         <div className="relative shrink-0">
           {detailUrl ? (
-            <Link to={detailUrl} className="block overflow-hidden rounded-md border border-border-light bg-background-tertiary">
+            <Link to={detailUrl} className="block overflow-hidden rounded border border-border-light bg-background-tertiary">
               {item.listing?.imageUrl ? (
                 <img
                   src={item.listing.imageUrl}
@@ -85,7 +85,7 @@ const CartItemCard = ({
               </div>
             </Link>
           ) : (
-            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-md border border-border-light bg-background-tertiary flex items-center justify-center text-sm font-semibold text-text-muted">
+            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded border border-border-light bg-background-tertiary flex items-center justify-center text-sm font-semibold text-text-muted">
               {item.listing?.title?.charAt(0)?.toUpperCase() || '?'}
             </div>
           )}
@@ -126,7 +126,7 @@ const CartItemCard = ({
                   {sellerTotalReviews > 0 && (
                     <span className="inline-flex items-center gap-0.5 tabular-nums text-text-tertiary">
                       <span>·</span>
-                      <Star className="h-3 w-3 fill-status-warning text-status-warning" aria-hidden />
+                      <Star className="h-3 w-3 fill-status-warning text-status-warning" aria-hidden strokeWidth={1.5} />
                       <span className="font-medium text-text-secondary">{sellerRating.toFixed(1)}</span>
                       <span>({sellerTotalReviews})</span>
                     </span>
@@ -187,7 +187,7 @@ const CartItemCard = ({
           {/* Bottom Bar: Stepper & Price */}
           <div className="mt-3 flex flex-wrap items-end justify-between gap-3 pt-1">
             {/* Quantity Stepper */}
-            <div className="inline-flex items-center rounded-md border border-border bg-background-primary h-8">
+            <div className="inline-flex items-center rounded border border-border bg-background-primary h-8">
               <button
                 type="button"
                 onClick={() => handleQuantityChange(item.quantity - 1)}
@@ -228,7 +228,7 @@ const CartItemCard = ({
                   </span>
                 </div>
                 {shownLine.quantity > 1 && (
-                  <p className="text-xs text-text-muted tabular-nums mt-0.5">
+                  <p className="text-xs text-text-tertiary tabular-nums mt-0.5">
                     {shownLine.quantity} × {formatCurrency(shownLine.campaignUnitPrice, currency)}
                   </p>
                 )}
@@ -243,7 +243,7 @@ const CartItemCard = ({
 
           {/* Notes if present */}
           {item.notes && (
-            <div className="mt-3 rounded-md border border-border-light bg-background-secondary p-2.5 text-sm text-text-secondary">
+            <div className="mt-3 rounded border border-border-light bg-background-secondary p-2.5 text-sm text-text-secondary">
               <span className="font-semibold text-text-primary mr-1">{t("note", "Not:")}</span>
               {item.notes}
             </div>

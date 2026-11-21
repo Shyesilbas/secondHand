@@ -45,12 +45,12 @@ function statusBadge(status) {
             };
         case LISTING_STATUS.INACTIVE:
             return {
-                cls: 'bg-secondary-light text-text-muted border-border-light',
+                cls: 'bg-background-tertiary text-text-muted border-border-light',
                 label: 'Inactive'
             };
         default:
             return {
-                cls: 'bg-secondary-light text-text-muted border-border-light',
+                cls: 'bg-background-tertiary text-text-muted border-border-light',
                 label: status || '—'
             };
     }
@@ -133,13 +133,13 @@ const ListingInfoModal = ({
                             })} alt={title} className="h-full w-full object-cover" onError={() => setImageBroken(true)} />
                         ) : (
                             <div className="flex h-full flex-col items-center justify-center gap-1.5 text-text-muted">
-                                <ImageIcon className="h-8 w-8 opacity-45" />
+                                <ImageIcon className="h-8 w-8 opacity-45" strokeWidth={1.5} />
                                 <span className="text-xs font-semibold">{t("no_photo")}</span>
                             </div>
                         )}
                         {isInShowcase && (
                             <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-sm bg-status-warning px-3 py-1 text-xs font-semibold text-white shadow-md">
-                                <Zap className="h-3 w-3 fill-current text-white" />{t("featured")}
+                                <Zap className="h-3 w-3 fill-current text-white" strokeWidth={1.5} />{t("featured")}
                             </span>
                         )}
                     </div>
@@ -152,8 +152,8 @@ const ListingInfoModal = ({
                                     {st.label}
                                 </span>
                                 {listing.listingNo && (
-                                    <span className="inline-flex items-center gap-1 rounded-sm bg-secondary-light px-2 py-0.5 text-xs font-semibold text-text-muted border border-border-light">
-                                        <Hash className="h-3 w-3 opacity-60" />
+                                    <span className="inline-flex items-center gap-1 rounded-sm bg-background-tertiary px-2 py-0.5 text-xs font-semibold text-text-muted border border-border-light">
+                                        <Hash className="h-3 w-3 opacity-60" strokeWidth={1.5} />
                                         {listing.listingNo}
                                     </span>
                                 )}
@@ -165,7 +165,7 @@ const ListingInfoModal = ({
 
                         {/* Price Display */}
                         <div className="pt-3 border-t border-border-light">
-                            <p className="text-xs font-semibold text-text-muted mb-1">{t("price")}</p>
+                            <p className="text-xs font-medium text-text-tertiary mb-1">{t("price")}</p>
                             <div className="flex items-baseline gap-2 flex-wrap">
                                 <span className="text-xl font-semibold tabular-nums text-text-primary tracking-tight">
                                     {formatCurrency(price, currency)}
@@ -176,7 +176,7 @@ const ListingInfoModal = ({
                                             {formatCurrency(listing.price, currency)}
                                         </span>
                                         {discountPct > 0 && (
-                                            <span className="bg-background-secondary text-status-success-text border border-border inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-xs font-semibold">
+                                            <span className="inline-flex items-center gap-0.5 rounded-sm border border-status-success-border bg-status-success-bg px-1.5 py-0.5 text-xs font-medium tabular-nums text-status-success-text">
                                                 -{discountPct}%
                                             </span>
                                         )}
@@ -188,9 +188,9 @@ const ListingInfoModal = ({
                         {/* Seller Section */}
                         {(listing.sellerName || listing.sellerSurname) && (
                             <div className="pt-3 border-t border-border-light">
-                                <p className="text-xs font-semibold text-text-muted mb-2">{t("seller")}</p>
+                                <p className="text-xs font-medium text-text-tertiary mb-2">{t("seller")}</p>
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-text-primary text-xs font-semibold text-text-inverse border border-primary/5 shadow-sm">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-text-primary text-xs font-semibold text-text-inverse shadow-sm">
                                         {(listing.sellerName || '?')[0]?.toUpperCase()}
                                     </div>
                                     <div className="min-w-0 flex-1">
@@ -199,7 +199,7 @@ const ListingInfoModal = ({
                                         </p>
                                         {sellerStats && (
                                             <div className="flex items-center gap-1 mt-0.5">
-                                                <Star className="w-3 h-3 text-status-warning fill-status-warning shrink-0" />
+                                                <Star className="w-3 h-3 text-status-warning fill-status-warning shrink-0" strokeWidth={1.5} />
                                                 <span className="text-xs font-semibold text-text-primary">{(sellerStats.averageRating ?? 5.0).toFixed(1)}</span>
                                                 <span className="text-xs text-text-muted font-medium">({sellerStats.totalReviews ?? sellerStats.reviewCount ?? 0} {t("reviews")})</span>
                                             </div>
@@ -212,11 +212,11 @@ const ListingInfoModal = ({
                         {/* Location / Escrow Tag */}
                         <div className="pt-3 border-t border-border-light space-y-2 text-sm font-medium text-text-secondary">
                             <div className="flex items-center gap-1.5">
-                                <MapPin className="h-3.5 w-3.5 text-text-muted" />
+                                <MapPin className="h-3.5 w-3.5 text-text-muted" strokeWidth={1.5} />
                                 <span>{[listing.city, listing.district].filter(Boolean).join(' · ')}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                                <ShieldCheck className="w-3.5 h-3.5 text-status-success-icon" />
+                                <ShieldCheck className="w-3.5 h-3.5 text-status-success-icon" strokeWidth={1.5} />
                                 <span>{t("escrow_safe_meetup_protected")}</span>
                             </div>
                         </div>
@@ -251,7 +251,7 @@ const ListingInfoModal = ({
                                     <ViewStatisticsCard viewStats={viewStats} periodDays={viewStats?.periodDays || 7} />
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-12 text-center rounded border border-border-light bg-background-primary">
-                                        <Eye className="mb-2 h-7 w-7 text-text-muted opacity-40" />
+                                        <Eye className="mb-2 h-7 w-7 text-text-muted opacity-40" strokeWidth={1.5} />
                                         <p className="text-sm font-semibold text-text-primary">{t("no_view_data")}</p>
                                         <p className="mt-0.5 max-w-xs text-sm text-text-muted">{t("open_the_full_listing_to_collect_views")}</p>
                                     </div>

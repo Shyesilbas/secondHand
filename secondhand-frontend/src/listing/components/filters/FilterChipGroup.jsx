@@ -38,7 +38,7 @@ const FilterChipGroup = ({
  {list.slice(0, maxChips).map(opt => {
  const id = getOptionValue(opt);
  const isSelected = selectedIds.includes(id);
- return <button key={id} type="button" onClick={() => handleToggle(id)} className={`inline-flex items-center px-2.5 py-1.5 rounded text-sm font-medium transition-all duration-150 ${isSelected ? 'bg-primary text-white' : 'bg-background-tertiary text-text-secondary hover:bg-secondary-200 hover:text-text-primary'}`}>
+ return <button key={id} type="button" onClick={() => handleToggle(id)} className={`inline-flex items-center px-2.5 py-1.5 rounded text-sm font-medium transition-colors duration-150 ${isSelected ? 'bg-accent-teal-50 text-accent-teal-800 ring-1 ring-inset ring-accent-teal' : 'bg-background-tertiary text-text-secondary hover:bg-secondary-200 hover:text-text-primary'}`}>
  {getOptionLabel(opt)}
  </button>;
  })}

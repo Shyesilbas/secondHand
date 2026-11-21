@@ -23,7 +23,7 @@ const ListingsModuleLayout = ({
  if (!engine) return null;
 
  return (
- <div className="min-h-screen bg-background-secondary relative">
+ <div className="min-h-screen bg-background-page relative">
  <FilterSidebar
  mode={mode}
  isOpen={engine.showFilterSidebar}
@@ -71,6 +71,7 @@ const ListingsModuleLayout = ({
  isSelectable={isSelectable}
  selectedIds={selectedIds}
  onToggleSelect={onToggleSelect}
+ sortable={mode !== 'mine'}
  />
  )}
  </ListingsNavigation>

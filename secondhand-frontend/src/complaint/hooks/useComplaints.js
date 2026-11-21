@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   createComplaint,
   getMyComplaints,
@@ -42,6 +43,7 @@ export const useRestrictionFlags = () => {
 };
 
 export const useCreateComplaint = () => {
+  const { t } = useTranslation();
   const { showNotification } = useNotification();
   const queryClient = useQueryClient();
   return useMutation({
@@ -50,21 +52,22 @@ export const useCreateComplaint = () => {
       queryClient.invalidateQueries({ queryKey: COMPLAINT_KEYS.my() });
       showNotification({
         type: 'success',
-        title: COMPLAINT_MESSAGES.SUBMITTED_TITLE,
-        message: COMPLAINT_MESSAGES.SUBMITTED_SUCCESS,
+        title: t('complaint_submitted_title', COMPLAINT_MESSAGES.SUBMITTED_TITLE),
+        message: t('complaint_submitted_success', COMPLAINT_MESSAGES.SUBMITTED_SUCCESS),
       });
     },
     onError: (err) => {
       showNotification({
         type: 'error',
-        title: COMPLAINT_MESSAGES.SUBMIT_FAILED_TITLE,
-        message: getComplaintErrorMessage(err),
+        title: t('complaint_submit_failed_title', COMPLAINT_MESSAGES.SUBMIT_FAILED_TITLE),
+        message: getComplaintErrorMessage(err, t('complaint_submit_failed_fallback', COMPLAINT_MESSAGES.SUBMIT_FAILED_FALLBACK)),
       });
     },
   });
 };
 
 export const useSubmitAppeal = () => {
+  const { t } = useTranslation();
   const { showNotification } = useNotification();
   const queryClient = useQueryClient();
   return useMutation({
@@ -74,15 +77,15 @@ export const useSubmitAppeal = () => {
         Array.isArray(list) ? list.map((c) => (c.complaintId === updated.complaintId ? updated : c)) : list);
       showNotification({
         type: 'success',
-        title: COMPLAINT_MESSAGES.APPEAL_SUBMITTED_TITLE,
-        message: COMPLAINT_MESSAGES.APPEAL_SUBMITTED_SUCCESS,
+        title: t('complaint_appeal_submitted_title', COMPLAINT_MESSAGES.APPEAL_SUBMITTED_TITLE),
+        message: t('complaint_appeal_submitted_success', COMPLAINT_MESSAGES.APPEAL_SUBMITTED_SUCCESS),
       });
     },
     onError: (err) => {
       showNotification({
         type: 'error',
-        title: COMPLAINT_MESSAGES.APPEAL_FAILED_TITLE,
-        message: getComplaintErrorMessage(err, COMPLAINT_MESSAGES.APPEAL_FAILED_FALLBACK),
+        title: t('complaint_appeal_failed_title', COMPLAINT_MESSAGES.APPEAL_FAILED_TITLE),
+        message: getComplaintErrorMessage(err, t('complaint_appeal_failed_fallback', COMPLAINT_MESSAGES.APPEAL_FAILED_FALLBACK)),
       });
     },
   });

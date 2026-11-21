@@ -119,7 +119,7 @@ export const electronicsConfig = {
  id: 2, title: 'Electronic Details', description: 'Specify the electronic specifications', kind: 'details',
  sections: [
  {
- id: 'electronics-basic', title: 'Basic Information', description: 'Product type, brand, model and variant',
+ id: 'electronics-basic', title: 'Basic Information', description: 'Product type, brand and model information',
  fields: [
  { name: 'electronicTypeId', label: 'Type', type: 'enum', enumKey: 'electronicTypes', required: true, onChange: resetFromType },
  { name: 'electronicBrandId', label: 'Brand', type: 'enum', enumKey: 'electronicBrands', required: true, onChange: resetFromBrand },
@@ -130,12 +130,6 @@ export const electronicsConfig = {
  typeId: ctx.formData?.electronicTypeId, brandId: ctx.formData?.electronicBrandId,
  })),
  onChange: onModelPicked,
- },
- {
- name: 'electronicVariantId', label: 'Variant / Sürüm', type: 'enum', enumKey: 'electronicVariants',
- description: 'Seçtiğin sürümün bilgileri katalogdan doldurulur',
- visibleWhen: (ctx) => variantsOf(ctx).length > 0,
- getOptions: (ctx) => variantsOf(ctx).map((v) => ({ id: normalizeId(v?.id), label: String(v?.name ?? '') })).filter((o) => o.id && o.label),
  },
  {
  name: 'colorName', label: 'Color', type: 'enum', enumKey: 'electronicModelColors', required: true,
@@ -156,6 +150,13 @@ export const electronicsConfig = {
  id: 'electronics-specs', title: 'Technical Specifications', description: 'Fields depend on the device type; catalog values are read-only',
  visibleWhen: (ctx) => Boolean(ctx.formData?.electronicTypeId),
  fields: [
+ // A model's variants (e.g. 128 GB / 256 GB) belong with the specs they fill, not with the basics.
+ {
+ name: 'electronicVariantId', label: 'Variant / Sürüm', type: 'enum', enumKey: 'electronicVariants',
+ description: 'Seçtiğin sürümün bilgileri katalogdan doldurulur',
+ visibleWhen: (ctx) => variantsOf(ctx).length > 0,
+ getOptions: (ctx) => variantsOf(ctx).map((v) => ({ id: normalizeId(v?.id), label: String(v?.name ?? '') })).filter((o) => o.id && o.label),
+ },
  { name: 'storage', label: 'Storage (GB)', type: 'number', min: 1, placeholder: '128, 256, 512...', ...spec('storage') },
  { name: 'ram', label: 'RAM (GB)', type: 'number', min: 1, placeholder: '8, 16, 32...', ...spec('ram') },
  { name: 'storageType', label: 'Storage Type', type: 'enum', enumKey: 'storageTypes', ...spec('storageType') },

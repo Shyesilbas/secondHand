@@ -57,8 +57,8 @@ const HeaderAuthActions = ({
  <HeaderProfileMenu user={user} isOpen={profileMenuOpen} onToggle={onToggleProfileMenu} onClose={closeAllDropdowns} onLogout={onLogout} />
  </div>
 
- <button className="lg:hidden p-2.5 ml-2 text-text-muted hover:text-text-primary hover:bg-secondary transition-all duration-300 ease-in-out rounded" onClick={onToggleMobileMenu}>
- {mobileMenuOpen ? <X /> : <Menu />}
+ <button className="lg:hidden p-2.5 ml-2 text-text-muted hover:text-text-primary hover:bg-secondary transition-colors duration-150 ease-in-out rounded" onClick={onToggleMobileMenu}>
+ {mobileMenuOpen ? <X strokeWidth={1.5} /> : <Menu strokeWidth={1.5} />}
  </button>
  </>;
 };

@@ -1,26 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
-import { ComplaintReason } from '../types/complaintTypes.js';
 import { formatDate, formatDateTime } from '../../common/formatters.js';
 import { Badge, Button } from '../../common/components/ui/index.js';
 import {
   APPEAL_STATUS_LABELS,
+  COMPLAINT_REASON_LABELS,
   COMPLAINT_STATUS_LABELS,
   COMPLAINT_STATUS_TONES,
   PENALTY_LABELS,
   VIOLATION_LABELS,
   labelOf,
 } from '../complaintConstants.js';
-
-const REASON_LABELS = {
-  [ComplaintReason.INAPPROPRIATE_CONTENT]: 'Inappropriate Content',
-  [ComplaintReason.HARASSMENT]: 'Harassment',
-  [ComplaintReason.SCAM_FRAUD]: 'Scam/Fraud Listing',
-  [ComplaintReason.FALSE_ADVERTISING]: 'False Advertising',
-  [ComplaintReason.COPYRIGHT_VIOLATION]: 'Copyright Violation',
-  [ComplaintReason.SPAM]: 'Spam',
-  [ComplaintReason.OTHER]: 'Other',
-};
 
 const Row = ({ label, children }) => (
   <div className="flex items-center justify-between gap-3">
@@ -49,7 +39,7 @@ const ComplaintCard = ({ complaint, side = 'filed', onOpen, onAppeal }) => {
       : t('complaint_target_user', 'User');
 
   return (
-    <div className="flex h-full flex-col rounded border border-border bg-background-primary transition-colors duration-150 hover:border-border-focus">
+    <div className="flex h-full flex-col rounded border border-border-light bg-background-primary shadow-sm transition duration-150 hover:border-border hover:shadow-md">
       <button
         type="button"
         onClick={() => onOpen?.(complaint)}
@@ -69,7 +59,7 @@ const ComplaintCard = ({ complaint, side = 'filed', onOpen, onAppeal }) => {
 
         <div className="mt-4 flex flex-wrap gap-2">
           <Badge variant="neutral">{targetLabel}</Badge>
-          <Badge variant="neutral">{REASON_LABELS[complaint.reason] || complaint.reason}</Badge>
+          <Badge variant="neutral">{labelOf(COMPLAINT_REASON_LABELS, complaint.reason, t)}</Badge>
         </div>
 
         {complaint.description && side === 'filed' && (
@@ -139,7 +129,7 @@ const ComplaintCard = ({ complaint, side = 'filed', onOpen, onAppeal }) => {
             {t('appeal_deadline', 'Appeal until')} {formatDateTime(complaint.appealDeadline)}
           </span>
           <Button variant="secondary" size="sm" onClick={() => onAppeal?.(complaint)}>
-            {t('appeal', 'Appeal')}
+            {t('appeal_action', 'Appeal')}
           </Button>
         </div>
       )}

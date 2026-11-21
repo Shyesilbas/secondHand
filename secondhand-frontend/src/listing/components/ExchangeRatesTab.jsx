@@ -34,7 +34,7 @@ const ExchangeRatesTab = ({
                             type="button"
                             aria-pressed={selected === curr}
                             onClick={() => setSelected(curr)}
-                            className={`rounded-sm px-3 py-1 text-sm transition-colors ${selected === curr ? 'bg-background-primary font-medium text-text-primary' : 'text-text-secondary hover:text-text-primary'
+                            className={`rounded-sm px-3 py-1 text-sm transition-colors ${selected === curr ? 'font-medium bg-background-primary text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'
                                 }`}
                         >
                             {curr}

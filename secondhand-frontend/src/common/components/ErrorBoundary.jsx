@@ -1,6 +1,7 @@
 import React from 'react';
 import i18n from '../../i18n.js';
 import logger from '../utils/logger.js';
+import { buttonClasses } from './ui/Button.jsx';
 class ErrorBoundary extends React.Component {
  constructor(props) {
  super(props);
@@ -55,8 +56,8 @@ class ErrorBoundary extends React.Component {
 
  {/* Action Buttons */}
  <div className="mt-6 flex gap-3">
- <button onClick={this.handleRefresh} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 flex-1">{t("refresh_page")}</button>
- <button onClick={this.handleGoHome} className="flex-1 bg-background-tertiary text-text-secondary px-4 py-2 rounded-md hover:bg-secondary-300 transition-colors">{t("go_home")}</button>
+ <button onClick={this.handleRefresh} className={`${buttonClasses('primary', 'sm')} flex-1`}>{t("refresh_page")}</button>
+ <button onClick={this.handleGoHome} className="flex-1 bg-background-tertiary text-text-secondary px-4 py-2 rounded hover:bg-secondary-300 transition-colors">{t("go_home")}</button>
  </div>
 
  {/* Development Error Details */}

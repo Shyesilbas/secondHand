@@ -4,30 +4,25 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { listingService } from '../../listing/services/listingService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import ListingCard from '../../listing/components/ListingCard.jsx';
-import Alert from '../../common/components/ui/Alert.jsx';
-import Button from '../../common/components/ui/Button.jsx';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import HomeSection from './HomeSection.jsx';
-import { HOME_GRID_COLUMNS, HOME_GRID_SIZE } from './homeLayout.js';
+import { HOME_GRID_COLUMNS, HOME_GRID_GAP, HOME_GRID_SIZE } from './homeLayout.js';
 
-const HOME_NEWEST_QUERY_KEY = ['listings', 'home', 'newest', HOME_GRID_SIZE];
+// The viewer is part of the key: cards carry per-user favorite state and blocked sellers are left out.
+const homeBestSellersQueryKey = (userId) => ['listings', 'home', 'bestSellers', HOME_GRID_SIZE, userId ?? 'guest'];
 
-/** Newest active listings: always has content, unlike the showcase. Hidden when there are none. */
-const NewListingsSection = () => {
+/** Active listings with the most units sold, across all categories. Hidden when nothing has sold yet. */
+const BestSellersSection = () => {
   const { t } = useTranslation();
   const { user } = useAuthState();
   const { data: listings = [], isLoading, isError, refetch } = useQuery({
-    queryKey: HOME_NEWEST_QUERY_KEY,
+    queryKey: homeBestSellersQueryKey(user?.id),
     queryFn: async () => {
-      const page = await listingService.filterListings({
-        status: 'ACTIVE',
-        page: 0,
-        size: HOME_GRID_SIZE,
-        sortBy: 'createdAt',
-        sortDirection: 'DESC'
-      });
-      return Array.isArray(page?.content) ? page.content : [];
+      const result = await listingService.getBestSellers(HOME_GRID_SIZE);
+      return Array.isArray(result) ? result : [];
     },
-    staleTime: 60 * 1000,
+    // The backend ranking is cached for minutes, so refetching more often would only repeat it.
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false
   });
 
@@ -38,15 +33,11 @@ const NewListingsSection = () => {
     content = <HomeSection.Skeleton />;
   } else if (isError) {
     content = (
-      <Alert
-        type="error"
-        message={t('home_newest_load_failed', 'Yeni ilanlar yüklenemedi.')}
-        action={<Button variant="secondary" size="sm" onClick={() => refetch()}>{t('try_again', 'Tekrar dene')}</Button>}
-      />
+      <ErrorState title={t('home_best_sellers_load_failed', 'Çok satan ilanlar yüklenemedi')} onRetry={refetch} />
     );
   } else {
     content = (
-      <div className={`grid gap-4 ${HOME_GRID_COLUMNS}`}>
+      <div className={`grid ${HOME_GRID_GAP} ${HOME_GRID_COLUMNS}`}>
         {listings.map(listing => (
           <ListingCard
             key={listing.id}
@@ -62,7 +53,7 @@ const NewListingsSection = () => {
 
   return (
     <HomeSection
-      title={t('home_newest_title', 'Yeni eklenenler')}
+      title={t('home_best_sellers_title', 'Çok satanlar')}
       linkTo={ROUTES.LISTINGS}
       linkLabel={t('see_all', 'Tümünü gör')}
     >
@@ -71,4 +62,4 @@ const NewListingsSection = () => {
   );
 };
 
-export default NewListingsSection;
+export default BestSellersSection;

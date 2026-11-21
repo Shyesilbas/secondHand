@@ -134,7 +134,7 @@ const CheckoutVerificationStep = ({
         >
           {isCheckingOut ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden strokeWidth={1.5} />
               <span>{t('processing', 'Ödeme alınıyor…')}</span>
             </>
           ) : (

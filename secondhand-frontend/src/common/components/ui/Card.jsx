@@ -9,9 +9,12 @@ const SURFACE_CLASSES = {
   secondary: 'bg-background-secondary',
 };
 
+// Cards sit on the page canvas and separate by tone and shadow, so the default edge is light.
+// 'strong' is for cards that sit on white (inside another surface) without a shadow.
 const BORDER_CLASSES = {
-  default: 'border-border',
+  default: 'border-border-light',
   light: 'border-border-light',
+  strong: 'border-border',
 };
 
 const Card = ({
@@ -30,7 +33,7 @@ const Card = ({
   const borderClass = BORDER_CLASSES[border] ?? BORDER_CLASSES.default;
   const shadowClass = shadow ? 'shadow-sm' : '';
   const interactiveClass = interactive
-    ? 'transition-all duration-150 hover:border-card-border-hover hover:shadow'
+    ? 'transition duration-150 hover:border-border hover:shadow-md'
     : '';
 
   return (

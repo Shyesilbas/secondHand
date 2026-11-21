@@ -133,8 +133,8 @@ const MyShowcasesPanel = ({ userId }) => {
 
       {/* ─── Error Alert ─── */}
       {actionError && (
-        <div className="mt-4 flex items-start gap-2.5 rounded border border-status-error/30 bg-background-secondary p-3 text-sm text-status-error-text">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-status-error mt-0.5" />
+        <div className="mt-4 flex items-start gap-2.5 rounded border border-status-error-border bg-background-secondary p-3 text-sm text-status-error-text">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-status-error mt-0.5" strokeWidth={1.5} />
           <div className="flex-1">
             <span className="font-semibold block">{t('operation_error', 'İşlem Hatası')}</span>
             <p className="mt-0.5">{actionError}</p>
@@ -170,7 +170,7 @@ const MyShowcasesPanel = ({ userId }) => {
                   className={`flex flex-col justify-between rounded border transition-colors ${
                     showcase.isExpired
                       ? 'border-border-light bg-background-secondary'
-                      : 'border-border-light bg-background-primary hover:border-border-strong'
+                      : 'border-border-light bg-background-primary hover:border-border'
                   } p-4`}
                 >
                   {/* Top: Image + Info */}
@@ -187,7 +187,7 @@ const MyShowcasesPanel = ({ userId }) => {
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-text-muted">
-                            <ImageIcon className="h-5 w-5 opacity-40" />
+                            <ImageIcon className="h-5 w-5 opacity-40" strokeWidth={1.5} />
                           </div>
                         )}
                       </div>

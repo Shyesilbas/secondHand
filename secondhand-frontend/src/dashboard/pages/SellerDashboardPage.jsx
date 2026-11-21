@@ -14,7 +14,7 @@ import OrderStatusBreakdown from '../components/OrderStatusBreakdown.jsx';
 import ConversionFunnel from '../components/ConversionFunnel.jsx';
 import OfferAnalyticsCard from '../components/OfferAnalyticsCard.jsx';
 import {
-  CardLink, DashboardCard, DashboardError, DashboardShell, DashboardSkeleton
+  CardLink, DashboardCard, DashboardError, DashboardShell, DashboardSkeleton, MetricGrid
 } from '../components/DashboardUi.jsx';
 import { DASHBOARD_CURRENCY } from '../dashboardConstants.js';
 
@@ -49,7 +49,7 @@ const SellerDashboardPage = () => {
     const revenueTrend = dashboard.revenueGrowth != null ? parseFloat(dashboard.revenueGrowth) : null;
     content = (
       <>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <MetricGrid>
           <MetricCard
             title={t('dash_revenue', 'Gelir')}
             value={formatCurrency(dashboard.totalRevenue || 0, DASHBOARD_CURRENCY)}
@@ -72,7 +72,7 @@ const SellerDashboardPage = () => {
             value={formatCurrency(pendingEscrowAmount || 0, DASHBOARD_CURRENCY)}
             subtitle={t('dash_pending_escrow_hint', 'Alıcı onayından sonra cüzdana geçer')}
           />
-        </div>
+        </MetricGrid>
 
         <DashboardCard title={t('dash_revenue_trend', 'Gelir')}>
           <Suspense fallback={<Skeleton className="h-72 w-full" />}>

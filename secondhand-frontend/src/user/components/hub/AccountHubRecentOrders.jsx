@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
-import Alert from '@/common/components/ui/Alert';
-import Button, { buttonClasses } from '@/common/components/ui/Button';
+import { buttonClasses } from '@/common/components/ui/Button';
+import ErrorState from '@/common/components/ui/ErrorState';
 import Skeleton from '@/common/components/ui/Skeleton';
 import { Badge, Card, EmptyState } from '../../../common/components/ui/index.js';
 import { ROUTES } from '../../../common/constants/routes.js';
@@ -19,17 +19,17 @@ const AccountHubRecentOrders = ({
   const { t } = useTranslation();
 
   return (
-    <Card as="section" shadow={false} className="flex flex-col lg:col-span-2">
-      <div className="mb-4 flex items-center justify-between gap-4 border-b border-border-light pb-3">
-        <h2 className="text-lg font-semibold text-text-primary">
+    <Card as="section" className="flex flex-col lg:col-span-2">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h2 className="text-base font-semibold text-text-primary">
           {t('recent_orders', 'Recent Orders')}
         </h2>
         <Link
           to={ROUTES.MY_ORDERS}
-          className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-text-secondary transition-colors hover:text-text-primary"
+          className="inline-flex shrink-0 items-center gap-1 rounded text-sm font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
         >
           <span>{t('view_all', 'View All')}</span>
-          <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+          <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
         </Link>
       </div>
 
@@ -40,30 +40,23 @@ const AccountHubRecentOrders = ({
           ))}
         </div>
       ) : ordersError ? (
-        <Alert
-          type="error"
-          message={trEn(
-            'Siparişler yüklenirken bir hata oluştu.',
-            'Failed to load recent orders.'
-          )}
-          action={
-            <Button variant="secondary" size="sm" onClick={() => refetchOrders()}>
-              {trEn('Tekrar Dene', 'Retry')}
-            </Button>
-          }
+        <ErrorState
+          size="compact"
+          bordered={false}
+          title={t('orders_load_failed')}
+          onRetry={() => refetchOrders()}
         />
       ) : recentOrders.length === 0 ? (
         <EmptyState
           icon={ShoppingBag}
           title={t('your_shopping_bag_is_waiting')}
           description={t('explore_our_second_hand_listings_to_find')}
-          className="flex-1 py-8"
-          action={
-            <Link to={ROUTES.LISTINGS} className={buttonClasses('secondary', 'sm')}>
-              {t('explore_listings')}
-            </Link>
-          }
-        />
+          className="flex-1 border-0 py-8"
+        >
+          <Link to={ROUTES.LISTINGS} className={buttonClasses('secondary', 'sm')}>
+            {t('explore_listings')}
+          </Link>
+        </EmptyState>
       ) : (
         <ul className="divide-y divide-border-light">
           {recentOrders.map((order) => {
@@ -89,7 +82,7 @@ const AccountHubRecentOrders = ({
                   className="-mx-2 flex items-center justify-between gap-4 rounded px-2 py-3 transition-colors duration-150 hover:bg-background-secondary"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-secondary">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded bg-secondary-200">
                       {thumbUrl ? (
                         <img
                           src={thumbUrl}
@@ -111,7 +104,7 @@ const AccountHubRecentOrders = ({
                       {order.createdAt ? (
                         <time
                           dateTime={order.createdAt}
-                          className="mt-0.5 block text-xs tabular-nums text-text-tertiary"
+                          className="mt-0.5 block text-sm tabular-nums text-text-tertiary"
                         >
                           {formatLongDate(order.createdAt)}
                         </time>

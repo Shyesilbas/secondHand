@@ -56,7 +56,7 @@ const FavoriteListModal = ({
  }
  };
  const isLoading = createMutation.isPending || updateMutation.isPending;
- const privacyClass = active => `flex h-10 items-center justify-center gap-2 rounded border text-sm transition-colors ${active ? 'border-primary text-text-primary ring-1 ring-primary' : 'border-border text-text-secondary hover:border-card-border-hover'}`;
+ const privacyClass = active => `flex h-10 items-center justify-center gap-2 rounded border text-sm transition-colors ${active ? 'border-accent-teal text-text-primary ring-1 ring-accent-teal' : 'border-border text-text-secondary hover:border-card-border-hover'}`;
  return <Modal isOpen={isOpen} onClose={onClose} title={editList ? 'Edit list' : 'Create new list'} size="sm" footer={<>
  <Button variant="secondary" onClick={onClose}>{t("cancel")}</Button>
  <Button type="submit" form="favorite-list-form" disabled={isLoading || !formData.name.trim()}>

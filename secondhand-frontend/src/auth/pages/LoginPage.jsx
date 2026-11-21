@@ -109,7 +109,7 @@ const LoginPage = () => {
         </label>
 
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+          {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden strokeWidth={1.5} />}
           {isLoading ? t('auth_signing_in', 'Giriş yapılıyor…') : t('auth_login_submit', 'Giriş yap')}
         </Button>
       </form>

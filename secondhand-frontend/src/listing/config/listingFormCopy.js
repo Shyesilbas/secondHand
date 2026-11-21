@@ -4,6 +4,15 @@ import i18n from '../../i18n.js';
 // the form looks fields up by name and step/section text by its English original.
 
 export const FORM_FIELD_LABELS = {
+  batteryCapacityMah: 'Pil kapasitesi (mAh)',
+  cameraMegapixels: 'Ana kamera (MP)',
+  chipset: 'Yonga seti',
+  supports5g: '5G desteği',
+  dualSim: 'Çift SIM',
+  hasNfc: 'NFC',
+  wireless: 'Kablosuz',
+  electronicVariantId: 'Sürüm',
+  colorName: 'Renk',
   fabricType: 'Kumaş',
   pattern: 'Desen',
   fit: 'Kesim',
@@ -93,6 +102,7 @@ export const FORM_FIELD_LABELS = {
 };
 
 const FORM_TEXT = {
+  'Fields depend on the device type; catalog values are read-only': 'Alanlar cihaz tipine göre değişir; katalogdan gelen değerler değiştirilemez.',
   // Steps
   'Basic Information': 'Temel bilgiler',
   'Set the title, description and price of your listing': 'Başlık, açıklama ve fiyat.',

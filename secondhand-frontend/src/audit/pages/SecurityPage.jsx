@@ -78,8 +78,8 @@ const SecurityPage = () => {
   if (isLoading) return <LoadingSkeleton />;
 
   return (
-    <div className="min-h-screen bg-background-secondary pb-20 text-text-primary">
-      <PageContainer className="py-6 sm:py-10">
+    <div className="min-h-screen bg-background-page pb-20 text-text-primary">
+      <PageContainer className="py-8">
         <PageHeader
           className="mb-6"
           back={
@@ -123,7 +123,7 @@ const SecurityPage = () => {
         />
 
         {/* Main Activity Feed Container */}
-        <div className="overflow-hidden rounded border border-border bg-background-primary">
+        <div className="overflow-hidden rounded border border-border-light bg-background-primary shadow-sm">
           {/* Card Controls Header */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border-light px-5 py-4">
             <div className="flex items-center gap-2.5">
@@ -211,7 +211,7 @@ const SecurityPage = () => {
 };
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-background-secondary pb-20">
+  <div className="min-h-screen bg-background-page pb-20">
     <PageContainer className="space-y-6 py-6 sm:py-10">
       <Skeleton className="h-6 w-24" />
       <div className="space-y-2">

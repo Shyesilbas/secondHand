@@ -36,7 +36,7 @@ const ListingReviewsSection = ({
  {Number(stats.averageRating ?? 0).toFixed(1)}
  </span>
  <div className="flex gap-0.5" aria-hidden>
- {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-4 h-4 ${star <= Math.round(stats.averageRating ?? 0) ? 'fill-status-warning text-status-warning' : 'fill-transparent text-text-muted/40'}`} strokeWidth={1.5} />)}
+ {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-4 h-4 ${star <= Math.round(stats.averageRating ?? 0) ? 'fill-status-warning text-status-warning' : 'fill-transparent text-secondary-300'}`} strokeWidth={1.5} />)}
  </div>
  </div>
  <span className="text-text-tertiary text-sm tabular-nums">

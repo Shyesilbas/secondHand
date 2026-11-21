@@ -22,9 +22,9 @@ const ConversionFunnel = ({ funnel }) => {
           <li key={step.id} className="flex items-start gap-2">
             {idx > 0 && <ChevronRight className="mt-1 hidden h-4 w-4 shrink-0 text-text-muted sm:block" strokeWidth={1.5} aria-hidden />}
             <div className="min-w-0">
-              <p className="text-xs text-text-tertiary">{step.label}</p>
+              <p className="text-sm text-text-tertiary">{step.label}</p>
               <p className="mt-1 text-xl font-semibold tabular-nums text-text-primary">{Number(step.value || 0).toLocaleString('tr-TR')}</p>
-              {step.rate != null && <p className="text-xs tabular-nums text-text-tertiary">{rate(step.rate)}</p>}
+              {step.rate != null && <p className="text-sm tabular-nums text-text-tertiary">{rate(step.rate)}</p>}
             </div>
           </li>
         ))}

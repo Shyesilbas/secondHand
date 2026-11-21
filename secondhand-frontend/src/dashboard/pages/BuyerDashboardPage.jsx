@@ -11,7 +11,7 @@ import OfferAnalyticsCard from '../components/OfferAnalyticsCard.jsx';
 import ActiveDeliveriesTracker from '../components/ActiveDeliveriesTracker.jsx';
 import PriceDropWatchlist from '../components/PriceDropWatchlist.jsx';
 import {
-  CardEmpty, CardLink, DashboardCard, DashboardError, DashboardShell, DashboardSkeleton
+  CardEmpty, CardLink, DashboardCard, DashboardError, DashboardShell, DashboardSkeleton, MetricGrid
 } from '../components/DashboardUi.jsx';
 import { DASHBOARD_CURRENCY } from '../dashboardConstants.js';
 
@@ -47,7 +47,7 @@ const BuyerDashboardPage = () => {
 
     content = (
       <>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <MetricGrid>
           <MetricCard
             title={t('dash_spending', 'Harcama')}
             value={formatCurrency(dashboard.totalSpending || 0, DASHBOARD_CURRENCY)}
@@ -68,7 +68,7 @@ const BuyerDashboardPage = () => {
             subtitle={deliveries.length > 0 ? t('dash_on_the_way_hint', 'Hazırlanan veya kargodaki') : t('dash_on_the_way_none', 'Bekleyen teslimat yok')}
             to={ROUTES.MY_ORDERS}
           />
-        </div>
+        </MetricGrid>
 
         {deliveries.length > 0 && (
           <DashboardCard title={t('dash_deliveries', 'Yoldaki siparişler')} action={<CardLink to={ROUTES.MY_ORDERS}>{t('dash_my_orders', 'Siparişlerim')}</CardLink>}>

@@ -3,8 +3,8 @@ const ErrorMessage = ({ message, className = '' }) => {
  if (!message) return null;
  
  return (
- <div className={`mb-6 p-4 bg-background-secondary border border-border rounded ${className}`}>
- <p className="text-status-error">{message}</p>
+ <div role="alert" className={`mb-6 rounded border border-status-error-border bg-status-error-bg p-4 ${className}`}>
+ <p className="text-sm text-status-error-text">{message}</p>
  </div>
  );
 };

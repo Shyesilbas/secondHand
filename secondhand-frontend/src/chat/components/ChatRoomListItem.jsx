@@ -38,13 +38,13 @@ const ChatRoomListItem = ({
         return sameChatId(room.lastMessageSenderId, userId) ? 'You' : room.lastMessageSenderName || `User ${room.lastMessageSenderId}`;
     };
     const title = getRoomTitle();
-    return <div className={`relative cursor-pointer transition-all duration-300 ease-in-out ${isSelected ? 'bg-background-tertiary border-l-2 border-l-primary' : 'hover:bg-background-secondary'}`} onClick={onClick}>
+    return <div className={`relative cursor-pointer transition-colors duration-150 ease-in-out ${isSelected ? 'bg-background-tertiary border-l-2 border-l-primary' : 'hover:bg-background-secondary'}`} onClick={onClick}>
         <div className="flex justify-between items-start">
             <div className="flex-1 min-w-0">
                 <div className="p-4 border-b border-border-light">
                     <div className="flex items-start space-x-3 w-full">
                         <div className="flex-shrink-0">
-                            <div className="w-12 h-12 bg-secondary-700 rounded-md flex items-center justify-center">
+                            <div className="w-12 h-12 bg-secondary-700 rounded flex items-center justify-center">
                                 <span className="text-sm font-semibold text-white tracking-tight">
                                     {title ? title.charAt(0).toUpperCase() : '?'}
                                 </span>
@@ -73,7 +73,7 @@ const ChatRoomListItem = ({
                                 <button onClick={e => {
                                     e.stopPropagation();
                                     onListingClick(room.listingId, e);
-                                }} className="text-xs text-text-secondary hover:text-text-primary hover:underline transition-all duration-300 ease-in-out break-words tracking-tight">
+                                }} className="text-xs text-text-secondary hover:text-text-primary hover:underline transition-colors duration-150 ease-in-out break-words tracking-tight">
                                     {room.listingTitle}
                                 </button>
                             </div>}
@@ -95,13 +95,13 @@ const ChatRoomListItem = ({
                 <button onClick={e => {
                     e.stopPropagation();
                     setShowOptions(!showOptions);
-                }} className="text-text-muted hover:text-text-secondary transition-all duration-300 ease-in-out p-1.5 rounded hover:bg-background-tertiary">
-                    <EllipsisVerticalIcon className="w-4 h-4" />
+                }} className="text-text-muted hover:text-text-secondary transition-colors duration-150 ease-in-out p-1.5 rounded hover:bg-background-tertiary">
+                    <EllipsisVerticalIcon className="w-4 h-4" strokeWidth={1.5} />
                 </button>
 
-                {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border-light rounded shadow-md z-10 min-w-36">
-                    <button onClick={handleDeleteClick} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
-                        <TrashIcon className="w-4 h-4" />
+                {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border rounded shadow-md z-10 min-w-36">
+                    <button onClick={handleDeleteClick} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-colors duration-150 ease-in-out rounded mx-1 my-1 tracking-tight">
+                        <TrashIcon className="w-4 h-4" strokeWidth={1.5} />
                         <span>{t("delete_chat")}</span>
                     </button>
                 </div>}

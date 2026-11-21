@@ -1,5 +1,9 @@
+import { AlertTriangle, CheckCircle2, Info, XCircle } from 'lucide-react';
 
-// `action` (e.g. a retry button) renders on the right of the message.
+const ICONS = { error: XCircle, success: CheckCircle2, warning: AlertTriangle, info: Info };
+
+// Inline message for a failed action or form submit, or a notice. `action` renders on the right.
+// Content that failed to load uses ErrorState instead.
 const Alert = ({ type = 'error', message, action }) => {
  if (!message) return null;
 
@@ -7,31 +11,19 @@ const Alert = ({ type = 'error', message, action }) => {
  error: { bg: 'bg-status-error-bg', border: 'border-status-error-border', text: 'text-status-error-text', icon: 'text-status-error' },
  success: { bg: 'bg-status-success-bg', border: 'border-status-success-border', text: 'text-status-success-text', icon: 'text-status-success' },
  warning: { bg: 'bg-status-warning-bg', border: 'border-status-warning-border', text: 'text-status-warning-text', icon: 'text-status-warning-text' },
+ info: { bg: 'bg-status-info-bg', border: 'border-status-info-border', text: 'text-status-info-text', icon: 'text-status-info-icon' },
  };
 
- const c = colors[type];
+ const c = colors[type] || colors.error;
+ const Icon = ICONS[type] || ICONS.error;
 
  return (
- <div role="alert" className={`${c.bg} ${c.border} border rounded p-4`}>
- <div className="flex items-start">
- <div className="flex-shrink-0">
- <svg className={`h-5 w-5 ${c.icon}`} viewBox="0 0 20 20" fill="currentColor">
- {type === 'error' && (
- <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
- )}
- {type === 'success' && (
- <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-7l-3-3 1.414-1.414L9 8.586l4.586-4.586L15 5l-6 6z" clipRule="evenodd" />
- )}
- {type === 'warning' && (
- <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
- )}
- </svg>
+ <div role="alert" className={`${c.bg} ${c.border} flex flex-col gap-3 rounded border px-4 py-3 sm:flex-row sm:items-center`}>
+ <div className="flex min-w-0 flex-1 items-start gap-2.5">
+ <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${c.icon}`} strokeWidth={1.5} aria-hidden />
+ <p className={`text-sm ${c.text}`}>{message}</p>
  </div>
- <div className="ml-3 flex flex-1 flex-wrap items-center justify-between gap-3">
- <p className={`text-sm font-medium ${c.text}`}>{message}</p>
- {action}
- </div>
- </div>
+ {action ? <div className="shrink-0 pl-6 sm:pl-0">{action}</div> : null}
  </div>
  );
 };

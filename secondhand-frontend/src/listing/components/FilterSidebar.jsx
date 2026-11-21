@@ -8,6 +8,7 @@ import PriceLocationFields from "./filters/shared/PriceLocationFields.jsx";
 import FilterRenderer from "./filters/FilterRenderer.jsx";
 import { getListingConfig } from "../config/listingConfig.js";
 import { LISTING_STATUSES } from "../types/index.js";
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 
 /**
  * browse mode: local draft filters applied on "Apply Filters" click.
@@ -69,14 +70,14 @@ const FilterSidebar = ({
   if (enumsLoading) {
     return isOpen ? <>
       <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={onClose} />
-      <aside className="fixed left-0 top-0 z-50 flex h-dvh w-80 max-w-[calc(100vw-1.25rem)] flex-col gap-3 border-r border-border bg-background-secondary p-4" aria-busy="true" aria-label={t("loading_filters")}>
+      <aside className="fixed left-0 top-0 z-50 flex h-dvh w-80 max-w-[calc(100vw-1.25rem)] flex-col gap-3 border-r border-border-light bg-background-primary p-4 lg:top-16 lg:bottom-0 lg:z-30 lg:h-auto lg:shadow-none" aria-busy="true" aria-label={t("loading_filters")}>
         {['a', 'b', 'c', 'd'].map(k => <Skeleton key={k} className="h-10 w-full" />)}
       </aside>
     </> : null;
   }
   return <>
     {isOpen && <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={onClose} />}
-    <aside className={`fixed left-0 top-0 z-50 flex h-dvh w-80 max-w-[calc(100vw-1.25rem)] flex-col border-r border-border-light bg-background-primary shadow-md
+    <aside className={`fixed left-0 top-0 z-50 flex h-dvh w-80 max-w-[calc(100vw-1.25rem)] flex-col border-r border-border-light bg-background-primary shadow-md lg:top-16 lg:bottom-0 lg:z-30 lg:h-auto lg:shadow-none
  transform transition-transform duration-300 ease-out
  ${isOpen ? 'translate-x-0' : '-translate-x-full'}
  `} aria-labelledby="listing-filters-title">
@@ -89,8 +90,8 @@ const FilterSidebar = ({
               <p className="text-sm text-text-tertiary">{t("refine_listings_then_apply")}</p>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="shrink-0 rounded border border-transparent p-2 text-text-muted transition-colors hover:bg-secondary-light hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 lg:hidden" aria-label={t("close_filters")}>
-            <X className="w-5 h-5" />
+          <button type="button" onClick={onClose} className="shrink-0 rounded border border-transparent p-2 text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus lg:hidden" aria-label={t("close_filters")}>
+            <X className="w-5 h-5" strokeWidth={1.5} />
           </button>
         </div>
       </header>
@@ -100,8 +101,8 @@ const FilterSidebar = ({
         <div className="flex flex-col gap-5">
           {mode === 'mine' ? (/* Mine mode: tabs for category/status */
             <div>
-              <div className="mb-3 flex gap-1 rounded bg-secondary-light p-1">
-                {['category', 'status'].map(tab => <button key={tab} type="button" onClick={() => setMineActiveTab(tab)} className={`flex-1 px-3 py-2.5 text-sm font-semibold rounded transition-all capitalize ${mineActiveTab === tab ? 'bg-background-primary text-text-primary ring-1 ring-border-border-light' : 'text-text-muted hover:text-text-primary'}`}>
+              <div className="mb-3 flex gap-1 rounded border border-border bg-background-secondary p-1">
+                {['category', 'status'].map(tab => <button key={tab} type="button" onClick={() => setMineActiveTab(tab)} className={`flex-1 rounded-sm px-3 py-2 text-sm font-medium transition duration-150 ${mineActiveTab === tab ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>
                   {tab === 'category' ? t('category', 'Kategori') : t('status', 'Durum')}
                 </button>)}
               </div>
@@ -153,9 +154,9 @@ const FilterSidebar = ({
 
       <footer className="flex-shrink-0 border-t border-border-light bg-background-primary px-4 py-3">
         <div className="flex gap-2">
-          {mode !== 'mine' && <button type="button" onClick={handleApplyFilters} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 flex-1">{t("apply_filters")}</button>}
-          <button type="button" onClick={handleReset} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4">
-            <RotateCcw className="w-4 h-4 shrink-0" />{t("reset")}</button>
+          {mode !== 'mine' && <button type="button" onClick={handleApplyFilters} className={`${buttonClasses()} flex-1`}>{t("apply_filters")}</button>}
+          <button type="button" onClick={handleReset} className={buttonClasses('secondary')}>
+            <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={1.5} />{t("reset")}</button>
         </div>
       </footer>
     </aside>
@@ -177,7 +178,7 @@ const OptionRow = ({
   label,
   active,
   onClick
-}) => <button type="button" onClick={onClick} className={`w-full rounded px-3 py-2.5 text-left text-sm font-medium transition-colors ${active ? 'bg-primary text-white' : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'}`}>
+}) => <button type="button" onClick={onClick} className={`w-full rounded px-3 py-2.5 text-left text-sm font-medium transition-colors ${active ? 'bg-accent-teal-50 text-accent-teal-800' : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'}`}>
     {label}
   </button>;
 const CategoryChip = ({
@@ -185,7 +186,7 @@ const CategoryChip = ({
   icon: Icon,
   active,
   onClick
-}) => <button type="button" onClick={onClick} className={`inline-flex items-center gap-1.5 rounded border px-3 py-2 text-sm font-medium transition-all ${active ? 'border-primary bg-primary text-white' : 'border-transparent bg-background-primary text-text-secondary ring-1 ring-border-light hover:bg-background-secondary'}`}>
+}) => <button type="button" onClick={onClick} className={`inline-flex items-center gap-1.5 rounded border px-3 py-2 text-sm font-medium transition-colors ${active ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800' : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary'}`}>
     {Icon && <Icon className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
     <span>{label}</span>
   </button>;

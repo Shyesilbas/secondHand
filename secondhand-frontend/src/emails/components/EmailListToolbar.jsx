@@ -29,7 +29,7 @@ const EmailListToolbar = ({
 
   return (
     <>
-      <div className="flex h-11 shrink-0 items-center gap-1.5 border-b border-border bg-background-primary px-3">
+      <div className="flex h-11 shrink-0 items-center gap-1.5 border-b border-border-light bg-background-primary px-3">
         <div className="relative min-w-0 flex-1">
           <input
             id="mail-search"
@@ -37,7 +37,7 @@ const EmailListToolbar = ({
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t('search_mail', 'E-postalarda ara...')}
-            className="h-8 w-full rounded border border-border bg-background-secondary pl-8 pr-7 text-sm text-text-primary transition-colors placeholder:text-text-muted focus:border-border-focus focus:bg-background-primary focus:outline-none focus:ring-1 focus:ring-border-focus"
+            className="h-8 w-full rounded border border-border bg-background-secondary pl-8 pr-7 text-sm text-text-primary transition-colors placeholder:text-text-muted focus:border-border-focus focus:bg-background-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
           />
           <Search
             className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted"

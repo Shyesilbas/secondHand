@@ -3,104 +3,95 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ROUTES } from '../../common/constants/routes.js';
 import { userService } from '../../user/services/userService.js';
-import { ArrowRight, Award, Star, CalendarDays } from 'lucide-react';
+import { Award, Star } from 'lucide-react';
 import GreatSellerRulesCallout from './GreatSellerRulesCallout.jsx';
-import { SkeletonCard } from '../../common/components/ui/Skeleton.jsx';
+import HomeSection from './HomeSection.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { formatMonthYear } from '../../common/formatters.js';
-const HeaderBlock = () => {
-    const { t } = useTranslation();
-    return (
-        <div className="relative z-10 mb-12">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-                <div className="max-w-2xl">
-                    <p className="text-xs font-semibold text-text-muted mb-3">{t("community_spotlight")}</p>
-                    <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("trust_verified_sellers")}</h2>
-                    <p className="text-base text-text-secondary mt-4 font-medium leading-relaxed">{t("high_performance_sellers_recognized_for_")}</p>
-                </div>
 
-                <Link to={ROUTES.LISTINGS} className="group inline-flex items-center justify-center gap-2 text-sm font-semibold text-text-primary hover:text-primary transition-colors">{t("view_all_marketplace_listings")}<ArrowRight className="w-4 h-4 transition-transform" />
-                </Link>
-            </div>
+const GRID = 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5 xl:grid-cols-4';
+const CARD = 'rounded border border-border-light bg-background-primary p-5 shadow-sm';
+const LIMIT = 12;
+
+const SellerCard = ({ s }) => {
+  const { t } = useTranslation();
+  const fullName = `${s.name || ''} ${s.surname || ''}`.trim() || t('anonymous_seller');
+  const initials = `${s.name?.[0] || ''}${s.surname?.[0] || ''}`.toUpperCase() || 'S';
+  return (
+    <Link
+      to={ROUTES.USER_PROFILE(s.id)}
+      className={`${CARD} group block transition duration-150 hover:border-border hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus`}
+    >
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-background-secondary text-sm font-semibold text-text-secondary">
+          {initials}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-sm font-semibold text-text-primary">{fullName}</h3>
+          <p className="mt-0.5 flex items-center gap-1.5 text-sm text-text-tertiary">
+            <Star className="h-3.5 w-3.5 shrink-0 fill-status-warning text-status-warning" strokeWidth={1.5} aria-hidden />
+            <span className="font-medium tabular-nums text-text-secondary">{s.averageRating?.toFixed(1) || '0.0'}</span>
+            <span aria-hidden>·</span>
+            <span className="truncate">{formatMonthYear(s.createdAt)}</span>
+          </p>
         </div>
-    );
+      </div>
+      <div className="mt-4 flex items-center gap-1.5 border-t border-border-light pt-3 text-sm font-medium text-text-secondary">
+        <Award className="h-4 w-4 shrink-0 text-accent-teal" strokeWidth={1.5} aria-hidden />
+        {t("great_seller")}
+      </div>
+    </Link>
+  );
 };
-const SellerCard = ({
-    s
-}) => {
-    const {
-        t
-    } = useTranslation();
-    const fullName = `${s.name || ''} ${s.surname || ''}`.trim() || 'Anonymous Seller';
-    const initials = `${s.name?.[0] || ''}${s.surname?.[0] || ''}`.toUpperCase() || 'S';
-    return <div>
-        <Link to={ROUTES.USER_PROFILE(s.id)} className="group block bg-background-primary border border-border-light rounded p-5 transition-all duration-300 hover:border-border">
-            <div className="flex items-start gap-4">
-                {/* Avatar - Calm Slate */}
-                <div className="w-12 h-12 rounded-full bg-background-secondary border border-border-light flex items-center justify-center shrink-0 transition-colors group-hover:bg-background-tertiary">
-                    <span className="text-sm font-semibold text-text-secondary">{initials}</span>
-                </div>
 
-                <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-medium text-text-primary truncate mb-1 group- transition-colors">
-                        {fullName}
-                    </h3>
+// Mirrors SellerCard (avatar row, divider, badge row) so the grid does not jump on load.
+const SellerCardSkeleton = () => (
+  <div className={CARD} aria-hidden>
+    <div className="flex items-center gap-3">
+      <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+    </div>
+    <div className="mt-4 border-t border-border-light pt-3">
+      <Skeleton className="h-5 w-1/3" />
+    </div>
+  </div>
+);
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        {/* Rating / Trust Score */}
-                        <div className="flex items-center gap-1">
-                            <Star className="w-3 h-3 text-status-warning fill-status-warning" />
-                            <span className="text-xs font-semibold text-text-secondary">{s.averageRating?.toFixed(1) || '0.0'}</span>
-                            <span className="text-xs text-text-muted font-medium">{t("score")}</span>
-                        </div>
-
-                        <div className="w-1 h-1 rounded-full bg-border-light" />
-
-                        {/* Join Date */}
-                        <div className="flex items-center gap-1 text-text-muted">
-                            <CalendarDays className="w-3 h-3" />
-                            <span className="text-xs font-medium">{formatMonthYear(s.createdAt)}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Footer Badge - Subtle */}
-            <div className="mt-4 pt-3 border-t border-border-light flex items-center justify-between">
-                <div className="flex items-center gap-1.5 py-0.5 px-2 bg-primary-light rounded-md">
-                    <Award className="w-3 h-3 text-primary" />
-                    <span className="text-xs font-semibold text-primary">{t("great_seller")}</span>
-                </div>
-                <ArrowRight className="w-3.5 h-3.5 text-text-muted opacity-0 group-hover:opacity-100 transition-all" />
-            </div>
-        </Link>
-    </div>;
-};
 const GreatSellersSection = () => {
-    const {
-        t
-    } = useTranslation();
-    const limit = 12;
-    const {
-        data: sellers = [],
-        isLoading,
-        error
-    } = useQuery({
-        queryKey: ['greatSellersHome', limit],
-        queryFn: () => userService.listGreatSellers(limit),
-        staleTime: 10 * 60 * 1000
-    });
-    return <section className="py-20 bg-background-secondary border-y border-border-light">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8">
-            <HeaderBlock />
+  const { t } = useTranslation();
+  const { data: sellers = [], isLoading, error } = useQuery({
+    queryKey: ['greatSellersHome', LIMIT],
+    queryFn: () => userService.listGreatSellers(LIMIT),
+    staleTime: 10 * 60 * 1000
+  });
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {isLoading ? [...Array(8)].map((_, i) => <SkeletonCard key={i} />) : error ? <div className="col-span-full py-12 text-center text-text-muted text-sm italic">{t("unable_to_load_featured_sellers_at_this_")}</div> : !sellers.length ? <div className="col-span-full py-12 text-center text-text-muted text-sm">{t("new_community_verified_sellers_will_appe")}</div> : sellers.map((s) => <SellerCard key={s.id} s={s} />)}
-            </div>
+  let body;
+  if (isLoading) {
+    body = <div className={GRID} aria-busy="true">{Array.from({ length: 8 }, (_, i) => <SellerCardSkeleton key={i} />)}</div>;
+  } else if (error || !sellers.length) {
+    body = (
+      <p className={`${CARD} py-10 text-center text-sm text-text-secondary`}>
+        {error ? t("unable_to_load_featured_sellers_at_this_") : t("new_community_verified_sellers_will_appe")}
+      </p>
+    );
+  } else {
+    body = <div className={GRID}>{sellers.map((s) => <SellerCard key={s.id} s={s} />)}</div>;
+  }
 
-            <div className="mt-16">
-                <GreatSellerRulesCallout />
-            </div>
-        </div>
-    </section>;
+  return (
+    <HomeSection
+      title={t("trust_verified_sellers")}
+      description={t("high_performance_sellers_recognized_for_")}
+      linkTo={ROUTES.LISTINGS}
+      linkLabel={t("view_all_marketplace_listings")}
+    >
+      {body}
+      <GreatSellerRulesCallout className="mt-8" />
+    </HomeSection>
+  );
 };
+
 export default GreatSellersSection;

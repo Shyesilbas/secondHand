@@ -3,8 +3,13 @@ import { useCallback, useState } from 'react';
 import EmptyState from '../../../common/components/ui/EmptyState.jsx';
 import { useEWallet } from '../../../ewallet/hooks/useEWallet.js';
 import { usePaymentStatisticsQuery } from '../../hooks/queries.js';
-import { EWalletActions, EWalletBalance } from '../WalletOverview.jsx';
-const EWalletSection = () => {
+import { Link } from 'react-router-dom';
+import PageHeader from '../../../common/components/ui/PageHeader.jsx';
+import { buttonClasses } from '../../../common/components/ui/Button.jsx';
+import { ROUTES } from '../../../common/constants/routes.js';
+import { EWalletOverview } from '../WalletOverview.jsx';
+// Owns the page header so its action (transaction history) sits on the same row as the title.
+const EWalletSection = ({ back = null }) => {
  const {
  t
  } = useTranslation();
@@ -37,24 +42,24 @@ const EWalletSection = () => {
  }
  }, [statisticsLoaded, refetchStats]);
  return <div>
- <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
- <div>
- <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("ewallet")}</h2>
- <p className="text-sm text-text-tertiary mt-1">{t("manage_your_wallet_balance_limits_and_tr")}</p>
- </div>
- {eWallet && <EWalletActions eWallet={eWallet} loading={loading} onCreateEWallet={createEWallet} onUpdateLimits={updateLimits} onUpdateSpendingWarningLimit={updateSpendingWarningLimit} onDeposit={deposit} onWithdraw={withdraw} />}
- </div>
+ <PageHeader
+ back={back}
+ title={t("wallet")}
+ subtitle={t("manage_your_wallet_balance_and_limits")}
+ actions={eWallet ? <Link to={ROUTES.PAYMENTS} className={buttonClasses('secondary', 'sm')}>{t("payment_history")}</Link> : null}
+ className="mb-8"
+ />
 
- {error && <div className="mb-6 p-3 bg-background-secondary border border-border rounded text-sm text-status-error-text">
+ {error && <div className="mb-6 p-3 rounded border border-status-error-border bg-status-error-bg text-sm text-status-error-text" role="alert">
  {error}
  </div>}
 
- {!eWallet ? <EmptyState title={t("no_ewallet_found")} description="You don't have an eWallet yet. Create one to start using digital payments." variant="neutral" primaryAction={{
- label: loading ? 'Creating...' : 'Create eWallet',
+ {!eWallet ? <EmptyState title={t("no_ewallet_found")} description={t('ewallet_empty_desc')} variant="neutral" primaryAction={{
+ label: loading ? t('ewallet_creating') : t('ewallet_create'),
  onClick: createEWallet,
  disabled: loading,
  variant: 'neutral'
- }} /> : <EWalletBalance eWallet={eWallet} totalAmount={totalAmount} statsData={statsData} statisticsLoaded={statisticsLoaded} onLoadStatistics={fetchStatistics} />}
+ }} /> : <EWalletOverview eWallet={eWallet} loading={loading} totalAmount={totalAmount} statsData={statsData} statisticsLoaded={statisticsLoaded} onLoadStatistics={fetchStatistics} onDeposit={deposit} onWithdraw={withdraw} onUpdateLimits={updateLimits} onUpdateSpendingWarningLimit={updateSpendingWarningLimit} />}
 
  </div>;
 };

@@ -253,7 +253,7 @@ const EmailsPage = ({ embedded = false }) => {
     <div
       className={
         embedded
-          ? 'flex h-full min-h-0 w-full flex-col overflow-hidden rounded-md border border-border bg-background-primary'
+          ? 'flex h-full min-h-0 w-full flex-col overflow-hidden rounded border border-border-light bg-background-primary shadow-sm'
           : 'flex h-dvh min-h-0 flex-col overflow-hidden bg-background-secondary'
       }
     >

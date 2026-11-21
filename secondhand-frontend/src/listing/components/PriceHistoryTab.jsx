@@ -20,7 +20,7 @@ const StatItem = ({
   <div className="rounded border border-border-light bg-background-primary p-3.5 hover:border-card-border-hover transition-colors">
     <div className="flex items-center gap-2">
       <Icon className="w-4 h-4 text-text-tertiary shrink-0" strokeWidth={1.5} />
-      <p className="text-xs font-semibold text-text-secondary">{title}</p>
+      <p className="text-xs font-medium text-text-secondary">{title}</p>
     </div>
     <div className="mt-1.5 min-w-0">
       {typeof value === 'string' || typeof value === 'number' ? (
@@ -332,12 +332,12 @@ const PriceHistoryTab = ({
                     <div className="mt-1.5 flex justify-end">
                       {hasPct ? (
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-semibold border ${badgeClass} tabular-nums`}>
-                          {isUp ? <TrendingUp className="w-3.5 h-3.5" /> : isDown ? <TrendingDown className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
+                          {isUp ? <TrendingUp className="w-3.5 h-3.5" strokeWidth={1.5} /> : isDown ? <TrendingDown className="w-3.5 h-3.5" strokeWidth={1.5} /> : <Minus className="w-3.5 h-3.5" strokeWidth={1.5} />}
                           {Math.abs(pctValue).toFixed(1)}%
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-semibold border bg-background-secondary text-text-secondary border-border-light">
-                          <Minus className="w-3.5 h-3.5" />
+                          <Minus className="w-3.5 h-3.5" strokeWidth={1.5} />
                           —
                         </span>
                       )}

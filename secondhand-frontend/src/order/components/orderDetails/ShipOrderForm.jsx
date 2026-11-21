@@ -43,7 +43,7 @@ export const ShipOrderForm = ({
                     {carriers.map(c => <button key={c.value} type="button" role="radio" aria-checked={carrier === c.value} onClick={() => {
                         setCarrier(c.value);
                         setError('');
-                    }} className={`h-10 rounded border px-3 text-sm transition-colors ${carrier === c.value ? 'border-primary text-text-primary ring-1 ring-primary' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'}`}>
+                    }} className={`h-10 rounded border px-3 text-sm transition-colors ${carrier === c.value ? 'border-accent-teal text-text-primary ring-1 ring-accent-teal' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'}`}>
                         {c.label}
                     </button>)}
                 </div> : <p className="text-sm text-status-error-text">No cargo provider is available. Please try again later.</p>}

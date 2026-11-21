@@ -8,8 +8,9 @@ const PageContainer = ({ children, className = '', narrow = false, full = false 
  ? ''
  : 'max-w-7xl';
 
+ // w-full keeps the container at full width inside flex columns, where mx-auto alone would shrink it.
  return (
- <div className={`${width} mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
+ <div className={`w-full ${width} mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
  {children}
  </div>
  );

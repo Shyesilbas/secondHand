@@ -16,6 +16,10 @@ const getInitials = (name) => {
 
 const isRouteActive = (pathname, route) => pathname === route;
 
+const NAV_ITEM = 'flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus';
+const NAV_ITEM_ACTIVE = 'bg-accent-teal-50 font-medium text-accent-teal-800';
+const NAV_ITEM_IDLE = 'text-text-secondary hover:bg-background-secondary hover:text-text-primary';
+
 const formatGroupLabel = (text, isTr) => {
   if (!text) return '';
   const locale = isTr ? 'tr-TR' : 'en-US';
@@ -53,11 +57,7 @@ const AccountHubSidebar = ({
                 to={item.route}
                 onClick={onItemClick}
                 aria-current={active ? 'page' : undefined}
-                className={`flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors duration-150 ${
-                  active
-                    ? 'bg-primary font-medium text-white'
-                    : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'
-                }`}
+                className={`${NAV_ITEM} ${active ? NAV_ITEM_ACTIVE : NAV_ITEM_IDLE}`}
               >
                 <ItemIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
                 <span className="truncate">{t(item.nameKey || item.name)}</span>
@@ -76,13 +76,13 @@ const AccountHubSidebar = ({
               type="button"
               onClick={() => toggleGroup(group.id)}
               aria-expanded={isOpen}
-              className={`flex w-full items-center justify-between rounded px-3 py-1.5 text-left text-xs font-semibold transition-colors duration-150 ${
+              className={`flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
                 hasActiveChild ? 'text-text-primary' : 'text-text-tertiary hover:text-text-primary'
               }`}
             >
               <span className="truncate">{formatGroupLabel(rawGroupLabel, isTr)}</span>
               <ChevronDown
-                className={`h-3.5 w-3.5 shrink-0 text-text-muted transition-transform duration-150 ${
+                className={`h-4 w-4 shrink-0 text-text-muted transition-transform duration-150 ${
                   isOpen ? '' : '-rotate-90'
                 }`}
                 strokeWidth={1.5}
@@ -100,14 +100,10 @@ const AccountHubSidebar = ({
                       to={item.route}
                       onClick={onItemClick}
                       aria-current={active ? 'page' : undefined}
-                      className={`flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors duration-150 ${
-                        active
-                          ? 'bg-primary font-medium text-white'
-                          : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'
-                      }`}
+                      className={`${NAV_ITEM} ${active ? NAV_ITEM_ACTIVE : NAV_ITEM_IDLE}`}
                     >
                       <ItemIcon
-                        className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-text-tertiary'}`}
+                        className={`h-4 w-4 shrink-0 ${active ? 'text-accent-teal' : 'text-text-tertiary'}`}
                         strokeWidth={1.5}
                         aria-hidden
                       />
@@ -124,8 +120,8 @@ const AccountHubSidebar = ({
   );
 
   return (
-    <aside className="w-full shrink-0 lg:sticky lg:top-6 lg:w-64 xl:w-72">
-      <Card padding="compact" shadow={false}>
+    <aside className="w-full shrink-0 lg:sticky lg:top-24 lg:w-64 xl:w-72">
+      <Card padding="compact">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-background-tertiary text-sm font-semibold text-text-secondary">
             {user?.profilePicture ? (
@@ -136,16 +132,16 @@ const AccountHubSidebar = ({
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="truncate text-sm font-semibold text-text-primary">{fullName}</h2>
-            <p className="truncate text-xs text-text-tertiary">{user?.email || ''}</p>
+            <p className="truncate text-sm text-text-tertiary">{user?.email || ''}</p>
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between border-t border-border-light pt-3 text-xs">
+        <div className="mt-3 flex items-center justify-between border-t border-border-light pt-3 text-sm">
           <Badge variant={isPremium ? 'warning' : 'neutral'} dot>
             {isPremium ? plan || 'Premium' : t('standard', 'Standard')}
           </Badge>
           <Link
             to={ROUTES.PROFILE}
-            className="font-medium text-text-secondary transition-colors hover:text-text-primary"
+            className="rounded font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             {t('edit', 'Edit')}
           </Link>
@@ -187,7 +183,6 @@ const AccountHubSidebar = ({
       <Card
         as="nav"
         padding="none"
-        shadow={false}
         className="mt-4 hidden p-2 lg:block"
         aria-label={trEn('Hesap menüsü', 'Account navigation')}
       >

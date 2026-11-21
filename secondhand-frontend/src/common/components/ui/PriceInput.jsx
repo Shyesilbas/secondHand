@@ -43,6 +43,6 @@ export const PriceInput = ({value, onChange, onBlur, placeholder = '0,00', class
  const baseCls = compact ? 'w-20 px-2 py-1.5 text-xs' : 'w-full px-3.5 py-2 text-sm';
  return (
  <input type="text" inputMode="decimal" value={display} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur}
- placeholder={placeholder} className={`${baseCls} border border-border-light rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary ${className}`} {...rest} />
+ placeholder={placeholder} className={`${baseCls} border border-border-light rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary ${className}`} {...rest} />
  );
 };

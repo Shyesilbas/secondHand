@@ -4,7 +4,7 @@ import { FileText } from 'lucide-react';
 import { useRequiredAgreements } from '../../agreements/hooks/useAgreements.js';
 import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
-import { AGREEMENT_TYPE_LABELS } from '../../agreements/agreements.js';
+import { agreementLabel } from '../../agreements/agreements.js';
 
 const PaymentAgreementsSection = ({
   acceptedAgreements,
@@ -56,47 +56,36 @@ const PaymentAgreementsSection = ({
     <div className="space-y-2">
       {agreements.map((agreement) => {
         const isChecked = acceptedAgreements.has(agreement.agreementId);
-        const agreementName = AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType;
+        const agreementName = agreementLabel(t, agreement.agreementType);
         return (
           <div
             key={agreement.agreementId}
-            className={`flex items-start justify-between gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors duration-150 ${
+            className={`flex items-center gap-3 rounded border px-4 py-3 text-sm transition-colors duration-150 has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-border-focus ${
               isChecked
-                ? 'border-border bg-background-secondary'
-                : 'border-border-light bg-background-primary hover:border-card-border-hover'
+                ? 'border-accent-teal bg-accent-teal-50'
+                : 'border-border bg-background-primary hover:border-card-border-hover'
             }`}
           >
-            <div className="flex min-w-0 items-start gap-2.5">
+            {/* The label covers the row, so a click anywhere but "Read" toggles the checkbox. */}
+            <label htmlFor={`agreement-${agreement.agreementId}`} className="flex min-w-0 flex-1 cursor-pointer select-none items-center gap-3">
               <input
                 id={`agreement-${agreement.agreementId}`}
                 type="checkbox"
                 checked={isChecked}
                 onChange={() => handleAgreementToggle(agreement.agreementId)}
-                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded-sm border-border text-primary accent-primary focus:ring-primary"
+                className="h-4 w-4 shrink-0 cursor-pointer rounded-sm border-border accent-accent-teal focus-visible:outline-none"
               />
-              <label
-                htmlFor={`agreement-${agreement.agreementId}`}
-                className="cursor-pointer select-none leading-relaxed text-text-secondary"
-              >
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleAgreementClick(agreement);
-                  }}
-                  className="mr-1 cursor-pointer font-medium text-text-primary underline hover:text-primary"
-                >
-                  {agreementName}
-                </button>
-                <span>{t('kosullarini_kabul_ediyorum', 'metnini okudum, onaylıyorum.')}</span>
-              </label>
-            </div>
+              <span className="text-text-secondary">
+                <span className="font-medium text-text-primary">{agreementName}</span>{' '}
+                {t('kosullarini_kabul_ediyorum', 'metnini okudum, onaylıyorum.')}
+              </span>
+            </label>
             <button
               type="button"
               onClick={() => handleAgreementClick(agreement)}
-              className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded px-2 py-1 text-sm font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             >
-              <FileText className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+              <FileText className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span>{t('read', 'Oku')}</span>
             </button>
           </div>

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, RefreshCw, Shield } from 'lucide-react';
+import { ArrowLeft, Plus, RefreshCw } from 'lucide-react';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -149,30 +149,29 @@ const AdminCouponsPage = () => {
   }, [sorted, normalizedCodeQuery]);
 
   return (
-    <div className="min-h-screen bg-background-secondary">
-      <div className="mx-auto max-w-7xl px-4 pb-10">
-        <div className="sticky top-0 z-10 -mx-4 mb-4 border-b border-border-light bg-background-secondary px-4 py-4">
+    <div className="min-h-screen bg-background-page">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-6">
           <PageHeader
             back={
               <Link
                 to={ROUTES.DASHBOARD}
                 className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-primary"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
                 {t('account')}
               </Link>
             }
-            icon={Shield}
             title={t('coupon_management')}
             subtitle={t('admin_only_platform_coupons')}
             actions={
               <div className="flex items-center gap-2">
                 <Button variant="secondary" size="sm" onClick={() => refetch()} disabled={isFetching}>
-                  <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} strokeWidth={1.5} />
                   {t('refresh')}
                 </Button>
                 <Button size="sm" onClick={openCreate}>
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4" strokeWidth={1.5} />
                   {t('new_coupon')}
                 </Button>
               </div>

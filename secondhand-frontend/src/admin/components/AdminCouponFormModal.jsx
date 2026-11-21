@@ -4,7 +4,7 @@ import { Button, Card, Modal } from '../../common/components/ui/index.js';
 import { AUDIENCES, DISCOUNT_KINDS } from '../utils/couponFormUtils.js';
 
 const inputCn =
-  'mt-1.5 w-full rounded border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-background-tertiary disabled:text-text-tertiary';
+  'mt-1.5 w-full rounded border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-border-focus disabled:cursor-not-allowed disabled:bg-background-tertiary disabled:text-text-tertiary';
 
 const FormSection = ({ Icon, title, subtitle, children, className = '' }) => (
   <Card as="section" padding="compact" border="light" className={className}>
@@ -103,16 +103,16 @@ const AdminCouponFormModal = ({
                 return (
                   <label
                     key={opt.value}
-                    className={`flex cursor-pointer items-start gap-3 rounded-md border p-3.5 transition-all sm:p-4 ${
+                    className={`flex cursor-pointer items-start gap-3 rounded border p-3.5 transition-colors sm:p-4 ${
                       selected
-                        ? 'border-primary bg-primary-light ring-2 ring-primary/20'
+                        ? 'border-accent-teal bg-background-secondary ring-1 ring-accent-teal'
                         : 'border-border-light bg-background-primary hover:border-border-dark hover:bg-background-secondary'
                     } ${modal?.mode === 'edit' ? 'cursor-default opacity-95' : ''}`}
                   >
                     <input
                       type="radio"
                       name="coupon-audience"
-                      className="mt-1 h-4 w-4 shrink-0 border-border-light text-primary focus:ring-primary"
+                      className="mt-1 h-4 w-4 shrink-0 border-border-light text-primary focus:ring-border-focus"
                       checked={selected}
                       onChange={() => onAudienceSelect(opt.value)}
                     />
@@ -134,14 +134,14 @@ const AdminCouponFormModal = ({
           )}
 
           {form.audience === 'NEVER_ORDERED_FIRST_ORDER' && (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-light bg-background-secondary px-4 py-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded border border-border-light bg-background-secondary px-4 py-3.5">
               <div className="flex items-center gap-2.5 text-sm text-text-primary">
                 <div className="flex h-10 w-10 items-center justify-center rounded border border-border-light bg-background-primary">
-                  <Users className="h-5 w-5 text-primary" />
+                  <Users className="h-5 w-5 text-primary" strokeWidth={1.5} />
                 </div>
                 <div>
                   <p className="font-semibold">{t('anl_k_uygun_kullan_c')}</p>
-                  <p className="text-xs text-text-muted">{t('tamamlanm_demeli_sipari_i_olmayan_kay_tl')}</p>
+                  <p className="text-sm text-text-muted">{t('tamamlanm_demeli_sipari_i_olmayan_kay_tl')}</p>
                 </div>
               </div>
               <div className="rounded border border-border-light bg-background-primary px-4 py-2 text-center">
@@ -170,13 +170,13 @@ const AdminCouponFormModal = ({
         </FormSection>
 
         <FormSection Icon={Clock} title={t('yay_n_ve_s_re')} subtitle={t('admin_publication_subtitle')}>
-          <label className="flex cursor-pointer items-center justify-between gap-4 rounded-md border border-border-light bg-background-primary px-4 py-3.5 transition hover:border-border-dark">
+          <label className="flex cursor-pointer items-center justify-between gap-4 rounded border border-border-light bg-background-primary px-4 py-3.5 transition hover:border-border-dark">
             <span className="text-sm font-semibold text-text-primary">{t('kupon_yay_nda')}</span>
             <input
               type="checkbox"
               checked={form.active}
               onChange={(e) => setForm((p) => ({ ...p, active: e.target.checked }))}
-              className="h-5 w-5 shrink-0 rounded-md border-border-light text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+              className="h-5 w-5 shrink-0 rounded border-border-light text-primary focus:ring-2 focus:ring-border-focus focus:ring-offset-0"
             />
           </label>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -202,7 +202,7 @@ const AdminCouponFormModal = ({
             </label>
           </div>
           {firstOrderAudience && (
-            <p className="text-xs text-text-muted">{t('bu_kuralda_s_re_s_n_r_yok_alanlar_kilitl')}</p>
+            <p className="text-sm text-text-muted">{t('bu_kuralda_s_re_s_n_r_yok_alanlar_kilitl')}</p>
           )}
         </FormSection>
 
@@ -270,7 +270,7 @@ const AdminCouponFormModal = ({
                   onClick={() => onToggleListingType(typeCode)}
                   className={`rounded border px-3 py-2 text-xs font-medium transition ${
                     on
-                      ? 'border-primary bg-primary-light text-primary ring-1 ring-primary/15'
+                      ? 'border-accent-teal bg-background-secondary text-primary ring-1 ring-accent-teal'
                       : 'border-border-light bg-background-primary text-text-secondary hover:border-border-dark hover:bg-background-secondary'
                   }`}
                 >

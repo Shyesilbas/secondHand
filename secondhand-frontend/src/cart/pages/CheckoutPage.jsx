@@ -193,7 +193,7 @@ const CheckoutPage = () => {
 
   if (!offerId && cartCount === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background-secondary p-4 antialiased">
+      <div className="flex min-h-screen items-center justify-center bg-background-page p-4 antialiased">
         <EmptyState
           icon={ShoppingCart}
           title={t('empty_cart_title', CART_MESSAGES.EMPTY_CART_TITLE)}
@@ -217,8 +217,8 @@ const CheckoutPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background-secondary text-text-primary antialiased">
-      <header className="sticky top-0 z-30 border-b border-border bg-background-primary">
+    <div className="min-h-screen bg-background-page text-text-primary antialiased">
+      <header className="z-10 border-b border-border-light bg-background-primary md:sticky md:top-16">
         <PageContainer className="py-3">
           <div className="flex items-center gap-4">
             <Button
@@ -265,7 +265,7 @@ const CheckoutPage = () => {
       </header>
 
       {/* Mobile: collapsible summary with the total always visible */}
-      <div className="border-b border-border bg-background-primary px-4 py-3 lg:hidden">
+      <div className="border-b border-border-light bg-background-primary px-4 py-3 lg:hidden">
         <button
           type="button"
           onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)}
@@ -283,7 +283,7 @@ const CheckoutPage = () => {
         {isOrderSummaryExpanded && <div className="mt-3">{summary}</div>}
       </div>
 
-      <PageContainer className="py-6 sm:py-8">
+      <PageContainer className="py-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
           <div className="lg:col-span-8">
             {reservationError ? (

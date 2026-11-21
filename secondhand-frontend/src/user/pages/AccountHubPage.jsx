@@ -2,7 +2,7 @@ import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, Heart, MessageSquare, Package, Plus } from 'lucide-react';
+import { BarChart3, ChevronRight, HandCoins, Heart, MessageSquare, Package, Plus, ShoppingBag } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { usePlan } from '@/common/hooks/usePlan';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
@@ -28,19 +28,14 @@ const QuickActionLink = ({ to, icon: Icon, title }) => (
     as={Link}
     to={to}
     padding="none"
-    shadow={false}
     interactive
-    className="group flex items-center justify-between gap-3 px-4 py-3"
+    className="group flex items-center gap-3 px-4 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
   >
-    <span className="flex min-w-0 items-center gap-2.5">
-      <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-      <span className="truncate text-sm font-medium text-text-primary">{title}</span>
+    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-background-secondary text-text-secondary transition-colors duration-150 group-hover:bg-accent-teal-50 group-hover:text-accent-teal-800">
+      <Icon className="h-4 w-4" strokeWidth={1.5} aria-hidden />
     </span>
-    <ChevronRight
-      className="h-4 w-4 shrink-0 text-text-muted transition-transform duration-150 ease-out group-hover:translate-x-0.5 motion-reduce:transform-none"
-      strokeWidth={1.5}
-      aria-hidden
-    />
+    <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-primary">{title}</span>
+    <ChevronRight className="h-4 w-4 shrink-0 text-text-muted transition-colors duration-150 group-hover:text-text-secondary" strokeWidth={1.5} aria-hidden />
   </Card>
 );
 
@@ -52,7 +47,8 @@ const AccountHubPage = () => {
 
   const { user } = useAuthState();
   const { pathname } = useLocation();
-  const [openGroups, setOpenGroups] = useState(() => new Set());
+  // Groups start open; the set holds the ones the user collapsed.
+  const [closedGroups, setClosedGroups] = useState(() => new Set());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -64,8 +60,12 @@ const AccountHubPage = () => {
     });
   }, [user]);
 
+  const openGroups = useMemo(
+    () => new Set(navGroups.map((group) => group.id).filter((id) => !closedGroups.has(id))),
+    [navGroups, closedGroups]
+  );
   const toggleGroup = (id) => {
-    setOpenGroups((prev) => {
+    setClosedGroups((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -133,7 +133,7 @@ const AccountHubPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background-secondary">
+    <div className="min-h-screen bg-background-page">
       <PageContainer className="py-6 lg:py-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <AccountHubSidebar
@@ -190,22 +190,13 @@ const AccountHubPage = () => {
               }
             />
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <QuickActionLink
-                to={ROUTES.MY_LISTINGS}
-                icon={Package}
-                title={t('my_listings', 'My Listings')}
-              />
-              <QuickActionLink
-                to={ROUTES.FAVORITES}
-                icon={Heart}
-                title={t('favorites', 'Favorites')}
-              />
-              <QuickActionLink
-                to={ROUTES.INBOX}
-                icon={MessageSquare}
-                title={t('inbox', 'Inbox')}
-              />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <QuickActionLink to={ROUTES.MY_LISTINGS} icon={Package} title={t('my_listings', 'İlanlarım')} />
+              <QuickActionLink to={ROUTES.MY_ORDERS} icon={ShoppingBag} title={t('my_orders', 'Siparişlerim')} />
+              <QuickActionLink to={ROUTES.OFFERS} icon={HandCoins} title={t('offers', 'Teklifler')} />
+              <QuickActionLink to={ROUTES.FAVORITES} icon={Heart} title={t('favorites', 'Favoriler')} />
+              <QuickActionLink to={ROUTES.INBOX} icon={MessageSquare} title={t('inbox', 'Mesajlar')} />
+              <QuickActionLink to={ROUTES.SELLER_DASHBOARD} icon={BarChart3} title={t('dash_tab_seller', 'Satışlarım')} />
             </div>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

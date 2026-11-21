@@ -21,7 +21,7 @@ const PriceDropWatchlist = ({ priceDrops = [] }) => {
             />
             <p className="mt-2 truncate text-sm text-text-primary group-hover:underline">{item.title}</p>
             <p className="text-sm font-medium tabular-nums text-text-primary">{formatCurrency(item.currentPrice, DASHBOARD_CURRENCY)}</p>
-            <p className="truncate text-xs text-status-success-text">{item.campaignName || t('dash_on_campaign', 'Kampanyada')}</p>
+            <p className="truncate text-sm text-status-success-text">{item.campaignName || t('dash_on_campaign', 'Kampanyada')}</p>
           </Link>
         </li>
       ))}

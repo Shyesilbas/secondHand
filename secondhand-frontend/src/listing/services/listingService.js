@@ -114,6 +114,19 @@ export const listingService = {
         }
         return get(url);
     },
+    // Ids and statuses of every own listing matching the My Listings filter, for "select all".
+    getMyListingSelection: async ({ status = null, listingType = null, title = null } = {}) => {
+        const params = new URLSearchParams();
+        if (status) params.set('status', status);
+        if (listingType) params.set('listingType', listingType);
+        if (title && String(title).trim()) params.set('title', String(title).trim());
+        const query = params.toString();
+        return get(`${API_ENDPOINTS.LISTINGS.MY_LISTING_SELECTION}${query ? `?${query}` : ''}`);
+    },
+    // Puts every INACTIVE own listing back on sale; resolves to { updatedCount }.
+    reactivateAllInactive: async () => put(API_ENDPOINTS.LISTINGS.REACTIVATE_ALL_INACTIVE),
+    // Takes every ACTIVE own listing off sale; resolves to { updatedCount }.
+    deactivateAllActive: async () => put(API_ENDPOINTS.LISTINGS.DEACTIVATE_ALL_ACTIVE),
     getMyListingsByStatus: async (status, page = 0, size = LISTING_DEFAULTS.SERVICE_FILTER_PAGE_SIZE) => {
         const url = `${API_ENDPOINTS.LISTINGS.MY_LISTINGS}/status/${status}?page=${page}&size=${size}`;
         return get(url);
@@ -159,12 +172,16 @@ export const listingService = {
     },
     updateBatchQuantity: async (listingIds, quantity) => put(API_ENDPOINTS.LISTINGS.UPDATE_QUANTITY_BATCH, { listingIds, quantity }),
     updateBatchPrice: async (listingIds, price) => put(API_ENDPOINTS.LISTINGS.UPDATE_PRICE_BATCH, { listingIds, price }),
+    // action: DEACTIVATE | REACTIVATE | MARK_SOLD; all or nothing on the backend.
+    updateBatchStatus: async (listingIds, action) => put(API_ENDPOINTS.LISTINGS.UPDATE_STATUS_BATCH, { listingIds, action }),
     deleteListing: async (id) => {
         return del(API_ENDPOINTS.LISTINGS.DELETE(id));
     },
     getListingStatistics: async () => {
         return get(API_ENDPOINTS.LISTINGS.STATISTICS);
     },
+    // Active listings ranked by units sold, all categories; the backend caches the ranking.
+    getBestSellers: async (size) => get(API_ENDPOINTS.LISTINGS.BEST_SELLERS, { params: { size } }),
 
     filterListings: async (filters) => {
         const listingType = String(filters.listingType || filters.type || '').trim().toUpperCase();

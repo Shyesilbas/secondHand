@@ -1,4 +1,4 @@
-import { CreditCard, LayoutDashboard, LifeBuoy, Megaphone, Package, Receipt, Sparkles, Ticket, TrendingUp } from 'lucide-react';
+import { CreditCard, HandCoins, LayoutDashboard, LifeBuoy, Megaphone, Package, Receipt, Sparkles, Ticket, TrendingUp } from 'lucide-react';
 import { ROUTES } from '../../../constants/routes.js';
 
 export const getPaymentsMenuItems = () => [
@@ -16,6 +16,7 @@ export const getListingsMenuItems = () => [
 export const getProfileMenuItems = () => [
   { to: ROUTES.DASHBOARD, icon: LayoutDashboard, labelKey: 'account_hub', key: 'accountHub' },
   { to: ROUTES.MY_LISTINGS, icon: Package, labelKey: 'my_listings', key: 'myListings' },
+  { to: ROUTES.OFFERS, icon: HandCoins, labelKey: 'offers', key: 'offers' },
   { to: ROUTES.SELLER_CAMPAIGNS, icon: Megaphone, labelKey: 'campaigns', key: 'campaigns' },
   { to: ROUTES.PLATFORM_COUPONS, icon: Ticket, labelKey: 'platform_coupons', key: 'coupons' },
   { to: ROUTES.COMPLAINTS, icon: LifeBuoy, labelKey: 'complaints', key: 'complaints' },

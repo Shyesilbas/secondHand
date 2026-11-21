@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Clock as ClockIcon, FileText } from 'lucide-react';
-import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
+import { agreementLabel } from '../agreements.js';
 import { formatDate } from '../../common/formatters.js';
 import { Button, Modal } from '../../common/components/ui/index.js';
 import { sanitizeHtml } from '../../common/utils/sanitizeHtml.js';
@@ -63,6 +63,8 @@ const AgreementModal = ({
   onAccept,
   accepting = false,
   isAccepted = false,
+  // Reading only (footer for guests): no accept action and no acceptance hint.
+  readOnly = false,
 }) => {
   const { t } = useTranslation();
 
@@ -76,7 +78,7 @@ const AgreementModal = ({
 
   if (!agreement) return null;
 
-  const title = AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType;
+  const title = agreementLabel(t, agreement.agreementType);
   const updatedLabel = formatDate(agreement.updatedDate || agreement.createdDate);
 
   const handleAcceptClick = async () => {
@@ -94,17 +96,19 @@ const AgreementModal = ({
       title={title}
       size="lg"
       footer={
-        <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-text-tertiary">
-            {isAccepted
-              ? t('agreement_already_accepted', 'Bu sözleşmeyi onayladınız.')
-              : t('please_read_carefully_before_accepting', 'Onaylamadan önce metni dikkatle okuyun.')}
-          </p>
+        <div className={`flex w-full flex-col-reverse gap-3 sm:flex-row sm:items-center ${readOnly ? 'sm:justify-end' : 'sm:justify-between'}`}>
+          {!readOnly && (
+            <p className="text-sm text-text-tertiary">
+              {isAccepted
+                ? t('agreement_already_accepted', 'Bu sözleşmeyi onayladınız.')
+                : t('please_read_carefully_before_accepting', 'Onaylamadan önce metni dikkatle okuyun.')}
+            </p>
+          )}
           <div className="flex items-center justify-end gap-2">
             <Button variant="secondary" onClick={onClose}>
               {t('close', 'Kapat')}
             </Button>
-            {(onAccept || !isAccepted) && (
+            {!readOnly && (onAccept || !isAccepted) && (
               <Button onClick={handleAcceptClick} disabled={Boolean(accepting)}>
                 <Check className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                 {accepting
@@ -140,7 +144,7 @@ const AgreementModal = ({
         <div className="rounded border border-border-light bg-background-primary p-4 sm:p-5">
           {isHtmlContent ? (
             <div
-              className="prose prose-base max-w-prose text-base leading-relaxed text-text-secondary prose-headings:text-text-primary"
+              className="legal-prose max-w-prose text-base leading-relaxed text-text-secondary"
               dangerouslySetInnerHTML={{ __html: safeHtml }}
             />
           ) : (

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Copy } from 'lucide-react';
 import { formatCurrency, formatDateTime } from '../../formatters.js';
-import { PAYMENT_DIRECTIONS, PAYMENT_STATUSES, TRANSACTION_TYPE_LABELS } from '../../../payments/paymentSchema.js';
+import { PAYMENT_DIRECTIONS, PAYMENT_STATUSES, transactionTypeLabel } from '../../../payments/paymentSchema.js';
 import Badge from '../ui/Badge.jsx';
 import Button from '../ui/Button.jsx';
 import Modal from '../ui/Modal.jsx';
@@ -30,7 +30,7 @@ const InfoRow = ({
     <dt className="shrink-0 text-text-secondary">{label}</dt>
     <dd className="flex min-w-0 items-center gap-2 text-right text-text-primary">
       <span className="break-words">{value || '-'}</span>
-      {isCopyable && value && <button type="button" onClick={() => navigator.clipboard.writeText(value)} aria-label={`Copy ${label}`} className="rounded-md p-1 text-text-tertiary transition-colors hover:text-text-primary print:hidden">
+      {isCopyable && value && <button type="button" onClick={() => navigator.clipboard.writeText(value)} aria-label={`Copy ${label}`} className="rounded p-1 text-text-tertiary transition-colors hover:text-text-primary print:hidden">
         <Copy className="h-4 w-4" strokeWidth={1.5} />
       </button>}
     </dd>
@@ -64,7 +64,7 @@ const PaymentReceiptModal = ({
       </p>
     </div>
     <dl className="divide-y divide-border-light">
-      <InfoRow label={t("transaction_category")} value={TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType} />
+      <InfoRow label={t("transaction_category")} value={transactionTypeLabel(t, payment.transactionType)} />
       <InfoRow label={t("date")} value={formatDateTime(payment.processedAt || payment.createdAt)} />
       <InfoRow label={t("payment_method")} value={payment.providerName} />
       <InfoRow label={t("reference_id")} value={transactionId} isCopyable />

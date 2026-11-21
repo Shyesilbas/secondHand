@@ -151,7 +151,7 @@ const CreateCampaignModal = ({
  ...p,
  campaignType: 'STANDARD',
  minQuantity: 1
- }))} type="button" aria-pressed={form.campaignType === 'STANDARD'} className={`w-full rounded border p-4 text-left transition-colors ${form.campaignType === 'STANDARD' ? 'border-primary bg-background-primary text-text-primary ring-1 ring-primary' : 'border-transparent text-text-secondary hover:border-border hover:bg-background-primary'}`}>
+ }))} type="button" aria-pressed={form.campaignType === 'STANDARD'} className={`w-full rounded border p-4 text-left transition-colors ${form.campaignType === 'STANDARD' ? 'border-accent-teal bg-background-primary text-text-primary ring-1 ring-accent-teal' : 'border-transparent text-text-secondary hover:border-border hover:bg-background-primary'}`}>
  <div className="text-sm font-medium">{t("standard_discount")}</div>
  <div className="mt-1 text-sm text-text-tertiary">{t("apply_to_specific_items_or_categories")}</div>
  </button>
@@ -161,7 +161,7 @@ const CreateCampaignModal = ({
  campaignType: 'BUNDLE',
  mode: 'ALL',
  minQuantity: 2
- }))} type="button" aria-pressed={form.campaignType === 'BUNDLE'} className={`w-full rounded border p-4 text-left transition-colors ${form.campaignType === 'BUNDLE' ? 'border-primary bg-background-primary text-text-primary ring-1 ring-primary' : 'border-transparent text-text-secondary hover:border-border hover:bg-background-primary'}`}>
+ }))} type="button" aria-pressed={form.campaignType === 'BUNDLE'} className={`w-full rounded border p-4 text-left transition-colors ${form.campaignType === 'BUNDLE' ? 'border-accent-teal bg-background-primary text-text-primary ring-1 ring-accent-teal' : 'border-transparent text-text-secondary hover:border-border hover:bg-background-primary'}`}>
  <div className="text-sm font-medium">{t("bundle_save")}</div>
  <div className="mt-1 text-sm text-text-tertiary">{t("multi_item_rewards_for_all_your_listings")}</div>
  </button>
@@ -179,7 +179,7 @@ const CreateCampaignModal = ({
  <input value={form.name} onChange={e => setForm(p => ({
  ...p,
  name: e.target.value
- }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder={t("e_g_summer_special_2024")} />
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary transition" placeholder={t("e_g_summer_special_2024")} />
  </div>
  </div>
 
@@ -189,7 +189,7 @@ const CreateCampaignModal = ({
  <select value={form.discountKind} onChange={e => setForm(p => ({
  ...p,
  discountKind: e.target.value
- }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none bg-background-primary">
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary appearance-none bg-background-primary">
  <option value="PERCENT">{t("percentage")}</option>
  <option value="FIXED">{t("fixed_amount")}</option>
  </select>
@@ -199,7 +199,7 @@ const CreateCampaignModal = ({
  <input value={form.value} onChange={e => setForm(p => ({
  ...p,
  value: e.target.value
- }))} type="number" className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="0.00" />
+ }))} type="number" className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary transition" placeholder="0.00" />
  </div>
  </div>
 
@@ -209,20 +209,20 @@ const CreateCampaignModal = ({
  <input type="datetime-local" value={form.startsAt} onChange={e => setForm(p => ({
  ...p,
  startsAt: e.target.value
- }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary" />
  </div>
  <div className="relative">
  <label className="absolute -top-2 left-3 px-1 bg-background-primary text-xs font-semibold text-text-muted">{t("ends_at")}</label>
  <input type="datetime-local" value={form.endsAt} onChange={e => setForm(p => ({
  ...p,
  endsAt: e.target.value
- }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary" />
  </div>
  </div>
  </section>
 
  {/* Type Specific Section */}
- {form.campaignType === 'BUNDLE' ? <section className="p-6 bg-background-tertiary border border-primary rounded-md space-y-4">
+ {form.campaignType === 'BUNDLE' ? <section className="p-6 bg-background-tertiary border border-primary rounded space-y-4">
  <div className="flex items-center gap-3">
  <div className="w-8 h-8 bg-primary text-white rounded flex items-center justify-center">
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,7 +238,7 @@ const CreateCampaignModal = ({
  <input type="number" min="2" value={form.minQuantity} onChange={e => setForm(p => ({
  ...p,
  minQuantity: e.target.value
- }))} className="w-full px-4 py-3.5 bg-background-primary border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+ }))} className="w-full px-4 py-3.5 bg-background-primary border border-primary rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary" />
  </div>
  <p className="text-sm text-primary leading-relaxed">{t("this_bundle_will_automatically_apply_to")}<b>{t("all_your_active_listings")}</b>{t("customers_will_receive_the_discount_only")}<b>{form.minQuantity || 2}{t("or_more")}</b>{t("items_to_their_cart")}</p>
  </div>
@@ -250,12 +250,12 @@ const CreateCampaignModal = ({
  mode: m,
  eligibleListingIds: [],
  eligibleTypes: []
- }))} className={`px-4 py-2 rounded text-sm font-semibold border transition-all ${form.mode === m ? 'bg-primary text-white border-primary' : 'bg-background-primary text-text-secondary border-border hover:border-primary'}`}>
+ }))} className={`px-4 py-2 rounded text-sm font-semibold border transition-colors ${form.mode === m ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800' : 'bg-background-primary text-text-secondary border-border hover:bg-background-secondary'}`}>
  {m === 'ALL' ? 'Everything' : m === 'LISTING' ? 'Specific Listings' : 'Listing Types'}
  </button>)}
  </div>
 
- {form.mode === 'LISTING' && <div className="border border-border rounded-md overflow-hidden">
+ {form.mode === 'LISTING' && <div className="border border-border rounded overflow-hidden">
  <div className="max-h-48 overflow-y-auto p-4 space-y-2">
  {availableListings.map(l => <label key={l.id} className="flex items-center gap-3 p-2 hover:bg-background-secondary rounded cursor-pointer transition-colors">
  <input type="checkbox" checked={form.eligibleListingIds.includes(l.id)} onChange={() => {
@@ -267,7 +267,7 @@ const CreateCampaignModal = ({
  eligibleListingIds: newList
  };
  });
- }} className="w-5 h-5 rounded-md border-border text-primary focus:ring-primary" />
+ }} className="w-5 h-5 rounded border-border text-primary focus:ring-border-focus" />
  <div className="flex-1 min-w-0">
  <div className="text-sm font-medium text-text-primary truncate">{l.title}</div>
  <div className="text-xs text-text-muted">{formatCurrency(l.price, l.currency)}</div>
@@ -286,13 +286,13 @@ const CreateCampaignModal = ({
  eligibleTypes: newList
  };
  });
- }} className={`px-4 py-2 rounded text-sm font-semibold border transition-all ${form.eligibleTypes.includes(t) ? 'bg-primary text-white border-primary' : 'bg-background-secondary text-text-secondary border-border'}`}>
+ }} className={`px-4 py-2 rounded text-sm font-semibold border transition-colors ${form.eligibleTypes.includes(t) ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800' : 'bg-background-primary text-text-secondary border-border hover:bg-background-secondary'}`}>
  {t}
  </button>)}
  </div>}
  </section>}
 
- <section className="flex items-center justify-between p-4 bg-background-secondary rounded-md border border-border-light">
+ <section className="flex items-center justify-between p-4 bg-background-secondary rounded border border-border-light">
  <div>
  <div className="text-sm font-semibold text-text-primary">{t("active_status")}</div>
  <div className="text-xs text-text-muted">{t("campaign_will_be_visible_once_saved")}</div>
@@ -300,8 +300,8 @@ const CreateCampaignModal = ({
  <button type="button" onClick={() => setForm(p => ({
  ...p,
  active: !p.active
- }))} className={`w-14 h-8 rounded-full transition-all relative ${form.active ? 'bg-primary' : 'bg-secondary-200'}`}>
- <div className={`absolute top-1 w-6 h-6 bg-background-primary rounded-full transition-all ${form.active ? 'left-7' : 'left-1'}`} />
+ }))} className={`w-14 h-8 rounded-full transition-colors relative ${form.active ? 'bg-primary' : 'bg-secondary-200'}`}>
+ <div className={`absolute top-1 w-6 h-6 bg-background-primary rounded-full transition-colors ${form.active ? 'left-7' : 'left-1'}`} />
  </button>
  </section>
  </div>

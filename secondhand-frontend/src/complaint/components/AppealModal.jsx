@@ -24,7 +24,7 @@ const AppealModal = ({ complaint, isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (reason.trim().length < COMPLAINT_DEFAULTS.MIN_APPEAL_LENGTH) {
-      setError(COMPLAINT_MESSAGES.APPEAL_TOO_SHORT);
+      setError(t('complaint_appeal_too_short', COMPLAINT_MESSAGES.APPEAL_TOO_SHORT));
       return;
     }
     try {

@@ -1,9 +1,14 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useListingStatistics } from '../../listing/hooks/useListingStatistics.js';
 import { Layers, Car, Laptop, Building2 } from 'lucide-react';
-import { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
+import PageContainer from '../../common/components/layout/PageContainer.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
+
+const GRID = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5';
 
 const MarketplaceStatsSection = () => {
+ const { t } = useTranslation();
  const { statistics, isLoading, error } = useListingStatistics();
 
  const metrics = useMemo(() => {
@@ -23,79 +28,67 @@ const MarketplaceStatsSection = () => {
 
  return [
  {
- label: 'Active Listings',
+ label: t('active_listings'),
  value: totalActive.toLocaleString('tr-TR'),
- desc: 'Live items ready for trade',
+ desc: t('about_stat_active_desc'),
  icon: Layers,
- color: 'text-status-success-text bg-background-secondary border-border'
  },
  {
- label: 'Vehicles',
+ label: t('vehicles'),
  value: vehicles.toLocaleString('tr-TR'),
- desc: 'Cars, motorcycles & parts',
+ desc: t('about_stat_vehicles_desc'),
  icon: Car,
- color: 'text-primary bg-primary-light border-primary-200'
  },
  {
- label: 'Electronics',
+ label: t('electronics'),
  value: electronics.toLocaleString('tr-TR'),
- desc: 'Laptops, phones & watches',
+ desc: t('about_stat_electronics_desc'),
  icon: Laptop,
- color: 'text-primary bg-primary-light border-primary-200'
  },
  {
- label: 'Real Estate',
+ label: t('real_estate'),
  value: realEstate.toLocaleString('tr-TR'),
- desc: 'Apartments, villas & offices',
+ desc: t('about_stat_real_estate_desc'),
  icon: Building2,
- color: 'text-status-warning-text bg-background-secondary border-border'
  }
  ];
- }, [statistics]);
+ }, [statistics, t]);
 
- if (isLoading) {
- return (
- <section className="py-8 bg-transparent border-b border-border-light">
- <div className="max-w-7xl mx-auto px-6 sm:px-8">
- <SkeletonGrid count={4} columns="grid-cols-2 lg:grid-cols-4" />
- </div>
- </section>
- );
- }
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <div className={GRID} aria-busy="true">
+          {Array.from({ length: 4 }, (_, i) => <Skeleton key={i} className="h-32" />)}
+        </div>
+      </PageContainer>
+    );
+  }
 
- // Strictly do not render if error, no stats, or total active listings is zero
- if (error || !metrics) return null;
+  // Strictly do not render if error, no stats, or total active listings is zero
+  if (error || !metrics) return null;
 
- return (
- <section className="py-8 bg-transparent border-b border-border-light">
- <div className="max-w-7xl mx-auto px-6 sm:px-8">
- <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
- {metrics.map((metric) => {
- const Icon = metric.icon;
- return (
- <div
- key={metric.label}
- className="bg-background-primary border border-border-light rounded p-5 transition-all hover:border-border"
- >
- <div className="flex items-center gap-3">
- <div className={`w-9 h-9 rounded-md flex items-center justify-center border ${metric.color}`}>
- <Icon className="w-4.5 h-4.5 shrink-0" />
- </div>
- <div>
- <span className="text-xs font-semibold text-text-muted">{metric.label}</span>
- <h3 className="text-base font-semibold text-text-primary tracking-tight mt-0.5">{metric.value}</h3>
- </div>
- </div>
- <p className="text-sm text-text-secondary font-medium mt-3 border-t border-border-light pt-2 leading-relaxed">
- {metric.desc}
- </p>
- </div>
- );
- })}
- </div>
- </div>
- </section>
- );
+  // Read-only figures: no hover lift, since nothing here is clickable.
+  return (
+    <section>
+      <PageContainer>
+      <dl className={GRID}>
+        {metrics.map((metric) => {
+          const Icon = metric.icon;
+          return (
+            <div key={metric.label} className="rounded border border-border-light bg-background-primary p-5 shadow-sm">
+              <dt className="flex items-center gap-2 text-sm text-text-tertiary">
+                <Icon className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+                {metric.label}
+              </dt>
+              <dd className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-text-primary">{metric.value}</dd>
+              <dd className="mt-1 text-sm text-text-secondary">{metric.desc}</dd>
+            </div>
+          );
+        })}
+      </dl>
+      </PageContainer>
+    </section>
+  );
 };
 
 export default MarketplaceStatsSection;
