@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.application.common;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingSelectionItem;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
@@ -31,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -64,7 +66,6 @@ class ListingQueryServiceBulkAndVisibilityTest {
                 enrichmentService,
                 listingViewService,
                 reviewService,
-                Runnable::run,
                 self,
                 userBlockService);
         lenient().when(enrichmentService.enrich(anyList(), any())).thenAnswer(inv -> inv.getArgument(0));
@@ -151,6 +152,27 @@ class ListingQueryServiceBulkAndVisibilityTest {
     }
 
     @Test
+    void findByIdAsDtoRunsEnrichmentAndOwnerStatsOnTheCallingThread() {
+        // Work handed to another thread needs a second pooled connection while the caller's
+        // transaction still holds the first; under load that exhausted the Hikari pool.
+        Listing active = listing(15L, ListingStatus.ACTIVE);
+        when(listingRepository.findByIdWithSeller(active.getId())).thenReturn(Optional.of(active));
+        stubDynamicDto(active);
+        Thread caller = Thread.currentThread();
+        List<Thread> workers = new ArrayList<>();
+        doAnswer(inv -> { workers.add(Thread.currentThread()); return null; })
+                .when(enrichmentService).enrichInPlace(any(), any());
+        when(listingViewService.getViewStatistics(eq(active.getId()), any(), any())).thenAnswer(inv -> {
+            workers.add(Thread.currentThread());
+            return null;
+        });
+
+        assertThat(service.findByIdAsDto(active.getId(), 15L, 15L)).isPresent();
+
+        assertThat(workers).hasSize(2).containsOnly(caller);
+    }
+
+    @Test
     void findByListingNoAsDtoHidesInactiveFromNonOwner() {
         Listing inactive = listing(15L, ListingStatus.INACTIVE);
         inactive.setListingNo("ABC12345");
@@ -159,6 +181,35 @@ class ListingQueryServiceBulkAndVisibilityTest {
 
         assertThat(service.findByListingNoAsDto("ABC12345", 88L, 88L)).isEmpty();
         assertThat(service.findByListingNoAsDto("ABC12345", 15L, 15L)).isPresent();
+    }
+
+    @Test
+    void myListingSelectionReturnsIdsAndStatusesWithinTheCap() {
+        List<ListingSelectionItem> items = List.of(
+                new ListingSelectionItem(UUID.randomUUID(), ListingStatus.ACTIVE),
+                new ListingSelectionItem(UUID.randomUUID(), ListingStatus.INACTIVE));
+        when(listingRepository.findSelectionBySellerIdAndFilters(eq(7L), eq(null), eq(null), eq("shirt"), any()))
+                .thenReturn(items);
+
+        Result<List<ListingSelectionItem>> result = service.getMyListingSelection(7L, null, null, "  shirt ");
+
+        assertThat(result.isError()).isFalse();
+        assertThat(result.getData()).isEqualTo(items);
+    }
+
+    @Test
+    void myListingSelectionFailsInsteadOfTruncatingAboveTheCap() {
+        List<ListingSelectionItem> overCap = new ArrayList<>();
+        for (int i = 0; i <= ListingBusinessConstants.MAX_BATCH_STATUS_SIZE; i++) {
+            overCap.add(new ListingSelectionItem(UUID.randomUUID(), ListingStatus.ACTIVE));
+        }
+        when(listingRepository.findSelectionBySellerIdAndFilters(eq(7L), eq(null), eq(null), eq(null), any()))
+                .thenReturn(overCap);
+
+        Result<List<ListingSelectionItem>> result = service.getMyListingSelection(7L, null, null, null);
+
+        assertThat(result.isError()).isTrue();
+        assertThat(result.getErrorCode()).isEqualTo(ListingErrorCodes.BULK_LISTING_LIMIT_EXCEEDED.getCode());
     }
 
     private Listing listing(Long sellerId, ListingStatus status) {

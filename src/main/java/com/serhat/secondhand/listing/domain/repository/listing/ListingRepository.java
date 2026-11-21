@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.domain.repository.listing;
 
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingSelectionItem;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
@@ -95,6 +96,24 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
                                            @Param("listingType") ListingType listingType,
                                            @Param("title") String title,
                                            Pageable pageable);
+
+    /** Every listing of the seller in one status, unpaged, for seller-wide batch changes. */
+    @EntityGraph(attributePaths = {"seller"})
+    @Query("SELECT l FROM Listing l WHERE l.seller.id = :sellerId AND l.status = :status")
+    List<Listing> findAllOwnedWithStatus(@Param("sellerId") Long sellerId, @Param("status") ListingStatus status);
+
+    /** Same filter as {@link #findBySellerIdAndFilters}, projected to id and status only (no entity load). */
+    @Query("SELECT new com.serhat.secondhand.listing.domain.dto.response.listing.ListingSelectionItem(l.id, l.status) " +
+            "FROM Listing l WHERE l.seller.id = :sellerId " +
+            "AND (:status IS NULL AND l.status <> com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.DELETED OR :status IS NOT NULL AND l.status = :status) " +
+            "AND (:listingType IS NULL OR l.listingType = :listingType) " +
+            "AND (:title IS NULL OR :title = '' OR LOWER(l.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
+            "ORDER BY l.createdAt DESC")
+    List<ListingSelectionItem> findSelectionBySellerIdAndFilters(@Param("sellerId") Long sellerId,
+                                                                 @Param("status") ListingStatus status,
+                                                                 @Param("listingType") ListingType listingType,
+                                                                 @Param("title") String title,
+                                                                 Pageable limit);
 
     @org.springframework.cache.annotation.Cacheable(value = "listingStats", key = "'totalCount'")
     @Query("SELECT COUNT(l) FROM Listing l")

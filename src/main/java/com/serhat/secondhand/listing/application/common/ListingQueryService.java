@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.application.common;
 import com.serhat.secondhand.core.dto.PageRequests;
 import com.serhat.secondhand.core.dto.CachedPage;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingSelectionItem;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
@@ -16,7 +17,6 @@ import com.serhat.secondhand.review.application.IReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +40,6 @@ public class ListingQueryService {
     private final ListingEnrichmentService enrichmentService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
-    private final Executor taskExecutor;
     private final ListingQueryService self;
     private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
 
@@ -51,7 +48,6 @@ public class ListingQueryService {
                                ListingEnrichmentService enrichmentService,
                                ListingViewService listingViewService,
                                IReviewService reviewService,
-                               @Qualifier("taskExecutor") Executor taskExecutor,
                                @Lazy ListingQueryService self,
                                com.serhat.secondhand.user.application.UserBlockService userBlockService) {
         this.userBlockService = userBlockService;
@@ -60,7 +56,6 @@ public class ListingQueryService {
         this.enrichmentService = enrichmentService;
         this.listingViewService = listingViewService;
         this.reviewService = reviewService;
-        this.taskExecutor = taskExecutor;
         this.self = self;
     }
 
@@ -119,21 +114,17 @@ public class ListingQueryService {
         UUID id = listing.getId();
         ListingDto dto = listingMapper.toDynamicDto(listing);
 
-        CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
-                enrichmentService.enrichInPlace(dto, userId), taskExecutor);
+        // Runs on the request thread inside this read-only transaction. Handing these lookups to an
+        // executor made each request hold one pooled connection while waiting for a second one, so
+        // ~20 concurrent detail views exhausted the Hikari pool and every request hit its timeout.
+        enrichmentService.enrichInPlace(dto, userId);
 
         // View statistics are visible to the listing owner only.
         boolean isOwner = currentUserId != null && currentUserId.equals(dto.getSellerId());
-        CompletableFuture<ListingViewStatsDto> statsTask = isOwner
-                ? CompletableFuture.supplyAsync(() ->
-                        listingViewService.getViewStatistics(id,
-                                LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
-                                LocalDateTime.now()), taskExecutor)
-                : CompletableFuture.completedFuture(null);
-
-        CompletableFuture.allOf(enrichTask, statsTask).join();
-        ListingViewStatsDto stats = statsTask.join();
         if (isOwner) {
+            ListingViewStatsDto stats = listingViewService.getViewStatistics(id,
+                    LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
+                    LocalDateTime.now());
             dto.setViewStats(stats);
             dto.setViewCount(stats != null && stats.getTotalViews() != null ? stats.getTotalViews() : 0L);
         }
@@ -191,6 +182,21 @@ public class ListingQueryService {
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
         Page<Listing> listingsPage = listingRepository.findBySellerIdAndFilters(userId, status, listingType, title != null ? title.trim() : null, pageable);
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
+    }
+
+    /**
+     * Ids and statuses of every listing of the seller that matches the My Listings filters, for "select all".
+     * Fails with BULK_LISTING_LIMIT_EXCEEDED above MAX_BATCH_STATUS_SIZE instead of returning a partial set,
+     * since a batch action on a silently truncated selection would miss listings.
+     */
+    public Result<List<ListingSelectionItem>> getMyListingSelection(Long userId, ListingStatus status, ListingType listingType, String title) {
+        int cap = ListingBusinessConstants.MAX_BATCH_STATUS_SIZE;
+        List<ListingSelectionItem> items = listingRepository.findSelectionBySellerIdAndFilters(
+                userId, status, listingType, title != null ? title.trim() : null, PageRequest.of(0, cap + 1));
+        if (items.size() > cap) {
+            return Result.error(ListingErrorCodes.BULK_LISTING_LIMIT_EXCEEDED);
+        }
+        return Result.success(items);
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size, String title) {

@@ -6,6 +6,8 @@ import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
+import com.serhat.secondhand.listing.domain.dto.request.ListingBatchStatusAction;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingBatchResult;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,8 +32,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @org.springframework.transaction.annotation.Transactional
-@org.springframework.cache.annotation.CacheConfig(cacheNames = "user:profile")
+// Every mutation here changes what the seller's My Listings pages show, so the name-less @CacheEvict
+// methods must clear listing:userListings (cached unfiltered pages) as well as user:profile.
+@org.springframework.cache.annotation.CacheConfig(cacheNames = {"user:profile", ListingCommandService.USER_LISTINGS_CACHE})
 public class ListingCommandService {
+
+    static final String USER_LISTINGS_CACHE = "listing:userListings";
 
     private final ListingRepository listingRepository;
     private final ApplicationEventPublisher eventPublisher;
@@ -104,6 +111,63 @@ public class ListingCommandService {
         } catch (BusinessException e) {
             return Result.error(e.getMessage(), e.getErrorCode());
         }
+    }
+
+    /**
+     * Applies one status change to several of the seller's listings, all or nothing: every listing must
+     * belong to the seller and allow the transition, otherwise nothing changes. The entity methods keep the
+     * transition rules; a rejected one throws, which rolls back the whole transaction.
+     */
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
+    public Result<Void> updateBatchStatus(List<UUID> listingIds, ListingBatchStatusAction action, Long userId) {
+        List<UUID> ids = List.copyOf(new LinkedHashSet<>(listingIds));
+        if (action == ListingBatchStatusAction.REACTIVATE) {
+            Result<Void> restriction = userRestrictionService.check(userId, RestrictedAction.CREATE_LISTING);
+            if (restriction.isError()) {
+                return restriction;
+            }
+        }
+        if (listingRepository.countByIdInAndSellerId(ids, userId) != ids.size()) {
+            return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
+        }
+        List<Listing> listings = listingRepository.findAllByIdIn(ids);
+        for (Listing listing : listings) {
+            switch (action) {
+                case DEACTIVATE -> listing.deactivate();
+                case REACTIVATE -> listing.reactivate();
+                case MARK_SOLD -> listing.markAsSold();
+            }
+        }
+        listingRepository.saveAll(listings);
+        log.info("Batch status {} applied to {} listings", action, listings.size());
+        return Result.success();
+    }
+
+    /**
+     * Puts every INACTIVE listing of the seller back on sale in one transaction. Uses the same restriction
+     * check and entity transition as a single reactivate; a seller with nothing inactive gets a count of 0.
+     */
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
+    public Result<ListingBatchResult> reactivateAllInactive(Long userId) {
+        Result<Void> restriction = userRestrictionService.check(userId, RestrictedAction.CREATE_LISTING);
+        if (restriction.isError()) {
+            return restriction.propagateError();
+        }
+        List<Listing> inactive = listingRepository.findAllOwnedWithStatus(userId, ListingStatus.INACTIVE);
+        inactive.forEach(Listing::reactivate);
+        listingRepository.saveAll(inactive);
+        log.info("Seller {} reactivated all {} inactive listings", userId, inactive.size());
+        return Result.success(new ListingBatchResult(inactive.size()));
+    }
+
+    /** Takes every ACTIVE listing of the seller off sale in one transaction; a count of 0 when none is active. */
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
+    public Result<ListingBatchResult> deactivateAllActive(Long userId) {
+        List<Listing> active = listingRepository.findAllOwnedWithStatus(userId, ListingStatus.ACTIVE);
+        active.forEach(Listing::deactivate);
+        listingRepository.saveAll(active);
+        log.info("Seller {} deactivated all {} active listings", userId, active.size());
+        return Result.success(new ListingBatchResult(active.size()));
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)

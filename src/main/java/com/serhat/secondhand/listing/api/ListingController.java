@@ -7,14 +7,18 @@ import com.serhat.secondhand.listing.application.common.ListingCommandService;
 import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.application.common.ListingViewService;
+import com.serhat.secondhand.listing.application.query.ListingBestSellerService;
 import com.serhat.secondhand.listing.application.query.ListingSearchService;
 import com.serhat.secondhand.listing.application.query.ListingStatisticsService;
 import com.serhat.secondhand.listing.domain.dto.request.listing.ListingFeePaymentRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchPriceRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchQuantityRequest;
+import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchStatusRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdatePriceRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateQuantityRequest;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingBatchResult;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingSelectionItem;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
@@ -57,6 +61,7 @@ public class ListingController {
     private final ListingQueryService listingQueryService;
     private final ListingSearchService listingSearchService;
     private final ListingStatisticsService listingStatisticsService;
+    private final ListingBestSellerService listingBestSellerService;
     private final ListingCommandService listingCommandService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
@@ -145,6 +150,25 @@ public class ListingController {
         return ResultResponses.ok(Result.success(myListings));
     }
 
+    @PutMapping("/my/inactive/reactivate")
+    public ResponseEntity<ListingBatchResult> reactivateAllInactive(@AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(listingCommandService.reactivateAllInactive(currentUser.getId()));
+    }
+
+    @PutMapping("/my/active/deactivate")
+    public ResponseEntity<ListingBatchResult> deactivateAllActive(@AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(listingCommandService.deactivateAllActive(currentUser.getId()));
+    }
+
+    @GetMapping("/my/selection")
+    public ResponseEntity<List<ListingSelectionItem>> getMyListingSelection(
+            @RequestParam(required = false) ListingType listingType,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) ListingStatus status,
+            @AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(listingQueryService.getMyListingSelection(currentUser.getId(), status, listingType, title));
+    }
+
     @GetMapping("/my/status/{status}")
     public ResponseEntity<Page<ListingDto>> getMyListingsByStatus(
             @PathVariable ListingStatus status,
@@ -204,6 +228,16 @@ public class ListingController {
     }
 
     @PublicEndpoint
+    @GetMapping("/best-sellers")
+    @Operation(summary = "Best-selling active listings across all categories")
+    public ResponseEntity<List<ListingDto>> getBestSellers(
+            @RequestParam(required = false) Integer size,
+            @AuthenticationPrincipal User currentUser) {
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        return ResultResponses.ok(Result.success(listingBestSellerService.getBestSellers(size, userId)));
+    }
+
+    @PublicEndpoint
     @GetMapping("/statistics")
     public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
         return ResultResponses.ok(Result.success(listingStatisticsService.getGlobalListingStatistics()));
@@ -248,6 +282,14 @@ public class ListingController {
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.noContent(
                 listingCommandService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId()));
+    }
+
+    @PutMapping("/status/batch")
+    public ResponseEntity<Void> updateBatchStatus(
+            @Valid @RequestBody UpdateBatchStatusRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResultResponses.noContent(
+                listingCommandService.updateBatchStatus(request.listingIds(), request.action(), currentUser.getId()));
     }
 
     @PublicEndpoint
