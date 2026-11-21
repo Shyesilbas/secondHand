@@ -44,6 +44,9 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[ci-cd-and-deployment-guide.md](ci-cd-and-deployment-guide.md)** | Docker Compose servisleri (Postgres, Redis, Kafka KRaft), environment variable'lar (`.env`), Prod Security Guard ve Actuator/Prometheus. |
 | **[frontend-architecture-and-state-management.md](frontend-architecture-and-state-management.md)** | React 19 SPA mimarisi, React Query v5 server-state yönetimi, Axios 401 sessiz refresh kuyruğu (*mutex queue*), client depolama güvenliği, Apple/Spotify tier tasarım tokens ve dual-sync WebSocket. |
 | **[error-handling-and-contract-architecture.md](error-handling-and-contract-architecture.md)** | Dual-track hata modeli (`ProblemDetail` + `ResultResponses`), HTTP durum haritalaması (`ErrorCodeStatuses`), frontend güvenli hata çözme (`errorUtils`) ve Axios katmanı. |
+| **[operations-runbook.md](operations-runbook.md)** | Arıza müdahale prosedürleri: `FAILED` outbox event'lerini yeniden kuyruğa alma, DLT inceleme, Redis/PostgreSQL stok farkı, Flyway checksum, prod başlangıç hatası ve scheduler'lar. |
+| **[data-model-and-er-diagram.md](data-model-and-er-diagram.md)** | Para/sipariş hattı, kullanıcı-ilan etkileşimi ve polymorphic listing için Mermaid ER diyagramları. |
+| **[adr/README.md](adr/README.md)** | Mimari Karar Kayıtları: outbox, Redis Lua stok, kalem bazlı escrow, payment provider stratejisi, HttpOnly cookie oturumu, değiştirilmez Flyway ([0001](adr/0001-transactional-outbox-with-polling.md), [0002](adr/0002-redis-lua-stock-reservation.md), [0003](adr/0003-item-level-escrow.md), [0004](adr/0004-payment-provider-port-and-strategy.md), [0005](adr/0005-httponly-cookie-jwt-sessions.md), [0006](adr/0006-immutable-flyway-migrations.md)). |
 
 ---
 
