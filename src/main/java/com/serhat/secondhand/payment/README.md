@@ -12,6 +12,7 @@ Executes payments through pluggable providers, guards against double charges wit
 ## Business Rules & Invariants
 - **Idempotency lives in `PaymentProcessor`, not in adapters.** `PaymentRedisIdempotencyService.claim` takes `v4:payment:idempotency:{key}` with `SET NX`; value is `PENDING:{fingerprint}` then `DONE:{fingerprint}`. TTLs: `PaymentProcessingConstants.IDEMPOTENCY_LOCK_TTL_HOURS` / `IDEMPOTENCY_RESULT_TTL_HOURS`.
 - **Pre-check before any transfer** (`PaymentPreCheckService`): active account, accepted agreements, OTP when required (`POST /initiate-verification`).
+- **Payment OTP is single use** (`PaymentVerificationService.validateCode`): the code row is locked and marked used in the caller's transaction (a rollback makes it usable again); other payments in the same transaction accept it again. Wrong codes count in `v4:payment:otp_fail:{userId}` (`FAILED_ATTEMPT_WINDOW`); at `MAX_FAILED_ATTEMPTS` every code is refused with `PAYMENT_VERIFICATION_LOCKED` until a new code is requested.
 - **Order link:** `payment.order_id` holds `Order.externalId` (UUID), never `orders.id`; FK `fk_payment_order_external_id`. Purchases and refunds set it plus `order_item_id` (refunds via `WalletTransactionReference`); non-order payments leave both null.
 - **Ledger row and outbox row commit in the same transaction** (`payments` + `payment_outbox_events`). The API never waits for side effects.
 - **Item purchases pay into platform escrow**, never directly to the seller.
@@ -21,7 +22,7 @@ Executes payments through pluggable providers, guards against double charges wit
 - **Change rule:** Post-payment side effects are `PaymentCompletedHandler` beans with a narrow `supports` condition and an explicit `@Order`; they run after commit and never change payment state.
 
 ## Redis, Outbox & Kafka
-- Idempotency key: see above. Spring cache `payment:stats` (`PaymentStatsService`), evicted by `PaymentProcessor` on every payment; TTL in `CacheConfig`.
+- Idempotency key: see above. Spring cache `payment:stats` (`PaymentStatsService`, key `user:<id>:<ALL|provider>`), evicted per payer and recipient by `PaymentStatsCacheEvictor`; TTL in `CacheConfig`. **Change rule:** never `allEntries`/`clear()` this cache, and add a provider to `CACHED_PROVIDER_FILTERS` only together with its eviction.
 - Outbox: `payment_outbox_events`, polled by `PaymentOutboxWorker` (`app.payment.outbox.fixed-delay-ms`).
 - Topic: `payment.completed.v1` (`PaymentCompletedKafkaEvent`).
 

@@ -39,7 +39,7 @@ public class PaymentProcessor {
     private final PaymentPreCheckService paymentPreCheckService;
     private final PaymentOutboxService paymentOutboxService;
     private final PaymentRedisIdempotencyService paymentRedisIdempotencyService;
-    private final org.springframework.cache.CacheManager cacheManager;
+    private final PaymentStatsCacheEvictor paymentStatsCacheEvictor;
 
     @Lazy
     @Autowired
@@ -182,7 +182,7 @@ public class PaymentProcessor {
                 result);
         payment = paymentRepository.save(payment);
 
-        evictUserPaymentStatsCache(userId);
+        paymentStatsCacheEvictor.evictUsers(context.fromUser(), context.toUser());
 
         if (!result.success()) {
             return Result.error(result.errorMessage() != null ? result.errorMessage() : "Payment failed.",
@@ -222,14 +222,5 @@ public class PaymentProcessor {
                 paymentRequest.amount() + "|" +
                 paymentRequest.listingId() + "|" +
                 paymentRequest.orderItemId();
-    }
-
-    private void evictUserPaymentStatsCache(Long userId) {
-        // Stats are cached per user and provider filter, and a payment changes both the payer's and the
-        // recipient's numbers, so clear the whole cache like the escrow and e-wallet paths do.
-        org.springframework.cache.Cache cache = cacheManager.getCache("payment:stats");
-        if (cache != null) {
-            cache.clear();
-        }
     }
 }

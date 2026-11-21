@@ -19,6 +19,7 @@ Manages post-delivery buyer ratings (1-5 stars) and text feedback (`reviews` tab
 
 ## Redis & Caching
 - Review creation evicts Spring cache `user:stats:reviews` (`@CacheEvict(value = "user:stats:reviews", allEntries = true)`).
+- **Change rule:** `getListingReviewStatsDto` returns `ListingReviewStatsMap`, never a plain `HashMap`: the cache serializer only restores UUID keys for the named subclass, so a plain map makes every lookup miss on a cache hit.
 
 ## API
 - `POST /api/v1/reviews` (`ReviewController`) — create a review for a delivered order item (`ReviewDto`).

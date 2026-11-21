@@ -6,7 +6,6 @@ import com.serhat.secondhand.notification.application.NotificationService;
 import com.serhat.secondhand.order.application.OrderQueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -37,9 +36,9 @@ public class UserBadgeService {
         this.taskExecutor = taskExecutor;
     }
 
-    @Cacheable(value = "user:badges", key = "#userId")
+    // Not cached: counts change on every new notification, email and chat message, and the client already
+    // keeps them for a short staleTime, so a server cache only showed old numbers.
     public Map<String, Object> getUserBadges(Long userId) {
-        log.info("[CACHE MISS] user:badges:{}", userId);
 
         // Run all count queries in parallel using the application's taskExecutor
         var notificationFuture = CompletableFuture.supplyAsync(() -> 

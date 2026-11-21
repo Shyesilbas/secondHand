@@ -53,7 +53,7 @@ import java.time.Duration;
 public class CacheConfig {
 
     /** Cache key prefix versiyonu. Serializer/format değişimlerinde bumb edilir. */
-    private static final String CACHE_VERSION = "v4";
+    static final String CACHE_VERSION = "v4";
 
     @Bean
     @Primary
@@ -80,7 +80,7 @@ public class CacheConfig {
         RedisCacheConfiguration favoriteStatsConfig = defaultConfig.entryTtl(Duration.ofHours(12));
 
         // ── Tier 0b: AI Yorum Özetleri — 3 gün ────────────────────────────
-        RedisCacheConfiguration aiSummariesConfig = defaultConfig.entryTtl(Duration.ofDays(3));
+        RedisCacheConfiguration aiSummariesConfig = defaultConfig.entryTtl(com.serhat.secondhand.ai.application.AiSummaryService.CACHE_TTL);
 
         // ── Tier 2: Tamamlanmış İşlemler — 2 saat ──────────────────────
         RedisCacheConfiguration completedConfig = defaultConfig.entryTtl(Duration.ofHours(2));
@@ -94,35 +94,29 @@ public class CacheConfig {
         // ── Tier 3b: Kısa süreli — 5 dakika ───────────────────────────
         RedisCacheConfiguration shortConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
 
-        // ── Tier 4: Ultra Kısa — 5 dakika ────────────────────────────
-        RedisCacheConfiguration ultraShortConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
-
         log.info("Redis cache manager initialized | typing=As.PROPERTY EVERYTHING | keyPrefix={}:", CACHE_VERSION);
 
-        // allEntries evictions (e.g. payment:stats on every wallet operation) must not run KEYS,
+        // allEntries evictions (e.g. listing:userListings on listing writes) must not run KEYS,
         // which blocks Redis; SCAN deletes the cache's keys in batches instead.
         RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(
                 redisConnectionFactory, BatchStrategies.scan(1000));
 
         return RedisCacheManager.builder(cacheWriter)
                 .cacheDefaults(defaultConfig)
+                // Puts and evictions inside a transaction run after commit; an eviction before commit lets a
+                // concurrent read cache the old row again until the TTL ends.
+                .transactionAware()
 
                 // Tier 0b — AI Yorum Özetleri (3 gün)
                 .withCacheConfiguration("ai:summaries", aiSummariesConfig)
 
                 // Tier 1 — Statik lookup tabloları (24 saat)
                 .withCacheConfiguration("catalog:enums", lookupConfig)
-                .withCacheConfiguration("catalog:brands", lookupConfig)
-                .withCacheConfiguration("catalog:vehicleTypes", lookupConfig)
-                .withCacheConfiguration("catalog:electronicTypes", lookupConfig)
-                .withCacheConfiguration("catalog:bookGenres", lookupConfig)
-                .withCacheConfiguration("catalog:clothingTypes", lookupConfig)
                 .withCacheConfiguration("catalog:attributeDefinitions", lookupConfig)
                 .withCacheConfiguration("catalog:vehicle", lookupConfig)
 
                 // Tier 2 — Tamamlanmış işlemler (2 saat)
                 .withCacheConfiguration("order:completed", completedConfig)
-                .withCacheConfiguration("payment:history", completedConfig)
                 .withCacheConfiguration("payment:stats", completedConfig)
                 .withCacheConfiguration("payment:exchangeRates", completedConfig)
 
@@ -136,17 +130,15 @@ public class CacheConfig {
                 .withCacheConfiguration("user:stats:reviews", aggregationConfig)
                 .withCacheConfiguration("listing:views:seller", aggregationConfig)
                 .withCacheConfiguration("listing:userListings", aggregationConfig)
+                .withCacheConfiguration("listing:bestSellers", aggregationConfig)
 
                 // Tier 3b — Kısa süreli (5 dakika)
-                .withCacheConfiguration("order:pending", shortConfig)
                 .withCacheConfiguration("listing:views:listing", shortConfig)
                 .withCacheConfiguration("listing:globalStats", shortConfig)
-                .withCacheConfiguration("listing:showcases", shortConfig)
+                // ListingRepository count queries behind listing:globalStats; without an entry they took the 30 min default.
+                .withCacheConfiguration("listingStats", shortConfig)
                 .withCacheConfiguration("dashboard:seller", shortConfig)
                 .withCacheConfiguration("dashboard:buyer", shortConfig)
-
-                // Tier 4 — Ultra Kısa (5 dakika)
-                .withCacheConfiguration("user:badges", ultraShortConfig)
 
                 .build();
     }
@@ -180,7 +172,7 @@ public class CacheConfig {
      * bulunur ve doğru tipe deserialize edilir.
      */
     @SuppressWarnings("deprecation") // Jackson 2.18+ DefaultTyping.EVERYTHING deprecated; gerekli (simetri için).
-    private ObjectMapper buildCacheObjectMapper() {
+    ObjectMapper buildCacheObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
 
         // LocalDateTime / LocalDate ISO-8601 string olarak yazılsın.

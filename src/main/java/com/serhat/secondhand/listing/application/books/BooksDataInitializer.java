@@ -18,7 +18,6 @@ import com.serhat.secondhand.listing.domain.repository.books.BookLanguageReposit
 import com.serhat.secondhand.listing.domain.repository.books.BookTypeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -51,7 +50,6 @@ public class BooksDataInitializer implements SeedTask {
 
     private static final String CATALOG_PATH = "data/books/books.json";
     /** BookGenreRepository caches findAll/findByNameIgnoreCase in Redis; a stale list hides genres added here. */
-    private static final String GENRE_CACHE = "catalog:bookGenres";
 
     private final BookTypeRepository bookTypeRepository;
     private final BookGenreRepository bookGenreRepository;
@@ -62,7 +60,6 @@ public class BooksDataInitializer implements SeedTask {
     private final CatalogLegacyPruner legacyPruner;
     private final BookCatalogSeeder catalogSeeder;
     private final BookGenreRemapper genreRemapper;
-    private final CacheManager cacheManager;
 
     private final Set<String> seenTypes = new HashSet<>();
     private final Set<String> seenGenres = new HashSet<>();
@@ -81,7 +78,6 @@ public class BooksDataInitializer implements SeedTask {
         try {
             Stream.of(seenTypes, seenGenres, seenLanguages, seenFormats, seenConditions).forEach(Set::clear);
             replacements.clear();
-            clearGenreCache();
             JsonNode root = loadCatalog();
             seedTypes(root.get("types"));
             seedGenres(root.get("genres"));
@@ -95,19 +91,13 @@ public class BooksDataInitializer implements SeedTask {
             legacyPruner.prune("book_languages", seenLanguages);
             legacyPruner.prune("book_formats", seenFormats);
             legacyPruner.prune("book_conditions", seenConditions);
-            clearGenreCache();
             catalogSeeder.seed();
-            clearGenreCache();
             log.info("Books seed completed successfully");
             return Result.success();
         } catch (Exception e) {
             log.error("Books seed failed", e);
             return Result.error("Books seed failed: " + e.getMessage(), "SEED_FAILED");
         }
-    }
-
-    private void clearGenreCache() {
-        Optional.ofNullable(cacheManager.getCache(GENRE_CACHE)).ifPresent(cache -> cache.clear());
     }
 
     private JsonNode loadCatalog() throws Exception {

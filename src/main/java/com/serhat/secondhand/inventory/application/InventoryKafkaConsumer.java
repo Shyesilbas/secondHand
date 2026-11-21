@@ -8,6 +8,7 @@ import com.serhat.secondhand.payment.contract.PaymentCompletedKafkaEvent;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,9 @@ public class InventoryKafkaConsumer {
             groupId = "${app.kafka.consumer.inventory-group:inventory-sync-consumers}"
     )
     @Transactional
+    // Stock and SOLD status change here, outside ListingCommandService: the seller's cached My Listings pages
+    // (and profile listing counts) must be cleared too, or they show the old quantity until the TTL ends.
+    @CacheEvict(cacheNames = {"listing:userListings", "user:profile"}, allEntries = true)
     public void consumePaymentCompleted(PaymentCompletedKafkaEvent event) {
         if (event.listingId() == null) {
             log.debug("PaymentCompletedKafkaEvent {} has no listingId, skipping inventory deduction.", event.paymentId());

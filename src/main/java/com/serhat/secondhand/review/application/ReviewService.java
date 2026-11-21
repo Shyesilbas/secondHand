@@ -8,6 +8,7 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
 import com.serhat.secondhand.review.dto.ReviewDto;
+import com.serhat.secondhand.review.dto.ListingReviewStatsMap;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import com.serhat.secondhand.review.dto.UserReviewStatsDto;
 import com.serhat.secondhand.review.entity.Review;
@@ -19,6 +20,7 @@ import com.serhat.secondhand.review.validator.ReviewValidator;
 import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.review.application.event.ReviewCreatedEvent;
 import com.serhat.secondhand.user.application.event.SellerEligibilityRecheckEvent;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +98,8 @@ public class ReviewService implements IReviewService {
             log.error("Failed to create in-app notification for review received: {}", e.getMessage());
         }
         eventPublisher.publishEvent(new SellerEligibilityRecheckEvent(reviewedUser.getId()));
+        eventPublisher.publishEvent(new ReviewCreatedEvent(savedReview.getId(), reviewedUser.getId(),
+                orderItem.getListing() != null ? orderItem.getListing().getId() : null));
         return Result.success(reviewMapper.toDto(savedReview));
     }
 
@@ -158,14 +162,16 @@ public class ReviewService implements IReviewService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "user:stats:reviews",
-            key = "#root.target.createStableListingStatsKey(#listingIds)",
+            // "typed:" keeps hits away from entries written as a plain HashMap (String keys) before ListingReviewStatsMap.
+            key = "'typed:' + #root.target.createStableListingStatsKey(#listingIds)",
             unless = "#result == null || #result.isEmpty()"
     )
     public Map<UUID, ReviewStatsDto> getListingReviewStatsDto(List<UUID> listingIds) {
         if (listingIds == null || listingIds.isEmpty()) return new HashMap<>();
         log.info("ReviewService#getListingReviewStatsDto CACHE MISS for {} listings", listingIds.size());
         List<ListingReviewStatsProjection> rows = reviewRepository.getListingReviewStats(listingIds);
-        Map<UUID, ReviewStatsDto> statsMap = new HashMap<>();
+        // Cached in Redis: must stay ListingReviewStatsMap so UUID keys survive a cache hit.
+        ListingReviewStatsMap statsMap = new ListingReviewStatsMap();
         for (UUID id : listingIds) {
             statsMap.put(id, ReviewStatsDto.empty());
         }

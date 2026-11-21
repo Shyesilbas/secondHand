@@ -45,6 +45,22 @@ public class AiSummaryService {
     @Value("${ai.summary.ip-hourly-limit:10}")
     private int ipHourlyLimit = 10;
 
+    public static final String CACHE_NAME = "ai:summaries";
+    /** TTL of {@link #CACHE_NAME}; also bounds the new-review counter in {@link AiSummaryCacheInvalidationListener}. */
+    public static final Duration CACHE_TTL = Duration.ofDays(3);
+
+    static final String USER_NO_REVIEWS_MESSAGE = "Bu kullanıcı için henüz yapılmış yorum bulunmamaktadır.";
+    static final String LISTING_NO_REVIEWS_MESSAGE = "Bu ürün/ilan için henüz yapılmış yorum bulunmamaktadır.";
+
+    /** Refreshed by {@link AiSummaryCacheInvalidationListener} as the user receives reviews. */
+    public static String userSummaryKey(Long userId) {
+        return "user:" + userId;
+    }
+
+    public static String listingSummaryKey(UUID listingId) {
+        return "listing:" + listingId;
+    }
+
     public AiSummaryService(ReviewRepository reviewRepository, GeminiClient geminiClient) {
         this(reviewRepository, geminiClient, null, null);
     }
@@ -61,7 +77,7 @@ public class AiSummaryService {
         this.clientIpResolver = clientIpResolver;
     }
 
-    @Cacheable(value = "ai:summaries", key = "'user:' + #userId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
+    @Cacheable(value = CACHE_NAME, key = "T(com.serhat.secondhand.ai.application.AiSummaryService).userSummaryKey(#userId)", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
     public String getUserReviewsSummary(Long userId) {
         log.info("Generating AI summary for user reviews: userId={}", userId);
         List<Review> reviews = reviewRepository
@@ -71,13 +87,13 @@ public class AiSummaryService {
                 "user",
                 String.valueOf(userId),
                 reviews,
-                "Bu kullanıcı için henüz yapılmış yorum bulunmamaktadır.",
+                USER_NO_REVIEWS_MESSAGE,
                 "Aşağıda bir satıcıya yapılan kullanıcı yorumları listelenmiştir. Bu yorumları analiz et ve satıcının öne çıkan olumlu ve varsa olumsuz özelliklerini içeren, samimi, anlaşılır ve kısa bir Türkçe özet oluştur.",
                 "user reviews"
         );
     }
 
-    @Cacheable(value = "ai:summaries", key = "'listing:' + #listingId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
+    @Cacheable(value = CACHE_NAME, key = "T(com.serhat.secondhand.ai.application.AiSummaryService).listingSummaryKey(#listingId)", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
     public String getListingReviewsSummary(UUID listingId) {
         log.info("Generating AI summary for listing reviews: listingId={}", listingId);
         List<Review> reviews = reviewRepository
@@ -87,7 +103,7 @@ public class AiSummaryService {
                 "listing",
                 String.valueOf(listingId),
                 reviews,
-                "Bu ürün/ilan için henüz yapılmış yorum bulunmamaktadır.",
+                LISTING_NO_REVIEWS_MESSAGE,
                 "Aşağıda bir ilan/ürün için yapılan kullanıcı yorumları listelenmiştir. Bu yorumları analiz et ve ürünün öne çıkan özelliklerini, kalitesini, olumlu ve varsa olumsuz yanlarını içeren, samimi, anlaşılır ve kısa bir Türkçe özet oluştur.",
                 "listing reviews"
         );
@@ -172,6 +188,11 @@ public class AiSummaryService {
         if (budgetGuard != null && negativeCacheSeconds > 0) {
             budgetGuard.markCooldown(cooldownKey, Duration.ofSeconds(negativeCacheSeconds));
         }
+    }
+
+    /** The cached text is the "no reviews yet" placeholder, generated without a Gemini call. */
+    static boolean isNoReviewsPlaceholder(Object cachedValue) {
+        return USER_NO_REVIEWS_MESSAGE.equals(cachedValue) || LISTING_NO_REVIEWS_MESSAGE.equals(cachedValue);
     }
 
     public static String summaryUnavailableMessage() {

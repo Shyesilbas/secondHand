@@ -258,7 +258,6 @@ public class OrderQueryService {
         orderDto.setMeetupCodeExpiresAt(view.meetupCodeExpiresAt());
     }
 
-    @Cacheable(value = "order:pending", key = "#userId")
     public Map<String, Object> getPendingCompletionStatus(Long userId) {
         long count = orderRepository.countByUserIdAndStatus(userId, OrderStatus.DELIVERED);
 

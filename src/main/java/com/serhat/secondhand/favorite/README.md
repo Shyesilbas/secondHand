@@ -14,6 +14,7 @@ Manages user listing bookmarks (`favorites` table, unique on `(user_id, listing_
 - **Fail-Safe Seller Notification:** Favoriting dispatches a `LISTING_FAVORITED` alert to the seller via `NotificationEventPublisher`; notification failures are caught and logged so bookmark persistence never rolls back.
 - **Seller Broadcast Offers (`broadcastOfferToFavoriters`):** Verified listing owners can broadcast a discounted in-chat offer to all active favoriters (`findUsersByListingId`), returning `FavoriterBroadcastResponseDto`.
 - **Change rule:** Write methods keep `@Transactional` + `@CacheEvict(allEntries = true)` on `user:stats:favorites`.
+- **Change rule:** `FavoriteStatsService.getFavoriteStatsForListings` returns `ListingFavoriteStatsMap`, never a plain `HashMap`, so UUID keys survive a cache hit.
 
 ## Redis & Caching
 - Mutations evict Spring cache `user:stats:favorites` (`@CacheEvict(value = "user:stats:favorites", allEntries = true)`).

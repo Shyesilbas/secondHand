@@ -34,4 +34,27 @@ class PaymentStatsServiceTest {
         assertThat(stats.totalAmount()).isEqualByComparingTo("80");
         assertThat(stats.escrowAmount()).isEqualByComparingTo("12");
     }
+
+    @Test
+    void cacheKey_normalizesFilterSoEvictedKeysMatchWhatWasCached() {
+        assertThat(PaymentStatsService.cacheKey(7L, null)).isEqualTo("user:7:ALL");
+        assertThat(PaymentStatsService.cacheKey(7L, "  ")).isEqualTo("user:7:ALL");
+        assertThat(PaymentStatsService.cacheKey(7L, " ewallet ")).isEqualTo("user:7:EWALLET");
+        assertThat(PaymentStatsService.isCacheable(null)).isTrue();
+        assertThat(PaymentStatsService.isCacheable("ewallet")).isTrue();
+        // Unknown filters are never cached, since nothing would evict them.
+        assertThat(PaymentStatsService.isCacheable("anything")).isFalse();
+    }
+
+    @Test
+    void statistics_queryUsesTheNormalizedProvider() {
+        PaymentRepository paymentRepository = mock(PaymentRepository.class);
+        PaymentStatsService service = new PaymentStatsService(paymentRepository, mock(EscrowRepository.class),
+                mock(PaymentMapper.class), mock(PaymentContextResolver.class));
+        when(paymentRepository.getPaymentStats(7L, "EWALLET")).thenReturn(List.of());
+
+        service.getPaymentStatistics(7L, "ewallet");
+
+        verify(paymentRepository).getPaymentStats(7L, "EWALLET");
+    }
 }

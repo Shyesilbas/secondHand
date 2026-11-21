@@ -15,7 +15,7 @@ Renders localized Thymeleaf emails (`EmailTemplateService`) and delivers them to
 
 ## Redis, Caching & Kafka
 - Kafka topic: `mail.dispatch.v1` (`MailDispatchKafkaEvent`), consumer group `mail-dispatch-consumers`.
-- Read and delete mutations evict Spring cache `user:badges` (`@CacheEvict(value = "user:badges", key = "#userId")`).
+- Unread counts feed `UserBadgeService`, which is not cached, so read and delete changes show up on the next badge fetch.
 
 ## API (`EmailController`, `/api/v1/emails`)
 - `GET /my-emails` & `GET /my-emails/{email-type}` — paginated recipient inbox (optionally filtered by `EmailType`).

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.ewallet;
 
+import com.serhat.secondhand.payment.application.PaymentStatsCacheEvictor;
 import com.serhat.secondhand.core.config.AppConfigProperties;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.ewallet.application.EWalletPaymentFactory;
@@ -37,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +50,7 @@ class EWalletServiceOperationsTest {
     @Mock private IUserService userService;
     @Mock private EWalletPaymentFactory paymentFactory;
     @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private PaymentStatsCacheEvictor statsCacheEvictor;
 
     private AppConfigProperties appConfigProperties;
     private EWalletValidator validator;
@@ -68,7 +71,8 @@ class EWalletServiceOperationsTest {
                 userService,
                 appConfigProperties,
                 paymentFactory,
-                eventPublisher
+                eventPublisher,
+                statsCacheEvictor
         );
         user = User.builder().id(5L).email("buyer@test.com").build();
         seller = User.builder().id(8L).email("seller@test.com").build();
@@ -164,6 +168,18 @@ class EWalletServiceOperationsTest {
         assertThat(wallet.getBalance()).isEqualByComparingTo("325.00");
         verify(paymentRepository).save(refundPayment);
         verify(eventPublisher).publishEvent(any(PaymentCompletedEvent.class));
+        verify(statsCacheEvictor).evictUsers(user, seller);
+    }
+
+    @Test
+    void debitFromUser_evictsOnlyBothPartiesStatistics() {
+        WalletTransactionReference ref = new WalletTransactionReference(UUID.randomUUID(), "Item", "LST-3", UUID.randomUUID(), 12L);
+        when(eWalletRepository.findByUserWithLock(seller)).thenReturn(Optional.of(wallet));
+        when(paymentFactory.buildRefundDebitPayment(seller, user, new BigDecimal("50.00"), ref)).thenReturn(new Payment());
+
+        service.debitFromUser(seller, new BigDecimal("50.00"), ref, PaymentTransactionKind.REFUND, user);
+
+        verify(statsCacheEvictor).evictUsers(seller, user);
     }
 
     @Test
@@ -174,5 +190,6 @@ class EWalletServiceOperationsTest {
         assertThatThrownBy(() -> service.debitFromUser(seller, new BigDecimal("999.00"), ref, PaymentTransactionKind.REFUND, user))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode").isEqualTo(PaymentErrorCodes.INSUFFICIENT_EWALLET_BALANCE.getCode());
+        verifyNoInteractions(statsCacheEvictor);
     }
 }

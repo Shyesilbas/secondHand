@@ -1,5 +1,6 @@
 package com.serhat.secondhand.ewallet;
 
+import com.serhat.secondhand.payment.application.PaymentStatsCacheEvictor;
 import com.serhat.secondhand.core.config.AppConfigProperties;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
@@ -44,7 +45,8 @@ class EWalletServiceIdempotencyTest {
     @BeforeEach
     void setUp() {
         service = new EWalletService(eWalletRepository, paymentRepository, mock(EWalletMapper.class), validator,
-                userService, mock(AppConfigProperties.class), paymentFactory, mock(ApplicationEventPublisher.class));
+                userService, mock(AppConfigProperties.class), paymentFactory, mock(ApplicationEventPublisher.class),
+                mock(PaymentStatsCacheEvictor.class));
         user = new User();
         user.setId(5L);
         wallet = new EWallet();

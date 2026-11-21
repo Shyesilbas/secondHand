@@ -1,5 +1,6 @@
 package com.serhat.secondhand.payment;
 
+import com.serhat.secondhand.payment.application.PaymentStatsCacheEvictor;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.application.PaymentPreCheckService;
 import com.serhat.secondhand.payment.application.PaymentProcessor;
@@ -16,7 +17,6 @@ import com.serhat.secondhand.payment.util.PaymentRedisIdempotencyService;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.cache.CacheManager;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -38,7 +38,7 @@ class PaymentProcessorTest {
     private final PaymentMapper paymentMapper = mock(PaymentMapper.class);
     private final PaymentPreCheckService preCheck = mock(PaymentPreCheckService.class);
     private final PaymentOutboxService outbox = mock(PaymentOutboxService.class);
-    private final CacheManager cacheManager = mock(CacheManager.class);
+    private final PaymentStatsCacheEvictor statsCacheEvictor = mock(PaymentStatsCacheEvictor.class);
     private final PaymentRedisIdempotencyService redisIdempotency = mock(PaymentRedisIdempotencyService.class);
     private final PaymentIdempotencyHelper idempotencyHelper = mock(PaymentIdempotencyHelper.class);
     private PaymentProcessor processor;
@@ -51,7 +51,7 @@ class PaymentProcessorTest {
     @BeforeEach
     void setUp() {
         processor = new PaymentProcessor(List.of(provider), paymentRepository, paymentMapper,
-                idempotencyHelper, preCheck, outbox, redisIdempotency, cacheManager);
+                idempotencyHelper, preCheck, outbox, redisIdempotency, statsCacheEvictor);
         ReflectionTestUtils.setField(processor, "self", processor);
         when(idempotencyHelper.withIdempotencyKey(request, "k1")).thenReturn(request);
         when(redisIdempotency.claim(eq("k1"), anyString()))
@@ -88,6 +88,8 @@ class PaymentProcessorTest {
 
         assertThat(result.isSuccess()).isTrue();
         verify(outbox).enqueuePaymentCompleted(any(Payment.class));
+        // Only the payer's and the recipient's statistics change.
+        verify(statsCacheEvictor).evictUsers(from, to);
     }
 
     @Test

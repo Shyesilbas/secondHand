@@ -85,7 +85,7 @@ Her kategorinin bir `SeedTask` implementasyonu (`*DataInitializer`) vardır; see
 
 ### Enum / katalog okuma
 
-[`EnumReadService`](../src/main/java/com/serhat/secondhand/core/application/EnumReadService.java) repository'lerden katalog listelerini toplar ve `name`'e göre tekilleştirir. Cache'leme servis içinde değil repository seviyesindedir (örn. `CarBrandRepository.findAll` → `@Cacheable("catalog:brands")`); `CacheConfig` bu `catalog:*` cache'lerini ayrı `lookupConfig` ile tanımlar, key prefix'i `v4:<cacheName>:`'dir. Seed tamamlandığında `CatalogSeedStartupRunner` tüm `catalog:` cache'lerini temizler.
+[`EnumReadService`](../src/main/java/com/serhat/secondhand/core/application/EnumReadService.java) repository'lerden katalog listelerini toplar ve `name`'e göre tekilleştirir. Cache'leme servis seviyesindedir: `EnumReadService` DTO çıktısını `catalog:enums` altında tutar. Katalog repository'leri (`CarBrandRepository`, `ClothingTypeRepository` vb.) JPA entity döndürdüğü için cache'lenmez; cache'ten dönen detached entity'ler lazy alanlarda ve yeni ilana bağlanırken sorun çıkarır. Seed tamamlandığında `CatalogSeedStartupRunner` tüm `catalog:` cache'lerini temizler.
 
 ---
 

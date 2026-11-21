@@ -19,7 +19,7 @@ Manages internal user virtual balances (`e_wallets` table), deposits, withdrawal
 - **Change rule:** `fromUser` is never null, including system refunds.
 
 ## Redis, Outbox & Kafka
-- Evicts Spring cache `payment:stats` (`@CacheEvict(value = "payment:stats", allEntries = true)`) on wallet ledger mutations.
+- Wallet ledger mutations evict only the touched users' `payment:stats` entries through `PaymentStatsCacheEvictor` (after commit).
 
 ## API (`EWalletController`, `/api/v1/e-wallets`)
 - `POST /` — create eWallet for the authenticated user (`EwalletRequest`).

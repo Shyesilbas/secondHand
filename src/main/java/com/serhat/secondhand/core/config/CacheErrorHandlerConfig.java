@@ -2,20 +2,21 @@ package com.serhat.secondhand.core.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
+import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.interceptor.CacheErrorHandler;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Cache read/write hatalarında uygulamayı düşürmeden fallback davranışı sağlar.
- * Özellikle Redis deserialize kaynaklı geçici/bozuk key senaryolarında isteğin DB'ye düşmesini garanti eder.
+ * Fail-open cache: a Redis outage or an unreadable entry falls through to the method (and the database)
+ * instead of failing the request. Spring only uses an error handler supplied through {@link CachingConfigurer};
+ * a plain CacheErrorHandler bean is ignored and every cache error becomes a 500.
  */
 @Configuration
 @Slf4j
-public class CacheErrorHandlerConfig {
+public class CacheErrorHandlerConfig implements CachingConfigurer {
 
-    @Bean
-    public CacheErrorHandler cacheErrorHandler() {
+    @Override
+    public CacheErrorHandler errorHandler() {
         return new CacheErrorHandler() {
             @Override
             public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {

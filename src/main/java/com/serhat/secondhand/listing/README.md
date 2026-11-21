@@ -1,6 +1,6 @@
 # Listing Domain
 
-Manages the 6-vertical polymorphic product catalog (`VehicleListing`, `ElectronicListing`, `RealEstateListing`, `BooksListing`, `ClothingListing`, `SportsListing` extending `Listing` via JPA joined inheritance), rule-driven attribute validation, deterministic spec snapshotting, price change history (`@TrackPriceChange`), and real-time view/social proof metrics.
+Manages the 6-vertical polymorphic product catalog (`VehicleListing`, `ElectronicListing`, `RealEstateListing`, `BooksListing`, `ClothingListing`, `SportsListing` extending `Listing` via JPA joined inheritance), rule-driven attribute validation, spec snapshotting, price history (`@TrackPriceChange`), and view/social proof metrics.
 
 > [!NOTE]
 > **Related Documentation & Runbooks:**
@@ -12,16 +12,17 @@ Manages the 6-vertical polymorphic product catalog (`VehicleListing`, `Electroni
 ## Business Rules & Invariants
 - **Joined Polymorphism & Rule-Driven Validation:** Base `listings` rows join to `vehicle_listings`, `electronic_listings`, `real_estate_listings`, `book_listings`, `clothing_listings`, and `sports_listings`. `ListingValidationEngine` runs location checks, category `CategorySpecValidator`s (`*TypeRulesValidator` + `*HierarchyValidator`), and `ListingAttributeValidator` (`listing_attribute_definitions` stored in `listings.attributes` JSONB with GIN index `idx_listings_attributes_gin`).
 - **Deterministic Spec Snapshotters:** `VehicleSpecSnapshotter`, `ElectronicSpecSnapshotter`, and `BooksEditionSnapshotter` overwrite client inputs with non-null verified catalog facts on create and update; unlinked listings remain allowed as unverified.
-- **Lifecycle & Price History (`ListingStatus`):** Transitions across `DRAFT`, `ACTIVE` (publishes `NewListingCreatedEvent`), `INACTIVE`, `RESERVED` (24h accepted offer hold), `SOLD`, and `DELETED`. Modifying `price` triggers `@TrackPriceChange` (`listing_price_histories`). Only `ListingStatus.isPublicBrowsable()` statuses (`ACTIVE`, `SOLD`) are public; `/filter` and `/status/{status}` reject the rest (`INVALID_LISTING_STATUS`).
+- **Lifecycle & Price History (`ListingStatus`):** Transitions across `DRAFT`, `ACTIVE` (publishes `NewListingCreatedEvent`), `INACTIVE`, `RESERVED` (24h accepted offer hold), `SOLD`, and `DELETED`. Modifying `price` triggers `@TrackPriceChange` (`listing_price_histories`). Only `ListingStatus.isPublicBrowsable()` statuses are public; `/filter` and `/status/{status}` reject the rest (`INVALID_LISTING_STATUS`).
 - **Moderation Takedowns:** `ListingModerationService` moves `ACTIVE` listings to `INACTIVE` for complaint sanctions without an owner check; it requires the caller's transaction.
+- **Best Sellers:** `ListingBestSellerService` ranks `ACTIVE` listings by units sold; only IDs are cached.
 - **Debounced Views & Social Proof:** `ListingViewService` records views asynchronously, one per viewer per `ListingBusinessConstants.VIEW_DUPLICATE_WINDOW_HOURS`. Anonymous viewers are keyed by the server IP hash, never the client `sessionId`; owner and duplicate checks run before any entity load. View-stat cache keys include the requester and date range. `ListingSocialProofService` combines 24h active viewers, in-cart count, and favorite count in one payload.
 
 ## Redis & Caching
-- Spring caches (`CacheConfig`, cleared by `CatalogSeedStartupRunner` / mutations): `catalog:*` (`catalog:brands`, `catalog:vehicleTypes`, `catalog:clothingTypes`, `catalog:electronicTypes`, `catalog:bookGenres`), `listing:userListings`, `listing:views:seller`, `listing:views:listing`, `listing:globalStats` (public `GET /statistics`).
+- Spring caches (`CacheConfig`, cleared by `CatalogSeedStartupRunner` / mutations): `catalog:enums`, `catalog:vehicle`, `catalog:attributeDefinitions` (DTOs only, never entities), `listing:userListings`, `listing:views:seller`, `listing:views:listing`, `listing:globalStats` (public `GET /statistics`), `listing:bestSellers`.
 - Filter queries: page size clamped by `PageRequests.MAX_PAGE_SIZE`, `id` tie-breaker on every sort, COUNT skipped when the page is not full, and the `city`/`district` label `LIKE` runs only when no catalog key is sent.
 - Redis keys: `v4:listing:active_viewers:{id}` (24h ZSET) and `v6:catalog:locations:*` (`LocationCatalogService`).
 
 ## API
-- **Base (`ListingController`, `/api/v1/listings`):** `GET /` · `GET /{id}` · `POST /` · `PUT /{id}` · `DELETE /{id}` · `POST /{id}/{publish|deactivate|reactivate|sold|view}` · `GET /{id}/{view-stats|active-viewers|social-proof}`. Fee: `GET /fee-config` · `GET /fee-quote` (server fee + `sufficientBalance`) · `POST /pay-fee`.
+- **Base (`ListingController`, `/api/v1/listings`):** `GET /` · `GET /{id}` · `POST /` · `PUT /{id}` · `DELETE /{id}` · `POST /{id}/{publish|deactivate|reactivate|sold|view}` · `GET /{id}/{view-stats|active-viewers|social-proof}`. `GET /{statistics|best-sellers}`. Fee: `GET /fee-config` · `GET /fee-quote` (server fee + `sufficientBalance`) · `POST /pay-fee`. Batch: `PUT /{quantity|price|status}/batch` (all or nothing) · `GET /my/selection` (capped at `MAX_BATCH_STATUS_SIZE`) · `PUT /my/inactive/reactivate` · `PUT /my/active/deactivate`.
 - **Verticals (`/api/v1/{vehicles|electronics|real-estates|books|clothings|sports}`):** `POST /create-listing` · `PUT /{id}` · `GET /{id}` · `POST /filter`.
 - **Price History (`/api/v1/price-history/listing/{listing-id}`):** `GET /` · `GET /latest` · `GET /exists`.

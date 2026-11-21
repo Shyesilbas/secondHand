@@ -1,5 +1,6 @@
 package com.serhat.secondhand.escrow;
 
+import com.serhat.secondhand.payment.application.PaymentStatsCacheEvictor;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.escrow.domain.entity.Escrow;
@@ -36,7 +37,8 @@ class EscrowRefundReferenceTest {
     private final EscrowRepository escrowRepository = mock(EscrowRepository.class);
     private final IEWalletService walletService = mock(IEWalletService.class);
     private final EscrowService service = new EscrowService(escrowRepository, mock(PaymentRepository.class),
-            walletService, mock(ApplicationEventPublisher.class), mock(EscrowOutboxService.class));
+            walletService, mock(ApplicationEventPublisher.class), mock(EscrowOutboxService.class),
+            mock(PaymentStatsCacheEvictor.class));
 
     private final User buyer = User.builder().id(1L).build();
     private final User seller = User.builder().id(2L).build();

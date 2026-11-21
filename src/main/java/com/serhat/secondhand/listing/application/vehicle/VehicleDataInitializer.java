@@ -670,8 +670,6 @@ public class VehicleDataInitializer implements SeedTask {
     }
 
     private void evictVehicleCaches() {
-        Optional.ofNullable(cacheManager.getCache("catalog:brands")).ifPresent(cache -> cache.clear());
-        Optional.ofNullable(cacheManager.getCache("catalog:vehicleTypes")).ifPresent(cache -> cache.clear());
         Optional.ofNullable(cacheManager.getCache(VehicleCatalogService.CACHE_NAME)).ifPresent(cache -> cache.clear());
     }
 

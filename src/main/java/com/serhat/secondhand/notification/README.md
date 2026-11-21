@@ -16,7 +16,7 @@ Delivers personal user alerts (`notifications` table) and zero-fan-out system br
 
 ## WebSocket & Caching
 - STOMP destinations (`NotificationWebSocketService`): `/user/{userId}/notifications` (personal) and `/topic/notifications` (broadcast).
-- Read mutations (`read`, `read-all`) evict Spring cache `user:badges` (`@CacheEvict(value = "user:badges", key = "#userId")`).
+- Badge counts (`UserBadgeService`) are not cached on the server: they are counted on every request, so a new notification or a read shows up on the next fetch.
 
 ## API (`NotificationController`, `/api/v1/notifications`)
 - `GET /` — paginated unified personal + broadcast notification feed (`Page<NotificationDto>`).

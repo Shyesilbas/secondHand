@@ -1,7 +1,6 @@
 package com.serhat.secondhand.listing.domain.repository.electronics;
 
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,11 +10,10 @@ import java.util.UUID;
 
 @Repository
 public interface ElectronicTypeRepository extends JpaRepository<ElectronicType, UUID> {
-    
-    @Cacheable(value = "catalog:electronicTypes", key = "'all'")
+
+    // Not cached: these are JPA entities (lazy proxies, mutable seed rows). EnumReadService caches its DTO output.
     List<ElectronicType> findAll();
-    
-    @Cacheable(value = "catalog:electronicTypes", key = "#name", unless = "#result == null")
+
     Optional<ElectronicType> findByNameIgnoreCase(String name);
 }
 

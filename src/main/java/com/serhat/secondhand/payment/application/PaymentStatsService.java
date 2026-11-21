@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +32,23 @@ public class PaymentStatsService {
     private final PaymentMapper paymentMapper;
     private final PaymentContextResolver paymentContextResolver;
 
-    // The 'dto_' key prefix keeps entries cached before PaymentStatisticsDto (plain maps) from being read back.
-    @Cacheable(value = "payment:stats", key = "'dto_' + #userId + '_' + #providerName")
+    public static final String CACHE_NAME = "payment:stats";
+    static final String ALL_PROVIDERS = "ALL";
+
+    /**
+     * Provider filters whose result is cached. {@link PaymentStatsCacheEvictor} evicts exactly these keys
+     * (plus the unfiltered one) per affected user, so any other filter value is read from the database.
+     */
+    static final Set<String> CACHED_PROVIDER_FILTERS = Set.of("EWALLET");
+
+    @Cacheable(value = CACHE_NAME,
+            key = "T(com.serhat.secondhand.payment.application.PaymentStatsService).cacheKey(#userId, #providerName)",
+            condition = "T(com.serhat.secondhand.payment.application.PaymentStatsService).isCacheable(#providerName)")
     public PaymentStatisticsDto getPaymentStatistics(Long userId, String providerName) {
+        String provider = normalizeProvider(providerName);
         log.info("[CACHE MISS] payment:stats for userId: {}", userId);
 
-        List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, providerName);
+        List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, provider);
         Object[] stats = statsRows.isEmpty()
                 ? new Object[] { 0L, 0L, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO }
                 : statsRows.get(0);
@@ -45,7 +58,7 @@ public class PaymentStatsService {
         BigDecimal incomingAmount = stats[2] != null ? (BigDecimal) stats[2] : BigDecimal.ZERO;
         BigDecimal outgoingAmount = stats[3] != null ? (BigDecimal) stats[3] : BigDecimal.ZERO;
         BigDecimal escrowAmount;
-        if (providerName == null || providerName.isBlank()) {
+        if (provider == null) {
             BigDecimal pendingEscrow = escrowRepository.sumAmountBySellerIdAndStatus(userId, PaymentStatus.ESCROW);
             escrowAmount = pendingEscrow != null ? pendingEscrow : BigDecimal.ZERO;
         } else {
@@ -61,6 +74,22 @@ public class PaymentStatsService {
                 outgoingAmount,
                 incomingAmount.add(outgoingAmount),
                 escrowAmount);
+    }
+
+    /** Blank means no filter; provider names are stored upper case ({@code EWALLET}). */
+    static String normalizeProvider(String providerName) {
+        return providerName == null || providerName.isBlank() ? null : providerName.trim().toUpperCase(Locale.ROOT);
+    }
+
+    public static boolean isCacheable(String providerName) {
+        String normalized = normalizeProvider(providerName);
+        return normalized == null || CACHED_PROVIDER_FILTERS.contains(normalized);
+    }
+
+    /** Per user and provider filter, e.g. {@code user:7:ALL}; the prefix keeps older entry shapes from being read. */
+    public static String cacheKey(Long userId, String providerName) {
+        String normalized = normalizeProvider(providerName);
+        return "user:" + userId + ":" + (normalized == null ? ALL_PROVIDERS : normalized);
     }
 
     public Page<PaymentDto> getMyPayments(Long userId, Pageable pageable, PaymentFilter filter) {

@@ -13,7 +13,6 @@ import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +35,6 @@ public class OrderCompletionService {
     private final OrderCompletionPolicy orderCompletionPolicy;
     private final ApplicationEventPublisher eventPublisher;
 
-    @CacheEvict(value = "order:pending", key = "#user.id")
     public Result<OrderDto> completeOrder(Long orderId, User user) {
         Result<Order> orderResult = validateOrderForCompletion(orderId, user);
         if (orderResult.isError()) return orderResult.propagateError();

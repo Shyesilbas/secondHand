@@ -17,8 +17,6 @@ import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRep
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +48,6 @@ public class ClothingDataInitializer implements SeedTask {
     private final ObjectMapper objectMapper;
     private final CatalogLegacyPruner legacyPruner;
     private final SizeSystemCatalog sizeCatalog;
-    private final CacheManager cacheManager;
 
     private final Set<String> seenBrands = new HashSet<>();
     private final Set<String> seenTypes = new HashSet<>();
@@ -65,25 +62,15 @@ public class ClothingDataInitializer implements SeedTask {
         try {
             seenBrands.clear();
             seenTypes.clear();
-            clearTypeCache();
             seedBrands(loadJson(BRANDS_PATH));
             seedTypes(loadJson(TYPES_PATH));
             legacyPruner.prune("clothing_brands", seenBrands);
             legacyPruner.prune("clothing_types", seenTypes);
-            clearTypeCache();
             log.info("Clothing seed completed successfully");
             return Result.success();
         } catch (Exception e) {
             log.error("Clothing seed failed", e);
             return Result.error("Clothing seed failed: " + e.getMessage(), "SEED_FAILED");
-        }
-    }
-
-    /** Types are cached in Redis by name; a cached copy would hide the new rules from validation. */
-    private void clearTypeCache() {
-        Cache cache = cacheManager.getCache("catalog:clothingTypes");
-        if (cache != null) {
-            cache.clear();
         }
     }
 

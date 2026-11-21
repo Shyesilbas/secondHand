@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 @RequiredArgsConstructor
@@ -115,7 +114,6 @@ public class NotificationService implements INotificationService {
     }
 
 
-    @CacheEvict(value = "user:badges", key = "#userId")
     public Result<Void> markAsRead(UUID notificationId, Long userId) {
         log.info("Marking notification {} as read for user: {}", notificationId, userId);
 
@@ -153,7 +151,6 @@ public class NotificationService implements INotificationService {
     }
 
 
-    @CacheEvict(value = "user:badges", key = "#userId")
     public void markAllAsRead(Long userId) {
         log.info("Marking all notifications as read for user: {}", userId);
 

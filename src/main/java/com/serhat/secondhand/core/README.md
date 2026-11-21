@@ -22,9 +22,10 @@ Provides cross-cutting platform infrastructure: the Spring Security filter chain
 
 ## Redis & Caching
 - Rate-limit keys (`RateLimitingFilter`, 60s window): `ratelimit:{category}:ip:{clientIp}:{windowBucket}` and `ratelimit:{category}:user:{userId}:{windowBucket}`.
-- Spring Cache (`CacheConfig`): `v4:<cacheName>:` prefix (`CacheConfig.CACHE_VERSION`) with explicit per-cache TTLs and `CacheErrorHandlerConfig` fail-open logging.
+- Spring Cache (`CacheConfig`): `v4:<cacheName>:` prefix (`CacheConfig.CACHE_VERSION`) with explicit per-cache TTLs, transaction-aware puts/evictions and `CacheErrorHandlerConfig` (a `CachingConfigurer`) fail-open logging. Attempt counters use `ExpiringCounter` (INCR and expiry in one Lua call).
 
 ## API
 - `GET /api/v1/enums/all` (`EnumController`, `@PublicEndpoint`) — cached dictionary of system enums, type rules, and catalog metadata.
 - `GET /api/v1/admin/audit-logs` (`AuditLogController`, `ROLE_ADMIN`) — paginated audit log search.
+- `POST /api/v1/admin/outbox/{type}/{eventId}/requeue` (`OutboxAdminController`, `ROLE_ADMIN`) — reset one `FAILED` payment/order/escrow outbox event to `PENDING`; `OutboxMetrics` exposes `secondhand.outbox.events` gauges.
 - `GET /api/v1/test/rate-limits/ping` (`RateLimitTestController`) — rate-limit header diagnostic endpoint.

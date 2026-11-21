@@ -32,7 +32,7 @@ public class ListingModerationService {
 
     /** Returns true when the listing was ACTIVE and is now INACTIVE. */
     @Transactional(propagation = Propagation.MANDATORY)
-    @CacheEvict(cacheNames = "user:profile", allEntries = true)
+    @CacheEvict(cacheNames = {"user:profile", "listing:userListings"}, allEntries = true)
     public boolean suspend(UUID listingId) {
         Listing listing = listingRepository.findById(listingId).orElse(null);
         if (listing == null || listing.getStatus() != ListingStatus.ACTIVE) {
@@ -46,7 +46,7 @@ public class ListingModerationService {
 
     /** Deactivates every ACTIVE listing of the seller; returns how many changed. */
     @Transactional(propagation = Propagation.MANDATORY)
-    @CacheEvict(cacheNames = "user:profile", allEntries = true)
+    @CacheEvict(cacheNames = {"user:profile", "listing:userListings"}, allEntries = true)
     public int suspendAllActive(Long sellerId) {
         int total = 0;
         for (int pass = 0; ; pass++) {

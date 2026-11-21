@@ -1,5 +1,6 @@
 package com.serhat.secondhand.review;
 
+import com.serhat.secondhand.review.application.event.ReviewCreatedEvent;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
@@ -142,6 +143,8 @@ class ReviewServiceTest {
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getData()).isEqualTo(expectedDto);
         verify(eventPublisher).publishEvent(new SellerEligibilityRecheckEvent(2L));
+        // Drives the AI summary refresh for the seller and the listing.
+        verify(eventPublisher).publishEvent(new ReviewCreatedEvent(3, 2L, listing.getId()));
     }
 
     @Test

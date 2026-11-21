@@ -135,7 +135,7 @@ Broadcast için "toplam − okuduklarım" hesabı yapılır. Dikkat: kullanıcı
 
 - `PUT /api/v1/notifications/{id}/read`: id önce `notifications`'ta aranır. Bulunursa sahibi kontrol edilir (`NOTIFICATION_NOT_BELONGS_TO_USER`) ve `isRead = true` yapılır. Bulunamazsa `notification_events`'te aranır ve `(eventId, userId)` satırı yoksa eklenir. İkisinde de yoksa `NOTIFICATION_NOT_FOUND`.
 - `PUT /api/v1/notifications/read-all`: kişisel bildirimlerin hepsini okundu yapar, okunmamış her broadcast için read satırı ekler.
-- Her iki metot `@CacheEvict(value = "user:badges", key = "#userId")` taşır; badge sayısı sonraki okumada yeniden hesaplanır (`user:badges` TTL 5 dk).
+- Badge sayıları (`UserBadgeService`) sunucuda cache'lenmez; her istekte yeniden sayılır, okundu işaretleme sonraki okumada görünür.
 
 ---
 
@@ -164,5 +164,4 @@ Başlık ve metinler [`NotificationTemplateCatalog`](../src/main/java/com/serhat
 ## 7. Bilinen sınırlar
 
 - Dağıtım JVM içi event ile yapılır; kalıcı kuyruk yoktur (§2).
-- Yeni bildirim oluşturmak `user:badges` cache'ini temizlemez; cache'teki sayı en fazla 5 dakika eski kalabilir. Anlık güncelleme WebSocket push'u ile sağlanır.
 - Okunmamış broadcast sayısı tüm broadcast satırları üzerinden hesaplanır; kullanıcının kayıt tarihinden eski broadcast'ler de sayılır.

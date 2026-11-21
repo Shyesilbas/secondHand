@@ -10,6 +10,7 @@ import com.serhat.secondhand.ewallet.mapper.EWalletMapper;
 import com.serhat.secondhand.ewallet.repository.EWalletRepository;
 import com.serhat.secondhand.ewallet.util.EWalletBalanceUtil;
 import com.serhat.secondhand.ewallet.validator.EWalletValidator;
+import com.serhat.secondhand.payment.application.PaymentStatsCacheEvictor;
 import com.serhat.secondhand.payment.contract.PaymentTransactionKind;
 import com.serhat.secondhand.payment.entity.*;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
@@ -19,7 +20,6 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,6 +45,7 @@ public class EWalletService implements IEWalletService {
     private final AppConfigProperties appConfigProperties;
     private final EWalletPaymentFactory eWalletPaymentFactory;
     private final org.springframework.context.ApplicationEventPublisher eventPublisher;
+    private final PaymentStatsCacheEvictor paymentStatsCacheEvictor;
 
     @Transactional
     public EWalletDto createEWallet(EwalletRequest ewalletRequest) {
@@ -92,7 +93,6 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
-    @CacheEvict(value = "payment:stats", allEntries = true)
     public void deposit(DepositRequest request, String idempotencyKey) {
         requireIdempotencyKey(idempotencyKey);
         User user = getAuthenticatedUser();
@@ -111,11 +111,11 @@ public class EWalletService implements IEWalletService {
         payment.setIdempotencyKey(idempotencyKey);
         paymentRepository.save(payment);
         eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
+        paymentStatsCacheEvictor.evictUsers(user);
         log.info("Mock eWallet top-up successful for user: {} amount: {}", user.getEmail(), request.getAmount());
     }
 
     @Transactional
-    @CacheEvict(value = "payment:stats", allEntries = true)
     public void withdraw(WithdrawRequest request, String idempotencyKey) {
         requireIdempotencyKey(idempotencyKey);
         User user = getAuthenticatedUser();
@@ -134,6 +134,7 @@ public class EWalletService implements IEWalletService {
         payment.setIdempotencyKey(idempotencyKey);
         paymentRepository.save(payment);
         eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
+        paymentStatsCacheEvictor.evictUsers(user);
         log.info("eWallet withdrawal successful for user: {} amount: {}", user.getEmail(), request.getAmount());
     }
 
@@ -257,7 +258,6 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
-    @CacheEvict(value = "payment:stats", allEntries = true)
     public void creditToUser(User user, BigDecimal amount, WalletTransactionReference reference, PaymentTransactionKind transactionKind, User counterpartUser) {
         java.util.Objects.requireNonNull(reference, "reference must not be null; use WalletTransactionReference.none()");
         log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
@@ -288,6 +288,7 @@ public class EWalletService implements IEWalletService {
             log.info("Item sale payment record created for seller: {} amount: {}", user.getEmail(), amount);
         }
 
+        paymentStatsCacheEvictor.evictUsers(user, counterpartUser);
         log.info("Successfully credited {} to user's e-wallet. New balance: {}", amount, eWallet.getBalance());
     }
 
@@ -306,7 +307,6 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
-    @CacheEvict(value = "payment:stats", allEntries = true)
     public void debitFromUser(User user, BigDecimal amount, WalletTransactionReference reference, PaymentTransactionKind transactionKind, User counterpartUser) {
         java.util.Objects.requireNonNull(reference, "reference must not be null; use WalletTransactionReference.none()");
         log.info("Debiting {} from user's e-wallet: {}", amount, user.getEmail());
@@ -325,6 +325,7 @@ public class EWalletService implements IEWalletService {
             log.info("Refund debit payment record created for seller: {} amount: {}", user.getEmail(), amount);
         }
 
+        paymentStatsCacheEvictor.evictUsers(user, counterpartUser);
         log.info("Successfully debited {} from user's e-wallet. New balance: {}", amount, eWallet.getBalance());
     }
 

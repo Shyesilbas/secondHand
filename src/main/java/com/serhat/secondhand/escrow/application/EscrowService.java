@@ -9,6 +9,7 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
+import com.serhat.secondhand.payment.application.PaymentStatsCacheEvictor;
 import com.serhat.secondhand.payment.contract.PaymentTransactionKind;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.ewallet.application.IEWalletService;
@@ -42,9 +43,9 @@ public class EscrowService {
     private final IEWalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
     private final com.serhat.secondhand.escrow.outbox.EscrowOutboxService escrowOutboxService;
+    private final PaymentStatsCacheEvictor paymentStatsCacheEvictor;
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> hold(Order order) {
         log.info("Creating escrows for order: {}", order.getOrderNumber());
         
@@ -82,6 +83,7 @@ public class EscrowService {
                     .build();
 
             escrowRepository.save(escrow);
+            paymentStatsCacheEvictor.evictUsers(order.getUser(), escrow.getSeller());
 
             log.info("Escrowed {} for seller {} (Item: {})",
                     escrowAmountsByItemId.getOrDefault(item.getId(), item.getTotalPrice()),
@@ -126,7 +128,6 @@ public class EscrowService {
     }
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> release(Order order) {
         log.info("Releasing escrows for order: {}", order.getOrderNumber());
         List<Escrow> escrows = escrowRepository.findByOrderIdAndStatusForUpdate(order.getId(), PaymentStatus.ESCROW);
@@ -141,6 +142,7 @@ public class EscrowService {
             escrow.setStatus(PaymentStatus.COMPLETED);
             escrow.setReleasedAt(LocalDateTime.now());
             escrowRepository.save(escrow);
+            paymentStatsCacheEvictor.evictUsers(order.getUser(), escrow.getSeller());
 
             // 2. Update the corresponding Seller-Side Payment record in the history
             List<Payment> sellerPayments = paymentRepository.findByOrderIdAndToUserIdAndOrderItemId(
@@ -168,7 +170,6 @@ public class EscrowService {
     }
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> cancel(Order order, List<OrderItem> itemsToCancel) {
         log.info("Cancelling escrows for {} items in order: {}", itemsToCancel.size(), order.getOrderNumber());
         
@@ -183,6 +184,7 @@ public class EscrowService {
             if (escrow.getStatus() == PaymentStatus.ESCROW) {
                 escrow.setStatus(PaymentStatus.CANCELLED);
                 escrowRepository.save(escrow);
+                paymentStatsCacheEvictor.evictUsers(order.getUser(), escrow.getSeller());
 
                 updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), escrow.getOrderItem().getId(), PaymentStatus.CANCELLED);
 
@@ -199,7 +201,6 @@ public class EscrowService {
     }
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> refund(Order order, List<OrderItem> itemsToRefund) {
         log.info("Refunding escrows for {} items in order: {}", itemsToRefund.size(), order.getOrderNumber());
         
@@ -215,6 +216,7 @@ public class EscrowService {
                 escrow.setStatus(PaymentStatus.REFUNDED);
                 escrow.setRefundedAt(LocalDateTime.now());
                 escrowRepository.save(escrow);
+                paymentStatsCacheEvictor.evictUsers(order.getUser(), escrow.getSeller());
 
                 updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), escrow.getOrderItem().getId(), PaymentStatus.REFUNDED);
 

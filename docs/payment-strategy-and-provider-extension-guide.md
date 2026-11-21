@@ -117,7 +117,7 @@ sequenceDiagram
     Proc->>DB: findByIdempotencyKeyAndFromUserId
     Proc->>Pre: preCheck(userId, request)
     Proc->>Prov: supports → canProcess → process
-    Proc->>DB: save(Payment) + evict payment:stats
+    Proc->>DB: save(Payment) + evict payer/recipient payment:stats
     Proc->>DB: payment_outbox_events (aynı transaction)
     Proc->>Redis: markCompleted (commit sonrası)
     DB-->>Kafka: PaymentOutboxWorker → payment.completed.v1
@@ -236,9 +236,9 @@ Bilmeniz gereken noktalar:
 
 - **Provider seçimi** `stream().filter().findFirst()` ile yapılır (O(n), liste küçüktür). İki adapter aynı `providerName` için `true` dönerse hangisinin seçileceği bean sırasına bağlıdır; her provider adı tek adapter'a ait olmalıdır.
 - **Bilinmeyen `providerName`** `IllegalArgumentException` fırlatır; `GlobalExceptionHandler` bunu 400 (Bad Request, ProblemDetail gövdesi) yapar, yani `PaymentErrorCodes` içinde bir hata kodu taşımaz ve `Result` zarfı dönmez. İstenirse `UNSUPPORTED_PAYMENT_TYPE` gibi bir kodla `Result.error` döndürmek daha tutarlı olur.
-- **Başarısız provider sonucu da kaydedilir:** `Payment` satırı `result` ile birlikte `save` edilir, `payment:stats` temizlenir; **outbox event'i yalnızca başarıda** yazılır. `Payment.status` varsayılan olarak `COMPLETED`'dir (`PaymentMapper`), request `status` taşıyorsa o kullanılır (checkout `ESCROW` gönderir).
+- **Başarısız provider sonucu da kaydedilir:** `Payment` satırı `result` ile birlikte `save` edilir, ödeyen ve alanın `payment:stats` key'leri silinir; **outbox event'i yalnızca başarıda** yazılır. `Payment.status` varsayılan olarak `COMPLETED`'dir (`PaymentMapper`), request `status` taşıyorsa o kullanılır (checkout `ESCROW` gönderir).
 - **Idempotency eşleşmesi** `validateIdempotencyKeyMatch` ile tutar, listing, orderItem, providerName ve kullanıcıyı karşılaştırır; biri farklıysa `IDEMPOTENCY_KEY_CONFLICT`.
-- **Cache:** temizlenen cache adı `payment:stats`'tır ve tamamı silinir, çünkü bir ödeme hem ödeyenin hem alıcının istatistiğini değiştirir.
+- **Cache:** `PaymentStatsCacheEvictor` yalnızca ödeyen ve alanın `payment:stats` key'lerini (`user:<id>:ALL` ve cache'lenen provider filtreleri) siler; diğer kullanıcıların istatistikleri korunur. Cache transaction-aware olduğu için silme commit sonrasına ertelenir.
 
 ### 3.5 `PaymentPreCheckService`
 
@@ -247,8 +247,8 @@ Bilmeniz gereken noktalar:
 ```java
 User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);  // yalnızca ITEM_PURCHASE / ITEM_SALE'de dolu
 
-boolean isAutoRenewal = paymentRequest.transactionType() == PaymentTransactionType.MEMBERSHIP_PAYMENT
-        && "AUTO_RENEWAL".equals(paymentRequest.verificationCode());
+boolean isAutoRenewal = paymentRequest.systemInitiated()                         // yalnızca MembershipService yenilemesi true yapar
+        && paymentRequest.transactionType() == PaymentTransactionType.MEMBERSHIP_PAYMENT;
 if (!isAutoRenewal) {
     paymentValidator.validatePaymentAgreements(paymentRequest);                  // sözleşmeler
     if (paymentVerificationService.isVerificationRequired(paymentRequest.verificationCode())) {
@@ -260,7 +260,7 @@ if (!isAutoRenewal) {
 paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);  // tutar > 0, kendine ödeme yok
 ```
 
-Kontroller sırasıyla: kullanıcı, sözleşmeler (`AGREEMENTS_NOT_ACCEPTED`, `REQUIRED_AGREEMENTS_NOT_ACCEPTED`), OTP (`PAYMENT_VERIFICATION_REQUIRED` 428, `INVALID_VERIFICATION_CODE`), tutar (`INVALID_AMOUNT`) ve kendine ödeme (`SELF_PAYMENT`; ilan, vitrin ve üyelik ödemeleri hariç). Üyelik otomatik yenilemesi sözleşme ve OTP adımını atlar.
+Kontroller sırasıyla: kullanıcı, sözleşmeler (`AGREEMENTS_NOT_ACCEPTED`, `REQUIRED_AGREEMENTS_NOT_ACCEPTED`), OTP (`PAYMENT_VERIFICATION_REQUIRED` 428, `INVALID_VERIFICATION_CODE`), tutar (`INVALID_AMOUNT`) ve kendine ödeme (`SELF_PAYMENT`; ilan, vitrin ve üyelik ödemeleri hariç). Üyelik otomatik yenilemesi sözleşme ve OTP adımını atlar; bunu `PaymentRequest.systemInitiated` bayrağı belirler ve client'tan gelen hiçbir `verificationCode` değeri bu adımı atlatamaz.
 
 ### 3.6 Hata kodları
 
@@ -382,4 +382,4 @@ public class IyzicoPaymentProviderAdapter implements PaymentProviderPort {
 | DB idempotency | `findByIdempotencyKeyAndFromUserId` + parametre eşleşmesi. | Redis kaydı olmasa da aynı ödeme ikinci kez oluşmaz. |
 | Optimistic lock retry | Yalnızca çağıranın transaction'ı yoksa, 3 deneme, `50 ms × deneme`. | Eşzamanlı çakışmalarda otomatik tekrar. |
 | Transactional outbox | Ödeme ile aynı transaction'da `payment_outbox_events`, worker `payment.completed.v1` yayınlar. | Bildirim ve handler işleri asenkron ve tekilleştirilmiş çalışır. |
-| Cache eviction | `payment:stats` tamamen temizlenir. | İstatistikler anında güncellenir. |
+| Cache eviction | Ödeyen ve alanın `payment:stats` key'leri silinir. | İki tarafın istatistikleri commit sonrası güncellenir; diğer kullanıcılar etkilenmez. |

@@ -8,7 +8,6 @@ import com.serhat.secondhand.email.dto.EmailDto;
 import com.serhat.secondhand.email.mapper.EmailMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,7 +49,6 @@ public class EmailService {
         return emailRepository.countByUserIdAndReadAtIsNull(userId);
     }
 
-    @CacheEvict(value = "user:badges", key = "#userId")
     public Result<String> deleteEmail(UUID emailId, Long userId) {
         int affected = emailRepository.softDeleteByIdAndUserId(emailId, userId, LocalDateTime.now());
         if (affected > 0) {
@@ -59,13 +57,11 @@ public class EmailService {
         return Result.error("Email not found or unauthorized", "EMAIL_NOT_FOUND");
     }
 
-    @CacheEvict(value = "user:badges", key = "#userId")
     public String deleteAllEmails(Long userId) {
         emailRepository.softDeleteAllByUserId(userId, LocalDateTime.now());
         return "Emails deleted for userId: " + userId;
     }
 
-    @CacheEvict(value = "user:badges", key = "#userId")
     public int markAllAsRead(Long userId) {
         log.info("Marking all emails as read for userId: {}", userId);
         int affected = emailRepository.markAllRead(userId, LocalDateTime.now());
@@ -73,7 +69,6 @@ public class EmailService {
         return affected;
     }
 
-    @CacheEvict(value = "user:badges", key = "#userId")
     public EmailDto markAsRead(UUID emailId, Long userId, String userEmail) {
         Email email = emailRepository.findByIdAndRecipientEmail(emailId, userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Email not found or unauthorized"));

@@ -127,6 +127,8 @@ ai:
   summary:
     ip-hourly-limit: ${AI_SUMMARY_IP_HOURLY_LIMIT:10}
     negative-cache-seconds: ${AI_SUMMARY_NEGATIVE_CACHE_SECONDS:120}
+    # A cached summary is regenerated after this many new reviews (the first review always refreshes it).
+    refresh-after-new-reviews: ${AI_SUMMARY_REFRESH_AFTER_NEW_REVIEWS:5}
 
 aura:
   agent:
