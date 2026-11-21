@@ -1,6 +1,7 @@
 package com.serhat.secondhand.order.repository;
 
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
@@ -14,9 +15,27 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
+
+    /**
+     * Listing IDs ranked by units sold on paid orders that were not cancelled or refunded,
+     * limited to listings currently in {@code listingStatus}. Ties break on listing id so the order is stable.
+     */
+    @Query("""
+            SELECT oi.listing.id FROM OrderItem oi
+            WHERE oi.order.paymentStatus = :completed
+              AND oi.order.status NOT IN :excludedStatuses
+              AND oi.listing.status = :listingStatus
+            GROUP BY oi.listing.id
+            ORDER BY SUM(oi.quantity) DESC, oi.listing.id ASC
+            """)
+    List<UUID> findTopSellingListingIds(@Param("completed") PaymentStatus completed,
+                                        @Param("excludedStatuses") Collection<OrderStatus> excludedStatuses,
+                                        @Param("listingStatus") ListingStatus listingStatus,
+                                        Pageable pageable);
 
     @Query("""
             SELECT COUNT(oi) FROM OrderItem oi

@@ -12,6 +12,9 @@ public final class ListingBusinessConstants {
     private ListingBusinessConstants() {
     }
 
+    /** Most listings one batch status request may change, and the cap on "select all my listings". */
+    public static final int MAX_BATCH_STATUS_SIZE = 500;
+
     /** Rolling window for duplicate view detection (listing views). */
     public static final int VIEW_DUPLICATE_WINDOW_HOURS = 1;
 
@@ -70,4 +73,11 @@ public final class ListingBusinessConstants {
 
     /** Floor for non-negative listing price validation. */
     public static final BigDecimal MIN_NON_NEGATIVE_PRICE = BigDecimal.ZERO;
+
+    /** Ranked listing IDs kept in the best-seller cache; larger than the page so blocked or stale entries can drop out. */
+    public static final int BEST_SELLER_POOL_SIZE = 48;
+
+    /** Default and maximum number of listings returned by the public best-seller feed. */
+    public static final int DEFAULT_BEST_SELLER_LIMIT = 10;
+    public static final int MAX_BEST_SELLER_LIMIT = 24;
 }
