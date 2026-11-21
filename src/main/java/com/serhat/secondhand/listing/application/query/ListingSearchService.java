@@ -16,6 +16,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -148,6 +149,57 @@ public class ListingSearchService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, totalMatches);
+    }
+
+    /**
+     * Lenient sibling of {@link #globalSearch} for the assistant: a listing may miss one of the query
+     * words (a seller writes "GS" where the buyer types "Galatasaray"), and results are ranked by how many
+     * words they match, newest first among equals. Single-word queries stay strict. One page, no count query.
+     */
+    public Page<ListingDto> globalSearchBestMatch(String query, int size, Long userId) {
+        int safeSize = normalizePageSize(size);
+        if (query == null || query.trim().isEmpty()) return emptySearchPage(0, safeSize);
+        List<String> tokens = tokenizeSearchQuery(query);
+        if (tokens.size() < 2) {
+            return globalSearch(query, 0, safeSize, userId);
+        }
+
+        Set<Long> hiddenSellerIds = userBlockService.getMutuallyHiddenUserIds(userId);
+        forceCustomPlanForThisTransaction();
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Listing> dataQuery = cb.createQuery(Listing.class);
+        Root<Listing> root = dataQuery.from(Listing.class);
+        root.fetch("seller", JoinType.LEFT);
+
+        Expression<Integer> score = cb.literal(0);
+        for (String token : tokens) {
+            String pattern = "%" + escapeLikeWildcards(token) + "%";
+            Predicate match = cb.or(
+                    cb.like(cb.lower(root.get("title")), pattern, LIKE_ESCAPE_CHAR),
+                    cb.like(cb.lower(root.get("description")), pattern, LIKE_ESCAPE_CHAR));
+            score = cb.sum(score, cb.<Integer>selectCase().when(match, 1).otherwise(0));
+        }
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("status"), ListingStatus.ACTIVE));
+        if (!hiddenSellerIds.isEmpty()) {
+            predicates.add(cb.not(root.get("seller").get("id").in(hiddenSellerIds)));
+        }
+        predicates.add(cb.ge(score, tokens.size() - 1));
+
+        dataQuery.select(root)
+                .where(predicates.toArray(new Predicate[0]))
+                .orderBy(
+                        cb.desc(score),
+                        cb.desc(root.get(ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT)),
+                        cb.desc(root.get(ListingBusinessConstants.LISTING_SORT_PROPERTY_ID)));
+
+        List<Listing> found = entityManager.createQuery(dataQuery).setMaxResults(safeSize).getResultList();
+        log.debug("ListingSearchService best-match search tokens={} returned {} items", tokens, found.size());
+
+        List<ListingDto> dtos = found.stream().map(listingMapper::toDynamicDto).collect(Collectors.toList());
+        return new PageImpl<>(enrichmentService.enrich(dtos, userId), PageRequest.of(0, safeSize), dtos.size());
     }
 
     // After a few executions of the same server-side prepared statement PostgreSQL may switch to a

@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicL
 import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.sports.SportsListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
@@ -192,5 +193,49 @@ class AuraAgentEnhancementsTest {
 
         assertThat(aug.suggestedListings()).hasSize(1);
         assertThat(aug.liveSearchBlock()).contains("özellikler=16GB RAM, 512GB");
+    }
+
+    @Test
+    void searchOrchestrator_triesAlternativePhrasingWhenTheFullQueryFindsNothing() {
+        when(geminiClient.generateJsonForMemory(anyString()))
+                .thenReturn("""
+                        {"mode":"GLOBAL_TEXT","searchQuery":"galatasaray iç saha forması",
+                         "alternativeQueries":["gs iç saha forması"],"resultSize":8}
+                        """);
+        when(listingSearchService.globalSearch(eq("galatasaray iç saha forması"), anyInt(), anyInt(), eq(5L)))
+                .thenReturn(new PageImpl<>(List.of()));
+        when(listingSearchService.globalSearch(eq("gs iç saha forması"), anyInt(), anyInt(), eq(5L)))
+                .thenReturn(new PageImpl<ListingDto>(List.of(jersey())));
+
+        AgentSearchAugmentation aug = searchOrchestrator.augment(5L, "sezon fark etmez, galatasaray iç saha forması arıyorum", "");
+
+        assertThat(aug.suggestedListings()).hasSize(1);
+        verify(listingSearchService, never()).globalSearchBestMatch(anyString(), anyInt(), anyLong());
+    }
+
+    @Test
+    void searchOrchestrator_fallsBackToBestMatchWhenNoPhrasingMatchesEveryWord() {
+        when(geminiClient.generateJsonForMemory(anyString()))
+                .thenReturn("{\"mode\":\"GLOBAL_TEXT\",\"searchQuery\":\"galatasaray iç saha forması\",\"resultSize\":8}");
+        when(listingSearchService.globalSearch(anyString(), anyInt(), anyInt(), eq(5L)))
+                .thenReturn(new PageImpl<>(List.of()));
+        when(listingSearchService.globalSearchBestMatch(eq("galatasaray iç saha forması"), anyInt(), eq(5L)))
+                .thenReturn(new PageImpl<ListingDto>(List.of(jersey())));
+
+        AgentSearchAugmentation aug = searchOrchestrator.augment(5L, "galatasaray iç saha forması arıyorum", "");
+
+        assertThat(aug.suggestedListings()).hasSize(1);
+        assertThat(aug.liveSearchBlock()).contains("Gs 22/23 iç saha forması");
+    }
+
+    private static ListingDto jersey() {
+        SportsListingDto dto = new SportsListingDto();
+        dto.setId(UUID.randomUUID());
+        dto.setListingNo("ZG806TC2");
+        dto.setType(ListingType.SPORTS);
+        dto.setTitle("Gs 22/23 iç saha forması");
+        dto.setPrice(new BigDecimal("28000"));
+        dto.setCurrency(Currency.TRY);
+        return dto;
     }
 }
