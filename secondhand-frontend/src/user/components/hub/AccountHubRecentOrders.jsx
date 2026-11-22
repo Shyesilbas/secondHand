@@ -4,10 +4,19 @@ import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { buttonClasses } from '@/common/components/ui/Button';
 import ErrorState from '@/common/components/ui/ErrorState';
 import Skeleton from '@/common/components/ui/Skeleton';
-import { Badge, Card, EmptyState } from '../../../common/components/ui/index.js';
+import { Card, EmptyState } from '../../../common/components/ui/index.js';
 import { ROUTES } from '../../../common/constants/routes.js';
 import { formatCurrency, formatLongDate } from '../../../common/formatters.js';
 import { getOrderStatusBadgeVariant } from '../../../order/utils/statusPresentation.js';
+
+const STATUS_DOT = {
+  neutral: 'bg-text-tertiary',
+  muted: 'bg-text-tertiary',
+  success: 'bg-status-success',
+  warning: 'bg-status-warning',
+  error: 'bg-status-error',
+  primary: 'bg-primary'
+};
 
 const AccountHubRecentOrders = ({
   ordersLoading,
@@ -118,14 +127,13 @@ const AccountHubRecentOrders = ({
                         order.currency || 'TRY'
                       )}
                     </p>
-                    <Badge
-                      variant={getOrderStatusBadgeVariant(order.status)}
-                      dot
-                      size="sm"
-                      className="mt-1"
-                    >
+                    <p className="mt-0.5 inline-flex items-center gap-1.5 text-sm text-text-tertiary">
+                      <span
+                        className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[getOrderStatusBadgeVariant(order.status)] || STATUS_DOT.neutral}`}
+                        aria-hidden
+                      />
                       {statusLabel}
-                    </Badge>
+                    </p>
                   </div>
                 </Link>
               </li>

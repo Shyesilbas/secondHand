@@ -8,7 +8,7 @@ import { EmptyState, PageHeader, Skeleton } from '../../common/components/ui/ind
 import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import Tabs from '../../common/components/ui/Tabs.jsx';
-import { inputNormal } from '../../common/components/forms/inputStyles.js';
+import { inputNormal, selectCompact } from '../../common/components/forms/inputStyles.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { offerService } from '../services/offerService.js';
@@ -207,7 +207,7 @@ const OffersPage = () => {
               />
             </div>
             <label className="sr-only" htmlFor="offer-sort">{t('sort')}</label>
-            <select id="offer-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className={`${inputNormal} sm:w-auto`}>
+            <select id="offer-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className={selectCompact}>
               <option value={SORT.NEWEST}>{t('newest_first')}</option>
               <option value={SORT.EXPIRING}>{t('expiring_soon')}</option>
             </select>

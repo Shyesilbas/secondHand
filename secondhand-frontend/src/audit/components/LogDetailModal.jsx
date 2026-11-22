@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from '../../common/formatters.js';
 import { Copy, Check } from 'lucide-react';
-import { Badge, Button, Modal } from '../../common/components/ui/index.js';
+import { Button, Modal } from '../../common/components/ui/index.js';
 
 const Row = ({ label, children }) => (
   <div className="flex items-start justify-between gap-4 py-2.5 text-sm">
@@ -34,7 +34,7 @@ const LogDetailModal = ({
   };
 
   const isFailure = selectedLog.eventStatus === 'FAILURE' || selectedLog.eventType?.includes('FAILURE');
-  const statusVariant = isFailure ? 'error' : selectedLog.eventStatus === 'SUCCESS' ? 'success' : 'warning';
+  const statusDot = isFailure ? 'bg-status-error' : selectedLog.eventStatus === 'SUCCESS' ? 'bg-status-success' : 'bg-status-warning';
 
   return (
     <Modal
@@ -47,9 +47,10 @@ const LogDetailModal = ({
       <dl className="divide-y divide-border-light">
         <Row label={t("event_type", "Olay Türü")}>{getEventTypeDisplay(selectedLog.eventType)}</Row>
         <Row label={t("status", "Durum")}>
-          <Badge variant={statusVariant} dot>
+          <span className="inline-flex items-center gap-1.5">
+            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusDot}`} aria-hidden />
             {selectedLog.eventStatus}
-          </Badge>
+          </span>
         </Row>
         {selectedLog.details && <Row label={t("details", "Açıklama / Mesaj")}>{selectedLog.details}</Row>}
         <Row label={t("date_time", "Tarih ve Saat")}>
@@ -62,7 +63,7 @@ const LogDetailModal = ({
               <button
                 type="button"
                 onClick={handleCopyIp}
-                className="rounded p-1 text-text-tertiary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+                className="rounded p-1 text-text-tertiary transition-colors duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                 aria-label="IP adresini kopyala"
               >
                 {copiedIp ? <Check className="h-4 w-4" strokeWidth={1.5} /> : <Copy className="h-4 w-4" strokeWidth={1.5} />}

@@ -29,7 +29,7 @@ const SecurityFilters = ({
       {/* Quick Filter Chips */}
       <div className="mb-5">
         <div className="flex items-center justify-between gap-2 mb-2.5">
-          <span className="text-xs font-semibold text-text-muted">
+          <span className="text-sm font-medium text-text-muted">
             {t("quick_filters", "Hızlı Filtreler")}
           </span>
           <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ const SecurityFilters = ({
               <button
                 type="button"
                 onClick={clearFilters}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-status-error-text hover:underline transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-status-error-text hover:underline transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.5} />
                 <span>{t("clear_all_filters", "Filtreleri Temizle")}</span>
@@ -58,48 +58,44 @@ const SecurityFilters = ({
           <button
             type="button"
             onClick={() => updateFilter('eventType', filters.eventType === 'LOGIN_SUCCESS' ? '' : 'LOGIN_SUCCESS')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer ${filters.eventType === 'LOGIN_SUCCESS'
-                ? 'border border-accent-teal bg-accent-teal-50 text-accent-teal-800'
-                : 'border border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${filters.eventType === 'LOGIN_SUCCESS'
+                ? 'border border-accent-teal bg-background-primary text-text-primary ring-1 ring-accent-teal'
+                : 'border border-transparent bg-background-primary text-text-secondary hover:text-text-primary'
               }`}
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-status-success-text" strokeWidth={1.5} />
             <span>{t("successful_logins", "Başarılı Girişler")}</span>
           </button>
 
           <button
             type="button"
             onClick={() => updateFilter('eventType', filters.eventType === 'LOGIN_FAILURE' ? '' : 'LOGIN_FAILURE')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer ${filters.eventType === 'LOGIN_FAILURE'
-                ? 'border border-accent-teal bg-accent-teal-50 text-accent-teal-800'
-                : 'border border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${filters.eventType === 'LOGIN_FAILURE'
+                ? 'border border-accent-teal bg-background-primary text-text-primary ring-1 ring-accent-teal'
+                : 'border border-transparent bg-background-primary text-text-secondary hover:text-text-primary'
               }`}
           >
-            <Shield className="w-3.5 h-3.5 text-status-error-text" strokeWidth={1.5} />
             <span>{t("failed_logins", "Başarısız Girişler")}</span>
           </button>
 
           <button
             type="button"
             onClick={() => updateFilter('eventType', filters.eventType === 'PASSWORD_CHANGE_SUCCESS' ? '' : 'PASSWORD_CHANGE_SUCCESS')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer ${filters.eventType === 'PASSWORD_CHANGE_SUCCESS'
-                ? 'border border-accent-teal bg-accent-teal-50 text-accent-teal-800'
-                : 'border border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${filters.eventType === 'PASSWORD_CHANGE_SUCCESS'
+                ? 'border border-accent-teal bg-background-primary text-text-primary ring-1 ring-accent-teal'
+                : 'border border-transparent bg-background-primary text-text-secondary hover:text-text-primary'
               }`}
           >
-            <Shield className="w-3.5 h-3.5 text-text-primary" strokeWidth={1.5} />
             <span>{t("password_changes", "Şifre Değişiklikleri")}</span>
           </button>
 
           <button
             type="button"
             onClick={() => updateFilter('eventStatus', filters.eventStatus === 'SUCCESS' ? '' : 'SUCCESS')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer ${filters.eventStatus === 'SUCCESS'
-                ? 'border border-accent-teal bg-accent-teal-50 text-accent-teal-800'
-                : 'border border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${filters.eventStatus === 'SUCCESS'
+                ? 'border border-accent-teal bg-background-primary text-text-primary ring-1 ring-accent-teal'
+                : 'border border-transparent bg-background-primary text-text-secondary hover:text-text-primary'
               }`}
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-status-success-text" strokeWidth={1.5} />
             <span>{t("success_events", "Tüm Başarılı Olaylar")}</span>
           </button>
         </div>
@@ -109,8 +105,7 @@ const SecurityFilters = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-border-light">
         {/* Event Type Select */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />
+          <label className="text-sm font-medium text-text-secondary">
             <span>{t("event_type", "Olay Türü")}</span>
           </label>
           <select
@@ -129,8 +124,7 @@ const SecurityFilters = ({
 
         {/* Event Status Select */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />
+          <label className="text-sm font-medium text-text-secondary">
             <span>{t("event_status", "Olay Durumu")}</span>
           </label>
           <select
@@ -167,8 +161,7 @@ const SecurityFilters = ({
 
         {/* Date From */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />
+          <label className="text-sm font-medium text-text-secondary">
             <span>{t("from_date", "Başlangıç Tarihi")}</span>
           </label>
           <input
@@ -181,8 +174,7 @@ const SecurityFilters = ({
 
         {/* Date To */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />
+          <label className="text-sm font-medium text-text-secondary">
             <span>{t("to_date", "Bitiş Tarihi")}</span>
           </label>
           <input

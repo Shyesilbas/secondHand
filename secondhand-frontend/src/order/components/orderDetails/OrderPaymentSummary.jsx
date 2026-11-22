@@ -4,7 +4,9 @@ import { Check, FileText, ShieldCheck } from 'lucide-react';
 import { useRequiredAgreements } from '../../../agreements/hooks/useAgreements.js';
 import { agreementLabel } from '../../../agreements/agreements.js';
 import AgreementModal from '../../../agreements/components/AgreementModal.jsx';
+import Button from '../../../common/components/ui/Button.jsx';
 import { ORDER_STATUSES } from '../../constants/orderUiConstants.js';
+import { getPaymentProviderLabel, getPaymentStatusLabel } from '../../utils/statusPresentation.js';
 
 const Row = ({ label, children }) => (
   <div className="flex items-baseline justify-between gap-4">
@@ -17,7 +19,7 @@ export const OrderPaymentSummary = React.memo(({
   CardComponent: Card,
   isSellerView,
   selectedOrder,
-  resolveEnumLabel,
+  enums,
   formatCurrency,
   getPaymentStatusIndicatorClass,
   getPaymentStatusTextClass
@@ -39,30 +41,33 @@ export const OrderPaymentSummary = React.memo(({
     ].includes(orderStatus)
   );
 
+  const paymentMethodLabel = getPaymentProviderLabel(t, paymentProviderName);
+  const paymentStatusLabel = getPaymentStatusLabel(t, enums, paymentStatus);
+
   return (
     <>
       <Card>
-        <h3 className="mb-4 text-base font-semibold text-text-primary">{t("payment_summary", "Ödeme özeti")}</h3>
+        <h3 className="mb-4 text-base font-semibold text-text-primary">{t('payment_summary', 'Ödeme özeti')}</h3>
 
         <dl className="space-y-3 text-sm">
           {!isSellerView && subtotal != null ? (
-            <Row label={t("subtotal", "Ara toplam")}>{formatCurrency(subtotal, currency)}</Row>
+            <Row label={t('subtotal', 'Ara toplam')}>{formatCurrency(subtotal, currency)}</Row>
           ) : null}
 
           {!isSellerView && couponDiscount > 0 ? (
-            <Row label={t("od_coupon_discount", "Kupon indirimi")}>-{formatCurrency(couponDiscount, currency)}</Row>
+            <Row label={t('od_coupon_discount', 'Kupon indirimi')}>-{formatCurrency(couponDiscount, currency)}</Row>
           ) : null}
 
           {paymentProviderName ? (
-            <Row label={t("payment_method", "Ödeme yöntemi")}>{paymentProviderName}</Row>
+            <Row label={t('payment_method', 'Ödeme yöntemi')}>{paymentMethodLabel}</Row>
           ) : null}
 
           {paymentStatus ? (
-            <Row label={t("payment_status", "Ödeme durumu")}>
+            <Row label={t('payment_status', 'Ödeme durumu')}>
               <span className="inline-flex items-center gap-1.5">
                 <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${getPaymentStatusIndicatorClass(paymentStatus)}`} aria-hidden />
                 <span className={getPaymentStatusTextClass(paymentStatus)}>
-                  {resolveEnumLabel('paymentStatuses', paymentStatus) || paymentStatus}
+                  {paymentStatusLabel}
                 </span>
               </span>
             </Row>
@@ -70,21 +75,23 @@ export const OrderPaymentSummary = React.memo(({
         </dl>
 
         <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-border-light pt-4">
-          <span className="text-sm font-semibold text-text-primary">{t("od_total", "Toplam")}</span>
-          <span className="text-2xl font-semibold tabular-nums text-text-price">{total != null ? formatCurrency(total, currency) : '—'}</span>
+          <span className="text-sm font-semibold text-text-primary">{t('od_total', 'Toplam')}</span>
+          <span className="text-xl font-semibold tabular-nums tracking-tight text-text-price">
+            {total != null ? formatCurrency(total, currency) : '—'}
+          </span>
         </div>
 
         {showEscrowNotice && (
-          <div className="mt-3 flex items-center gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-secondary">
-            <ShieldCheck className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-            <span>{t("od_escrow_note", "Ödeme, teslimat onaylanana kadar escrow havuzunda tutulur.")}</span>
+          <div className="mt-4 flex items-start gap-2.5 rounded bg-background-secondary px-3 py-2.5 text-sm text-text-secondary">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+            <span>{t('od_escrow_note', 'Ödeme, teslimat onaylanana kadar escrow havuzunda tutulur.')}</span>
           </div>
         )}
 
         {!isSellerView && agreements.length > 0 && (
           <div className="mt-4 border-t border-border-light pt-4">
-            <p className="mb-2 text-xs font-medium text-text-tertiary">
-              {t("od_accepted_agreements", "Onaylanan sözleşmeler")}
+            <p className="mb-2.5 text-sm font-medium text-text-secondary">
+              {t('od_accepted_agreements', 'Onaylanan sözleşmeler')}
             </p>
             <div className="space-y-2">
               {agreements.map((agreement) => {
@@ -92,29 +99,31 @@ export const OrderPaymentSummary = React.memo(({
                 return (
                   <div
                     key={agreement.agreementId}
-                    className="flex items-start justify-between gap-3 rounded border border-border-light bg-background-secondary px-3 py-2.5 text-sm"
+                    className="flex items-start justify-between gap-3 rounded bg-background-secondary px-3 py-2.5 text-sm"
                   >
                     <div className="flex min-w-0 items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-                      <div className="min-w-0 leading-relaxed text-text-secondary">
+                      <div className="min-w-0 text-text-secondary">
                         <button
                           type="button"
                           onClick={() => setSelectedAgreement(agreement)}
-                          className="mr-1 cursor-pointer text-left font-medium text-text-primary underline hover:text-primary"
+                          className="mr-1 rounded-sm text-left font-medium text-text-link underline underline-offset-2 transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                         >
                           {agreementName}
                         </button>
-                        <span>{t("od_agreement_accepted_suffix", "metnini okudum, onayladım.")}</span>
+                        <span>{t('od_agreement_accepted_suffix', 'metnini okudum, onayladım.')}</span>
                       </div>
                     </div>
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => setSelectedAgreement(agreement)}
-                      className="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-0.5 text-xs font-medium text-text-tertiary transition-colors hover:bg-background-primary hover:text-text-primary"
+                      aria-label={`${t('read', 'Oku')}: ${agreementName}`}
+                      className="shrink-0"
                     >
                       <FileText className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                      <span>{t("read", "Oku")}</span>
-                    </button>
+                      <span>{t('read', 'Oku')}</span>
+                    </Button>
                   </div>
                 );
               })}

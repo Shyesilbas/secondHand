@@ -6,7 +6,6 @@ import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
 import { useReservationTimer } from '../hooks/useReservationTimer.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
-import Badge from '../../common/components/ui/Badge.jsx';
 import { hasCampaignOnLine } from '../utils/pricedLines.js';
 
 const CartItemCard = ({
@@ -57,18 +56,18 @@ const CartItemCard = ({
   const detailUrl = item.listing?.id ? ROUTES.LISTING_DETAIL(item.listing.id) : null;
 
   return (
-    <article className="group p-4 transition-colors hover:bg-background-secondary sm:p-5">
+    <article className="p-4 sm:p-5">
       <div className="flex gap-4">
         {/* Thumbnail */}
         <div className="relative shrink-0">
           {detailUrl ? (
-            <Link to={detailUrl} className="block overflow-hidden rounded border border-border-light bg-background-tertiary">
+            <Link to={detailUrl} className="block overflow-hidden rounded bg-background-tertiary">
               {item.listing?.imageUrl ? (
                 <img
                   src={item.listing.imageUrl}
                   alt={item.listing.title || ''}
                   loading="lazy"
-                  className="h-20 w-20 object-cover sm:h-24 sm:w-24 transition-opacity group-hover:opacity-95"
+                  className="h-20 w-20 object-cover sm:h-24 sm:w-24"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
@@ -85,7 +84,7 @@ const CartItemCard = ({
               </div>
             </Link>
           ) : (
-            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded border border-border-light bg-background-tertiary flex items-center justify-center text-sm font-semibold text-text-muted">
+            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded bg-background-tertiary flex items-center justify-center text-sm font-semibold text-text-muted">
               {item.listing?.title?.charAt(0)?.toUpperCase() || '?'}
             </div>
           )}
@@ -100,7 +99,7 @@ const CartItemCard = ({
                 {detailUrl ? (
                   <Link
                     to={detailUrl}
-                    className="text-sm font-semibold leading-snug text-text-primary hover:underline line-clamp-2"
+                    className="text-sm font-semibold leading-snug text-text-primary hover:text-text-link line-clamp-2"
                   >
                     {item.listing?.title}
                   </Link>
@@ -126,7 +125,7 @@ const CartItemCard = ({
                   {sellerTotalReviews > 0 && (
                     <span className="inline-flex items-center gap-0.5 tabular-nums text-text-tertiary">
                       <span>·</span>
-                      <Star className="h-3 w-3 fill-status-warning text-status-warning" aria-hidden strokeWidth={1.5} />
+                      <Star className="h-3.5 w-3.5 fill-status-warning text-status-warning" aria-hidden strokeWidth={1.5} />
                       <span className="font-medium text-text-secondary">{sellerRating.toFixed(1)}</span>
                       <span>({sellerTotalReviews})</span>
                     </span>
@@ -143,20 +142,20 @@ const CartItemCard = ({
                 type="button"
                 onClick={handleRemove}
                 disabled={isRemoving}
-                className="shrink-0 rounded p-1 text-text-muted transition hover:bg-background-secondary hover:text-status-error disabled:opacity-40"
+                className="shrink-0 rounded p-1.5 text-text-muted transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-40"
                 aria-label={t("remove")}
                 title={t("remove")}
               >
-                <X className="h-4 w-4" strokeWidth={1.75} />
+                <X className="h-4 w-4" strokeWidth={1.5} />
               </button>
             </div>
 
             {/* Badges and Reservation status */}
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
               {isLowStock && (
-                <Badge variant="warning">
+                <span className="text-status-warning-text">
                   {t("stock", "Stok: ")} {Number(maxStock)}
-                </Badge>
+                </span>
               )}
 
               {isReserved && !isExpired && (
@@ -164,7 +163,7 @@ const CartItemCard = ({
                   className={`inline-flex items-center gap-1 font-medium tabular-nums ${isReservationExpiring ? 'text-status-error' : 'text-text-secondary'
                     }`}
                 >
-                  <Clock className="h-3 w-3" strokeWidth={1.75} />
+                  <Clock className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
                   <span>
                     {timeRemaining?.minutes ?? 0}:{(timeRemaining?.seconds ?? 0).toString().padStart(2, '0')}
                   </span>
@@ -177,9 +176,9 @@ const CartItemCard = ({
               )}
 
               {hasCampaign && (
-                <Badge variant="success">
+                <span className="text-status-success-text">
                   {shownLine?.appliedCampaign?.name || t("campaign", "Kampanya")}
-                </Badge>
+                </span>
               )}
             </div>
           </div>
@@ -187,15 +186,15 @@ const CartItemCard = ({
           {/* Bottom Bar: Stepper & Price */}
           <div className="mt-3 flex flex-wrap items-end justify-between gap-3 pt-1">
             {/* Quantity Stepper */}
-            <div className="inline-flex items-center rounded border border-border bg-background-primary h-8">
+            <div className="inline-flex h-9 items-center rounded bg-background-secondary">
               <button
                 type="button"
                 onClick={() => handleQuantityChange(item.quantity - 1)}
                 disabled={isUpdating || item.quantity <= 1}
-                className="h-8 w-8 flex items-center justify-center text-text-secondary transition hover:bg-background-secondary disabled:opacity-30 disabled:hover:bg-transparent"
+                className="h-9 w-9 flex items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-30 disabled:hover:bg-transparent"
                 aria-label={t("decrease_quantity", "Adet azalt")}
               >
-                <Minus className="h-3.5 w-3.5" strokeWidth={2} />
+                <Minus className="h-3.5 w-3.5" strokeWidth={1.5} />
               </button>
               <span className="min-w-8 text-center text-sm font-semibold tabular-nums text-text-primary px-1">
                 {item.quantity}
@@ -207,10 +206,10 @@ const CartItemCard = ({
                   isUpdating ||
                   (maxStock != null && Number.isFinite(Number(maxStock)) && item.quantity >= Number(maxStock))
                 }
-                className="h-8 w-8 flex items-center justify-center text-text-secondary transition hover:bg-background-secondary disabled:opacity-30 disabled:hover:bg-transparent"
+                className="h-9 w-9 flex items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-30 disabled:hover:bg-transparent"
                 aria-label={t("increase_quantity", "Adet artır")}
               >
-                <Plus className="h-3.5 w-3.5" strokeWidth={2} />
+                <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
               </button>
             </div>
 
@@ -219,7 +218,7 @@ const CartItemCard = ({
               <div className={`text-right transition-opacity duration-150 ${isRepricing ? 'opacity-50' : ''}`} aria-busy={isRepricing}>
                 <div className="flex items-baseline justify-end gap-1.5">
                   {hasCampaign && (
-                    <span className="text-xs text-text-muted line-through tabular-nums">
+                    <span className="text-sm text-text-tertiary line-through tabular-nums">
                       {formatCurrency(shownLine.originalLineTotal, currency)}
                     </span>
                   )}
@@ -228,7 +227,7 @@ const CartItemCard = ({
                   </span>
                 </div>
                 {shownLine.quantity > 1 && (
-                  <p className="text-xs text-text-tertiary tabular-nums mt-0.5">
+                  <p className="mt-0.5 text-sm text-text-tertiary tabular-nums">
                     {shownLine.quantity} × {formatCurrency(shownLine.campaignUnitPrice, currency)}
                   </p>
                 )}
@@ -243,7 +242,7 @@ const CartItemCard = ({
 
           {/* Notes if present */}
           {item.notes && (
-            <div className="mt-3 rounded border border-border-light bg-background-secondary p-2.5 text-sm text-text-secondary">
+            <div className="mt-3 rounded bg-background-secondary p-2.5 text-sm text-text-secondary">
               <span className="font-semibold text-text-primary mr-1">{t("note", "Not:")}</span>
               {item.notes}
             </div>

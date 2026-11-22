@@ -42,6 +42,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -130,7 +131,7 @@ class CouponServiceTest {
 
     @Test
     void redeem_blankCode_succeedsWithoutTouchingRepositories() {
-        Result<Void> result = couponService.redeem("   ", 7L, Order.builder().id(1L).build());
+        Result<Void> result = couponService.redeem("   ", 7L, Order.builder().id(1L).build(), null);
 
         assertThat(result.isSuccess()).isTrue();
         verifyNoInteractions(couponRepository, couponRedisLimiterService, couponRedemptionRepository);
@@ -144,7 +145,7 @@ class CouponServiceTest {
         when(couponRedisLimiterService.acquireCouponUsage(eq("SAVE20"), eq(7L), eq(5), eq(1), anyLong()))
                 .thenReturn(-2);
 
-        Result<Void> result = couponService.redeem("save20", 7L, Order.builder().id(1L).build());
+        Result<Void> result = couponService.redeem("save20", 7L, Order.builder().id(1L).build(), null);
 
         assertThat(result.isError()).isTrue();
         assertThat(result.getErrorCode()).isEqualTo(CouponErrorCodes.COUPON_USAGE_LIMIT_REACHED.getCode());
@@ -162,7 +163,7 @@ class CouponServiceTest {
 
         TransactionSynchronizationManager.initSynchronization();
         try {
-            Result<Void> result = couponService.redeem("SAVE20", 7L, Order.builder().id(1L).build());
+            Result<Void> result = couponService.redeem("SAVE20", 7L, Order.builder().id(1L).build(), null);
             assertThat(result.isError()).isTrue();
             assertThat(result.getErrorCode()).isEqualTo(CouponErrorCodes.COUPON_EXPIRED.getCode());
 
@@ -187,9 +188,10 @@ class CouponServiceTest {
 
         TransactionSynchronizationManager.initSynchronization();
         try {
-            Result<Void> result = couponService.redeem("SAVE20", 7L, order);
+            Result<Void> result = couponService.redeem("SAVE20", 7L, order, new java.math.BigDecimal("37.50"));
             assertThat(result.isSuccess()).isTrue();
-            verify(couponRedemptionRepository).save(any(CouponRedemption.class));
+            verify(couponRedemptionRepository).save(argThat(r ->
+                    r.getDiscountAmount().compareTo(new java.math.BigDecimal("37.50")) == 0));
 
             for (TransactionSynchronization sync : TransactionSynchronizationManager.getSynchronizations()) {
                 sync.afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
@@ -201,25 +203,29 @@ class CouponServiceTest {
     }
 
     @Test
-    void listActiveForUser_filtersOutIneligibleAndAlreadyParticipatedCoupons() {
-        UUID participatedId = UUID.randomUUID();
-        UUID eligibleId = UUID.randomUUID();
-        Coupon participated = Coupon.builder().id(participatedId).code("USED").build();
-        Coupon eligible = Coupon.builder().id(eligibleId).code("FRESH").build();
+    void listActiveForUser_keepsCouponsWithRemainingUsesAndHidesExhaustedOnes() {
+        Coupon exhausted = Coupon.builder().id(UUID.randomUUID()).code("USED").build();
+        Coupon partlyUsed = Coupon.builder().id(UUID.randomUUID()).code("PARTLY").build();
+        Coupon globalGone = Coupon.builder().id(UUID.randomUUID()).code("GONE").build();
+        Coupon ineligible = Coupon.builder().id(UUID.randomUUID()).code("OTHER").build();
 
         when(userService.findById(7L)).thenReturn(Result.success(user));
-        when(couponRedemptionRepository.findDistinctCouponIdsByUser_Id(7L)).thenReturn(List.of(participatedId));
-        when(couponRepository.findActiveNow(any())).thenReturn(List.of(participated, eligible));
-        when(couponValidator.validateUserEligible(participated, user)).thenReturn(Result.success());
-        when(couponValidator.validateUserEligible(eligible, user)).thenReturn(Result.success());
-        when(couponMapper.toActiveDto(participated, user))
-                .thenReturn(ActiveCouponDto.builder().id(participatedId).code("USED").build());
-        when(couponMapper.toActiveDto(eligible, user))
-                .thenReturn(ActiveCouponDto.builder().id(eligibleId).code("FRESH").build());
+        when(couponRepository.findActiveNow(any())).thenReturn(List.of(exhausted, partlyUsed, globalGone, ineligible));
+        when(couponValidator.validateUserEligible(exhausted, user)).thenReturn(Result.success());
+        when(couponValidator.validateUserEligible(partlyUsed, user)).thenReturn(Result.success());
+        when(couponValidator.validateUserEligible(globalGone, user)).thenReturn(Result.success());
+        when(couponValidator.validateUserEligible(ineligible, user)).thenReturn(Result.error("x", "COUPON_NOT_APPLICABLE"));
+        when(couponMapper.toActiveDto(exhausted, user)).thenReturn(ActiveCouponDto.builder()
+                .id(exhausted.getId()).code("USED").usageLimitPerUser(2).usageRemainingPerUser(0).build());
+        when(couponMapper.toActiveDto(partlyUsed, user)).thenReturn(ActiveCouponDto.builder()
+                .id(partlyUsed.getId()).code("PARTLY").usageLimitPerUser(2).usageRemainingPerUser(1)
+                .usageLimitGlobal(100).usageRemainingGlobal(99).build());
+        when(couponMapper.toActiveDto(globalGone, user)).thenReturn(ActiveCouponDto.builder()
+                .id(globalGone.getId()).code("GONE").usageLimitGlobal(100).usageRemainingGlobal(0).build());
 
         List<ActiveCouponDto> result = couponService.listActiveForUser(7L);
 
-        assertThat(result).extracting(ActiveCouponDto::getCode).containsExactly("FRESH");
+        assertThat(result).extracting(ActiveCouponDto::getCode).containsExactly("PARTLY");
     }
 
     @Test

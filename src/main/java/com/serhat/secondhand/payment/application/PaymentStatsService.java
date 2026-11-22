@@ -1,5 +1,6 @@
 package com.serhat.secondhand.payment.application;
 
+import com.serhat.secondhand.escrow.domain.entity.Escrow;
 import com.serhat.secondhand.escrow.domain.repository.EscrowRepository;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
@@ -19,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -110,7 +113,8 @@ public class PaymentStatsService {
             paymentsPage = paymentRepository.findByUserId(userId, pageable);
         }
 
-        return paymentsPage.map(payment -> mapPaymentToDtoOptimized(payment, userId));
+        Map<Long, BigDecimal> subsidyByItemId = platformSubsidiesForSellerRows(paymentsPage.getContent(), userId);
+        return paymentsPage.map(payment -> mapPaymentToDtoOptimized(payment, userId, subsidyByItemId));
     }
 
     private boolean isFilterPresent(PaymentFilter filter) {
@@ -126,15 +130,41 @@ public class PaymentStatsService {
                 (filter.searchTerm() != null && !filter.searchTerm().isBlank());
     }
 
-    private PaymentDto mapPaymentToDtoOptimized(Payment payment, Long currentUserId) {
+    /** Item payments the viewer receives as seller; their escrow row carries the platform coupon share. */
+    private static boolean isSellerSideItemPayment(Payment payment, Long viewerId) {
+        return payment.getOrderItemId() != null
+                && payment.getToUser() != null && viewerId.equals(payment.getToUser().getId())
+                && (payment.getFromUser() == null || !viewerId.equals(payment.getFromUser().getId()));
+    }
+
+    private Map<Long, BigDecimal> platformSubsidiesForSellerRows(List<Payment> payments, Long viewerId) {
+        List<Long> itemIds = payments.stream()
+                .filter(p -> isSellerSideItemPayment(p, viewerId))
+                .map(Payment::getOrderItemId)
+                .distinct()
+                .toList();
+        if (itemIds.isEmpty()) {
+            return Map.of();
+        }
+        return escrowRepository.findByOrderItemIdIn(itemIds).stream()
+                .filter(e -> e.getPlatformSubsidy() != null && e.getPlatformSubsidy().signum() > 0)
+                .collect(Collectors.toMap(e -> e.getOrderItem().getId(), Escrow::getPlatformSubsidy, BigDecimal::add));
+    }
+
+    private PaymentDto mapPaymentToDtoOptimized(Payment payment, Long currentUserId, Map<Long, BigDecimal> subsidyByItemId) {
         PaymentDto baseDto = paymentMapper.toDto(payment);
         var inferredData = paymentContextResolver.resolve(payment, currentUserId);
+        // The seller sees what is paid out (buyer-paid amount plus platform coupon share); the buyer sees what was paid.
+        BigDecimal amount = baseDto.amount();
+        if (amount != null && isSellerSideItemPayment(payment, currentUserId)) {
+            amount = amount.add(subsidyByItemId.getOrDefault(payment.getOrderItemId(), BigDecimal.ZERO));
+        }
 
         return new PaymentDto(
                 baseDto.paymentId(),
                 baseDto.senderDisplayName(),
                 baseDto.receiverDisplayName(),
-                baseDto.amount(),
+                amount,
                 baseDto.currency(),
                 baseDto.providerName(),
                 baseDto.providerTransactionId(),

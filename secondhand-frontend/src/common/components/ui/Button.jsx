@@ -8,6 +8,7 @@ const VARIANTS = {
 const SIZES = {
  sm: 'h-9 px-3',
  md: 'h-10 px-4',
+ icon: 'h-8 w-8',
 };
 
 // Shared with links that look like buttons (e.g. <Link className={buttonClasses()} />).

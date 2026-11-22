@@ -208,7 +208,7 @@ public class CheckoutOrchestrator {
                     .filter(o -> o.getCouponCode() != null)
                     .findFirst()
                     .orElse(orders.get(0));
-            Result<Void> redeemResult = couponService.redeem(pricing.getCouponCode(), userId, couponOrder);
+            Result<Void> redeemResult = couponService.redeem(pricing.getCouponCode(), userId, couponOrder, pricing.getCouponDiscount());
             if (redeemResult.isError()) {
                 return redeemResult;
             }

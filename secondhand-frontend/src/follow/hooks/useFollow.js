@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { followService } from '../services/followService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useFollowStats = (userId, options = {}) => {
     const normalizedUserId = userId ? String(userId) : null;
@@ -25,7 +26,7 @@ export const useFollowStats = (userId, options = {}) => {
     return {
         stats: stats || { followersCount: 0, followingCount: 0, isFollowing: false, notifyOnNewListing: false },
         isLoading,
-        error: error?.response?.data?.message || error?.message,
+        error: error ? getErrorMessage(error, 'Takip bilgileri yüklenemedi.') : null,
         refetch
     };
 };
@@ -50,7 +51,7 @@ export const useFollow = (userId) => {
             notification.showSuccess('Success', 'You are now following this user');
         },
         onError: (err) => {
-            notification.showError('Error', err.response?.data?.message || 'Failed to follow user');
+            notification.showError('Error', getErrorMessage(err, 'Failed to follow user'));
         }
     });
 
@@ -62,7 +63,7 @@ export const useFollow = (userId) => {
             notification.showSuccess('Success', 'You have unfollowed this user');
         },
         onError: (err) => {
-            notification.showError('Error', err.response?.data?.message || 'Failed to unfollow user');
+            notification.showError('Error', getErrorMessage(err, 'Failed to unfollow user'));
         }
     });
 
@@ -79,7 +80,7 @@ export const useFollow = (userId) => {
             );
         },
         onError: (err) => {
-            notification.showError('Error', err.response?.data?.message || 'Failed to update notifications');
+            notification.showError('Error', getErrorMessage(err, 'Failed to update notifications'));
         }
     });
 

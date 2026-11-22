@@ -43,10 +43,10 @@ const BlockedUsersList = ({ isActive = true }) => {
       {blocked.map((u) => (
         <li key={u.id} className="flex items-center justify-between gap-4 py-3">
           <div className="min-w-0">
-            <Link to={ROUTES.USER_PROFILE(u.id)} className="truncate text-sm font-medium text-text-primary hover:underline">
+            <Link to={ROUTES.USER_PROFILE(u.id)} className="truncate text-sm font-medium text-text-primary transition-colors duration-150 hover:text-text-link">
               {u.name} {u.surname}
             </Link>
-            <p className="text-xs text-text-tertiary">{formatDate(u.blockedAt)}</p>
+            <p className="text-sm text-text-tertiary">{formatDate(u.blockedAt)}</p>
           </div>
           <Button variant="secondary" size="sm" disabled={unblock.isPending} onClick={() => unblock.mutate(u.id)}>
             {t('unblock', 'Engeli Kaldır')}

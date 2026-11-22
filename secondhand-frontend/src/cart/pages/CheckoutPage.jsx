@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, Clock, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ShoppingCart } from 'lucide-react';
 import { useCart } from '../hooks/useCart.js';
 import { useCheckout } from '../hooks/useCheckout.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx';
 import CheckoutStep from '../components/checkout/CheckoutStep.jsx';
 import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary.jsx';
@@ -68,7 +69,7 @@ const CheckoutPage = () => {
       }
     }).catch(err => {
       logger.warn('Could not initiate stock reservation:', err);
-      setReservationError(err?.response?.data?.message || t('checkout_reservation_failed', CART_MESSAGES.RESERVATION_FAILED));
+      setReservationError(getErrorMessage(err, t('checkout_reservation_failed', CART_MESSAGES.RESERVATION_FAILED)));
     });
   }, [t]);
 
@@ -158,7 +159,7 @@ const CheckoutPage = () => {
   const requestedCoupon = appliedCouponCode != null && String(appliedCouponCode).trim() !== '' ? String(appliedCouponCode).trim().toUpperCase() : null;
   const couponDropped = pricingQueryData?.success === true && requestedCoupon != null && !pricing?.couponCode;
   const couponError = pricingQueryData?.success === false
-    ? pricingQueryData.error?.response?.data?.message || t('checkout_coupon_not_applied', CART_MESSAGES.COUPON_NOT_APPLIED)
+    ? getErrorMessage(pricingQueryData.error, t('checkout_coupon_not_applied', CART_MESSAGES.COUPON_NOT_APPLIED))
     : couponDropped ? t('checkout_coupon_no_longer_applies', CART_MESSAGES.COUPON_NO_LONGER_APPLIES) : null;
 
   // Payable total from the backend preview only; null until it loads, and payment stays disabled meanwhile.
@@ -193,7 +194,7 @@ const CheckoutPage = () => {
 
   if (!offerId && cartCount === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background-page p-4 antialiased">
+      <div className="flex min-h-dvh items-center justify-center p-4">
         <EmptyState
           icon={ShoppingCart}
           title={t('empty_cart_title', CART_MESSAGES.EMPTY_CART_TITLE)}
@@ -217,8 +218,8 @@ const CheckoutPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background-page text-text-primary antialiased">
-      <header className="z-10 border-b border-border-light bg-background-primary md:sticky md:top-16">
+    <div className="text-text-primary">
+      <header className="z-10 bg-background-primary shadow-sm md:sticky md:top-16">
         <PageContainer className="py-3">
           <div className="flex items-center gap-4">
             <Button
@@ -237,7 +238,7 @@ const CheckoutPage = () => {
             </div>
 
             <p
-              className={`flex shrink-0 items-center gap-1.5 text-sm tabular-nums font-medium ${
+              className={`shrink-0 text-sm tabular-nums font-medium ${
                 reservationExpired
                   ? 'text-status-error-text'
                   : timeLeft < 180
@@ -246,17 +247,6 @@ const CheckoutPage = () => {
               }`}
               title={t('cart_items_reserved_for_you', 'Sepetindeki ürünler senin için geçici olarak ayrıldı.')}
             >
-              <Clock
-                className={`h-4 w-4 ${
-                  reservationExpired
-                    ? 'text-status-error-text'
-                    : timeLeft < 180
-                    ? 'text-status-warning-text'
-                    : 'text-text-tertiary'
-                }`}
-                strokeWidth={1.5}
-                aria-hidden
-              />
               <span className="sr-only">{t('checkout_reservation', 'Ürünler ayrıldı, kalan süre')}</span>
               {formatTimer(timeLeft)}
             </p>
@@ -265,7 +255,7 @@ const CheckoutPage = () => {
       </header>
 
       {/* Mobile: collapsible summary with the total always visible */}
-      <div className="border-b border-border-light bg-background-primary px-4 py-3 lg:hidden">
+      <div className="bg-background-primary px-4 py-3 shadow-sm lg:hidden">
         <button
           type="button"
           onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)}

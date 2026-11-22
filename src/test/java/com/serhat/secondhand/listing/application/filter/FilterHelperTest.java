@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** GV-23: the public filter endpoints must never return draft, inactive, reserved or deleted listings. */
+/** The public filter endpoints must never return draft, inactive, reserved or deleted listings. */
 class FilterHelperTest {
 
     @Test
@@ -47,7 +47,7 @@ class FilterHelperTest {
                         .isEqualTo(ListingErrorCodes.INVALID_LISTING_STATUS.getCode()));
     }
 
-    /** PF-13: a client cannot ask the public filter for an unbounded page. */
+    /** A client cannot ask the public filter for an unbounded page. */
     @Test
     void pageSizeIsCapped() {
         ListingFilterDto filters = new SportsListingFilterDto();
@@ -60,7 +60,7 @@ class FilterHelperTest {
         assertThat(pageable.getPageNumber()).isZero();
     }
 
-    /** PF-15: with a catalog key present, the unindexable label LIKE is not added. */
+    /** With a catalog key present, the unindexable label LIKE is not added. */
     @Test
     @SuppressWarnings("unchecked")
     void locationKeySkipsLabelLike() {

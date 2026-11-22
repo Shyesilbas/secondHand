@@ -4,6 +4,7 @@ import {cartService} from '../services/cartService.js';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import {cacheService} from '../../common/services/cacheService.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useCart = (options = {}) => {
  const { user } = useAuthState();
@@ -78,7 +79,7 @@ export const useCart = (options = {}) => {
  showSuccess(null, 'Added to cart successfully.', { toast: true });
  },
  onError: (err) => {
- showError(null, err?.response?.data?.message || err?.message || 'Failed to add item to cart.', { toast: true });
+ showError(null, getErrorMessage(err, 'Failed to add item to cart.'), { toast: true });
  }
  });
 
@@ -95,7 +96,7 @@ export const useCart = (options = {}) => {
  syncCartCount(getStoredCartCount() - removedQty);
  },
  onError: (err) => {
- showError(null, err?.response?.data?.message || err?.message || 'Failed to remove item from cart.', { toast: true });
+ showError(null, getErrorMessage(err, 'Failed to remove item from cart.'), { toast: true });
  }
  });
 
@@ -113,7 +114,7 @@ export const useCart = (options = {}) => {
  syncCartCount(getStoredCartCount() - previousQty + nextQty);
  },
  onError: (err) => {
- showError(null, err?.response?.data?.message || err?.message || 'Failed to update cart item.', { toast: true });
+ showError(null, getErrorMessage(err, 'Failed to update cart item.'), { toast: true });
  }
  });
 
@@ -124,7 +125,7 @@ export const useCart = (options = {}) => {
  syncCartCount(0);
  },
  onError: (err) => {
- showError(null, err?.response?.data?.message || err?.message || 'Failed to clear cart.', { toast: true });
+ showError(null, getErrorMessage(err, 'Failed to clear cart.'), { toast: true });
  }
  });
 

@@ -6,6 +6,7 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
 import { EMAIL_QUERY_STALE_MS } from '../../emails/emailConstants.js';
 import { parseCustomDate } from '../utils/otp.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useEmails = () => {
  const { user } = useAuthState();
@@ -42,7 +43,7 @@ export const useEmails = () => {
  while (attempts < maxAttempts) {
  const res = await refetch();
  if (res.isError) {
- const msg = res.error?.message || res.error?.response?.data?.message || 'Emails could not be loaded.';
+ const msg = getErrorMessage(res.error, 'Emails could not be loaded.');
  notification.showError('Error', msg);
  return [];
  }

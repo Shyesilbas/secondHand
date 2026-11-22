@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { AlertCircle, Ban, Heart, Package, Plus } from 'lucide-react';
+import { Ban, Heart, Package, Plus } from 'lucide-react';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { userService } from '../services/userService.js';
 import { useUserListings } from '../hooks/useUserListings.js';
@@ -44,7 +45,7 @@ const useUserProfile = (userId) => {
  return {
  user: data?.id ? data : null,
  isLoading: !!userId && isLoading,
- error: error ? error.response?.data?.message || error.message || null : null
+ error: error ? getErrorMessage(error, null) : null
  };
 };
 
@@ -110,7 +111,7 @@ const UserProfilePage = () => {
 
  if (userLoading || (!isOwnProfile && blockLoading)) {
  return (
- <div className="min-h-screen bg-background-page">
+ <div className="bg-background-page">
  <PageContainer className="space-y-6 py-8" aria-busy="true" aria-label={t("loading_profile", "Profil yükleniyor")}>
  <UserProfileHeaderSkeleton />
  <Skeleton className="h-11 w-full" />
@@ -122,7 +123,7 @@ const UserProfilePage = () => {
 
  if (!isOwnProfile && blockStatus?.blockedMe) {
  return (
- <div className="min-h-screen bg-background-page">
+ <div className="bg-background-page">
  <PageContainer className="py-10">
  <div className="mx-auto max-w-md rounded border border-border-light bg-background-primary p-6 text-center shadow-sm">
  <Ban className="mx-auto h-8 w-8 text-text-tertiary" strokeWidth={1.5} aria-hidden />
@@ -144,19 +145,15 @@ const UserProfilePage = () => {
 
  if (userError || !user) {
  return (
- <div className="flex min-h-screen items-center justify-center bg-background-page p-4">
- <div className="w-full max-w-sm rounded border border-border-light bg-background-primary p-6 text-center shadow-sm">
- <AlertCircle className="mx-auto mb-3 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
- <h1 className="mb-1 text-lg font-semibold text-text-primary">
- {t("user_not_found", "Kullanıcı bulunamadı")}
- </h1>
- <p className="mb-5 text-sm text-text-secondary">
- {userError || t("profile_not_exist", "Görüntülemek istediğin profil bulunamadı veya silinmiş olabilir.")}
- </p>
- <Link to={ROUTES.LISTINGS} className={`${buttonClasses()} w-full`}>
+ <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-background-page p-4">
+ <ErrorState
+ title={t("user_not_found", "Kullanıcı bulunamadı")}
+ description={userError || t("profile_not_exist", "Görüntülemek istediğin profil bulunamadı veya silinmiş olabilir.")}
+ className="w-full max-w-md"
+ />
+ <Link to={ROUTES.LISTINGS} className={buttonClasses('secondary', 'sm')}>
  {t("back_to_listings", "İlanlara dön")}
  </Link>
- </div>
  </div>
  );
  }
@@ -172,7 +169,7 @@ const UserProfilePage = () => {
  };
 
  return (
- <div className="min-h-screen bg-background-page pb-16">
+ <div className="bg-background-page pb-16">
  <PageContainer className="py-6 sm:py-8">
  <UserProfileHeader
  user={user}

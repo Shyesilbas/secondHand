@@ -15,6 +15,8 @@ Manages platform promotional coupons (`coupons`, `coupon_eligible_users`, `coupo
   1. Acquires a PostgreSQL `PESSIMISTIC_WRITE` row lock via `findByCodeIgnoreCaseForUpdate`.
   2. Executes `CouponRedisLimiterService.acquireCouponUsage` (`apply_coupon_with_limit.lua`) and registers `releaseUsageUnlessCommitted` (`release_coupon_usage.lua`) via `TransactionSynchronization` so rolled-back checkouts restore quota immediately.
   3. Validates active window, audience, and DB usage counts, then writes one `CouponRedemption` row bound to the primary discounted order.
+- **Platform-Funded Discount:** the coupon share of each line (`OrderItem.couponDiscount`) becomes `Escrow.platformSubsidy`; the seller is paid `amount + platformSubsidy` on release, the buyer is refunded only `amount`. Only seller campaigns reduce what the seller earns.
+- **Savings Snapshot:** `CouponRedemption.discountAmount` stores the whole checkout coupon discount at redeem time (`CouponService.redeem(..., discountAmount)`); `GET /redemptions` returns it so the coupons page can show total savings without paging orders.
 - **Documented Redis Fallback:** If Redis is unreachable, `acquireCouponUsage` returns `NOT_COUNTED` and PostgreSQL row lock + `coupon_redemptions` count checks enforce limits safely.
 
 ## Redis & Lua Scripts

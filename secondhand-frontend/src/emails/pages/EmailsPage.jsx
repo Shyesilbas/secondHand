@@ -2,19 +2,21 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { emailService } from '../services/emailService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { handleError, parseError } from '../../common/errorHandler.js';
+import { handleError } from '../../common/errorHandler.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { extractSuccessMessage } from '../../common/successHandler.js';
+import logger from '../../common/utils/logger.js';
+import { Button } from '../../common/components/ui/index.js';
 import EmailListItem from '../components/EmailListItem.jsx';
-import { EmailFoldersSidebar, EmailMobileFolderTabs } from '../components/EmailFoldersSidebar.jsx';
-import { getEmailFolderLabel } from '../emailConstants.js';
 import EmailListToolbar from '../components/EmailListToolbar.jsx';
 import { EmailListSkeleton, EmailsPageFeedback } from '../components/EmailListFeedback.jsx';
 import EmailReadingPane from '../components/EmailReadingPane.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { extractEmailPreview } from '../emails.js';
-import { EMAIL_DEFAULTS, EMAIL_FILTERS, EMAIL_QUERY_STALE_MS } from '../emailConstants.js';
+import { EMAIL_DEFAULTS, EMAIL_FILTERS, EMAIL_MESSAGES, EMAIL_QUERY_STALE_MS, getEmailFolderLabel } from '../emailConstants.js';
 import { EMAIL_FILTER_TYPE_MAP } from '../emailFilterMap.js';
 import { useBadgeCounts } from '../../common/hooks/useBadgeCounts.js';
 
@@ -111,7 +113,7 @@ const EmailsPage = ({ embedded = false }) => {
     (emailId, subject) => {
       if (!emailId) return;
       handleDelete({
-        title: subject || 'E-Posta',
+        title: subject || 'E-posta',
         deleteFunc: () => emailService.deleteEmail(emailId),
         onSuccess: () => {
           setSelectedEmail((prev) => (prev?.id === emailId ? null : prev));
@@ -125,7 +127,7 @@ const EmailsPage = ({ embedded = false }) => {
 
   const handleDeleteAllEmails = () =>
     handleDelete({
-      title: 'Tüm E-Postalar',
+      title: 'Tüm e-postalar',
       deleteFunc: () => emailService.deleteAll(),
       onSuccess: () => {
         setSelectedEmail(null);
@@ -191,7 +193,7 @@ const EmailsPage = ({ embedded = false }) => {
             old ? { ...old, emailCount: Math.max(0, (old.emailCount || 1) - 1) } : old
           );
         } catch (err) {
-          console.error('Error marking email as read', err);
+          logger.error('Error marking email as read', err);
         }
       }
     },
@@ -249,77 +251,104 @@ const EmailsPage = ({ embedded = false }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedIndex, filteredEmails.length, handleSelectNext, handleSelectPrev]);
 
+  const loadErrorMessage = error ? getErrorMessage(error, EMAIL_MESSAGES.LOAD_ERROR_TITLE) : null;
+
   return (
     <div
       className={
         embedded
           ? 'flex h-full min-h-0 w-full flex-col overflow-hidden rounded border border-border-light bg-background-primary shadow-sm'
-          : 'flex h-dvh min-h-0 flex-col overflow-hidden bg-background-secondary'
+          : 'flex h-dvh min-h-0 flex-col overflow-hidden bg-background-page'
       }
     >
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-[204px_340px_minmax(0,1fr)] xl:grid-cols-[220px_360px_minmax(0,1fr)]">
-        <EmailFoldersSidebar
-          embedded={embedded}
-          filterType={filterType}
-          globalUnreadCount={globalUnreadCount}
-          onBack={() => navigate(-1)}
-          onSelectFolder={handleFolderSelect}
-        />
+      <EmailListToolbar
+        embedded={embedded}
+        onBack={() => navigate(-1)}
+        globalUnreadCount={globalUnreadCount}
+        filterType={filterType}
+        onSelectFolder={handleFolderSelect}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onClearSearch={() => setSearchTerm('')}
+        onRefresh={() => refetch()}
+        isFetching={isFetching}
+        onMarkAllRead={handleMarkAllAsRead}
+        disableMarkAllRead={
+          isMarkingAllRead || (globalUnreadCount === 0 && !filteredEmails.some((e) => !e.read && !e.isRead))
+        }
+        isMarkingAllRead={isMarkingAllRead}
+        onDeleteAll={handleDeleteAllEmails}
+        disableDeleteAll={isDeleting || filteredEmails.length === 0}
+      />
 
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-12">
         <section
-          className={`flex min-h-0 w-full min-w-0 flex-col border-r border-border bg-background-primary ${selectedEmail ? 'hidden lg:flex' : 'flex'
-            }`}
+          aria-label={selectedFolderLabel}
+          className={`min-h-0 w-full min-w-0 flex-col border-border-light bg-background-primary lg:col-span-5 lg:border-r xl:col-span-4 ${
+            selectedEmail ? 'hidden lg:flex' : 'flex'
+          }`}
         >
-          <EmailListToolbar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onClearSearch={() => setSearchTerm('')}
-            onRefresh={() => refetch()}
-            isFetching={isFetching}
-            onMarkAllRead={handleMarkAllAsRead}
-            disableMarkAllRead={
-              isMarkingAllRead || (globalUnreadCount === 0 && !filteredEmails.some((e) => !e.read && !e.isRead))
-            }
-            isMarkingAllRead={isMarkingAllRead}
-            onDeleteAll={handleDeleteAllEmails}
-            disableDeleteAll={isDeleting || filteredEmails.length === 0}
-            selectedFolderLabel={selectedFolderLabel}
-            pageInfo={pageInfo}
-            onPrevPage={() => setPage((p) => p - 1)}
-            onNextPage={() => setPage((p) => p + 1)}
-          />
-
-          <EmailMobileFolderTabs
-            filterType={filterType}
-            onSelectFolder={handleFolderSelect}
-          />
-
-          <div className="min-h-0 flex-1 overflow-y-auto" aria-label={t('emails', 'E-postalar')}>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
             {isLoading && !emails.length ? (
               <EmailListSkeleton />
             ) : (
               <>
                 <EmailsPageFeedback
-                  error={error ? parseError(error).message : null}
+                  error={loadErrorMessage}
                   emails={filteredEmails}
                   filterType={filterType}
                   searchTerm={searchTerm}
                   onRetry={() => refetch()}
                   onClearSearch={() => setSearchTerm('')}
                 />
-                {filteredEmails.map((email) => (
-                  <EmailListItem
-                    key={email.id}
-                    email={email}
-                    isSelected={selectedEmail?.id === email.id}
-                    onSelect={onSelectEmail}
-                    onDelete={handleDeleteEmail}
-                    isDeleting={isDeleting}
-                  />
-                ))}
+                {filteredEmails.length > 0 && (
+                  <ul className="divide-y divide-border-light">
+                    {filteredEmails.map((email) => (
+                      <EmailListItem
+                        key={email.id}
+                        email={email}
+                        isSelected={selectedEmail?.id === email.id}
+                        onSelect={onSelectEmail}
+                        onDelete={handleDeleteEmail}
+                        isDeleting={isDeleting}
+                      />
+                    ))}
+                  </ul>
+                )}
               </>
             )}
           </div>
+
+          {pageInfo.totalElements > 0 && (
+            <footer className="flex shrink-0 items-center justify-between border-t border-border-light bg-background-primary px-4 py-2">
+              <span className="text-xs tabular-nums text-text-tertiary">
+                {selectedFolderLabel} · {pageInfo.totalElements}
+              </span>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={pageInfo.page === 0}
+                  aria-label={t('previous_page', 'Önceki sayfa')}
+                >
+                  <ChevronLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                </Button>
+                <span className="px-1 text-xs tabular-nums text-text-secondary">
+                  {pageInfo.page + 1} / {Math.max(pageInfo.totalPages, 1)}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={pageInfo.page + 1 >= pageInfo.totalPages}
+                  aria-label={t('next_page', 'Sonraki sayfa')}
+                >
+                  <ChevronRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                </Button>
+              </div>
+            </footer>
+          )}
         </section>
 
         <EmailReadingPane

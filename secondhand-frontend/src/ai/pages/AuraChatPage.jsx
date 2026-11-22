@@ -325,20 +325,25 @@ export const AuraChatPage = () => {
               <BrainCircuit className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span className="hidden sm:inline">{t('aura_memory', 'Hafıza')}</span>
             </Button>
-            <button
-              type="button"
-              onClick={() => setConfirmClear(true)}
-              disabled={isSending || userId == null || conversation.length === 0}
-              className={ICON_BUTTON}
-              aria-label={t('aura_clear_history', 'Sohbet geçmişini temizle')}
-              title={t('aura_clear_history', 'Sohbet geçmişini temizle')}
-            >
-              <Trash2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-            </button>
-            <Button variant="secondary" size="sm" onClick={handleNewChat} disabled={isSending || userId == null || conversation.length === 0}>
-              <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-              <span>{t('aura_new_chat', 'Yeni sohbet')}</span>
-            </Button>
+            {/* Clear and new chat only mean something once there is a conversation; hidden instead of greyed out. */}
+            {conversation.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setConfirmClear(true)}
+                  disabled={isSending || userId == null}
+                  className={ICON_BUTTON}
+                  aria-label={t('aura_clear_history', 'Sohbet geçmişini temizle')}
+                  title={t('aura_clear_history', 'Sohbet geçmişini temizle')}
+                >
+                  <Trash2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                </button>
+                <Button variant="secondary" size="sm" onClick={handleNewChat} disabled={isSending || userId == null}>
+                  <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                  <span>{t('aura_new_chat', 'Yeni sohbet')}</span>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -366,11 +371,10 @@ export const AuraChatPage = () => {
                       type="button"
                       disabled={isSending}
                       onClick={() => send(message)}
-                      className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm text-text-primary transition-colors duration-150 hover:bg-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-primary transition-colors duration-150 hover:bg-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
                       <span className="min-w-0 flex-1 truncate">{label}</span>
-                      <ArrowUp className="h-3.5 w-3.5 shrink-0 rotate-45 text-text-muted" strokeWidth={1.5} aria-hidden />
                     </button>
                   </li>
                 ))}

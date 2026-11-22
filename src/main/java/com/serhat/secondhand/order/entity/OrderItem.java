@@ -76,6 +76,11 @@ public class OrderItem {
     @Column(name = "campaign_discount", precision = 10, scale = 2)
     private BigDecimal campaignDiscount;
 
+    // This line's share of the platform coupon. unitPrice and totalPrice are already net of it.
+    @Column(name = "coupon_discount", nullable = false, precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal couponDiscount = BigDecimal.ZERO;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "currency", length = 10, nullable = false)
     @Builder.Default

@@ -218,6 +218,7 @@ public class OrderCreationService {
                 : listing.getPrice();
         item.setOriginalUnitPrice(originalUnitPrice != null ? scale(originalUnitPrice) : null);
         item.setCampaignDiscount(scale(lineCampaignDiscount(priced)));
+        item.setCouponDiscount(priced != null && priced.getCouponDiscount() != null ? scale(priced.getCouponDiscount()) : BigDecimal.ZERO);
         if (priced != null && priced.getAppliedCampaign() != null) {
             item.setCampaignId(priced.getAppliedCampaign().getCampaignId());
             item.setCampaignName(priced.getAppliedCampaign().getName());

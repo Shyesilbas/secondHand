@@ -33,16 +33,18 @@ const OrderItemRow = ({ item, currency, isSellerView, review, reviewsLoading, ca
   const thumb = item.listing?.imageUrl ? (
     <img src={item.listing.imageUrl} alt="" className="h-full w-full object-cover" />
   ) : (
-    <div className="flex h-full w-full items-center justify-center text-text-muted">
-      <Package className="h-6 w-6" strokeWidth={1.5} aria-hidden />
+    <div className="flex h-full w-full items-center justify-center text-text-tertiary">
+      <Package className="h-5 w-5" strokeWidth={1.5} aria-hidden />
     </div>
   );
 
   return (
     <li className="flex gap-4 py-4 first:pt-0 last:pb-0">
-      <div className="h-16 w-16 shrink-0 overflow-hidden rounded border border-border-light bg-background-secondary">
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded bg-secondary-200">
         {listingPath ? (
-          <Link to={listingPath} onClick={onClose} tabIndex={-1} aria-hidden="true" className="block h-full w-full transition-opacity hover:opacity-80">{thumb}</Link>
+          <Link to={listingPath} onClick={onClose} tabIndex={-1} aria-hidden="true" className="block h-full w-full transition-opacity duration-150 hover:opacity-80">
+            {thumb}
+          </Link>
         ) : thumb}
       </div>
 
@@ -50,7 +52,15 @@ const OrderItemRow = ({ item, currency, isSellerView, review, reviewsLoading, ca
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h4 className="line-clamp-2 text-sm font-medium text-text-primary">
-              {listingPath ? <Link to={listingPath} onClick={onClose} className="hover:underline">{item.listing?.title}</Link> : item.listing?.title}
+              {listingPath ? (
+                <Link
+                  to={listingPath}
+                  onClick={onClose}
+                  className="transition-colors duration-150 hover:text-text-link hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-sm"
+                >
+                  {item.listing?.title}
+                </Link>
+              ) : item.listing?.title}
             </h4>
             <p className="mt-0.5 text-sm tabular-nums text-text-secondary">
               {item.quantity} ×{' '}
@@ -60,15 +70,17 @@ const OrderItemRow = ({ item, currency, isSellerView, review, reviewsLoading, ca
               {formatCurrency(item.unitPrice, currency)}
             </p>
           </div>
-          <span className="shrink-0 text-sm font-semibold tabular-nums text-text-primary">{formatCurrency(item.totalPrice, currency)}</span>
+          <span className="shrink-0 text-sm font-semibold tabular-nums text-text-primary">
+            {formatCurrency(item.totalPrice, currency)}
+          </span>
         </div>
 
         {!isSellerView && sellerName ? (
-          <p className="mt-1 text-sm text-text-tertiary">{t("seller")}: {sellerName}</p>
+          <p className="mt-1 text-sm text-text-tertiary">{t('seller', 'Satıcı')}: {sellerName}</p>
         ) : null}
         {item.campaignName ? (
           <p className="mt-1 text-sm text-text-tertiary">
-            {t("od_campaign", "Kampanya")}: {item.campaignName}
+            {t('od_campaign', 'Kampanya')}: {item.campaignName}
             {hasCampaignDiscount ? (
               <span className="tabular-nums">{' · '}-{formatCurrency(item.campaignDiscount, currency)}</span>
             ) : null}
@@ -77,23 +89,23 @@ const OrderItemRow = ({ item, currency, isSellerView, review, reviewsLoading, ca
 
         {cancelled ? (
           <Adjustment
-            label={item.cancelledQuantity >= item.quantity ? t("od_cancelled", "İptal edildi") : t("od_partially_cancelled", "Kısmen iptal edildi")}
+            label={item.cancelledQuantity >= item.quantity ? t('od_cancelled', 'İptal edildi') : t('od_partially_cancelled', 'Kısmen iptal edildi')}
             quantity={item.cancelledQuantity}
             total={item.quantity}
             reason={item.cancelReason}
             reasonText={item.cancelReasonText}
-            reasonLabel={t("od_reason", "Neden")}
+            reasonLabel={t('od_reason', 'Neden')}
             toneClass="text-status-error-text"
           />
         ) : null}
         {refunded ? (
           <Adjustment
-            label={item.refundedQuantity >= item.quantity ? t("od_refunded", "İade edildi") : t("od_partially_refunded", "Kısmen iade edildi")}
+            label={item.refundedQuantity >= item.quantity ? t('od_refunded', 'İade edildi') : t('od_partially_refunded', 'Kısmen iade edildi')}
             quantity={item.refundedQuantity}
             total={item.quantity}
             reason={item.refundReason}
             reasonText={item.refundReasonText}
-            reasonLabel={t("od_reason", "Neden")}
+            reasonLabel={t('od_reason', 'Neden')}
             toneClass="text-status-warning-text"
           />
         ) : null}
@@ -125,7 +137,9 @@ export const OrderItemsSection = React.memo(({
         <h3 className="text-base font-semibold text-text-primary">
           {isSellerView ? t('od_sold_items', 'Satılan ürünler') : t('od_order_items', 'Sipariş ürünleri')}
         </h3>
-        <span className="text-sm tabular-nums text-text-tertiary">{t('od_items_count', { defaultValue: '{{count}} ürün', count: items.length })}</span>
+        <span className="text-sm tabular-nums text-text-tertiary">
+          {t('od_items_count', { defaultValue: '{{count}} ürün', count: items.length })}
+        </span>
       </div>
       <ul className="divide-y divide-border-light">
         {items.map((item, idx) => {

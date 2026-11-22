@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -19,6 +20,8 @@ public class CouponParticipationDto {
     private String couponTitle;
     private String couponDescription;
     private LocalDateTime redeemedAt;
+    /** Discount this redemption gave the user, in the order currency. */
+    private BigDecimal discountAmount;
     /** Null if redemption had no linked order */
     private Long orderId;
     private String orderNumber;

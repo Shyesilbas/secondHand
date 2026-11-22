@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
 import { ERROR_MESSAGES } from '../types/index.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const LISTING_KEYS = {
  detail: (id) => ['listings', 'detail', id],
@@ -22,7 +23,7 @@ export const useListingData = (listingId, autoFetch = true) => {
  });
 
  const error = isError
- ? (queryError?.response?.data?.message || queryError?.message || ERROR_MESSAGES.NETWORK_ERROR)
+ ? getErrorMessage(queryError, ERROR_MESSAGES.NETWORK_ERROR)
  : null;
 
  return { listing: listing || null, isLoading, error, refetch };

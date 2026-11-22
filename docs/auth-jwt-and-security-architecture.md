@@ -178,6 +178,8 @@ Akış [`OAuth2LoginSuccessHandler`](../src/main/java/com/serhat/secondhand/core
 
 ---
 
+Google ile giriş de dahil başarılı girişler ve çıkışlar yalnızca `audit_logs` tablosuna yazılır ve güvenlik sayfasında izlenir; e-posta gitmez. `AuditLogService` e-postayı yalnızca başarısız giriş denemesi ve şifre değişikliği gibi güvenlik açısından uyarı gerektiren olaylarda gönderir.
+
 ## 6. Public endpoint keşfi
 
 Varsayılan kural "her şey kimlik ister"dir. Bir endpoint'i açmak için controller metoduna `@PublicEndpoint` konur; elle tutulan bir URL listesi yoktur.

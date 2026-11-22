@@ -6,6 +6,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import AddressForm from './address/AddressForm.jsx';
 import AddressCard from './address/AddressCard.jsx';
 import { Alert, Button, EmptyState, SkeletonList } from '../../common/components/ui/index.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import logger from '../../common/utils/logger.js';
 
 const AddressList = memo(({ isActive }) => {
@@ -84,8 +85,7 @@ const AddressList = memo(({ isActive }) => {
         logger.error('Failed to select main address:', err);
         showError(
           t('error', 'Hata'),
-          err.response?.data?.message ||
-            t('failed_to_set_main_address', 'Varsayılan adres güncellenemedi.')
+          getErrorMessage(err, t('failed_to_set_main_address', 'Varsayılan adres güncellenemedi.'))
         );
       }
     },
@@ -111,8 +111,7 @@ const AddressList = memo(({ isActive }) => {
             logger.error('Failed to delete address:', err);
             showError(
               t('error', 'Hata'),
-              err.response?.data?.message ||
-                t('failed_to_delete_address', 'Adres silinemedi.')
+              getErrorMessage(err, t('failed_to_delete_address', 'Adres silinemedi.'))
             );
           }
         }

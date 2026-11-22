@@ -2,7 +2,7 @@ import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, ChevronRight, HandCoins, Heart, MessageSquare, Package, Plus, ShoppingBag } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { usePlan } from '@/common/hooks/usePlan';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
@@ -10,7 +10,6 @@ import Alert from '@/common/components/ui/Alert';
 import Button, { buttonClasses } from '@/common/components/ui/Button';
 import Modal from '@/common/components/ui/Modal';
 import Skeleton from '@/common/components/ui/Skeleton';
-import { Card, PageHeader } from '../../common/components/ui/index.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { getAccountHubNavGroups } from '../utils/accountHubSections.js';
@@ -23,22 +22,6 @@ import AccountHubSidebar from '../components/hub/AccountHubSidebar.jsx';
 import AccountHubRecentOrders from '../components/hub/AccountHubRecentOrders.jsx';
 import AccountHubPlanCard from '../components/hub/AccountHubPlanCard.jsx';
 
-const QuickActionLink = ({ to, icon: Icon, title }) => (
-  <Card
-    as={Link}
-    to={to}
-    padding="none"
-    interactive
-    className="group flex items-center gap-3 px-4 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
-  >
-    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-background-secondary text-text-secondary transition-colors duration-150 group-hover:bg-accent-teal-50 group-hover:text-accent-teal-800">
-      <Icon className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-    </span>
-    <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-primary">{title}</span>
-    <ChevronRight className="h-4 w-4 shrink-0 text-text-muted transition-colors duration-150 group-hover:text-text-secondary" strokeWidth={1.5} aria-hidden />
-  </Card>
-);
-
 const AccountHubPage = () => {
   const { t, i18n } = useTranslation();
   const restrictionFlags = useRestrictionFlags();
@@ -47,8 +30,8 @@ const AccountHubPage = () => {
 
   const { user } = useAuthState();
   const { pathname } = useLocation();
-  // Groups start open; the set holds the ones the user collapsed.
-  const [closedGroups, setClosedGroups] = useState(() => new Set());
+  // Groups start collapsed; the set holds the ones the user expanded.
+  const [openGroups, setOpenGroups] = useState(() => new Set());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -60,12 +43,8 @@ const AccountHubPage = () => {
     });
   }, [user]);
 
-  const openGroups = useMemo(
-    () => new Set(navGroups.map((group) => group.id).filter((id) => !closedGroups.has(id))),
-    [navGroups, closedGroups]
-  );
   const toggleGroup = (id) => {
-    setClosedGroups((prev) => {
+    setOpenGroups((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -133,7 +112,7 @@ const AccountHubPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background-page">
+    <div className="bg-background-page">
       <PageContainer className="py-6 lg:py-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <AccountHubSidebar
@@ -152,7 +131,7 @@ const AccountHubPage = () => {
             onCloseMobileMenu={() => setMobileMenuOpen(false)}
           />
 
-          <main className="min-w-0 flex-1 space-y-6">
+          <main className="min-w-0 flex-1 space-y-5">
             {isExpiringSoon && (
               <Alert
                 type="warning"
@@ -167,36 +146,24 @@ const AccountHubPage = () => {
               />
             )}
 
-            <PageHeader
-              title={`${t('welcome', 'Welcome,')} ${firstName}`}
-              subtitle={t('your_personal_secondhand_space')}
-              actions={
-                restrictionFlags.canCreateListings ? (
-                  <Link to={ROUTES.CREATE_LISTING} className={`${buttonClasses()} shrink-0`}>
-                    <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                    <span>{t('new_listing', 'New Listing')}</span>
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    disabled
-                    title="Hesabınızdaki kısıtlama nedeniyle ilan oluşturamazsınız"
-                    className={`${buttonClasses()} shrink-0 disabled:cursor-not-allowed disabled:opacity-50`}
-                  >
-                    <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                    <span>{t('new_listing', 'New Listing')}</span>
-                  </button>
-                )
-              }
-            />
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              <QuickActionLink to={ROUTES.MY_LISTINGS} icon={Package} title={t('my_listings', 'İlanlarım')} />
-              <QuickActionLink to={ROUTES.MY_ORDERS} icon={ShoppingBag} title={t('my_orders', 'Siparişlerim')} />
-              <QuickActionLink to={ROUTES.OFFERS} icon={HandCoins} title={t('offers', 'Teklifler')} />
-              <QuickActionLink to={ROUTES.FAVORITES} icon={Heart} title={t('favorites', 'Favoriler')} />
-              <QuickActionLink to={ROUTES.INBOX} icon={MessageSquare} title={t('inbox', 'Mesajlar')} />
-              <QuickActionLink to={ROUTES.SELLER_DASHBOARD} icon={BarChart3} title={t('dash_tab_seller', 'Satışlarım')} />
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="truncate text-2xl font-semibold tracking-tight text-text-primary">
+                  {`${t('welcome', 'Welcome,')} ${firstName}`}
+                </h1>
+                <p className="mt-1 truncate text-sm text-text-tertiary">{t('your_personal_secondhand_space')}</p>
+              </div>
+              {restrictionFlags.canCreateListings ? (
+                <Link to={ROUTES.CREATE_LISTING} className={`${buttonClasses()} shrink-0`}>
+                  <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                  <span>{t('new_listing', 'New Listing')}</span>
+                </Link>
+              ) : (
+                <Button disabled className="shrink-0" title={t('listing_restricted_hint')}>
+                  <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                  <span>{t('new_listing', 'New Listing')}</span>
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

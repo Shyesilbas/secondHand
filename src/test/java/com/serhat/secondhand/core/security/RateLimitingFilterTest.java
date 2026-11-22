@@ -77,7 +77,7 @@ class RateLimitingFilterTest {
         assertThat(RateLimitingFilter.categorize("GET", "/api/v1/auth/login")).isEqualTo(RateLimitingFilter.Category.AUTH);
     }
 
-    /** GV-30: money writes outside /payments share the strict payment bucket; reads stay general. */
+    /** Money writes outside /payments share the strict payment bucket; reads stay general. */
     @Test
     void moneyWritesUseThePaymentBucket() {
         for (String uri : List.of("/api/v1/orders/checkout", "/api/checkout/initiate", "/api/v1/e-wallets/deposit",

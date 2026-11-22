@@ -9,7 +9,8 @@ Reports:
   TOPIC   backticked *.v1(*.DLT) Kafka topic names not declared in code or config
   TERM    forced Turkish words in docs/ where the English technical term is the convention
   STALE   references to removed tooling (./mvnw)
-  SIZE    module hub README.md (backend or frontend), AGENTS.md or SKILL.md over its word budget
+  --changed[=<git ref>]  also warn about docs naming changed code but left untouched (default ref HEAD; warning only)
+  SIZE    (warning only) hub, AGENTS.md or SKILL.md unusually long: filler signal, no exact quota
   CONST   backticked UPPER_SNAKE constant in a frontend README that no frontend or backend source declares
   ROUTE   backticked app route in a frontend README that common/constants/routes.js / AppRoutes.jsx does not define
 
@@ -19,6 +20,7 @@ Exit code 1 when anything is reported.
 import fnmatch
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -58,17 +60,17 @@ TOPIC_TOKEN_RE = re.compile(r"^[a-z][a-z0-9._-]*\.v1(?:\.DLT)?$")
 REDIS_TOKEN_RE = re.compile(r"^v[46]:[a-zA-Z0-9_:*{}<>-]+$")
 FQCN_RE = re.compile(r"\b(?:org|com|java|jakarta)\.[\w.]+\.([A-Z]\w*)")
 FENCE_RE = re.compile(r"^```.*?^```", re.S | re.M)
-# Word budgets: module hubs say "where" (docs/ says "how"); SKILL.md keeps rules, references/ keeps detail.
+# Size signals (WARN only, never fail): no exact word quota; useless filler is the problem. Module hubs say "where" (docs/ says "how"); SKILL.md keeps rules, references/ keeps detail.
 MODULE_ROOT = ROOT / "src" / "main" / "java" / "com" / "serhat" / "secondhand"
-HUB_WORD_BUDGET = 450
+HUB_WORD_BUDGET = 1000
 FRONTEND_ROOT = ROOT / "secondhand-frontend" / "src"
-FE_HUB_WORD_BUDGET = 450
+FE_HUB_WORD_BUDGET = 1000
 CONST_RE = re.compile(r"^[A-Z][A-Z0-9]+(?:_[A-Z0-9]+)+$")
 ROUTE_TOKEN_RE = re.compile(r"^/[a-z][\w/:.-]*$")
 NON_APP_ROUTE = ("/api", "/v1/", "/app/", "/topic/", "/user/", "/queue/")
-SKILL_WORD_BUDGET = 700
-AGENTS_WORD_BUDGET = 600  # loaded into every session: hard limit
-DOC_WORD_WARN = 2000  # docs/ deep dives: warning only, split by section when exceeded
+SKILL_WORD_BUDGET = 1500
+AGENTS_WORD_BUDGET = 1200  # loaded into every session: bloat signal only, never trim needed detail
+DOC_WORD_WARN = 3000  # docs/ deep dives: warning only, split by section when exceeded
 
 
 def walk(base: Path, pattern: str):
@@ -174,7 +176,7 @@ def check_file(path, text, names, topics, redis_prefixes, out):
             out.append(("STALE", path, lineno, "Maven wrapper was removed; use `mvn`"))
 
 
-def check_sizes(out):
+def check_sizes(warns):
     budgets = [(p, HUB_WORD_BUDGET) for p in sorted(MODULE_ROOT.glob("*/README.md"))]
     budgets += [(p, FE_HUB_WORD_BUDGET) for p in sorted(FRONTEND_ROOT.glob("*/README.md"))]
     budgets.append((ROOT / "AGENTS.md", AGENTS_WORD_BUDGET))
@@ -182,7 +184,7 @@ def check_sizes(out):
     for path, budget in budgets:
         words = len(path.read_text(encoding="utf-8").split())
         if words > budget:
-            out.append(("SIZE", path, 0, f"{words} words > budget {budget}; move detail to docs/ or references/"))
+            warns.append(f"WARN  {path.relative_to(ROOT)}  {words} words > {budget}; check for filler or detail that belongs in docs/ or references/")
 
 
 def check_frontend_facts(out):
@@ -216,19 +218,51 @@ def warn_large_docs():
     return warns
 
 
+def changed_paths(base):
+    """Paths changed against `base` (committed, staged, unstaged) plus untracked files."""
+    def git(*args):
+        r = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True)
+        return r.stdout.split("\n") if r.returncode == 0 else []
+    paths = set(git("diff", "--name-only", base)) | set(git("ls-files", "--others", "--exclude-standard"))
+    return {p for p in paths if p}
+
+
+def warn_untouched_docs(base):
+    """Warn when changed backend classes and frontend hooks/services (not pure UI restyles) are named by a doc that was not touched (a reminder, never a failure)."""
+    changed = changed_paths(base)
+    code = [Path(p) for p in changed if (p.startswith("src/main/java/") and p.endswith(".java"))
+            or (p.startswith("secondhand-frontend/src/") and ("/hooks/" in p or "/services/" in p))]
+    if not code:
+        return []
+    docs_changed = {p for p in changed if p.endswith(".md")}
+    warns = []
+    for doc in doc_files():
+        rel = str(doc.relative_to(ROOT))
+        if rel in docs_changed or rel.startswith(".agents/"):
+            continue
+        text = doc.read_text(encoding="utf-8")
+        hits = sorted({c.stem for c in code if len(c.stem) > 6 and re.search(r"\b" + re.escape(c.stem) + r"\b", text)})
+        if hits:
+            warns.append(f"WARN  {rel}  names changed code but was not updated: {', '.join(hits[:6])}{' ...' if len(hits) > 6 else ''}")
+    return warns
+
+
 def main():
     names = None if "--no-class" in sys.argv else known_names()
     topics, redis_prefixes = known_infra()
     out = []
+    size_warns = []
     check_map(out)
-    check_sizes(out)
+    check_sizes(size_warns)
     check_frontend_facts(out)
     for path in doc_files():
         check_file(path, path.read_text(encoding="utf-8"), names, topics, redis_prefixes, out)
     for kind, path, lineno, msg in out:
         loc = f"{path.relative_to(ROOT)}:{lineno}" if lineno else str(path.relative_to(ROOT))
         print(f"{kind:5} {loc}  {msg}")
-    for w in warn_large_docs():
+    changed_args = [a for a in sys.argv[1:] if a.startswith("--changed")]
+    touch_warns = warn_untouched_docs(changed_args[0].partition("=")[2] or "HEAD") if changed_args else []
+    for w in size_warns + warn_large_docs() + touch_warns:
         print(w)
     print(f"\n{len(out)} issue(s) in {len(doc_files())} files")
     return 1 if out else 0

@@ -1,129 +1,148 @@
-import {AlertTriangle, ChevronUp, ChevronDown, Lightbulb, MessageCircle, Clock} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import { Badge, Skeleton } from '../../common/components/ui/index.js';
 import {
- FORUM_CATEGORIES,
- FORUM_REACTIONS,
- FORUM_THREAD_STATUSES,
+  FORUM_CATEGORIES,
+  FORUM_REACTIONS,
+  FORUM_THREAD_STATUSES,
+  formatForumAuthor,
 } from '../forumConstants.js';
-import {formatForumDate} from '../utils/forumDateFormat.js';
+import { formatForumDate } from '../utils/forumDateFormat.js';
 
-const categoryMeta = {
- [FORUM_CATEGORIES.SUGGESTIONS]: {label: 'Suggestion', icon: Lightbulb, color: 'text-status-warning-text bg-background-secondary border-border'},
- [FORUM_CATEGORIES.COMPLAINTS]: {label: 'Complaint', icon: AlertTriangle, color: 'text-status-error-text bg-background-secondary border-border'},
+const CATEGORY_META = {
+  [FORUM_CATEGORIES.SUGGESTIONS]: {
+    labelKey: 'forum_cat_suggestion_singular',
+    fallback: 'Öneri',
+    variant: 'warning',
+  },
+  [FORUM_CATEGORIES.COMPLAINTS]: {
+    labelKey: 'forum_cat_complaint_singular',
+    fallback: 'Şikayet',
+    variant: 'error',
+  },
 };
 
-const statusMeta = {
- [FORUM_THREAD_STATUSES.OPEN]: {
- label: 'Open',
- dot: 'bg-status-success',
- },
- [FORUM_THREAD_STATUSES.IN_PROGRESS]: {
- label: 'In Progress',
- dot: 'bg-primary',
- },
- [FORUM_THREAD_STATUSES.RESOLVED]: {
- label: 'Resolved',
- dot: 'bg-secondary-400',
- },
+const STATUS_META = {
+  [FORUM_THREAD_STATUSES.OPEN]: {
+    labelKey: 'forum_status_open',
+    fallback: 'Açık',
+    dot: 'bg-status-success',
+  },
+  [FORUM_THREAD_STATUSES.IN_PROGRESS]: {
+    labelKey: 'forum_status_in_progress',
+    fallback: 'İnceleniyor',
+    dot: 'bg-status-warning',
+  },
+  [FORUM_THREAD_STATUSES.RESOLVED]: {
+    labelKey: 'forum_status_resolved',
+    fallback: 'Çözüldü',
+    dot: 'bg-text-tertiary',
+  },
 };
 
 export const ThreadCardSkeleton = () => (
- <div className="rounded border border-border-light shadow-sm bg-background-primary p-4 animate-pulse">
- <div className="flex items-center gap-2 mb-3">
- <div className="h-5 w-16 bg-background-tertiary rounded-full" />
- <div className="h-4 w-12 bg-background-tertiary rounded" />
- </div>
- <div className="h-5 bg-background-tertiary rounded w-5/6 mb-2" />
- <div className="h-4 bg-background-tertiary rounded w-full mb-1" />
- <div className="h-4 bg-background-tertiary rounded w-3/4" />
- <div className="mt-4 flex items-center gap-4">
- <div className="h-4 w-10 bg-background-tertiary rounded" />
- <div className="h-4 w-10 bg-background-tertiary rounded" />
- <div className="h-4 w-16 bg-background-tertiary rounded ml-auto" />
- </div>
- </div>
+  <div className="p-4">
+    <div className="mb-2.5 flex items-center gap-2">
+      <Skeleton className="h-5 w-16 rounded-sm" />
+      <Skeleton className="h-4 w-12" />
+    </div>
+    <Skeleton className="mb-2 h-4 w-5/6" />
+    <Skeleton className="mb-1 h-3.5 w-full" />
+    <Skeleton className="h-3.5 w-3/4" />
+    <div className="mt-3.5 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-4 w-10" />
+        <Skeleton className="h-4 w-8" />
+      </div>
+      <Skeleton className="h-3.5 w-28" />
+    </div>
+  </div>
 );
 
-export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
- const category = thread?.category || FORUM_CATEGORIES.SUGGESTIONS;
- const status = thread?.status || FORUM_THREAD_STATUSES.OPEN;
- const catMeta = categoryMeta[category] || categoryMeta[FORUM_CATEGORIES.SUGGESTIONS];
- const CatIcon = catMeta.icon;
- const statusInfo = statusMeta[status] || statusMeta[FORUM_THREAD_STATUSES.OPEN];
- const author = String(thread?.authorDisplayName || '').trim();
- const isLiked = reaction === FORUM_REACTIONS.LIKE;
- const isDisliked = reaction === FORUM_REACTIONS.DISLIKE;
- const netVotes = (Number(thread?.totalLikes) || 0) - (Number(thread?.totalDislikes) || 0);
+export const ThreadCard = ({ thread, isSelected, onSelect, reaction }) => {
+  const { t } = useTranslation();
+  const category = thread?.category || FORUM_CATEGORIES.SUGGESTIONS;
+  const status = thread?.status || FORUM_THREAD_STATUSES.OPEN;
+  const catMeta = CATEGORY_META[category] || CATEGORY_META[FORUM_CATEGORIES.SUGGESTIONS];
+  const statusInfo = STATUS_META[status] || STATUS_META[FORUM_THREAD_STATUSES.OPEN];
+  const author = formatForumAuthor(t, thread?.authorDisplayName);
+  const isLiked = reaction === FORUM_REACTIONS.LIKE;
+  const isDisliked = reaction === FORUM_REACTIONS.DISLIKE;
+  const netVotes = (Number(thread?.totalLikes) || 0) - (Number(thread?.totalDislikes) || 0);
 
- return (
- <button
- type="button"
- onClick={() => onSelect?.(thread?.id)}
- className={`group w-full text-left rounded border bg-background-primary transition-colors duration-150 ${
- isSelected
- ? 'border-accent-teal ring-1 ring-accent-teal'
- : 'border-border-light hover:border-border'
- }`}
- >
- <div className="p-4">
- {/* Top meta row */}
- <div className="flex items-center justify-between gap-2 mb-2.5">
- <div className="flex items-center gap-2">
- <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-semibold border ${catMeta.color}`}>
- <CatIcon className="w-3 h-3" strokeWidth={1.5} />
- {catMeta.label}
- </span>
- <span className="inline-flex items-center gap-1.5 text-xs text-text-muted font-medium">
- <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
- {statusInfo.label}
- </span>
- </div>
- </div>
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => onSelect?.(thread?.id)}
+        aria-current={isSelected ? 'true' : undefined}
+        className={`block w-full border-l-2 px-4 py-4 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus ${
+          isSelected
+            ? 'border-l-accent-teal bg-accent-teal-50'
+            : 'border-l-transparent bg-background-primary hover:bg-background-secondary'
+        }`}
+      >
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Badge variant={catMeta.variant} size="sm">
+              {t(catMeta.labelKey, catMeta.fallback)}
+            </Badge>
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-text-tertiary">
+              <span className={`h-1.5 w-1.5 rounded-full ${statusInfo.dot}`} aria-hidden />
+              {t(statusInfo.labelKey, statusInfo.fallback)}
+            </span>
+          </div>
+          <time
+            dateTime={thread?.createdAt || undefined}
+            className="whitespace-nowrap text-xs tabular-nums text-text-tertiary"
+          >
+            {formatForumDate(thread?.createdAt)}
+          </time>
+        </div>
 
- {/* Title */}
- <h3 className={`text-sm font-medium text-text-primary tracking-tight line-clamp-2 mb-1.5 transition-colors duration-150 ${ isSelected ? '' : ' group-' }`}>
- {thread?.title || 'Untitled'}
- </h3>
+        <h3 className="line-clamp-2 text-sm font-semibold text-text-primary">
+          {thread?.title || t('forum_untitled', 'Başlıksız konu')}
+        </h3>
 
- {/* Description preview */}
- <p className="text-sm text-text-muted line-clamp-2 leading-relaxed">
- {thread?.description || ''}
- </p>
+        {thread?.description && (
+          <p className="mt-1 line-clamp-2 text-sm text-text-secondary">
+            {thread.description}
+          </p>
+        )}
 
- {/* Bottom row: votes, date, author */}
- <div className="mt-3.5 flex items-center justify-between">
- <div className="flex items-center gap-3">
- {/* Vote display */}
- <div className="inline-flex items-center gap-0.5 text-xs">
- <ChevronUp className={`w-3.5 h-3.5 ${isLiked ? 'text-text-primary' : 'text-text-muted'}`} strokeWidth={1.5} />
- <span className={`font-semibold tabular-nums min-w-4 text-center ${
- netVotes > 0 ? 'text-text-primary' : netVotes < 0 ? 'text-status-error' : 'text-text-muted'
- }`}>
- {netVotes}
- </span>
- <ChevronDown className={`w-3.5 h-3.5 ${isDisliked ? 'text-status-error' : 'text-text-muted'}`} strokeWidth={1.5} />
- </div>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 text-xs text-text-tertiary">
+            <span className="inline-flex items-center gap-0.5">
+              <ChevronUp
+                className={`h-3.5 w-3.5 ${isLiked ? 'text-accent-teal' : 'text-text-tertiary'}`}
+                strokeWidth={1.5}
+                aria-hidden
+              />
+              <span
+                className={`min-w-4 text-center font-semibold tabular-nums ${
+                  netVotes > 0 ? 'text-text-primary' : netVotes < 0 ? 'text-status-error-text' : 'text-text-tertiary'
+                }`}
+              >
+                {netVotes}
+              </span>
+              <ChevronDown
+                className={`h-3.5 w-3.5 ${isDisliked ? 'text-status-error-text' : 'text-text-tertiary'}`}
+                strokeWidth={1.5}
+                aria-hidden
+              />
+            </span>
 
- {/* Comment count placeholder */}
- <span className="inline-flex items-center gap-1 text-xs text-text-muted">
- <MessageCircle className="w-3 h-3" strokeWidth={1.5} />
- <span className="tabular-nums font-medium">{Number(thread?.commentCount) || 0}</span>
- </span>
- </div>
+            <span className="inline-flex items-center gap-1">
+              <MessageCircle className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+              <span className="font-medium tabular-nums">{Number(thread?.commentCount) || 0}</span>
+            </span>
+          </div>
 
- <div className="flex items-center gap-2 text-xs text-text-muted">
- {author && (
- <>
- <span className="font-medium text-text-muted truncate max-w-24">{author}</span>
- <span className="text-secondary-300">·</span>
- </>
- )}
- <span className="inline-flex items-center gap-1 tabular-nums whitespace-nowrap">
- <Clock className="w-3 h-3" strokeWidth={1.5} />
- {formatForumDate(thread?.createdAt)}
- </span>
- </div>
- </div>
- </div>
- </button>
- );
+          <span className="max-w-32 truncate text-xs font-medium text-text-tertiary">
+            {author}
+          </span>
+        </div>
+      </button>
+    </li>
+  );
 };

@@ -2,7 +2,7 @@ package com.serhat.secondhand.auth.domain.dto.response;
 
 import lombok.Builder;
 
-/** Login/refresh body. Tokens travel only in httpOnly cookies, never in the body (GV-07). */
+/** Login/refresh body. Tokens travel only in httpOnly cookies, never in the body. */
 @Builder
 public record AuthClientResponse(
         String message,

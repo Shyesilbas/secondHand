@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import Alert from './Alert.jsx';
 import Button from './Button.jsx';
 import Modal from './Modal.jsx';
 import PremiumUpgradeModalHeader from './premium/PremiumUpgradeModalHeader.jsx';
 import PremiumUpgradePlanStep from './premium/PremiumUpgradePlanStep.jsx';
+import { getErrorMessage } from '../../utils/errorUtils.js';
 import PremiumUpgradeVerificationStep from './premium/PremiumUpgradeVerificationStep.jsx';
 import { membershipService } from '../../services/membershipService';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
@@ -144,9 +146,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
       setStep(2);
     } catch (err) {
       setError(
-        err?.response?.data?.message ||
-        err?.message ||
-        t('verification_code_send_failed', 'Doğrulama kodu gönderilemedi.')
+        getErrorMessage(err, t('verification_code_send_failed', 'Doğrulama kodu gönderilemedi.'))
       );
     } finally {
       setLoading(false);
@@ -188,7 +188,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
       );
       onClose?.();
     } catch (err) {
-      setError(err?.response?.data?.message ?? t('an_error_occurred', 'Bir hata oluştu.'));
+      setError(getErrorMessage(err, t('an_error_occurred', 'Bir hata oluştu.')));
     } finally {
       setLoading(false);
     }
@@ -293,13 +293,18 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
       )}
 
       {error && (
-        <div className="mt-4 flex items-center justify-between gap-2 rounded border border-status-warning-border bg-status-warning-bg p-3 text-sm text-status-warning-text">
-          <span>{error}</span>
-          {!canAfford && (
-            <a href={ROUTES.EWALLET} className="shrink-0 font-semibold underline hover:no-underline">
-              {t('top_up_balance', 'Bakiye Yükle')}
-            </a>
-          )}
+        <div className="mt-4">
+          <Alert
+            type="warning"
+            message={error}
+            action={
+              !canAfford ? (
+                <a href={ROUTES.EWALLET} className="text-sm font-medium text-text-link hover:text-text-linkHover">
+                  {t('top_up_balance', 'Bakiye Yükle')}
+                </a>
+              ) : null
+            }
+          />
         </div>
       )}
     </Modal>

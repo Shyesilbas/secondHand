@@ -33,7 +33,7 @@ public class EscrowOutboxService {
                     escrow.getSeller() != null ? escrow.getSeller().getEmail() : null,
                     escrow.getBuyer() != null ? escrow.getBuyer().getId() : null,
                     escrow.getBuyer() != null ? escrow.getBuyer().getEmail() : null,
-                    escrow.getAmount(),
+                    escrow.sellerPayout(),
                     "TRY",
                     LocalDateTime.now()
             );

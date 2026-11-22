@@ -40,7 +40,8 @@ CheckoutOrchestrator → sipariş(ler) → CouponService.redeem (checkout transa
    * `PERCENT`: `unitPrice × value / 100`; `FIXED`: `value`. İndirim birim fiyatı geçemez.
    * `minQuantity`: Aynı kampanyaya giren sepet satırlarının toplam miktarı `minQuantity`'den azsa kampanya atlanır (bundle).
 3. **Kupon (sepet bazlı):** Kampanya sonrası satır toplamları üzerinden hesaplanır (aşağıda §3). İndirim, uygun satırlara satır toplamıyla orantılı dağıtılır; yuvarlama farkı son satıra yazılır.
-4. **Sonuç:** `total = subtotalAfterCampaigns − couponDiscount`; `payableBySeller` her satıcının net satır toplamlarıdır.
+4. **Kupon maliyeti platformundur:** kuponun kaleme düşen payı `OrderItem.couponDiscount` olarak saklanır; alıcı kupon sonrası tutarı öder ve iade alır, satıcı escrow release'inde `amount + platform_subsidy` yani kampanya sonrası tam tutarı alır ([escrow rehberi](escrow-lifecycle-and-state-machine.md)). Yalnızca satıcı kampanyaları satıcının kazancını düşürür.
+5. **Sonuç:** `total = subtotalAfterCampaigns − couponDiscount`; `payableBySeller` her satıcının net satır toplamlarıdır.
 
 Listeleme ekranlarında [`ListingCampaignPricingUtil.enrichWithCampaignPricing`](../src/main/java/com/serhat/secondhand/listing/util/ListingCampaignPricingUtil.java) aynı "en iyi kampanya" kuralıyla `campaignPrice` alanını doldurur, ancak `minQuantity > 1` olan bundle kampanyaları kartlarda gösterilmez.
 
@@ -75,6 +76,7 @@ Listeleme ekranlarında [`ListingCampaignPricingUtil.enrichWithCampaignPricing`]
 2. [`CouponRedisLimiterService`](../src/main/java/com/serhat/secondhand/coupon/application/CouponRedisLimiterService.java) `apply_coupon_with_limit.lua` ile `v4:coupon:usage:global:{CODE}` ve `v4:coupon:usage:user:{CODE}:{userId}` sayaçlarını tek atomik çağrıda kontrol edip artırır (TTL 30 gün). `-2` kullanıcı, `-1` genel limit aşımıdır → `COUPON_USAGE_LIMIT_REACHED`.
 3. Sayaç artırıldıysa bir `TransactionSynchronization` kaydedilir: checkout transaction'ı commit edilmezse `release_coupon_usage.lua` sayaçları geri azaltır (sıfırın altına inmez).
 4. `validateUsable` PostgreSQL limitlerini tekrar kontrol eder ve `coupon_redemptions` satırı yazılır. Checkout'ta kupon bir kez, indirim alan ilk siparişe bağlanarak kullanılır.
+* Redemption satırı checkout'un toplam kupon indirimini `discount_amount` olarak saklar; `GET /api/v1/coupons/redemptions` bunu döner ve kuponlar sayfası toplam tasarrufu bundan toplar.
 * Redis erişilemezse limiter `NOT_COUNTED` döner; karar kupon satır kilidi altındaki PostgreSQL kontrollerine kalır.
 
 ---

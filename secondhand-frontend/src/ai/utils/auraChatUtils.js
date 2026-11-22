@@ -1,6 +1,7 @@
 import { cacheService } from '../../common/services/cacheService.js';
 import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const getAuraChatStorageKey = (userId) =>
  userId != null ? `aura.chat.started.${userId}` : 'aura.chat.started.anonymous';
@@ -26,7 +27,7 @@ export const createAuraChatId = (prefix) =>
  `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 export const getApiErrorMessage = (error, fallback) =>
- error?.userMessage || error?.response?.data?.message || error?.message || fallback;
+  getErrorMessage(error, fallback);
 
 export const createChatMessage = ({ role, content, typing = false, meta = undefined }) => ({
  id: createAuraChatId(role === 'user' ? 'user' : 'aura'),

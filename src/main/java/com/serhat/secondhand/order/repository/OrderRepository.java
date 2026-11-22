@@ -30,7 +30,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     long countByUser_IdAndPaymentStatus(Long userId, PaymentStatus paymentStatus);
     // Order.shipping is the inverse side of a one-to-one and is always loaded; fetch it in the page query
-    // instead of one extra select per order (PF-07). To-one fetch joins are safe with pagination.
+    // instead of one extra select per order. To-one fetch joins are safe with pagination.
     // `statuses` must never be empty: callers pass every status when no filter is requested (OrderListFilter.statusesOrAll).
     @Query(value = "SELECT DISTINCT o FROM Order o " +
            "LEFT JOIN FETCH o.shipping " +

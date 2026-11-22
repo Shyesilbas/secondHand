@@ -1,143 +1,193 @@
-import { useTranslation } from "react-i18next";
-import { memo, useState, useRef, useLayoutEffect } from 'react';
-import { Flag, ShieldAlert, Trash2 as TrashIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { memo, useLayoutEffect, useRef } from 'react';
+import { Flag, MessageCircle, ShieldAlert, Trash2 } from 'lucide-react';
 import { formatRelativeTime } from '../../common/utils/dateFormat.js';
 import { sameChatId } from '../chatIdUtils.js';
 import { InChatOfferCard } from './InChatOfferCard.jsx';
-import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import { EmptyState, Skeleton } from '../../common/components/ui/index.js';
 
 const MessageBubble = memo(({
- message,
- isOwnMessage,
- onDeleteMessage,
- onReportMessage,
- currentUserId
+  message,
+  isOwnMessage,
+  onDeleteMessage,
+  onReportMessage,
+  currentUserId
 }) => {
- const { t } = useTranslation();
- const [showDeleteButton, setShowDeleteButton] = useState(false);
- const handleDeleteClick = () => {
- onDeleteMessage(message.id);
- };
+  const { t } = useTranslation();
 
- if (message.removedByModeration) {
- return (
- <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
- <div className="flex max-w-xs items-start gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-tertiary lg:max-w-md">
- <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
- <p>{t('message_removed_by_moderation', 'Bu mesaj topluluk kuralları ihlali nedeniyle sistem tarafından silindi.')}</p>
- </div>
- </div>
- );
- }
+  if (message.removedByModeration) {
+    return (
+      <div className={`mb-3 flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+        <div className="flex max-w-xs items-start gap-2 rounded border border-border-light bg-background-primary px-3 py-2 text-sm text-text-tertiary lg:max-w-md">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+          <p>{t('message_removed_by_moderation', 'Bu mesaj topluluk kuralları ihlali nedeniyle sistem tarafından silindi.')}</p>
+        </div>
+      </div>
+    );
+  }
 
- if (message.deletedBySender) {
- // The text stays on the server for moderation, so the recipient can still report a deleted message.
- return (
- <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
- <div className="flex max-w-xs items-start gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-tertiary lg:max-w-md">
- <TrashIcon className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
- <p className="italic">{t('message_deleted_by_sender', 'Bu mesaj gönderen tarafından silindi.')}</p>
- {!isOwnMessage && onReportMessage && <button type="button" onClick={() => onReportMessage(message)} className="ml-1 shrink-0 text-text-tertiary transition-colors duration-150 hover:text-status-error-text" title={t("report_message", "Report message")} aria-label={t("report_message", "Report message")}>
- <Flag className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
- </button>}
- </div>
- </div>
- );
- }
+  if (message.deletedBySender) {
+    // The text stays on the server for moderation, so the recipient can still report a deleted message.
+    return (
+      <div className={`mb-3 flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+        <div className="flex max-w-xs items-start gap-2 rounded border border-border-light bg-background-primary px-3 py-2 text-sm text-text-tertiary lg:max-w-md">
+          <Trash2 className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+          <p className="italic">{t('message_deleted_by_sender', 'Bu mesaj gönderen tarafından silindi.')}</p>
+          {!isOwnMessage && onReportMessage && (
+            <button
+              type="button"
+              onClick={() => onReportMessage(message)}
+              className="ml-1 shrink-0 rounded-sm p-0.5 text-text-tertiary transition-colors duration-150 hover:text-status-error-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              title={t('report_message', 'Mesajı bildir')}
+              aria-label={t('report_message', 'Mesajı bildir')}
+            >
+              <Flag className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
- if (message.messageType === 'OFFER') {
- return (
- <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
- <InChatOfferCard message={message} currentUserId={currentUserId} />
- </div>
- );
- }
+  if (message.messageType === 'OFFER') {
+    return (
+      <div className={`mb-3 flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+        <InChatOfferCard message={message} currentUserId={currentUserId} />
+      </div>
+    );
+  }
 
- return <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
- <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded relative group shadow-sm transition duration-150 ease-in-out ${isOwnMessage ? 'bg-primary text-white rounded-br-sm' : 'bg-background-primary text-text-primary border border-border-light rounded-bl-sm'}`} onMouseEnter={() => setShowDeleteButton(true)} onMouseLeave={() => setShowDeleteButton(false)}>
- <p className="text-sm break-words leading-relaxed tracking-tight">{message.content}</p>
- <div className="flex items-center justify-between mt-2">
- <p className={`text-xs tracking-tight ${isOwnMessage ? 'text-secondary-300' : 'text-text-tertiary'}`}>
- {formatRelativeTime(message.createdAt)}
- </p>
- {isOwnMessage && <div className={`w-2 h-2 rounded-full ml-2 ${isOwnMessage ? 'bg-secondary-300' : 'bg-text-muted'}`}></div>}
- </div>
- {!isOwnMessage && showDeleteButton && onReportMessage && <button type="button" onClick={() => onReportMessage(message)} className="absolute -top-2 -right-2 rounded-full border border-border-light bg-background-primary p-1.5 text-text-secondary transition-colors duration-150 hover:text-status-error-text" title={t("report_message", "Report message")} aria-label={t("report_message", "Report message")}>
- <Flag className="h-3 w-3" strokeWidth={1.5} aria-hidden />
- </button>}
- {isOwnMessage && showDeleteButton && onDeleteMessage && <button type="button" onClick={handleDeleteClick} className="absolute -top-2 -right-2 bg-status-error text-white rounded-full p-1.5 hover:bg-status-error-text transition-colors duration-150 ease-in-out transform" title={t("delete_message")}>
- <TrashIcon className="w-3 h-3" strokeWidth={1.5} />
- </button>}
- </div>
- </div>;
+  return (
+    <div className={`mb-3 flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+      <div
+        className={`group relative max-w-xs rounded px-4 py-2.5 lg:max-w-md ${
+          isOwnMessage
+            ? 'rounded-br-sm bg-primary text-white'
+            : 'rounded-bl-sm border border-border-light bg-background-primary text-text-primary shadow-sm'
+        }`}
+      >
+        <p className="break-words text-sm leading-relaxed">{message.content}</p>
+        <div className="mt-1.5 flex items-center justify-end gap-1.5">
+          <time
+            dateTime={message.createdAt || undefined}
+            className={`text-xs tabular-nums ${isOwnMessage ? 'text-secondary-300' : 'text-text-tertiary'}`}
+          >
+            {formatRelativeTime(message.createdAt)}
+          </time>
+        </div>
+
+        {!isOwnMessage && onReportMessage && (
+          <button
+            type="button"
+            onClick={() => onReportMessage(message)}
+            className="absolute -right-2 -top-2 rounded-full border border-border bg-background-primary p-1.5 text-text-secondary opacity-0 shadow-sm transition-opacity duration-150 hover:text-status-error-text focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus group-hover:opacity-100 group-focus-within:opacity-100"
+            title={t('report_message', 'Mesajı bildir')}
+            aria-label={t('report_message', 'Mesajı bildir')}
+          >
+            <Flag className="h-3 w-3" strokeWidth={1.5} aria-hidden />
+          </button>
+        )}
+
+        {isOwnMessage && onDeleteMessage && (
+          <button
+            type="button"
+            onClick={() => onDeleteMessage(message.id)}
+            className="absolute -right-2 -top-2 rounded-full border border-status-error-border bg-status-error-bg p-1.5 text-status-error-text opacity-0 shadow-sm transition-opacity duration-150 hover:bg-status-error hover:text-white focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus group-hover:opacity-100 group-focus-within:opacity-100"
+            title={t('delete_message', 'Mesajı sil')}
+            aria-label={t('delete_message', 'Mesajı sil')}
+          >
+            <Trash2 className="h-3 w-3" strokeWidth={1.5} aria-hidden />
+          </button>
+        )}
+      </div>
+    </div>
+  );
 });
 MessageBubble.displayName = 'MessageBubble';
+
 const MessageList = memo(({
- messages,
- isLoadingMessages,
- messagesEndRef,
- messagesContainerRef,
- user,
- onDeleteMessage,
- onReportMessage,
- fetchNextPage,
- hasNextPage,
- isFetchingNextPage
+  messages,
+  isLoadingMessages,
+  messagesEndRef,
+  messagesContainerRef,
+  user,
+  onDeleteMessage,
+  onReportMessage,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage
 }) => {
- const { t } = useTranslation();
- const prevScrollHeightRef = useRef(0);
- const prevScrollTopRef = useRef(0);
+  const { t } = useTranslation();
+  const prevScrollHeightRef = useRef(0);
+  const prevScrollTopRef = useRef(0);
 
- const handleScroll = () => {
- if (!messagesContainerRef.current) return;
- const { scrollTop } = messagesContainerRef.current;
- prevScrollTopRef.current = scrollTop;
+  const handleScroll = () => {
+    if (!messagesContainerRef.current) return;
+    const { scrollTop } = messagesContainerRef.current;
+    prevScrollTopRef.current = scrollTop;
 
- if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
- if (fetchNextPage) fetchNextPage();
- }
- };
+    if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage?.();
+    }
+  };
 
- useLayoutEffect(() => {
- const container = messagesContainerRef.current;
- if (!container) return;
+  useLayoutEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
 
- const currentScrollHeight = container.scrollHeight;
- 
- if (prevScrollHeightRef.current > 0 && prevScrollHeightRef.current < currentScrollHeight) {
- if (prevScrollTopRef.current === 0) {
- container.scrollTop = currentScrollHeight - prevScrollHeightRef.current;
- }
- }
- 
- prevScrollHeightRef.current = currentScrollHeight;
- }, [messages, isFetchingNextPage, messagesContainerRef]);
+    const currentScrollHeight = container.scrollHeight;
+    if (prevScrollHeightRef.current > 0 && prevScrollHeightRef.current < currentScrollHeight) {
+      if (prevScrollTopRef.current === 0) {
+        container.scrollTop = currentScrollHeight - prevScrollHeightRef.current;
+      }
+    }
 
- return <div 
- ref={messagesContainerRef} 
- onScroll={handleScroll}
- className="flex-1 min-h-0 overflow-y-auto p-6 bg-background-secondary"
- >
- {isFetchingNextPage && (
- <div className="flex justify-center items-center py-2">
- <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
- </div>
- )}
- {isLoadingMessages ? <div className="space-y-3 p-4" aria-busy="true">
- <Skeleton className="h-10 w-2/3" />
- <Skeleton className="ml-auto h-10 w-1/2" />
- <Skeleton className="h-10 w-3/5" />
- </div> : messages.length === 0 ? <div className="flex flex-col items-center justify-center h-full text-center">
- <div className="w-16 h-16 bg-background-tertiary rounded flex items-center justify-center mb-4">
- <svg className="w-8 h-8 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
- </svg>
- </div>
- <h3 className="text-base font-medium text-text-primary mb-1 tracking-tight">{t("no_messages_yet")}</h3>
- <p className="text-sm text-text-tertiary tracking-tight">{t("send_the_first_message")}</p>
- </div> : messages.map(message => <MessageBubble key={message.id} message={message} isOwnMessage={sameChatId(message.senderId, user?.id)} onDeleteMessage={onDeleteMessage} onReportMessage={onReportMessage} />)}
- <div ref={messagesEndRef} />
- </div>;
+    prevScrollHeightRef.current = currentScrollHeight;
+  }, [messages, isFetchingNextPage, messagesContainerRef]);
+
+  return (
+    <div
+      ref={messagesContainerRef}
+      onScroll={handleScroll}
+      className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-background-secondary p-5 sm:p-6"
+    >
+      {isFetchingNextPage && (
+        <div className="flex items-center justify-center py-2">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-border border-t-primary motion-reduce:animate-none" />
+        </div>
+      )}
+
+      {isLoadingMessages ? (
+        <div className="space-y-3" aria-busy="true" aria-label={t('loading_messages', 'Mesajlar yükleniyor')}>
+          <Skeleton className="h-10 w-2/3" />
+          <Skeleton className="ml-auto h-10 w-1/2" />
+          <Skeleton className="h-10 w-3/5" />
+        </div>
+      ) : messages.length === 0 ? (
+        <div className="flex h-full items-center justify-center">
+          <EmptyState
+            icon={MessageCircle}
+            size="compact"
+            title={t('no_messages_yet', 'Henüz mesaj yok')}
+            description={t('send_the_first_message', 'Sohbeti başlatmak için ilk mesajı gönderin.')}
+            className="border-0 bg-transparent"
+          />
+        </div>
+      ) : (
+        messages.map((message) => (
+          <MessageBubble
+            key={message.id}
+            message={message}
+            isOwnMessage={sameChatId(message.senderId, user?.id)}
+            currentUserId={user?.id}
+            onDeleteMessage={onDeleteMessage}
+            onReportMessage={onReportMessage}
+          />
+        ))
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+  );
 });
 MessageList.displayName = 'MessageList';
 export default MessageList;

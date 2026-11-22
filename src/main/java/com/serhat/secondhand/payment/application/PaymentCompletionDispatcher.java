@@ -1,5 +1,7 @@
 package com.serhat.secondhand.payment.application;
 
+import com.serhat.secondhand.escrow.domain.entity.Escrow;
+import com.serhat.secondhand.escrow.domain.repository.EscrowRepository;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
@@ -10,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -18,6 +22,7 @@ public class PaymentCompletionDispatcher {
     private final PaymentCompletedHandlerRegistry handlerRegistry;
     private final PaymentNotificationService paymentNotificationService;
     private final PaymentMapper paymentMapper;
+    private final EscrowRepository escrowRepository;
 
     public void dispatch(Payment payment) {
         PaymentTransactionType txnType = payment.getTransactionType();
@@ -37,7 +42,7 @@ public class PaymentCompletionDispatcher {
                         paymentDto.paymentId(),
                         paymentDto.senderDisplayName(),
                         paymentDto.receiverDisplayName(),
-                        paymentDto.amount(),
+                        sellerReceivedAmount(payment, paymentDto.amount()),
                         paymentDto.currency(),
                         paymentDto.providerName(),
                         paymentDto.providerTransactionId(),
@@ -64,5 +69,16 @@ public class PaymentCompletionDispatcher {
             paymentNotificationService.sendPaymentSuccessNotification(recipient, paymentDto);
             log.info("Payment success notification sent to user ID: {}", recipient.getId());
         }
+    }
+
+    /** The seller receipt shows the payout: the buyer-paid amount plus the platform-funded coupon share of the item. */
+    private BigDecimal sellerReceivedAmount(Payment payment, BigDecimal paidAmount) {
+        if (paidAmount == null || payment.getOrderItemId() == null) {
+            return paidAmount;
+        }
+        return escrowRepository.findByOrderItemId(payment.getOrderItemId())
+                .map(Escrow::getPlatformSubsidy)
+                .map(paidAmount::add)
+                .orElse(paidAmount);
     }
 }

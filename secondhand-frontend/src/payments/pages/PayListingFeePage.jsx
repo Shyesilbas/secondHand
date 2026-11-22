@@ -89,7 +89,7 @@ const PayListingFeePage = () => {
     }, [showConfirmModal, refetchPaymentMethods]);
 
     return (
-        <div className="min-h-screen bg-background-page relative overflow-hidden pb-16">
+        <div className="pb-16">
 
             <PageContainer className="py-8">
                 {/* Header Navigation & Banner */}

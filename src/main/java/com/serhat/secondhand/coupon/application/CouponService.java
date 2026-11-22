@@ -113,7 +113,7 @@ public class CouponService {
         return Result.success(couponMapper.toDto(couponRepository.save(coupon)));
     }
 
-    public Result<Void> redeem(String code, Long userId, Order order) {
+    public Result<Void> redeem(String code, Long userId, Order order, java.math.BigDecimal discountAmount) {
         if (code == null || code.isBlank()) return Result.success();
 
         var userResult = userService.findById(userId);
@@ -150,6 +150,7 @@ public class CouponService {
                             .coupon(coupon)
                             .user(userResult.getData())
                             .order(order)
+                            .discountAmount(discountAmount != null ? discountAmount : java.math.BigDecimal.ZERO)
                             .build();
                     couponRedemptionRepository.save(redemption);
                     return Result.success();
@@ -234,12 +235,13 @@ public class CouponService {
         if (userResult.isError()) return List.of();
 
         User user = userResult.getData();
-        Set<UUID> participated = new HashSet<>(couponRedemptionRepository.findDistinctCouponIdsByUser_Id(userId));
+        // A coupon stays listed while the user still has uses left; it moves to "used" only when a limit is exhausted.
         return couponRepository.findActiveNow(LocalDateTime.now())
                 .stream()
                 .filter(c -> couponValidator.validateUserEligible(c, user).isSuccess())
                 .map(coupon -> couponMapper.toActiveDto(coupon, user))
-                .filter(d -> !participated.contains(d.getId()))
+                .filter(d -> d.getUsageRemainingPerUser() == null || d.getUsageRemainingPerUser() > 0)
+                .filter(d -> d.getUsageRemainingGlobal() == null || d.getUsageRemainingGlobal() > 0)
                 .toList();
     }
 
@@ -263,6 +265,7 @@ public class CouponService {
                 .couponTitle(coupon.getTitle())
                 .couponDescription(coupon.getDescription())
                 .redeemedAt(r.getRedeemedAt())
+                .discountAmount(r.getDiscountAmount())
                 .orderId(order != null ? order.getId() : null)
                 .orderNumber(order != null ? order.getOrderNumber() : null)
                 .build();

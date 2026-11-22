@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-/** GV-24: user search returns public profile fields only and cannot page through the whole user base. */
+/** User search returns public profile fields only and cannot page through the whole user base. */
 class UserSearchTest {
 
     private final UserRepository userRepository = mock(UserRepository.class);

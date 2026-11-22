@@ -6,7 +6,7 @@ C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL 15, R
 - **Start all:** `./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]` (Docker: Postgres 5433, Redis 6379, Kafka 9092; then backend and frontend).
 - **Backend:** `mvn spring-boot:run` | unit tests: `mvn test [-Dtest=<Class>]` (plain Mockito `*Test`, default) | JaCoCo + tests: `mvn -B verify` | integration tests (needs Docker): `mvn test -Pintegration-tests -Dtest=ConcurrentStockAndPaymentIntegrationTest`.
 - **Frontend:** `cd secondhand-frontend && npm run dev | build | lint`.
-- **Verify:** `./scripts/verify.sh` = `python3 scripts/check_docs.py` (0 issues after doc changes) + `python3 scripts/check_api_endpoints.py` (0 warnings) + zero-emoji scan + frontend lint.
+- **Verify:** `./scripts/verify.sh` = `python3 scripts/check_docs.py` (0 issues after doc changes) + `python3 scripts/check_api_endpoints.py` (0 warnings) + zero-emoji scan + frontend lint. `python3 scripts/check_docs.py --changed` lists docs naming changed code that were not touched (reminder).
 
 ## Skills (`.agents/skills/`, symlinked as `.claude/skills`)
 Load the matching skill before modifying code.
@@ -16,7 +16,6 @@ Load the matching skill before modifying code.
 | Money/stock flows, outbox, Kafka consumers, Redis Lua/locks/cache | `transactional-outbox-and-redis-concurrency` |
 | Endpoints, DTOs, validators, security annotations, Flyway, polymorphic listing | `polymorphic-catalog-and-layered-api` |
 | Adding or deepening a listing vertical's catalog | `catalog-vertical-playbook` |
-| Backend audit or a finding ID (GV/VT/PF/DB/SD/KK) | `backend-review-audit` |
 | Any doc, README, runbook, skill or `AGENTS.md` edit | `docs-drift-audit` |
 | Frontend UI component, view or style | `restrained-ui-design-standard` |
 | Frontend module structure, routes, React Query, forms | `frontend-modular-architecture` |
@@ -27,7 +26,7 @@ Load the matching skill before modifying code.
 - **Backend flow:** `controller -> service -> validator/policy -> repository -> mapper`. No business logic in controllers, no raw JPA entities in responses. Flyway migrations (`src/main/resources/db/migration/V<N>__*.sql`) are immutable.
 - **Frontend:** React Query 5 only; server state never copied into local state. Session tokens in `HttpOnly`, `SameSite` cookies, never `localStorage`.
 - **High-risk modules (map below):** no guessed behavior, no silent fallbacks, fail fast with error codes. Every money/stock fix ships with a unit test that fails without the fix.
-- **Docs:** `docs/` is Turkish prose with English technical terms; module READMEs, runbooks, skills and code are English. One home per fact: module rules in the module hub, cross-module flows in `docs/`, everything else links. Prefer constant/property names over copied literals.
+- **Docs:** `docs/` is Turkish prose with English technical terms; module READMEs, runbooks, skills and code are English. One home per fact: module rules in the module hub, cross-module flows in `docs/`, everything else links. Prefer constant/property names over copied literals. **New or changed business rules, columns and API shapes update the hub README and matching `docs/*.md` in the same change.**
 - **Never read:** `node_modules/`, `dist/`, `.vite/`, `.turbo/`, `target/`, `.mvn/`, `.idea/`, `.vscode/`, `.git/`. For large files (seed JSON, SQL dumps, logs) use `head -n 20` or targeted `grep -m 5`.
 
 ## Project Map & Risk Tiers

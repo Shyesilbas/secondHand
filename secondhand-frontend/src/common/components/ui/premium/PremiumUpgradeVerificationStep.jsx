@@ -3,6 +3,7 @@ import OtpDigitInputGroup from '../../../../payments/components/verification/Otp
 import OtpSuggestionBanner from '../../../../payments/components/verification/OtpSuggestionBanner.jsx';
 import { OTP_CODE_LENGTH } from '../../../constants/otp.js';
 import { formatCurrency } from '../../../formatters.js';
+import Card from '../Card.jsx';
 
 const PremiumUpgradeVerificationStep = ({
   otpTtlActive,
@@ -42,7 +43,7 @@ const PremiumUpgradeVerificationStep = ({
         )}
       </div>
 
-      <div className="flex items-center justify-between border-y border-border-light py-3">
+      <Card surface="secondary" padding="compact" shadow={false} className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-text-primary">{t('premium_membership')}</p>
           <p className="text-sm tabular-nums text-text-secondary">
@@ -52,7 +53,7 @@ const PremiumUpgradeVerificationStep = ({
         <span className="text-lg font-semibold tabular-nums text-text-primary">
           {premiumPrice != null ? formatCurrency(premiumPrice, 'TRY') : '—'}
         </span>
-      </div>
+      </Card>
 
       {suggestedFromInbox && (
         <OtpSuggestionBanner

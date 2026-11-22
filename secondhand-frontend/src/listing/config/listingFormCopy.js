@@ -157,6 +157,66 @@ const FORM_TEXT = {
   'Warranty document status': 'Garanti belgesi durumu.',
 };
 
+// Listing detail labels (detailsSchema field and tab labels) that the category configs keep in English.
+const DETAIL_LABELS = {
+  '5G': '5G',
+  'Accident Details': 'Hasar detayı',
+  'Accident History': 'Hasar kaydı',
+  'Basic': 'Genel',
+  'Battery Capacity': 'Pil kapasitesi',
+  'Battery Life': 'Pil ömrü',
+  'Body Type': 'Kasa tipi',
+  'Brand': 'Marka',
+  'Camera': 'Kamera',
+  'Chipset': 'Yonga seti',
+  'Color': 'Renk',
+  'Condition': 'Durum',
+  'Connection Type': 'Bağlantı tipi',
+  'Discipline': 'Spor dalı',
+  'Door': 'Kapı sayısı',
+  'Drivetrain': 'Çekiş',
+  'Dual SIM': 'Çift SIM',
+  'Engine Capacity': 'Motor hacmi',
+  'Engine Variant': 'Motor',
+  'Equipment Type': 'Ekipman tipi',
+  'Extras': 'Ekstralar',
+  'Fabric': 'Kumaş',
+  'Fit': 'Kesim',
+  'For': 'Kimin için',
+  'Fuel Consumption': 'Yakıt tüketimi',
+  'Fuel Type': 'Yakıt tipi',
+  'Gear Type': 'Vites',
+  'Generation': 'Kasa / nesil',
+  'GPU Model': 'Ekran kartı',
+  'History': 'Geçmiş',
+  'Horse Power': 'Motor gücü',
+  'Inspection Valid Until': 'Muayene bitiş tarihi',
+  'Kilometer': 'Kilometre',
+  'Kilometers/Liter': 'Km / litre',
+  'Mechanical': 'Mekanik',
+  'Microphone': 'Mikrofon',
+  'Noise Cancelling': 'Gürültü engelleme',
+  'Open To Swap': 'Takasa açık',
+  'Operating System': 'İşletim sistemi',
+  'Origin': 'Menşei',
+  'Pattern': 'Desen',
+  'Processor': 'İşlemci',
+  'Purchase Year': 'Satın alma yılı',
+  'Screen Size': 'Ekran boyutu',
+  'Seat Count': 'Koltuk sayısı',
+  'Size': 'Beden',
+  'Storage': 'Depolama',
+  'Storage Type': 'Depolama tipi',
+  'Trim Package': 'Donanım paketi',
+  'Type': 'Tip',
+  'Usage': 'Kullanım',
+  'Variant': 'Sürüm',
+  'Warranty Proof': 'Garanti belgesi',
+  'Wheels': 'Jant',
+  'Wireless': 'Kablosuz',
+  'Year': 'Yıl',
+};
+
 export const isTurkish = () => !i18n?.language || i18n.language.startsWith('tr');
 
 export const fieldLabel = (field) => {
@@ -172,4 +232,9 @@ export const formText = (text) => {
     return FORM_TEXT[text] || text;
   }
   return text;
+};
+
+export const detailLabel = (label) => {
+  if (!label) return label;
+  return isTurkish() ? DETAIL_LABELS[label] || label : label;
 };

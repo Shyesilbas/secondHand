@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
 import PaymentAgreementsSection from './PaymentAgreementsSection.jsx';
 import { formatPaymentAmount } from '../utils/formatPaymentAmount.js';
-import { buttonClasses } from '../../common/components/ui/Button.jsx';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import Button from '../../common/components/ui/Button.jsx';
+import Card from '../../common/components/ui/Card.jsx';
 
 const PaymentPanel = ({
  selectedListing,
@@ -27,36 +29,30 @@ const PaymentPanel = ({
 
  return (
  <div className="lg:col-span-5 xl:col-span-5">
- <div className="sticky top-20 rounded border border-border-light bg-background-primary p-5 shadow-sm space-y-4">
- {/* Header */}
- <div className="flex items-center justify-between pb-3 border-b border-border-light">
- <h3 className="text-sm font-semibold text-text-primary">
+ <Card className="sticky top-20 space-y-4">
+ <div className="flex items-center justify-between gap-3">
+ <h3 className="text-base font-semibold text-text-primary">
  {t("payment_panel")}
  </h3>
- <span className="text-xs font-medium text-text-secondary bg-background-secondary px-2 py-0.5 rounded-sm border border-border">
- {t("instant_activation")}
- </span>
+ <span className="text-sm text-text-tertiary">{t("instant_activation")}</span>
  </div>
 
  {selectedListing ? (
- <div className="space-y-3.5">
- {/* Listing Summary Card */}
- <div className="rounded border border-border bg-background-secondary p-3.5 space-y-2">
- <div className="flex items-center justify-between gap-2">
- <span className="text-xs font-semibold text-text-muted">
- {t("chosen_listing")}
- </span>
- <span className="text-xs font-semibold text-text-tertiary">
+ <div className="space-y-4">
+ <div className="space-y-2 rounded bg-background-secondary p-4">
+ <div className="flex items-center justify-between gap-2 text-sm text-text-tertiary">
+ <span>{t("chosen_listing")}</span>
+ <span className="tabular-nums">
  #{selectedListing.id ? selectedListing.id.substring(0, 6).toUpperCase() : ''}
  </span>
  </div>
- <h4 className="text-sm font-semibold text-text-primary truncate">
+ <h4 className="truncate text-sm font-semibold text-text-primary">
  {selectedListing.title}
  </h4>
 
  {feeConfig && (
- <div className="pt-2 border-t border-border-light flex items-baseline justify-between">
- <span className="text-sm font-semibold text-text-secondary">
+ <div className="flex items-baseline justify-between pt-2">
+ <span className="text-sm text-text-secondary">
  {t("total_due")}
  </span>
  <span className="text-lg font-semibold tabular-nums text-text-price">
@@ -66,94 +62,67 @@ const PaymentPanel = ({
  )}
  </div>
 
- {/* E-Wallet Balance Info */}
- <div className="rounded border border-border bg-background-primary p-3 flex items-center justify-between text-sm">
- <div className="flex items-center gap-2">
- <div className="w-7 h-7 rounded bg-secondary-200 text-text-primary flex items-center justify-center font-semibold">
- ₺
- </div>
+ <div className="flex items-center justify-between gap-3 text-sm">
  <div>
- <span className="font-semibold text-text-primary block">{t("ewallet")}</span>
+ <span className="block font-medium text-text-primary">{t("ewallet")}</span>
  {eWallet && (
- <span className="text-sm text-text-tertiary">
+ <span className="tabular-nums text-text-tertiary">
  {formatPaymentAmount(eWallet?.balance)}
  </span>
  )}
  </div>
- </div>
 
  {eWallet && (
- hasSufficientEWalletBalance ? (
- <span className="text-xs font-semibold text-text-primary bg-background-tertiary px-2 py-0.5 rounded border border-border">
- {t("sufficient_balance")}
+ <span className="inline-flex items-center gap-1.5 text-text-tertiary">
+ <span
+ className={`h-1.5 w-1.5 shrink-0 rounded-full ${hasSufficientEWalletBalance ? 'bg-status-success' : 'bg-status-warning'}`}
+ aria-hidden
+ />
+ {hasSufficientEWalletBalance ? t("sufficient_balance") : t("insufficient_balance")}
  </span>
- ) : (
- <span className="rounded-sm border border-status-warning-border bg-status-warning-bg px-2 py-0.5 text-xs font-medium text-status-warning-text">
- {t("insufficient_balance")}
- </span>
- )
  )}
  </div>
 
- {/* Agreements Checklist */}
- <div className="pt-1">
  <PaymentAgreementsSection
  acceptedAgreements={acceptedAgreementIds}
  onToggle={onAgreementToggle}
  onRequiredAgreementsChange={onRequiredAgreementsChange}
- error={!agreementsAccepted ? "Please accept payment agreements" : null}
+ error={!agreementsAccepted ? t("payment_accept_agreements", "Ödeme sözleşmelerini onaylamalısın") : null}
  />
- </div>
 
- {/* Pay Button */}
- <button
- onClick={onPayment}
- disabled={isButtonDisabled}
- className={`${buttonClasses()} w-full`}
- >
+ <Button onClick={onPayment} disabled={isButtonDisabled} className="w-full">
  {isProcessingPayment ? (
  <>
- <svg className="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
- <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
- <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
- </svg>
+ <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} aria-hidden />
  <span>{t("processing")}...</span>
  </>
  ) : (
  <>
  <span>
  {feeConfig
- ? `Pay ${formatPaymentAmount(feeConfig.totalCreationFee)} & Publish`
- : 'Pay Listing Fee'}
+ ? t('pay_and_publish', { defaultValue: '{{amount}} öde ve yayınla', amount: formatPaymentAmount(feeConfig.totalCreationFee) })
+ : t('pay_listing_fee', 'İlan ücretini öde')}
  </span>
- <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
- </svg>
+ <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  </>
  )}
- </button>
+ </Button>
 
- {/* Security Badges */}
- <div className="flex items-center justify-center gap-3 text-xs text-text-muted font-medium pt-1">
- <span>{t("ssl_secured")}</span>
- <span>•</span>
- <span>{t("pci_dss_compliant")}</span>
- </div>
+ <p className="text-center text-sm text-text-tertiary">
+ {t("ssl_secured")} · {t("pci_dss_compliant")}
+ </p>
  </div>
  ) : (
- <div className="text-center py-8">
- <div className="w-10 h-10 bg-background-tertiary rounded flex items-center justify-center mx-auto mb-2 text-text-muted font-semibold">
- ?
- </div>
- <h4 className="text-sm font-semibold text-text-primary mb-1">
+ <div className="py-6 text-center">
+ <h4 className="mb-1 text-sm font-semibold text-text-primary">
  {t("no_listing_selected")}
  </h4>
- <p className="text-sm text-text-tertiary max-w-xs mx-auto">
+ <p className="mx-auto max-w-xs text-sm text-text-tertiary">
  {t("choose_a_listing_to_pay_the_listing_fee")}
  </p>
  </div>
  )}
- </div>
+ </Card>
  </div>
  );
 };

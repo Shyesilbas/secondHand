@@ -79,6 +79,7 @@ Siparişe kupon/indirim uygulandığında (`order.totalAmount` < kalem toplamı)
 
 $$\text{Escrow Tutarı} = \text{Toplam Ödenen Tutar} \times \frac{\text{Ürün Fiyatı}}{\text{Sepet Ürün Toplamı}}$$
 
+* **Platform kuponu satıcıdan kesilmez:** `escrows.amount` alıcının ödediği (kupon sonrası) paydır ve iade tabanıdır; kuponun kaleme düşen payı `OrderItem.couponDiscount` olarak saklanır ve `hold` sırasında `escrows.platform_subsidy` olarak yazılır. `release` satıcıya `amount + platform_subsidy` ödettirir (`Escrow.sellerPayout()`); `cancel`/`refund` alıcıya yalnızca `amount` döner, sübvansiyon hiç hareket etmez. Satıcı kampanyası ise satıcının fiyatını düşürmeye devam eder.
 * Kalemler `OrderItem.id` sırasına dizilir; yuvarlama farkının havuzda açık yaratmaması için son kalem `remaining` bakiyeyi alır.
 * Ödenecek tutar negatifse 0'a, kalem toplamından büyükse kalem toplamına çekilir; kalem toplamı 0 veya altındaysa tüm kalemler 0 tutarlı escrow alır.
 * `hold` idempotent'tir: `order_item_id` için zaten escrow varsa o kalem atlanır. `hold`, `CheckoutOrchestrator` içinde ödeme başarılı olduktan sonra çağrılır; hata dönerse checkout transaction'ı `IllegalStateException` ile geri alınır.

@@ -1,11 +1,24 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ChevronRight, KeyRound, MessageSquare, MailCheck, Shield, UserCheck } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { USER_ACCOUNT_STATUSES } from '../userConstants.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import Button from '../../common/components/ui/Button.jsx';
-import Badge from '../../common/components/ui/Badge.jsx';
 import { useUserSettings, useUpdateUserSettings } from '../hooks/useBlocking.js';
+
+const DOT = {
+  success: 'bg-status-success',
+  warning: 'bg-status-warning',
+  error: 'bg-status-error',
+  neutral: 'bg-text-tertiary'
+};
+
+const StatusText = ({ variant, children }) => (
+  <span className="inline-flex shrink-0 items-center gap-1.5 text-sm text-text-tertiary">
+    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[variant] || DOT.neutral}`} aria-hidden />
+    {children}
+  </span>
+);
 
 const ProfileAccountStatus = ({ user }) => {
   const { t } = useTranslation();
@@ -54,11 +67,6 @@ const ProfileAccountStatus = ({ user }) => {
       {/* 1. Account Status Row */}
       <div className="flex items-center justify-between gap-4 py-4 first:pt-0">
         <div className="flex items-start gap-3 min-w-0">
-          <UserCheck
-            className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-text-primary">
               {t('account_status', 'Hesap Durumu')}
@@ -66,19 +74,12 @@ const ProfileAccountStatus = ({ user }) => {
             <p className="mt-0.5 text-sm text-text-secondary">{status.description}</p>
           </div>
         </div>
-        <Badge variant={status.variant} dot className="shrink-0">
-          {status.label}
-        </Badge>
+        <StatusText variant={status.variant}>{status.label}</StatusText>
       </div>
 
       {/* 2. Email Verification Row */}
       <div className="flex items-center justify-between gap-4 py-4">
         <div className="flex items-start gap-3 min-w-0">
-          <MailCheck
-            className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-text-primary">
               {t('email_verification', 'E-posta Doğrulaması')}
@@ -96,9 +97,7 @@ const ProfileAccountStatus = ({ user }) => {
 
         <div className="flex shrink-0 items-center gap-2">
           {isVerified ? (
-            <Badge variant="success" dot>
-              {t('verified', 'Doğrulandı')}
-            </Badge>
+            <StatusText variant="success">{t('verified', 'Doğrulandı')}</StatusText>
           ) : (
             <Link to={ROUTES.VERIFY_ACCOUNT}>
               <Button variant="secondary" size="sm">
@@ -112,7 +111,6 @@ const ProfileAccountStatus = ({ user }) => {
       {/* Messaging preference (global default for new listings and direct chats) */}
       <div className="flex items-center justify-between gap-4 py-4">
         <div className="flex items-start gap-3 min-w-0">
-          <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden="true" />
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-text-primary">
               {t('messaging_preference', 'Mesajlaşma Tercihi (Global)')}
@@ -145,14 +143,9 @@ const ProfileAccountStatus = ({ user }) => {
       {/* 3. Change Password Row */}
       <Link
         to={ROUTES.CHANGE_PASSWORD}
-        className="group -mx-2 flex items-center justify-between gap-4 rounded px-2 py-4 transition-colors hover:bg-background-secondary"
+        className="group -mx-2 flex items-center justify-between gap-4 rounded px-2 py-4 transition-colors duration-150 hover:bg-background-secondary"
       >
         <div className="flex items-start gap-3 min-w-0">
-          <KeyRound
-            className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-text-primary">
               {t('change_password', 'Şifre Değiştir')}
@@ -163,7 +156,7 @@ const ProfileAccountStatus = ({ user }) => {
           </div>
         </div>
         <ChevronRight
-          className="h-4 w-4 shrink-0 text-text-muted transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-text-primary"
+          className="h-4 w-4 shrink-0 text-text-muted transition-colors duration-150 group-hover:text-text-primary"
           strokeWidth={1.5}
           aria-hidden="true"
         />
@@ -175,11 +168,6 @@ const ProfileAccountStatus = ({ user }) => {
         className="group -mx-2 flex items-center justify-between gap-4 rounded px-2 py-4 last:pb-1 transition-colors hover:bg-background-secondary"
       >
         <div className="flex items-start gap-3 min-w-0">
-          <Shield
-            className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-text-primary">
               {t('security_hub', 'Güvenlik ve Denetim Kayıtları')}
@@ -190,7 +178,7 @@ const ProfileAccountStatus = ({ user }) => {
           </div>
         </div>
         <ChevronRight
-          className="h-4 w-4 shrink-0 text-text-muted transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-text-primary"
+          className="h-4 w-4 shrink-0 text-text-muted transition-colors duration-150 group-hover:text-text-primary"
           strokeWidth={1.5}
           aria-hidden="true"
         />

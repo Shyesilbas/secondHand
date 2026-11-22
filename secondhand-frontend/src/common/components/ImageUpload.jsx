@@ -6,6 +6,7 @@ import { API_ENDPOINTS } from '../constants/apiEndpoints.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import apiClient from '../services/api/interceptors.js';
 import logger from '../utils/logger.js';
+import { getErrorMessage } from '../utils/errorUtils.js';
 import { compressImage } from '../utils/imageOptimizer.js';
 const ImageUpload = ({
   onImageUpload,
@@ -64,7 +65,7 @@ const ImageUpload = ({
       if (error.name === 'AbortError' || error.code === 'ECONNABORTED') {
         setError('Upload timed out. Please try again.');
       } else {
-        const errorMessage = error.response?.data?.message || error.userMessage || 'Failed to upload image.';
+        const errorMessage = getErrorMessage(error, 'Failed to upload image.');
         setError(errorMessage);
       }
     } finally {

@@ -45,7 +45,7 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
       </ol>
 
       <div className="space-y-1.5 md:hidden">
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center justify-between text-sm">
           <span className="tabular-nums text-text-tertiary">
             {t('checkout_step_of', { defaultValue: 'Adım {{current}}/{{total}}', current: currentStep, total: steps.length })}
           </span>

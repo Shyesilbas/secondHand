@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useCallback, useState } from 'react';
+import Alert from '../../../common/components/ui/Alert.jsx';
 import EmptyState from '../../../common/components/ui/EmptyState.jsx';
 import { useEWallet } from '../../../ewallet/hooks/useEWallet.js';
 import { usePaymentStatisticsQuery } from '../../hooks/queries.js';
@@ -50,9 +51,7 @@ const EWalletSection = ({ back = null }) => {
  className="mb-8"
  />
 
- {error && <div className="mb-6 p-3 rounded border border-status-error-border bg-status-error-bg text-sm text-status-error-text" role="alert">
- {error}
- </div>}
+ {error && <div className="mb-6"><Alert type="error" message={error} /></div>}
 
  {!eWallet ? <EmptyState title={t("no_ewallet_found")} description={t('ewallet_empty_desc')} variant="neutral" primaryAction={{
  label: loading ? t('ewallet_creating') : t('ewallet_create'),

@@ -6,6 +6,7 @@ import { useChat } from '../hooks/useChat.js';
 import ChatWindow from './ChatWindow.jsx';
 import { sameChatId } from '../chatIdUtils.js';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { useLoginPrompt } from '../../auth/hooks/useLoginPrompt.js';
 import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -69,7 +70,7 @@ const ContactSellerButton = ({
  selectChatRoom(chatRoom);
  setIsChatOpen(true);
  } catch (err) {
- showError('Chat', err?.response?.data?.message || 'An error occurred while starting the chat. Please try again later.');
+ showError('Chat', getErrorMessage(err, 'An error occurred while starting the chat. Please try again later.'));
  }
  };
  return <>

@@ -9,7 +9,9 @@ import Skeleton from './ui/Skeleton.jsx';
 export const AuraSummary = ({
   type = 'listing',
   id,
-  listing
+  listing,
+  title,
+  textClassName = 'text-sm'
 }) => {
   const { t } = useTranslation();
   const containerRef = useRef(null);
@@ -65,36 +67,43 @@ export const AuraSummary = ({
     return null;
   }
 
+  const showCaption = !hasNoReviews && !isLoading && !error && Boolean(summary);
+
+  // No card of its own: the caller's section supplies the frame; `title` is for places without a heading.
   return (
-    <div ref={containerRef} className="rounded border border-border-light bg-background-secondary p-4">
-      <div className="flex items-center justify-between gap-3 mb-2.5 flex-wrap">
-        <div className="flex items-center gap-2 text-text-primary font-semibold text-sm">
-          <Sparkles className="w-4 h-4 text-status-warning shrink-0" strokeWidth={1.5} aria-hidden />
-          <span>{t("aura_ai_yorum_analizi", "Aura AI Akıllı Değerlendirme")}</span>
-        </div>
-        <span className="text-xs font-medium text-text-secondary bg-background-primary border border-border-light px-2 py-0.5 rounded-sm shrink-0">
-          {t("auto_analysis", "Otomatik analiz")}
-        </span>
-      </div>
+    <div ref={containerRef}>
+      {title && (
+        <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-text-primary">
+          <Sparkles className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+          {title}
+        </p>
+      )}
 
       {hasNoReviews ? (
-        <p className="text-sm text-text-muted leading-relaxed">
+        <p className="text-sm text-text-muted">
           {t("no_reviews_for_this_product_yet", "Bu ürün/ilan için henüz değerlendirme yapılmamış.")}
         </p>
       ) : isLoading ? (
-        <div className="space-y-2 py-1">
-          <Skeleton className="h-3.5 w-full" />
-          <Skeleton className="h-3.5 w-5/6" />
-          <Skeleton className="h-3.5 w-3/4" />
+        <div className="space-y-2" aria-busy="true">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-3/4" />
         </div>
       ) : error ? (
-        <div className="flex items-center gap-2 text-sm text-text-tertiary py-1">
-          <AlertCircle className="w-4 h-4 text-text-muted shrink-0" strokeWidth={1.5} aria-hidden />
+        <p className="flex items-center gap-2 text-sm text-text-tertiary">
+          <AlertCircle className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
           <span>{t("aura_summary_unavailable", "Henüz yeterli değerlendirme verisi bulunmuyor veya analiz hazırlanıyor.")}</span>
-        </div>
+        </p>
       ) : (
-        <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+        <p className={`max-w-prose whitespace-pre-line leading-relaxed text-text-secondary ${textClassName}`}>
           {summary || t("aura_summary_preparing", "Bu ilan için otomatik Aura AI analizi hazırlanıyor.")}
+        </p>
+      )}
+
+      {showCaption && (
+        <p className="mt-3 flex items-center gap-1.5 text-sm text-text-tertiary">
+          <Sparkles className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+          {t('aura_summary_caption', 'Alıcı yorumlarından Aura tarafından otomatik oluşturuldu.')}
         </p>
       )}
     </div>

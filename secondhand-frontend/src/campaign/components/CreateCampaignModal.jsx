@@ -6,6 +6,7 @@ import { Button, Modal } from '../../common/components/ui/index.js';
 import { campaignService } from '../../listing/services/campaignService.js';
 import { listingService } from '../../listing/services/listingService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { refreshCampaignAffectedQueries } from '../campaignQueries.js';
 const defaultForm = {
@@ -133,7 +134,7 @@ const CreateCampaignModal = ({
  onSuccess?.();
  onClose?.();
  } catch (e) {
- showError('Campaign', e?.response?.data?.message || 'Failed to save campaign');
+ showError('Campaign', getErrorMessage(e, 'Failed to save campaign'));
  } finally {
  setIsSaving(false);
  }
@@ -189,7 +190,7 @@ const CreateCampaignModal = ({
  <select value={form.discountKind} onChange={e => setForm(p => ({
  ...p,
  discountKind: e.target.value
- }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary appearance-none bg-background-primary">
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-primary bg-background-primary">
  <option value="PERCENT">{t("percentage")}</option>
  <option value="FIXED">{t("fixed_amount")}</option>
  </select>

@@ -6,6 +6,7 @@ import { authService } from '../services/authService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { OTP_CODE_LENGTH } from '../../common/constants/otp.js';
 import Button from '../../common/components/ui/Button.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import Alert from '../../common/components/ui/Alert.jsx';
 import OtpDigitInputGroup from '../../payments/components/verification/OtpDigitInputGroup.jsx';
 import { AuthBrand, AuthField, AuthHeader, PasswordField, PasswordRules } from '../components/AuthPrimitives.jsx';
@@ -49,7 +50,7 @@ const ForgotPasswordPage = () => {
     try {
       await requestCode();
     } catch (error) {
-      setSubmitError(error.response?.data?.message || t('auth_reset_request_failed', 'Kod gönderilemedi. Lütfen tekrar dene.'));
+      setSubmitError(getErrorMessage(error, t('auth_reset_request_failed', 'Kod gönderilemedi. Lütfen tekrar dene.')));
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +62,7 @@ const ForgotPasswordPage = () => {
     try {
       await requestCode();
     } catch (error) {
-      setSubmitError(error.response?.data?.message || t('auth_reset_request_failed', 'Kod gönderilemedi. Lütfen tekrar dene.'));
+      setSubmitError(getErrorMessage(error, t('auth_reset_request_failed', 'Kod gönderilemedi. Lütfen tekrar dene.')));
     } finally {
       setIsResending(false);
     }
@@ -87,7 +88,7 @@ const ForgotPasswordPage = () => {
         state: { message: t('auth_reset_done', 'Şifren güncellendi. Yeni şifrenle giriş yapabilirsin.') }
       });
     } catch (error) {
-      setSubmitError(error.response?.data?.message || t('auth_reset_failed', 'Şifre güncellenemedi. Kodu kontrol edip tekrar dene.'));
+      setSubmitError(getErrorMessage(error, t('auth_reset_failed', 'Şifre güncellenemedi. Kodu kontrol edip tekrar dene.')));
     } finally {
       setIsLoading(false);
     }

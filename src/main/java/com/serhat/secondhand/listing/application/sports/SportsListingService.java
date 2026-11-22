@@ -120,6 +120,7 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
         );
     }
 
+    @Transactional(readOnly = true)
     public SportsListingDto getSportsDetails(UUID id) {
         SportsListing entity = sportsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sports listing not found"));

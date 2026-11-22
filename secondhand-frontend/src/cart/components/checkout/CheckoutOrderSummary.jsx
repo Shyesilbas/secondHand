@@ -17,15 +17,15 @@ const CheckoutOrderSummary = ({ cartItems = [], pricing }) => {
 
   return (
     <aside className="lg:sticky lg:top-36">
-      <div className="rounded border border-border-light bg-background-primary shadow-sm">
-        <div className="flex items-baseline justify-between border-b border-border-light px-5 py-4">
+      <div className="overflow-hidden rounded border border-border-light bg-background-primary shadow-sm">
+        <div className="flex items-baseline justify-between px-5 pb-2 pt-5">
           <h2 className="text-sm font-semibold text-text-primary">{t('order_summary', 'Sipariş özeti')}</h2>
-          <span className="text-xs tabular-nums text-text-tertiary">
+          <span className="text-sm tabular-nums text-text-tertiary">
             {t('checkout_item_count', { defaultValue: '{{count}} ürün', count: itemCount })}
           </span>
         </div>
 
-        <ul className="max-h-96 divide-y divide-border-light overflow-y-auto px-5">
+        <ul className="max-h-96 overflow-y-auto px-5">
           {cartItems.map((item) => {
             const listing = item.listing || {};
             const line = pricedLines.get(listing.id);
@@ -33,8 +33,8 @@ const CheckoutOrderSummary = ({ cartItems = [], pricing }) => {
             const lineCurrency = listing.currency || currency;
             const seller = [listing.sellerName, listing.sellerSurname].filter(Boolean).join(' ') || listing.sellerUsername;
             return (
-              <li key={item.id} className="flex items-start gap-3 py-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-tertiary">
+              <li key={item.id} className="flex items-start gap-3 py-2.5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded bg-background-tertiary">
                   {listing.imageUrl ? (
                     <img src={listing.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
                   ) : (
@@ -43,10 +43,10 @@ const CheckoutOrderSummary = ({ cartItems = [], pricing }) => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 text-sm text-text-primary">{listing.title}</p>
-                  <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-text-tertiary">
+                  <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm text-text-tertiary">
                     {item.isOffer && (
-                      <span className="inline-flex items-center rounded-sm border border-border px-1.5 py-0.5 text-xs font-medium text-text-secondary bg-background-secondary">
-                        {t('offer', 'Teklif')}
+                      <span className="font-medium text-text-secondary">
+                        {t('offer', 'Teklif')} ·
                       </span>
                     )}
                     <span className="truncate">
@@ -65,7 +65,7 @@ const CheckoutOrderSummary = ({ cartItems = [], pricing }) => {
           })}
         </ul>
 
-        <dl className="space-y-2 border-t border-border-light px-5 py-4 text-sm">
+        <dl className="mt-2 space-y-2 bg-background-secondary px-5 py-4 text-sm">
           <div className="flex justify-between text-text-secondary">
             <dt>{t('subtotal', 'Ara toplam')}</dt>
             <dd className="tabular-nums">{amount(pricing?.originalSubtotal)}</dd>
@@ -80,7 +80,7 @@ const CheckoutOrderSummary = ({ cartItems = [], pricing }) => {
             <dt>{t('shipping', 'Kargo')}</dt>
             <dd>{t('free', 'Ücretsiz')}</dd>
           </div>
-          <div className="flex items-baseline justify-between border-t border-border-light pt-3">
+          <div className="flex items-baseline justify-between pt-2">
             <dt className="font-medium text-text-primary">{t('order_total', 'Sipariş toplamı')}</dt>
             <dd className="text-lg font-semibold tabular-nums text-text-price">{amount(pricing?.total, currency, 'h-6 w-24')}</dd>
           </div>

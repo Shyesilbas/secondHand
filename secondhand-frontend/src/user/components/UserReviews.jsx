@@ -1,8 +1,13 @@
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import { AlertCircle, ChevronLeft, ChevronRight, LayoutGrid, Loader2, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, Star } from 'lucide-react';
+import Alert from '../../common/components/ui/Alert.jsx';
+import Card from '../../common/components/ui/Card.jsx';
+import EmptyState from '../../common/components/ui/EmptyState.jsx';
+import Pagination from '../../common/components/ui/Pagination.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import ReviewCard from '../../reviews/components/ReviewCard.jsx';
 import AuraSummary from '../../common/components/AuraSummary.jsx';
 import { RatingStarsDisplay } from '../../reviews/components/RatingStarsDisplay.jsx';
@@ -29,14 +34,14 @@ const StarBreakdown = ({ stats }) => {
 
   return (
     <div className="space-y-2 mt-5">
-      <p className="text-xs font-medium text-text-tertiary">{t("rating_mix", "Puan Dağılımı")}</p>
+      <p className="text-sm font-medium text-text-tertiary">{t("rating_mix", "Puan Dağılımı")}</p>
       <ul className="space-y-1.5">
         {BREAKDOWN.map(({ key, label, bar }) => {
           const count = Number(stats[key]) || 0;
           const pct = total > 0 ? Math.round((count / total) * 1000) / 10 : 0;
           return (
-            <li key={key} className="flex items-center gap-3 text-body">
-              <span className="inline-flex w-7 shrink-0 items-center gap-0.5 font-medium tabular-nums text-text-secondary text-xs">
+            <li key={key} className="flex items-center gap-3">
+              <span className="inline-flex w-7 shrink-0 items-center gap-0.5 font-medium tabular-nums text-text-secondary text-sm">
                 {label}
                 <Star className="h-3 w-3 text-text-muted" strokeWidth={1.5} aria-hidden />
               </span>
@@ -46,7 +51,7 @@ const StarBreakdown = ({ stats }) => {
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <span className="w-10 text-right tabular-nums text-text-muted text-xs shrink-0">
+              <span className="w-10 text-right tabular-nums text-text-tertiary text-sm shrink-0">
                 {count}
               </span>
             </li>
@@ -58,6 +63,10 @@ const StarBreakdown = ({ stats }) => {
 };
 
 const NO_REVIEWS = [];
+
+const CHIP = 'inline-flex flex-none cursor-pointer items-center gap-2 rounded border px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus';
+const CHIP_ACTIVE = 'border-accent-teal bg-background-primary text-text-primary ring-1 ring-accent-teal';
+const CHIP_IDLE = 'border-transparent bg-background-primary text-text-secondary shadow-sm hover:text-text-primary';
 
 const UserReviews = ({
   profileUserId,
@@ -72,6 +81,7 @@ const UserReviews = ({
   isOwnProfile = false
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const totalReviewsStat = Number(reviewStats?.totalReviews) || 0;
   const avgRaw = Number(reviewStats?.averageRating);
   const averageRating = Number.isFinite(avgRaw) ? avgRaw : 0;
@@ -142,231 +152,153 @@ const UserReviews = ({
     return filteredAll.slice(filterPage * clientPerPage, (filterPage + 1) * clientPerPage);
   }, [filterActive, receivedReviews, filteredAll, filterPage, clientPerPage]);
 
-  const cycleFilterPrev = useCallback(() => setFilterPage((fp) => Math.max(0, fp - 1)), []);
-  const cycleFilterNext = useCallback(() => setFilterPage((fp) => Math.min(filterTotalPages - 1, fp + 1)), [filterTotalPages]);
 
   return (
-    <div className="space-y-6 min-w-0 max-w-full">
-      <section className="flex min-w-0 max-w-full flex-col overflow-hidden rounded border border-border-light bg-background-primary shadow-sm">
-        {/* Rating summary banner */}
-        <div className="shrink-0 min-w-0 p-5 sm:p-6 bg-background-secondary border-b border-border-light">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 min-w-0 w-full">
-            <div className="min-w-0">
-              <div className="mb-1.5 text-sm font-medium text-text-tertiary">
-                <span>{t("buyer_feedback", "Alıcı Geri Bildirimleri")}</span>
-              </div>
-              <h2 className="text-base sm:text-lg font-semibold text-text-primary tracking-tight">
-                {t("reputation", "Satıcı İtibarı")}
-              </h2>
-              <p className="text-sm text-text-muted mt-1 max-w-md leading-relaxed">
-                {isOwnProfile
-                  ? t('reviews_own_hint', 'Tamamlanan siparişlerin ardından alıcıların bıraktığı değerlendirmeler.')
-                  : t('reviews_public_hint', 'Bu üyenin satıcı olarak aldığı tüm geri bildirimler.')}
-              </p>
-            </div>
-
-            <div className="shrink-0 flex flex-col items-start sm:items-end gap-1.5 w-full min-w-0 lg:w-auto lg:min-w-52 rounded border border-border-light bg-background-primary px-4 py-3.5">
-              {totalReviewsStat > 0 ? (
-                <>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-3xl sm:text-4xl font-semibold text-text-primary tabular-nums tracking-tight">
-                      {roundedDisplay?.toFixed(1)}
-                    </span>
-                    <span className="text-xs font-semibold text-text-muted">/{REVIEW_LIMITS.MAX_RATING}</span>
-                  </div>
-                  <div className="flex items-center gap-0.5 justify-end" aria-label={`${roundedDisplay} / 5`}>
-                    <RatingStarsDisplay value={averageRating} iconClassName="w-4 h-4" mode="round" />
-                  </div>
-                  <p className="text-xs text-text-tertiary mt-0.5 tabular-nums">
-                    {t("based_on", "Toplam")}{' '}
-                    <strong className="text-text-primary font-semibold">{totalReviewsStat}</strong>{' '}
-                    {t("reviews", "değerlendirme")}
-                  </p>
-                </>
-              ) : (
-                <p className="text-sm text-text-muted py-2">
-                  {t("no_reviews_yet_average_will_show_after_t", "Henüz değerlendirme bulunmuyor")}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {reviewStats && totalReviewsStat > 0 ? <StarBreakdown stats={reviewStats} /> : null}
-          {totalReviewsStat > 0 && (
-            <div className="mt-5">
-              <AuraSummary type="user" id={profileUserId} />
-            </div>
-          )}
-        </div>
-
-        {/* Filter bar and controls */}
-        <div className="shrink-0 min-w-0 w-full px-5 sm:px-6 py-3.5 border-b border-border-light bg-background-primary space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
-            <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-medium text-text-primary tracking-tight">
-                {t("reviews_received", "Alınan Değerlendirmeler")}
-                {!filterActive && pagination?.totalElements > 0 ? (
-                  <span className="font-normal text-text-muted ml-1.5 tabular-nums">({pagination.totalElements})</span>
-                ) : null}
-                {filterActive ? (
-                  <span className="font-normal text-text-muted ml-1.5 tabular-nums">
-                    ({filteredAll.length} {t("for_selected_listing", "seçili ilan için")})
-                  </span>
-                ) : null}
-              </h3>
-              <p className="text-sm text-text-muted mt-0.5">
-                {filterActive
-                  ? t("filtered_reviews_hint", "Seçilen ilana göre filtrelendi · İncelemek için aşağı kaydırın")
-                  : t("public_reviews_hint", "Yeniden eskiye · Herkese açık değerlendirmeler")}
-              </p>
-            </div>
-
-            {!initialListLoading && !filterActive && pagination?.totalElements > 0 ? (
-              <label className="inline-flex items-center gap-2 text-xs text-text-secondary shrink-0">
-                <span>{t("per_page", "Sayfa başı:")}</span>
-                <select
-                  value={pagination.size}
-                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                  aria-label={t("per_page", "Sayfa başı değerlendirme")}
-                  className="h-8 rounded border border-border bg-background-primary px-2.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-border cursor-pointer"
-                >
-                  <option value={10}>10</option>
-                  <option value={15}>15</option>
-                  <option value={20}>20</option>
-                </select>
-              </label>
-            ) : null}
+    <div className="min-w-0 max-w-full space-y-6">
+      <Card as="section" shadow={false} className="sm:p-6">
+        <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-text-primary">{t("reputation", "Satıcı İtibarı")}</h2>
+            <p className="mt-1 max-w-md text-sm text-text-tertiary">
+              {isOwnProfile
+                ? t('reviews_own_hint', 'Tamamlanan siparişlerin ardından alıcıların bıraktığı değerlendirmeler.')
+                : t('reviews_public_hint', 'Bu üyenin satıcı olarak aldığı tüm geri bildirimler.')}
+            </p>
           </div>
 
           {totalReviewsStat > 0 ? (
-            <div className="min-w-0 pt-1">
-              <p className="text-xs font-medium text-text-tertiary mb-2 flex items-center gap-1.5">
-                <LayoutGrid className="w-3.5 h-3.5" strokeWidth={1.5} aria-hidden />
-                <span>{t("filter_by_listing", "İlana Göre Filtrele")}</span>
-                {indexFetching ? <Loader2 className="w-3 h-3 animate-spin text-status-warning" aria-hidden strokeWidth={1.5} /> : null}
-              </p>
-              <div
-                className="min-w-0 w-full overflow-x-auto overflow-y-hidden pb-1 -mx-1 px-1 [scrollbar-width:thin]"
-                role="group"
-                aria-label={t("listing_filter_chips", "İlan filtreleri")}
-              >
-                <div className="flex flex-row flex-nowrap gap-2 w-max max-w-none pr-1">
-                  <button
-                    type="button"
-                    onClick={() => setListingFilter(ALL_LISTINGS)}
-                    className={`flex-none inline-flex items-center gap-2 rounded border px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
-                      !filterActive
-                        ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800'
-                        : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
-                    }`}
-                  >
-                    <span>{t("all_listings", "Tüm İlanlar")}</span>
-                    {totalReviewsStat > 0 ? (
-                      <span
-                        className={`tabular-nums px-1.5 py-0.5 rounded-sm text-xs ${
-                          !filterActive ? 'bg-accent-teal-100 text-accent-teal-800' : 'bg-background-secondary text-text-tertiary'
-                        }`}
-                      >
-                        {totalReviewsStat}
-                      </span>
-                    ) : null}
-                  </button>
-                  {listingOptions.map((opt) => {
-                    const active = listingFilter === opt.key;
-                    return (
-                      <button
-                        key={opt.key}
-                        type="button"
-                        onClick={() => setListingFilter(opt.key)}
-                        title={opt.title}
-                        className={`flex-none text-left inline-flex flex-col rounded border px-3 py-1.5 text-sm font-medium transition-colors min-w-36 max-w-[260px] cursor-pointer ${
-                          active
-                            ? 'border-primary bg-background-secondary text-text-primary'
-                            : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
-                        }`}
-                      >
-                        <span className="block w-full min-w-0 truncate leading-snug">
-                          {opt.title}
-                        </span>
-                        <span className="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
-                          {opt.listingNo ? <span className="tabular-nums">#{opt.listingNo}</span> : null}
-                          <span
-                            className={`tabular-nums px-1.5 py-0.2 rounded-sm text-xs ${
-                              active ? 'bg-background-primary text-text-primary border border-border' : 'bg-background-secondary text-text-muted'
-                            }`}
-                          >
-                            {opt.count} {t("reviews", "değerlendirme")}
-                          </span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+            <div className="flex shrink-0 flex-col sm:items-end">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-4xl font-semibold tabular-nums tracking-tight text-text-primary">
+                  {roundedDisplay?.toFixed(1)}
+                </span>
+                <span className="text-sm text-text-tertiary">/{REVIEW_LIMITS.MAX_RATING}</span>
               </div>
-              {indexLoadError ? (
-                <p className="mt-1.5 text-xs text-status-warning-text">{t("listing_filter_incomplete", "Filtre verisi eksik:")} {indexLoadError}</p>
-              ) : null}
+              <div className="mt-1 flex items-center gap-0.5" aria-label={`${roundedDisplay} / 5`}>
+                <RatingStarsDisplay value={averageRating} iconClassName="w-4 h-4" mode="round" />
+              </div>
+              <p className="mt-1 text-sm tabular-nums text-text-tertiary">
+                {totalReviewsStat} {t("reviews", "değerlendirme")}
+              </p>
             </div>
+          ) : (
+            <p className="text-sm text-text-tertiary">
+              {t("no_reviews_yet_average_will_show_after_t", "Henüz değerlendirme bulunmuyor")}
+            </p>
+          )}
+        </div>
+
+        {reviewStats && totalReviewsStat > 0 ? <StarBreakdown stats={reviewStats} /> : null}
+        {totalReviewsStat > 0 && (
+          <div className="mt-5">
+            <AuraSummary type="user" id={profileUserId} title={t('aura_review_summary_title', 'Aura yorum özeti')} />
+          </div>
+        )}
+      </Card>
+
+      <section className="min-w-0 space-y-4">
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-base font-semibold text-text-primary">
+              {t("reviews_received", "Alınan Değerlendirmeler")}
+              {!filterActive && pagination?.totalElements > 0 ? (
+                <span className="ml-1.5 font-normal tabular-nums text-text-tertiary">({pagination.totalElements})</span>
+              ) : null}
+              {filterActive ? (
+                <span className="ml-1.5 font-normal tabular-nums text-text-tertiary">
+                  ({filteredAll.length} {t("for_selected_listing", "seçili ilan için")})
+                </span>
+              ) : null}
+            </h3>
+          </div>
+
+          {!initialListLoading && !filterActive && pagination?.totalElements > 0 ? (
+            <label className="inline-flex shrink-0 items-center gap-2 text-sm text-text-secondary">
+              <span>{t("per_page", "Sayfa başı:")}</span>
+              <select
+                value={pagination.size}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                aria-label={t("per_page", "Sayfa başı değerlendirme")}
+                className="h-9 cursor-pointer rounded border border-border bg-background-primary px-2.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
+              >
+                <option value={10}>10</option>
+                <option value={15}>15</option>
+                <option value={20}>20</option>
+              </select>
+            </label>
           ) : null}
         </div>
 
-        {/* Reviews list */}
-        <div className="relative bg-background-secondary">
-          {pagingLoading && !filterActive ? (
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 bg-secondary-300 animate-pulse" aria-hidden />
-          ) : null}
-
-          {initialListLoading ? (
-            <div className="p-5 sm:p-6" aria-busy="true">
-              <ul className="space-y-3">
-                {[...Array(4)].map((_, i) => (
-                  <li key={i} className="rounded border border-border-light bg-background-primary p-4 animate-pulse">
-                    <div className="flex gap-4">
-                      <div className="h-10 w-10 shrink-0 rounded-full bg-background-secondary" />
-                      <div className="flex-1 space-y-2.5">
-                        <div className="h-3.5 w-1/4 rounded bg-background-secondary" />
-                        <div className="h-3.5 w-full rounded bg-background-secondary" />
-                        <div className="h-3.5 w-3/4 rounded bg-background-secondary" />
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : receivedReviewsError ? (
-            <div className="p-5 sm:p-6">
-              <div className="rounded border border-border-light bg-background-primary px-6 py-12 text-center">
-                <AlertCircle className="mx-auto mb-3 block h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
-                <p className="mb-1 text-sm font-semibold text-text-primary">{t("couldn_t_load_reviews", "Değerlendirmeler yüklenemedi")}</p>
-                <p className="text-sm text-text-secondary">{receivedReviewsError}</p>
-              </div>
-            </div>
-          ) : receivedReviews.length === 0 && !filterActive ? (
-            <div className="p-5 sm:p-6">
-              <div className="rounded border border-dashed border-border bg-background-primary px-6 py-14 text-center">
-                <Star className="mx-auto mb-3 block h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
-                <h4 className="mb-1 text-base font-semibold text-text-primary">{t("no_reviews_received_yet", "Henüz değerlendirme bulunmuyor")}</h4>
-                <p className="mx-auto max-w-sm text-sm leading-relaxed text-text-muted">
-                  {isOwnProfile
-                    ? t('no_reviews_own_desc', 'Alıcılar siparişleri tamamlayıp geri bildirim bıraktığında değerlendirmeler burada görünecektir.')
-                    : t('no_reviews_public_desc', 'Bu üye henüz herkese açık bir değerlendirme almadı.')}
-                </p>
-                {isOwnProfile ? (
-                  <Link
-                    to={ROUTES.MY_LISTINGS}
-                    className="mt-4 inline-flex text-sm font-semibold text-text-primary underline underline-offset-4 hover:text-primary transition-colors"
+        {totalReviewsStat > 0 && listingOptions.length > 1 ? (
+          <div
+            className="-mx-1 min-w-0 overflow-x-auto px-1 pb-1 [scrollbar-width:thin]"
+            role="group"
+            aria-label={t("listing_filter_chips", "İlan filtreleri")}
+          >
+            <div className="flex w-max flex-row flex-nowrap gap-2 pr-1">
+              <button
+                type="button"
+                onClick={() => setListingFilter(ALL_LISTINGS)}
+                aria-pressed={!filterActive}
+                className={`${CHIP} ${!filterActive ? CHIP_ACTIVE : CHIP_IDLE}`}
+              >
+                <span>{t("all_listings", "Tüm İlanlar")}</span>
+                <span className="tabular-nums text-text-tertiary">{totalReviewsStat}</span>
+              </button>
+              {listingOptions.map((opt) => {
+                const active = listingFilter === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setListingFilter(opt.key)}
+                    aria-pressed={active}
+                    title={opt.title}
+                    className={`${CHIP} max-w-64 ${active ? CHIP_ACTIVE : CHIP_IDLE}`}
                   >
-                    {t("go_to_my_listings", "İlanlarıma Git")}
-                  </Link>
-                ) : null}
-              </div>
+                    <span className="min-w-0 truncate">{opt.title}</span>
+                    <span className="shrink-0 tabular-nums text-text-tertiary">{opt.count}</span>
+                  </button>
+                );
+              })}
+              {indexFetching ? (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin self-center text-text-tertiary" aria-hidden strokeWidth={1.5} />
+              ) : null}
             </div>
+          </div>
+        ) : null}
+        {indexLoadError ? (
+          <p className="text-sm text-status-warning-text">{t("listing_filter_incomplete", "Filtre verisi eksik:")} {indexLoadError}</p>
+        ) : null}
+
+        <div className="relative" aria-busy={initialListLoading}>
+          {initialListLoading ? (
+            <ul className="space-y-3">
+              {[0, 1, 2, 3].map((i) => (
+                <li key={i}><Skeleton className="h-32 w-full" /></li>
+              ))}
+            </ul>
+          ) : receivedReviewsError ? (
+            <Alert type="error" message={`${t("couldn_t_load_reviews", "Değerlendirmeler yüklenemedi")}: ${receivedReviewsError}`} />
+          ) : receivedReviews.length === 0 && !filterActive ? (
+            <EmptyState
+              icon={Star}
+              title={t("no_reviews_received_yet", "Henüz değerlendirme bulunmuyor")}
+              description={isOwnProfile
+                ? t('no_reviews_own_desc', 'Alıcılar siparişleri tamamlayıp geri bildirim bıraktığında değerlendirmeler burada görünecektir.')
+                : t('no_reviews_public_desc', 'Bu üye henüz herkese açık bir değerlendirme almadı.')}
+              primaryAction={isOwnProfile ? { label: t("go_to_my_listings", "İlanlarıma Git"), onClick: () => navigate(ROUTES.MY_LISTINGS) } : null}
+            />
           ) : (
-            <div className="p-5 sm:p-6">
-              <ul className={`space-y-3.5 pb-1 ${filterActive ? '' : pagingLoading ? 'opacity-70 transition-opacity duration-150' : ''}`}>
+            <>
+              <ul className={`space-y-3 ${!filterActive && pagingLoading ? 'opacity-50 transition-opacity duration-150' : ''}`}>
                 {displayReviews.length === 0 && filterActive ? (
-                  <li className="rounded border border-dashed border-border bg-background-primary px-6 py-10 text-center text-sm text-text-secondary">
-                    {t("no_reviews_matched_this_listing_try_relo", "Bu ilan için henüz bir değerlendirme bulunmuyor.")}
+                  <li>
+                    <EmptyState
+                      size="compact"
+                      icon={Star}
+                      title={t("no_reviews_matched_this_listing_try_relo", "Bu ilan için henüz bir değerlendirme bulunmuyor.")}
+                    />
                   </li>
                 ) : (
                   displayReviews.map((review) => (
@@ -378,73 +310,17 @@ const UserReviews = ({
               </ul>
 
               {!filterActive && pagination && pagination.totalPages > 1 ? (
-                <nav
-                  className="mt-5 flex shrink-0 flex-col gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center sm:justify-between"
-                  aria-label={t("reviews_pagination", "Değerlendirme sayfalandırma")}
-                >
-                  <p className="order-2 text-xs tabular-nums text-text-tertiary sm:order-1">
-                    {t("page", "Sayfa")} {page + 1} {t("of", "/")} {pagination.totalPages}
-                    {pagination.totalElements ? (
-                      <span className="text-text-muted"> · {pagination.totalElements} {t("total", "toplam")}</span>
-                    ) : null}
-                  </p>
-                  <div className="order-1 flex items-center justify-center gap-2 sm:order-2">
-                    <button
-                      type="button"
-                      onClick={() => loadPage(page - 1)}
-                      disabled={page <= 0 || pagingLoading}
-                      className="inline-flex items-center justify-center gap-1.5 rounded text-xs font-medium transition-colors border border-border bg-background-primary text-text-primary hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50 h-8 px-3 cursor-pointer"
-                    >
-                      <ChevronLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
-                      <span>{t("previous", "Önceki")}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => loadPage(page + 1)}
-                      disabled={page >= totalPages - 1 || pagingLoading}
-                      className="inline-flex items-center justify-center gap-1.5 rounded text-xs font-medium transition-colors border border-border bg-background-primary text-text-primary hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50 h-8 px-3 cursor-pointer"
-                    >
-                      <span>{t("next", "Sonraki")}</span>
-                      <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-                    </button>
-                    {pagingLoading ? (
-                      <Loader2 className="ml-1.5 h-4 w-4 animate-spin text-status-warning" aria-label={t("loading", "Yükleniyor")} strokeWidth={1.5} />
-                    ) : null}
-                  </div>
-                </nav>
+                <div className="mt-6">
+                  <Pagination page={page} totalPages={totalPages} onPageChange={loadPage} />
+                </div>
               ) : null}
 
               {filterActive && filteredAll.length > 0 && filterTotalPages > 1 ? (
-                <nav
-                  className="mt-5 flex shrink-0 flex-col gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center sm:justify-between"
-                  aria-label={t("filtered_reviews_pagination", "Filtrelenmiş değerlendirme sayfalandırma")}
-                >
-                  <p className="text-xs tabular-nums text-text-tertiary">
-                    {t("page", "Sayfa")} {filterPage + 1} {t("of", "/")} {filterTotalPages} · {filteredAll.length} {t("reviews", "değerlendirme")}
-                  </p>
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={cycleFilterPrev}
-                      disabled={filterPage <= 0}
-                      className="inline-flex items-center justify-center gap-1.5 rounded text-xs font-medium transition-colors border border-border bg-background-primary text-text-primary hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50 h-8 px-3 cursor-pointer"
-                    >
-                      <ChevronLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
-                      <span>{t("previous", "Önceki")}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={cycleFilterNext}
-                      disabled={filterPage >= filterTotalPages - 1}
-                      className="inline-flex items-center justify-center gap-1.5 rounded text-xs font-medium transition-colors border border-border bg-background-primary text-text-primary hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50 h-8 px-3 cursor-pointer"
-                    >
-                      <span>{t("next", "Sonraki")}</span>
-                      <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-                    </button>
-                  </div>
-                </nav>
+                <div className="mt-6">
+                  <Pagination page={filterPage} totalPages={filterTotalPages} onPageChange={setFilterPage} />
+                </div>
               ) : null}
-            </div>
+            </>
           )}
         </div>
       </section>

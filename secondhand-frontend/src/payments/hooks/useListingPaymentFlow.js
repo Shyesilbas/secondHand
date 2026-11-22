@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import {
  createListingFeePaymentRequest,
  PAYMENT_FLOW_DEFAULTS,
@@ -99,7 +100,7 @@ export const useDraftListings = () => {
  return {
  draftListings,
  isLoading,
- error: error?.response?.data?.message || error?.message || null,
+ error: error ? getErrorMessage(error, 'Ödeme bilgisi yüklenemedi.') : null,
  refetch,
  };
 };

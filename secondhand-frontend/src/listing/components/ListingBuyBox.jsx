@@ -13,8 +13,9 @@ import ListingCardActions from './ListingCardActions.jsx';
 import SafeMeetupModal from './SafeMeetupModal.jsx';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 
+// Secondary actions sit next to the price as borderless icon buttons; the CTAs below carry the only edges.
 const ICON_BUTTON =
-  'flex h-10 w-10 items-center justify-center rounded border border-border bg-background-primary text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus';
+  'flex h-10 w-10 items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus';
 
 const OwnerStat = ({ label, value }) => (
   <div className="px-3 py-2 text-center">
@@ -50,46 +51,46 @@ const ListingBuyBox = ({
     <section className="rounded border border-border-light bg-background-primary p-5 shadow-sm" aria-label={t('listing_summary', 'İlan özeti')}>
       <h1 className="text-xl font-semibold leading-snug text-text-primary sm:text-2xl">{listing.title}</h1>
 
-      <p className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="text-3xl font-semibold tabular-nums tracking-tight text-text-price">
-          {formatCurrency(price.display, listing.currency)}
+      <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-tertiary">
+        <span className="inline-flex min-w-0 items-center gap-1">
+          <MapPin className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+          <span className="truncate">{locationLabel}</span>
         </span>
-        {price.hasCampaign && (
-          <span className="text-base tabular-nums text-text-tertiary line-through">
-            {formatCurrency(listing.price, listing.currency)}
-          </span>
-        )}
-        {price.hasCampaign && (
-          <Badge variant="error">
-            {listing.campaignName || t('discount', 'İndirim')}
-            {price.discount ? ` −%${price.discount}` : ''}
-          </Badge>
+        <span aria-hidden>·</span>
+        <span className="tabular-nums">{formatDateTime(listing.createdAt)}</span>
+        {listing.listingNo && (
+          <>
+            <span aria-hidden>·</span>
+            <span className="tabular-nums">#{listing.listingNo}</span>
+          </>
         )}
       </p>
 
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-border-light pt-4">
-        <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-tertiary">
-          <span className="inline-flex items-center gap-1">
-            <MapPin className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
-            {locationLabel}
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-border-light pt-5">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="text-3xl font-semibold tabular-nums tracking-tight text-text-price">
+            {formatCurrency(price.display, listing.currency)}
           </span>
-          <span aria-hidden>·</span>
-          <span className="tabular-nums">{formatDateTime(listing.createdAt)}</span>
-          {listing.listingNo && (
-            <>
-              <span aria-hidden>·</span>
-              <span className="tabular-nums">#{listing.listingNo}</span>
-            </>
+          {price.hasCampaign && (
+            <span className="text-base tabular-nums text-text-tertiary line-through">
+              {formatCurrency(listing.price, listing.currency)}
+            </span>
           )}
-        </p>
-        <div className="flex shrink-0 items-center gap-1.5">
+          {price.hasCampaign && (
+            <Badge variant="error">
+              {listing.campaignName || t('discount', 'İndirim')}
+              {price.discount ? ` −%${price.discount}` : ''}
+            </Badge>
+          )}
+        </div>
+        <div className="-mr-2 flex shrink-0 items-center">
           {!isOwner && (
-            <FavoriteButton listingId={listing.id} listing={listing} size="md" showCount={false} className={ICON_BUTTON} />
+            <FavoriteButton listingId={listing.id} listing={listing} size="sm" showCount={false} className={ICON_BUTTON} />
           )}
           {!isOwner && (
-            <AddToListButton listingId={listing.id} listingTitle={listing.title} size="lg" className={ICON_BUTTON} />
+            <AddToListButton listingId={listing.id} listingTitle={listing.title} size="md" className={ICON_BUTTON} />
           )}
-          {!isOwner && <CompareButton listing={listing} variant="square" />}
+          {!isOwner && <CompareButton listing={listing} variant="ghost" />}
           <button
             type="button"
             onClick={onShare}
@@ -106,24 +107,22 @@ const ListingBuyBox = ({
         </div>
       </div>
 
-      <div>
-        {(stock || socialProof.length > 0) && (
-          <ul className="mt-3 space-y-1 text-sm text-text-secondary">
-            {stock && (
-              <li className="flex items-center gap-2 tabular-nums">
-                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${stock.dot}`} aria-hidden />
-                {stock.label}
-              </li>
-            )}
-            {socialProof.map(line => (
-              <li key={line} className="flex items-center gap-2 tabular-nums">
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-text-muted" aria-hidden />
-                {line}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {(stock || socialProof.length > 0) && (
+        <ul className="mt-2 space-y-1 text-sm text-text-secondary">
+          {stock && (
+            <li className="flex items-center gap-2 tabular-nums">
+              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${stock.dot}`} aria-hidden />
+              {stock.label}
+            </li>
+          )}
+          {socialProof.map(line => (
+            <li key={line} className="flex items-center gap-2 tabular-nums">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-text-muted" aria-hidden />
+              {line}
+            </li>
+          ))}
+        </ul>
+      )}
 
       {isOwner ? (
         <div className="mt-5 space-y-3">

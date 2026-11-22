@@ -6,7 +6,7 @@ import org.springframework.mock.env.MockEnvironment;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
-/** GV-33: prod startup refuses test endpoints and a Redis without a password. */
+/** Prod startup refuses test endpoints and a Redis without a password. */
 class ProdSecurityGuardTest {
 
     private ProdSecurityGuard guard(MockEnvironment environment) {

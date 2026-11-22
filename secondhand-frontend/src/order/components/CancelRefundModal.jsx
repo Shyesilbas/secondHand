@@ -6,6 +6,7 @@ import { inputError, inputNormal } from '../../common/components/forms/inputStyl
 import { formatCurrency } from '../../common/formatters.js';
 import { CANCEL_REFUND_REASON_LABELS } from '../../common/enums/cancelRefundReasons.js';
 import { ORDER_MESSAGES } from '../constants/orderUiConstants.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 const CancelRefundModal = ({
  isOpen,
  onClose,
@@ -65,7 +66,7 @@ const CancelRefundModal = ({
  await onSubmit(payload);
  handleClose();
  } catch (err) {
- setError(err.response?.data?.message || err.message || ORDER_MESSAGES.UNKNOWN_ERROR);
+ setError(getErrorMessage(err, ORDER_MESSAGES.UNKNOWN_ERROR));
  } finally {
  setIsSubmitting(false);
  }

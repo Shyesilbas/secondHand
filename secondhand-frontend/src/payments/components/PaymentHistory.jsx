@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { ArrowDownLeft, ArrowUpRight, ChevronRight, Receipt, ShieldCheck } from 'lucide-react';
 import { formatCurrency, formatLongDate } from '../../common/formatters.js';
 import { PAYMENT_DIRECTIONS, PAYMENT_STATUSES, transactionTypeLabel } from '../paymentSchema.js';
-import { Badge, EmptyState, Skeleton } from '../../common/components/ui/index.js';
+import { EmptyState, Skeleton } from '../../common/components/ui/index.js';
 import ErrorState from '../../common/components/ui/ErrorState.jsx';
 
 const TIME_ZONE = 'Europe/Istanbul';
@@ -27,11 +27,23 @@ const STATUS_VARIANTS = {
   [PAYMENT_STATUSES.CANCELLED]: ['error', 'payment_status_cancelled'],
 };
 
+const STATUS_DOT = {
+  warning: 'bg-status-warning',
+  success: 'bg-status-success',
+  error: 'bg-status-error',
+  neutral: 'bg-text-tertiary',
+};
+
 const PaymentStatusBadge = ({ payment }) => {
   const { t } = useTranslation();
   const [variant, key] = STATUS_VARIANTS[payment.status]
     ?? (payment.isSuccess ? ['success', 'payment_status_completed'] : ['error', 'payment_status_failed']);
-  return <Badge variant={variant} size="sm">{t(key)}</Badge>;
+  return (
+    <span className="inline-flex items-center gap-1.5 text-sm text-text-tertiary">
+      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[variant]}`} aria-hidden />
+      {t(key)}
+    </span>
+  );
 };
 
 const PaymentRow = ({ payment, onShowReceipt }) => {
@@ -130,10 +142,10 @@ const PaymentHistory = ({ payments, onShowReceipt, hasActiveFilters, onClearFilt
     <div>
       {groups.map((group, index) => (
         <section key={group.key || 'unknown'} aria-label={group.label}>
-          <h3 className={`border-b border-border-light bg-background-secondary px-5 py-2 text-sm font-medium text-text-secondary ${index > 0 ? 'border-t' : ''}`}>
+          <h3 className={`px-5 pb-1.5 text-sm font-medium text-text-tertiary ${index > 0 ? 'pt-5' : 'pt-4'}`}>
             {group.label}
           </h3>
-          <ul className="divide-y divide-border-light">
+          <ul>
             {group.items.map((payment, idx) => (
               <PaymentRow key={payment.paymentId || payment.id || idx} payment={payment} onShowReceipt={onShowReceipt} />
             ))}

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Menu } from 'lucide-react';
-import { Badge, Card } from '../../../common/components/ui/index.js';
+import { ChevronDown, Crown, Menu } from 'lucide-react';
+import { Card } from '../../../common/components/ui/index.js';
 import { ROUTES } from '../../../common/constants/routes.js';
 import { USER_DEFAULTS } from '../../userConstants.js';
 
@@ -131,17 +131,23 @@ const AccountHubSidebar = ({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-sm font-semibold text-text-primary">{fullName}</h2>
+            <h2 className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-text-primary">
+              <span className="truncate">{fullName}</span>
+              {/* Same crown the header profile menu shows next to the name. */}
+              {isPremium && (
+                <Crown
+                  className="h-3.5 w-3.5 shrink-0 text-status-warning"
+                  strokeWidth={1.5}
+                  role="img"
+                  aria-label={plan || t('premium_member')}
+                />
+              )}
+            </h2>
             <p className="truncate text-sm text-text-tertiary">{user?.email || ''}</p>
           </div>
-        </div>
-        <div className="mt-3 flex items-center justify-between border-t border-border-light pt-3 text-sm">
-          <Badge variant={isPremium ? 'warning' : 'neutral'} dot>
-            {isPremium ? plan || 'Premium' : t('standard', 'Standard')}
-          </Badge>
           <Link
             to={ROUTES.PROFILE}
-            className="rounded font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            className="shrink-0 self-start rounded text-sm font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             {t('edit', 'Edit')}
           </Link>

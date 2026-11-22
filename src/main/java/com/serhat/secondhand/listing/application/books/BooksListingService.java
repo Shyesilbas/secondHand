@@ -166,6 +166,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         return Result.success();
     }
 
+    @Transactional(readOnly = true)
     public BooksListingDto getBooksDetails(UUID id) {
         BooksListing books = booksRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Books listing not found"));

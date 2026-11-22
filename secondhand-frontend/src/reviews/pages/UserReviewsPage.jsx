@@ -13,7 +13,6 @@ const UserReviewsPage = () => {
  userId
  } = useParams();
  const location = useLocation();
- const isReceivedReviews = location.pathname.includes('/reviews/received/');
  const isGivenReviews = location.pathname.includes('/reviews/given/');
  const receivedQuery = useReviews(userId, {
  enabled: !isGivenReviews
@@ -39,17 +38,9 @@ const UserReviewsPage = () => {
  const total = reviews?.length || 0;
  const sum = reviews?.reduce((acc, r) => acc + (r.rating || 0), 0) || 0;
  const average = total > 0 ? sum / total : 0;
- const counts = {
- 5: 0,
- 4: 0,
- 3: 0,
- 2: 0,
- 1: 0,
- 0: 0
- };
+ const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
  reviews?.forEach(r => {
- const key = Number.isInteger(r.rating) ? r.rating : 0;
- if (counts[key] !== undefined) counts[key] += 1;
+ if (counts[r.rating] !== undefined) counts[r.rating] += 1;
  });
  return {
  userId,
@@ -61,33 +52,31 @@ const UserReviewsPage = () => {
  fourStarReviews: counts[4],
  threeStarReviews: counts[3],
  twoStarReviews: counts[2],
- oneStarReviews: counts[1],
- zeroStarReviews: counts[0]
+ oneStarReviews: counts[1]
  };
  }, [isGivenReviews, reviews, userId]);
- const getPageTitle = () => {
- if (isReceivedReviews) return 'Reviews Received';
- if (isGivenReviews) return 'Given Reviews';
- return 'Reviews';
- };
+ const title = isGivenReviews ? t('reviews_given', 'Verdiğim Değerlendirmeler') : t('reviews_received', 'Aldığım Değerlendirmeler');
  return <PageContainer className="py-8">
  <PageHeader
- title={getPageTitle()}
- subtitle={isReceivedReviews ? t("see_reviews_you_have_received") : t("see_reviews_you_have_given")}
- bottomBorder
+ title={title}
+ subtitle={isGivenReviews ? t("see_reviews_you_have_given") : t("see_reviews_you_have_received")}
  className="mb-8"
  />
- 
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
- {/* Review Stats */}
- <div className="lg:col-span-1">
- <ReviewStats stats={isGivenReviews ? givenStats : stats} loading={isGivenReviews ? false : statsLoading} />
+
+ <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+ <div className="lg:sticky lg:top-24">
+ <ReviewStats stats={isGivenReviews ? givenStats : stats} loading={isGivenReviews ? loading && reviews.length === 0 : statsLoading} />
  </div>
- 
- {/* Reviews List */}
  <div className="lg:col-span-2">
- <h2 className="text-lg font-semibold text-text-primary mb-6">{t("reviews")}</h2>
- <ReviewsList reviews={reviews} loading={loading} error={error} hasMore={hasMore} onLoadMore={loadMore} onRetry={refetch} />
+ <ReviewsList
+ reviews={reviews}
+ loading={loading}
+ error={error}
+ hasMore={hasMore}
+ onLoadMore={loadMore}
+ onRetry={refetch}
+ perspective={isGivenReviews ? 'given' : 'received'}
+ />
  </div>
  </div>
  </PageContainer>;

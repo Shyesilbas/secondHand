@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { formatDateTime, formatSmartEmailDate } from '../../common/formatters.js';
 import { Trash2 } from 'lucide-react';
+import { Button } from '../../common/components/ui/index.js';
 import { EMAIL_TYPE_LABELS, extractEmailPreview, stripEmailEmojis } from '../emails.js';
 
 const EmailListItem = ({
@@ -13,86 +14,85 @@ const EmailListItem = ({
   const { t } = useTranslation();
 
   const isUnread = !email.read && !email.isRead;
-  const cleanSubject = stripEmailEmojis(email?.subject || '').trim() || t('untitled_email', '(Başlıksız E-Posta)');
+  const cleanSubject = stripEmailEmojis(email?.subject || '').trim() || t('untitled_email', '(Başlıksız e-posta)');
   const previewText = extractEmailPreview(email?.content, email?.subject);
   const categoryLabel = EMAIL_TYPE_LABELS[email?.emailType] || t('email', 'Bildirim');
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-selected={isSelected}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect(email);
-        }
-      }}
-      onClick={() => onSelect(email)}
-      className={`group relative cursor-pointer border-b border-border-light border-l-2 px-3.5 py-2.5 sm:px-4 sm:py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus ${isSelected
-        ? 'border-l-primary bg-background-tertiary'
-        : isUnread
-          ? 'border-l-transparent bg-background-primary hover:bg-background-secondary'
-          : 'border-l-transparent bg-background-primary hover:bg-background-secondary'
+    <li className="group relative">
+      <button
+        type="button"
+        aria-current={isSelected ? 'true' : undefined}
+        onClick={() => onSelect(email)}
+        className={`block w-full border-l-2 px-4 py-3.5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus ${
+          isSelected
+            ? 'border-l-accent-teal bg-accent-teal-50'
+            : 'border-l-transparent bg-background-primary hover:bg-background-secondary'
         }`}
-    >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-1.5">
-          {isUnread && (
+      >
+        <div className="flex items-center justify-between gap-3">
+          <span className="flex min-w-0 items-center gap-1.5">
+            {isUnread && (
+              <span
+                className="h-2 w-2 shrink-0 rounded-full bg-accent-teal"
+                aria-label={t('unread', 'Okunmadı')}
+              />
+            )}
             <span
-              className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
-              aria-label={t('unread', 'Okunmadı')}
-            />
-          )}
-          <span
-            className={`truncate text-xs ${isUnread ? 'font-medium text-text-primary' : 'font-normal text-text-tertiary'
+              className={`truncate text-xs ${
+                isSelected
+                  ? 'font-medium text-accent-teal-800'
+                  : isUnread
+                    ? 'font-medium text-text-secondary'
+                    : 'font-normal text-text-tertiary'
               }`}
-          >
-            {categoryLabel}
+            >
+              {categoryLabel}
+            </span>
           </span>
-        </div>
 
-        <div className="flex shrink-0 items-center gap-1.5">
           <time
             dateTime={email.sentAt || undefined}
-            className={`text-xs tabular-nums ${isUnread ? 'font-medium text-text-primary' : 'font-normal text-text-muted'
-              }`}
+            className={`shrink-0 text-xs tabular-nums transition-opacity duration-150 md:group-hover:opacity-0 md:group-focus-within:opacity-0 ${
+              isUnread ? 'font-medium text-text-primary' : 'font-normal text-text-tertiary'
+            }`}
           >
             {formatSmartEmailDate(email.sentAt) || formatDateTime(email.sentAt)}
           </time>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(email.id, cleanSubject);
-            }}
-            disabled={isDeleting}
-            className="rounded p-1 text-text-muted opacity-0 transition-opacity hover:bg-background-tertiary hover:text-status-error focus-visible:opacity-100 group-hover:opacity-100 disabled:opacity-30"
-            title={t('delete', 'Sil')}
-            aria-label={t('delete_email', 'E-postayı sil')}
-          >
-            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-          </button>
         </div>
-      </div>
 
-      <h3
-        className={`mt-1 line-clamp-1 text-sm leading-snug ${isUnread
-          ? 'font-semibold text-text-primary'
-          : isSelected
-            ? 'font-medium text-text-primary'
-            : 'font-normal text-text-secondary'
+        <p
+          className={`mt-1 line-clamp-1 text-sm leading-snug ${
+            isUnread
+              ? 'font-semibold text-text-primary'
+              : isSelected
+                ? 'font-medium text-text-primary'
+                : 'font-normal text-text-primary'
           }`}
-      >
-        {cleanSubject}
-      </h3>
-
-      {previewText && (
-        <p className="mt-0.5 line-clamp-1 text-xs leading-relaxed text-text-tertiary">
-          {previewText}
+        >
+          {cleanSubject}
         </p>
-      )}
-    </div>
+
+        {previewText && (
+          <p className="mt-0.5 line-clamp-1 text-sm text-text-tertiary">
+            {previewText}
+          </p>
+        )}
+      </button>
+
+      <div className="pointer-events-none absolute right-2.5 top-2.5 hidden opacity-0 transition-opacity duration-150 md:block group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+        <Button
+          variant="danger"
+          size="icon"
+          onClick={() => onDelete(email.id, cleanSubject)}
+          disabled={isDeleting}
+          title={t('delete', 'Sil')}
+          aria-label={`${t('delete_email', 'E-postayı sil')}: ${cleanSubject}`}
+        >
+          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+        </Button>
+      </div>
+    </li>
   );
 };
 

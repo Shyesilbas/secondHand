@@ -9,7 +9,7 @@ import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * GV-25: the image API had a delete-by-URL endpoint without any ownership check, so any signed-in user could
+ * The image API had a delete-by-URL endpoint without any ownership check, so any signed-in user could
  * remove every public listing image. Nothing used it; it stays removed until a delete with ownership exists.
  */
 class ImageControllerTest {

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { showcaseService } from '../services/showcaseService.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useMyShowcases = (userId, options = {}) => {
  const queryClient = useQueryClient();
@@ -36,12 +37,12 @@ export const useMyShowcases = (userId, options = {}) => {
  return {
  showcases,
  isLoading,
- error: error?.response?.data?.message || error?.message || null,
+ error: error ? getErrorMessage(error, 'Vitrinler yüklenemedi.') : null,
  extendShowcase: (showcaseId, request) => extendMutation.mutateAsync({ showcaseId, request }),
  cancelShowcase: (showcaseId) => cancelMutation.mutateAsync(showcaseId),
  isMutating: extendMutation.isPending || cancelMutation.isPending,
- extendError: extendMutation.error?.response?.data?.message || extendMutation.error?.message || null,
- cancelError: cancelMutation.error?.response?.data?.message || cancelMutation.error?.message || null,
+ extendError: extendMutation.error ? getErrorMessage(extendMutation.error, 'Vitrin uzatılamadı.') : null,
+ cancelError: cancelMutation.error ? getErrorMessage(cancelMutation.error, 'Vitrin iptal edilemedi.') : null,
  refresh,
  };
 };

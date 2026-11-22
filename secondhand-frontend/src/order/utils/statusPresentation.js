@@ -1,7 +1,41 @@
 import { ORDER_STATUSES } from '../constants/orderUiConstants.js';
 import { PAYMENT_STATUSES } from '../../payments/paymentSchema.js';
+import { resolveEnumLabel } from '../../common/formatters.js';
 
 const statusUpper = (status) => String(status || '').toUpperCase();
+
+const translateIfPresent = (t, key) => {
+  if (!t || !key) return null;
+  const translated = t(key);
+  return translated && translated !== key ? translated : null;
+};
+
+export const getOrderStatusLabel = (t, enums, status) => {
+  if (!status) return '';
+  const key = `order_status_${String(status).toLowerCase()}`;
+  return translateIfPresent(t, key) || resolveEnumLabel(enums, 'orderStatuses', status) || status;
+};
+
+export const getShippingStatusLabel = (t, enums, status) => {
+  if (!status) return '';
+  const key = `shipping_status_${String(status).toLowerCase()}`;
+  return translateIfPresent(t, key) || resolveEnumLabel(enums, 'shippingStatuses', status) || status;
+};
+
+export const getPaymentStatusLabel = (t, enums, status) => {
+  if (!status) return '';
+  const normalized = statusUpper(status);
+  const key = normalized === PAYMENT_STATUSES.PAID
+    ? 'payment_status_completed'
+    : `payment_status_${normalized.toLowerCase()}`;
+  return translateIfPresent(t, key) || resolveEnumLabel(enums, 'paymentStatuses', status) || status;
+};
+
+export const getPaymentProviderLabel = (t, providerName) => {
+  if (!providerName) return '';
+  const normalized = String(providerName).trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  return translateIfPresent(t, `payment_provider_${normalized}`) || providerName;
+};
 
 export const getOrderStatusBadgeVariant = (status) => {
   const value = statusUpper(status);
@@ -106,7 +140,7 @@ export const getOrderStatusTextClass = (status) => {
     ORDER_STATUSES.VERIFICATION_LOCKED,
     'FAILED'
   ].includes(value)) {
-    return 'text-status-error';
+    return 'text-status-error-text';
   }
 
   return 'text-text-secondary';
@@ -132,16 +166,16 @@ export const getPaymentStatusIndicatorClass = (status) => {
 export const getPaymentStatusTextClass = (status) => {
   const s = statusUpper(status);
   if ([PAYMENT_STATUSES.COMPLETED, PAYMENT_STATUSES.PAID].includes(s)) {
-    return 'text-text-secondary';
+    return 'text-status-success-text';
   }
   if ([PAYMENT_STATUSES.ESCROW, PAYMENT_STATUSES.PARTIALLY_REFUNDED].includes(s)) {
     return 'text-status-warning-text';
   }
   if ([PAYMENT_STATUSES.FAILED, PAYMENT_STATUSES.CANCELLED, PAYMENT_STATUSES.REFUNDED].includes(s)) {
-    return 'text-status-error';
+    return 'text-status-error-text';
   }
   if (s === PAYMENT_STATUSES.PENDING) {
-    return 'text-text-muted';
+    return 'text-text-tertiary';
   }
   return 'text-text-secondary';
 };

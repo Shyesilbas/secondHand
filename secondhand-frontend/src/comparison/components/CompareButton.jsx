@@ -14,6 +14,8 @@ const CompareButton = memo(({ listing, size = 'sm', className = '', variant = 'r
   if (!listing) return null;
 
   const isAdded = isInComparison(listing.id);
+  // 'ghost': borderless 40px square for action rows inside a card (listing detail).
+  const isGhost = variant === 'ghost';
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -91,14 +93,16 @@ const CompareButton = memo(({ listing, size = 'sm', className = '', variant = 'r
       aria-pressed={isAdded}
       onClick={handleClick}
       disabled={isDisabled || isLimitReached}
-      className={`${variant === 'square' ? 'h-10 w-10' : sizeClasses[size]} rounded flex items-center justify-center transition-colors duration-150 ${isAdded
-          ? 'border border-accent-teal bg-accent-teal-50 text-accent-teal-800'
-          : 'border border-border bg-background-primary text-text-secondary hover:border-card-border-hover hover:text-text-primary'
+      className={`${isGhost ? 'h-10 w-10' : sizeClasses[size]} rounded flex items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${isGhost
+          ? (isAdded ? 'bg-accent-teal-50 text-accent-teal-800' : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary')
+          : isAdded
+            ? 'border border-accent-teal bg-accent-teal-50 text-accent-teal-800'
+            : 'border border-border bg-background-primary text-text-secondary hover:border-card-border-hover hover:text-text-primary'
         } ${(isDisabled || isLimitReached) && !isAdded ? 'opacity-50 cursor-not-allowed' : ''
         } ${className}`}
       title={buttonTitle}
     >
-      <Scale className={variant === 'square' ? 'h-4 w-4' : iconSizes[size]} strokeWidth={1.5} aria-hidden />
+      <Scale className={isGhost ? 'h-4 w-4' : iconSizes[size]} strokeWidth={1.5} aria-hidden />
     </button>
   );
 });

@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
-import { ExternalLink, LayoutDashboard, Mail } from 'lucide-react';
+import { BadgeCheck, ExternalLink, ShieldAlert } from 'lucide-react';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
-import Badge from '../../common/components/ui/Badge.jsx';
 
 const ProfileHeader = ({ user }) => {
   const { t } = useTranslation();
@@ -20,7 +19,7 @@ const ProfileHeader = ({ user }) => {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
-          <div className="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 select-none items-center justify-center rounded-full border border-border-light bg-background-tertiary text-base sm:text-lg font-semibold tracking-tight text-text-primary">
+          <div className="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 select-none items-center justify-center rounded-full bg-background-tertiary text-base sm:text-lg font-semibold tracking-tight text-text-primary">
             {userInitials}
           </div>
 
@@ -29,21 +28,24 @@ const ProfileHeader = ({ user }) => {
               <h1 className="truncate text-xl font-semibold text-text-primary sm:text-2xl">
                 {fullName || t('profile_settings', 'Profil Ayarları')}
               </h1>
-              <Badge variant={isVerified ? 'success' : 'warning'} dot>
-                {isVerified
-                  ? t('verified', 'Doğrulanmış')
-                  : t('unverified', 'Doğrulanmamış')}
-              </Badge>
-            </div>
-
-            <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-secondary">
-              {user?.email && (
-                <span className="inline-flex items-center gap-1.5 truncate">
-                  <Mail className="h-3.5 w-3.5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden="true" />
-                  <span className="truncate">{user.email}</span>
-                </span>
+              {isVerified ? (
+                <BadgeCheck
+                  className="h-5 w-5 shrink-0 text-accent-teal"
+                  strokeWidth={1.5}
+                  aria-label={t('verified', 'Doğrulanmış')}
+                  role="img"
+                />
+              ) : (
+                <ShieldAlert
+                  className="h-5 w-5 shrink-0 text-status-warning"
+                  strokeWidth={1.5}
+                  aria-label={t('unverified', 'Doğrulanmamış')}
+                  role="img"
+                />
               )}
             </div>
+
+            {user?.email && <p className="mt-1 truncate text-sm text-text-tertiary">{user.email}</p>}
           </div>
         </div>
 
@@ -52,7 +54,6 @@ const ProfileHeader = ({ user }) => {
             to={ROUTES.DASHBOARD}
             className={buttonClasses('secondary', 'sm')}
           >
-            <LayoutDashboard className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.5} aria-hidden="true" />
             <span>{t('account_hub', 'Account Hub')}</span>
           </Link>
 

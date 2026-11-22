@@ -6,6 +6,12 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 
 ## Doküman Haritası
 
+### Başlangıç ve ürün
+| Doküman | Kapsam |
+| :--- | :--- |
+| **[getting-started-and-developer-guide.md](getting-started-and-developer-guide.md)** | İlk kurulum, depo düzeni, günlük çalışma akışı, test ve doğrulama komutları, sık karşılaşılan sorunlar. |
+| **[product-overview-and-user-journeys.md](product-overview-and-user-journeys.md)** | Roller, satıcı ve alıcı akışları, teslimat yolları, kupon ve kampanya farkı, teklif, güven mekanizmaları. |
+
 ### Para akışı
 | Doküman | Kapsam |
 | :--- | :--- |

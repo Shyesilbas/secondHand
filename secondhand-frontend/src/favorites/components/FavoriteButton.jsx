@@ -6,6 +6,7 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { FavoriteStatsDTO } from '../favorites.js';
 import { FAVORITE_MESSAGES } from '../favoriteConstants.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { useLoginPrompt } from '../../auth/hooks/useLoginPrompt.js';
 
 const FavoriteButton = ({
@@ -85,7 +86,7 @@ const FavoriteButton = ({
  if (onToggle) onToggle(statsDto);
 
  } catch (error) {
- const message = error.response?.data?.message || FAVORITE_MESSAGES.UPDATE_FAVORITES_FAILED;
+ const message = getErrorMessage(error, FAVORITE_MESSAGES.UPDATE_FAVORITES_FAILED);
  showError(FAVORITE_MESSAGES.ERROR_TITLE, message);
  } finally {
  setIsLoading(false);

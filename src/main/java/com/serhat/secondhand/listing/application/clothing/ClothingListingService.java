@@ -116,11 +116,13 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
         );
     }
 
+    @Transactional(readOnly = true)
     public Page<ClothingListingDto> findByBrandAndClothingType(UUID brandId, UUID clothingTypeId, Pageable pageable) {
         return clothingRepository.findByBrand_IdAndClothingType_Id(brandId, clothingTypeId, pageable)
                 .map(listingMapper::toClothingDto);
     }
 
+    @Transactional(readOnly = true)
     public ClothingListingDto getClothingDetails(UUID id) {
         ClothingListing clothing = clothingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Clothing listing not found"));

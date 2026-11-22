@@ -108,7 +108,7 @@ const WalletOperationModal = ({
  setError('');
  }} />
  <FieldError error={error} id="wallet-operation-error" />
- {!error && amountHelp ? <p className="mt-1.5 text-xs text-text-tertiary">{amountHelp}</p> : null}
+ {!error && amountHelp ? <p className="mt-1.5 text-sm text-text-tertiary">{amountHelp}</p> : null}
  </div>
  </form>
  </Modal>;

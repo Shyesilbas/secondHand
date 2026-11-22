@@ -4,6 +4,7 @@ import { listingService } from '../services/listingService.js';
 import { PriceInput } from '../../common/components/ui/PriceInput.jsx';
 import { Check, Loader2 } from 'lucide-react';
 import { NON_PURCHASABLE_TYPES } from '../types/index.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const ListingQuickEdit = ({
   listing,
@@ -38,7 +39,7 @@ export const ListingQuickEdit = ({
       showSuccess('Updated', `${field === 'quantity' ? 'Stock' : 'Price'} updated`);
       onChanged?.();
     } catch (e) {
-      showError('Update failed', e?.response?.data?.message || 'Failed');
+      showError('Update failed', getErrorMessage(e, 'Failed'));
     } finally {
       setSavingQty(false);
       setSavingPrice(false);

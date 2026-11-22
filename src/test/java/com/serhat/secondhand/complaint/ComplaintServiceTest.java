@@ -178,7 +178,7 @@ class ComplaintServiceTest {
         verify(eventPublisher, never()).publishEvent(any(com.serhat.secondhand.complaint.application.event.AppealSubmittedEvent.class));
     }
 
-    /** GV-26: the reported user sees the decision, never who complained or the complainer's evidence. */
+    /** The reported user sees the decision, never who complained or the complainer's evidence. */
     @Test
     void complaintsAboutUserHideComplainerIdentityAndAiInternals() {
         User reported = user(COMPLAINED);

@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { DEFAULT_PAYMENT_FILTERS } from '../paymentSchema.js';
 import { usePaymentsQuery } from './queries.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const usePayments = () => {
  const { user } = useAuthState();
@@ -48,7 +49,7 @@ export const usePayments = () => {
  });
 
  const payments = useMemo(() => data?.payments || [], [data]);
- const error = queryError?.response?.data?.message || queryError?.message || null;
+ const error = queryError ? getErrorMessage(queryError, 'İşlemler yüklenemedi.') : null;
  const totalFilteredPages = data?.pagination?.totalPages || 0;
  const shouldShowPagination = totalFilteredPages > 1;
 

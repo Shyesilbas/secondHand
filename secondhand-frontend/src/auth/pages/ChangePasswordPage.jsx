@@ -6,6 +6,7 @@ import { passwordService } from '../services/passwordService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import logger from '../../common/utils/logger.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { ChangePasswordRequestDTO } from '../auth.js';
 import Button from '../../common/components/ui/Button.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
@@ -50,7 +51,7 @@ const ChangePasswordPage = () => {
       navigate(ROUTES.PROFILE, { replace: true });
     } catch (error) {
       logger.error(error);
-      setSubmitError(error.response?.data?.message || t('auth_password_change_failed', 'Şifre değiştirilemedi. Lütfen tekrar dene.'));
+      setSubmitError(getErrorMessage(error, t('auth_password_change_failed', 'Şifre değiştirilemedi. Lütfen tekrar dene.')));
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +93,7 @@ const ChangePasswordPage = () => {
         />
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
-          <Link to={ROUTES.PROFILE} className="inline-flex h-10 items-center justify-center rounded px-4 text-sm font-medium text-text-secondary hover:bg-background-secondary hover:text-text-primary">
+          <Link to={ROUTES.PROFILE} className="inline-flex h-10 items-center justify-center rounded px-4 text-sm font-medium text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
             {t('cancel', 'Vazgeç')}
           </Link>
           <Button type="submit" className="flex-1" disabled={isLoading}>

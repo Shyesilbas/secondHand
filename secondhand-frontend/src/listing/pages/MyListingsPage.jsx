@@ -6,6 +6,7 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useListingEngine } from '../hooks/useListingEngine.js';
 import ListingsModuleLayout from '../components/ListingsModuleLayout.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { listingService } from '../services/listingService.js';
 import { parseError } from '../../common/errorHandler.js';
@@ -172,7 +173,7 @@ const MyListingsPage = () => {
       clearBulk();
       engine.refresh();
     } catch (e) {
-      showError('Update failed', e?.response?.data?.message || 'Error');
+      showError('Update failed', getErrorMessage(e, 'Error'));
     } finally {
       setSaving(false);
     }

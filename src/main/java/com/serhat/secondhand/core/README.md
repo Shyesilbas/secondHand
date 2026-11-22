@@ -18,6 +18,7 @@ Provides cross-cutting platform infrastructure: the Spring Security filter chain
   - `OutboxHousekeepingScheduler` purges `PROCESSED` rows older than 7 days from `payment_outbox_events`, `order_outbox_events`, and `escrow_outbox_events`.
   - `CatalogSeedStartupRunner` executes `SeedTask` beans when `--app.seed` is passed and prunes unreferenced legacy rows via `CatalogLegacyPruner`.
   - `AuditAspect` records `@Auditable` actions asynchronously into `audit_logs`.
+  - `AuditLogService` mails the owner (`SystemAuditEmailEvent`) only for security-relevant failures and changes (failed login attempt, password change). Successful login, Google login and logout are written to `audit_logs` only and shown on the security page, never mailed.
   - `VerificationService` validates 6-digit OTPs (`CodeType`); 3 failed attempts trigger a 15-minute `VerificationLockedException` cooldown.
 
 ## Redis & Caching

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ewalletService } from '../services/ewalletService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 const EWALLET_KEYS = {
  wallet: ['ewallet'],
@@ -44,7 +45,7 @@ export const useEWallet = (options = {}) => {
  if (successMsg) showSuccess('Success', successMsg);
  },
  onError: (err) => {
- const msg = err.response?.data?.message || err.message || errorMsg;
+ const msg = getErrorMessage(err, errorMsg);
  showError('Error', msg);
  },
  });

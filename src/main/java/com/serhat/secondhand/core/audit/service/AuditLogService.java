@@ -134,25 +134,19 @@ public class AuditLogService {
             auditLogRepository.save(auditLog);
             log.info("Audit log saved for login: {} - {}", userEmail, success ? "SUCCESS" : "FAILURE");
 
-            // Send Security Audit Email
-            String subject = success ? "Güvenlik Uyarısı: Başarılı Giriş Yapıldı" : "Güvenlik Uyarısı: Başarısız Giriş Denemesi";
-            String description = success 
-                    ? "Hesabınıza yeni bir başarılı oturum açma işlemi gerçekleştirildi."
-                    : "Hesabınıza yönelik başarısız bir giriş denemesi tespit edildi.";
-            String warningMsg = success
-                    ? "Eğer bu giriş işlemini siz yapmadıysanız, lütfen hesabınızı korumak için hemen şifrenizi sıfırlayın."
-                    : "Eğer bu denemeyi siz yapmadıysanız hesabınız güvendedir, ancak şüpheli durumlara karşı şifrenizi güncelleyebilirsiniz.";
-
-            String content = buildAuditEmailHtml(
-                    description, 
-                    success ? "Başarılı Giriş" : "Başarısız Giriş Denemesi", 
-                    ipAddress, 
-                    userAgent, 
-                    LocalDateTime.now(), 
-                    warningMsg, 
-                    !success
-            );
-            sendAuditEmail(userEmail, subject, content, EmailType.SYSTEM);
+            // Successful logins are visible on the security page only; a failed attempt still alerts the owner.
+            if (!success) {
+                String content = buildAuditEmailHtml(
+                        "Hesabınıza yönelik başarısız bir giriş denemesi tespit edildi.",
+                        "Başarısız Giriş Denemesi",
+                        ipAddress,
+                        userAgent,
+                        LocalDateTime.now(),
+                        "Eğer bu denemeyi siz yapmadıysanız hesabınız güvendedir, ancak şüpheli durumlara karşı şifrenizi güncelleyebilirsiniz.",
+                        true
+                );
+                sendAuditEmail(userEmail, "Güvenlik Uyarısı: Başarısız Giriş Denemesi", content, EmailType.SYSTEM);
+            }
         } catch (Exception e) {
             log.error("Failed to save audit log for login: {}", e.getMessage());
         }
@@ -174,22 +168,6 @@ public class AuditLogService {
 
             auditLogRepository.save(auditLog);
             log.info("Audit log saved for Google OAuth login: {}", userEmail);
-
-            // Send Security Audit Email
-            String subject = "Güvenlik Uyarısı: Google ile Giriş Yapıldı";
-            String description = "Hesabınıza Google hesabınız kullanılarak başarılı bir giriş yapıldı.";
-            String warningMsg = "Eğer bu işlemi siz gerçekleştirmediyseniz lütfen Google yetkilendirmelerinizi ve hesap güvenlik ayarlarınızı kontrol edin.";
-
-            String content = buildAuditEmailHtml(
-                    description, 
-                    "Google OAuth Girişi", 
-                    ipAddress, 
-                    userAgent, 
-                    LocalDateTime.now(), 
-                    warningMsg, 
-                    false
-            );
-            sendAuditEmail(userEmail, subject, content, EmailType.SYSTEM);
         } catch (Exception e) {
             log.error("Failed to save audit log for Google OAuth login: {}", e.getMessage());
         }
@@ -211,21 +189,6 @@ public class AuditLogService {
 
             auditLogRepository.save(auditLog);
             log.info("Audit log saved for logout: {}", userEmail);
-
-            // Send Security Audit Email
-            String subject = "Güvenlik Bildirimi: Başarılı Çıkış Yapıldı";
-            String description = "Hesabınızdan güvenli bir şekilde çıkış yapıldı.";
-
-            String content = buildAuditEmailHtml(
-                    description, 
-                    "Güvenli Çıkış", 
-                    ipAddress, 
-                    userAgent, 
-                    LocalDateTime.now(), 
-                    null, 
-                    false
-            );
-            sendAuditEmail(userEmail, subject, content, EmailType.SYSTEM);
         } catch (Exception e) {
             log.error("Failed to save audit log for logout: {}", e.getMessage());
         }

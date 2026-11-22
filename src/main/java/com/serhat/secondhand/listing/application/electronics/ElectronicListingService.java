@@ -136,11 +136,13 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
         );
     }
 
+    @Transactional(readOnly = true)
     public Page<ElectronicListingDto> findByElectronicType(UUID electronicTypeId, Pageable pageable) {
         return repository.findByElectronicType_Id(electronicTypeId, pageable)
                 .map(listingMapper::toElectronicDto);
     }
 
+    @Transactional(readOnly = true)
     public ElectronicListingDto getElectronicDetails(UUID id) {
         ElectronicListing electronic = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Electronic listing not found"));

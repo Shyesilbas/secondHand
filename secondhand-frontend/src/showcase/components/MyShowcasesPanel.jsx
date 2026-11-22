@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import {
   AlertTriangle,
   X,
@@ -61,7 +62,7 @@ const MyShowcasesPanel = ({ userId }) => {
       await cancelShowcase(confirmCancelId);
       setConfirmCancelId(null);
     } catch (err) {
-      setLocalError(err?.response?.data?.message || err?.message || 'Cancel failed');
+      setLocalError(getErrorMessage(err, 'Cancel failed'));
       setConfirmCancelId(null);
     }
   };

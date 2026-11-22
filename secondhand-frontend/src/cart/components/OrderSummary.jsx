@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { memo } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
-import { Check, Tag, Crown, Loader2, X, ArrowRight } from 'lucide-react';
+import { Check, Crown, Loader2, ArrowRight } from 'lucide-react';
 import { FieldError } from '../../common/components/forms/FormPrimitives.jsx';
-import { Badge } from '../../common/components/ui/index.js';
+import { Button, Card } from '../../common/components/ui/index.js';
+import { inputNormal } from '../../common/components/forms/inputStyles.js';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { getCheckoutCurrency } from '../utils/pricedLines.js';
 
@@ -34,117 +35,91 @@ const OrderSummary = ({
 
   return (
     <aside className="sticky top-20">
-      <div className="overflow-hidden rounded border border-border-light bg-background-primary shadow-sm">
-        {/* Coupon Section */}
-        <div className="border-b border-border-light p-5 space-y-2.5 bg-background-secondary">
+      <Card padding="none">
+        <div className="space-y-3 p-5">
           <div className="flex items-center justify-between">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
-              <Tag className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.75} />
-              {t("coupon", "İndirim Kuponu")}
-            </span>
+            <span className="text-sm font-medium text-text-primary">{t("coupon", "İndirim Kuponu")}</span>
             {isPreviewLoading && (
-              <span className="inline-flex items-center gap-1 text-xs text-text-muted font-medium">
-                <Loader2 className="h-3 w-3 animate-spin" strokeWidth={1.5} />
+              <span className="inline-flex items-center gap-1 text-sm text-text-tertiary">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5} aria-hidden />
                 {t("calculating", "Hesaplanıyor...")}
               </span>
             )}
           </div>
 
           {appliedCouponCode ? (
-            <div className="flex items-center justify-between gap-2 rounded border border-border bg-background-primary px-3 py-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-status-success">
-                <Check className="h-3.5 w-3.5 text-status-success" strokeWidth={2.5} />
+            <div className="flex items-center justify-between gap-2 rounded bg-background-secondary px-3 py-2">
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-status-success-text">
+                <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden />
                 {appliedCouponCode}
               </span>
-              <button
-                type="button"
-                onClick={onRemoveCoupon}
-                className="inline-flex items-center gap-1 text-xs font-medium text-text-secondary hover:text-status-error transition"
-              >
-                <X className="h-3.5 w-3.5" strokeWidth={1.5} />
-                <span>{t("remove", "Kaldır")}</span>
-              </button>
+              <Button variant="ghost" size="sm" onClick={onRemoveCoupon} className="-mr-2 h-8">
+                {t("remove", "Kaldır")}
+              </Button>
             </div>
           ) : (
-            <div className="flex items-stretch gap-1.5">
+            <div className="flex items-stretch gap-2">
               <input
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value)}
                 placeholder={t("enter_code", "Kupon kodu")}
-                className="min-w-0 flex-1 rounded border border-border bg-background-primary px-3 py-1.5 text-sm font-medium text-text-primary outline-none transition placeholder:text-text-muted focus:border-border-focus"
+                aria-label={t("coupon", "İndirim Kuponu")}
+                className={`${inputNormal} h-10 min-w-0 flex-1`}
               />
-              <button
-                type="button"
-                onClick={onApplyCoupon}
-                disabled={isPreviewLoading || !couponInput.trim()}
-                className="inline-flex items-center justify-center rounded bg-primary px-3 text-sm font-medium text-text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 shrink-0"
-              >
+              <Button onClick={onApplyCoupon} disabled={isPreviewLoading || !couponInput.trim()} className="shrink-0">
                 {t("apply", "Uygula")}
-              </button>
-              <button
-                type="button"
-                onClick={onOpenCouponsModal}
-                className="inline-flex items-center justify-center rounded border border-border bg-background-primary px-2.5 text-sm font-medium text-text-secondary transition hover:bg-background-secondary hover:text-text-primary shrink-0"
-              >
+              </Button>
+              <Button variant="secondary" onClick={onOpenCouponsModal} className="shrink-0">
                 {t("browse", "Seç")}
-              </button>
+              </Button>
             </div>
           )}
 
           <FieldError error={couponError} />
         </div>
 
-        {/* Pricing Breakdown */}
-        <div className={`p-5 space-y-3 text-sm transition-opacity duration-150 ${isRepricing ? 'opacity-50' : ''}`} aria-busy={isRepricing}>
-          <div className="flex justify-between items-center text-text-secondary font-medium">
+        <div className={`space-y-3 border-t border-border-light p-5 text-sm transition-opacity duration-150 ${isRepricing ? 'opacity-50' : ''}`} aria-busy={isRepricing}>
+          <div className="flex items-center justify-between text-text-secondary">
             <span>{t("subtotal", "Ara Toplam")}</span>
-            <span className="font-semibold text-text-primary tabular-nums">
-              {amount(pricing?.originalSubtotal)}
-            </span>
+            <span className="font-medium tabular-nums text-text-primary">{amount(pricing?.originalSubtotal)}</span>
           </div>
 
           {hasCampaign && (
-            <div className="flex justify-between items-center text-status-success font-medium">
+            <div className="flex items-center justify-between text-status-success-text">
               <span>{t("campaign", "Kampanya İndirimi")}</span>
-              <span className="font-semibold tabular-nums">
-                −{amount(pricing?.campaignDiscount)}
-              </span>
+              <span className="font-medium tabular-nums">−{amount(pricing?.campaignDiscount)}</span>
             </div>
           )}
 
           {hasCoupon && (
-            <div className="flex justify-between items-center text-status-success font-medium">
+            <div className="flex items-center justify-between text-status-success-text">
               <span>{t("coupon", "Kupon İndirimi")}</span>
-              <span className="font-semibold tabular-nums">
-                −{amount(pricing?.couponDiscount)}
-              </span>
+              <span className="font-medium tabular-nums">−{amount(pricing?.couponDiscount)}</span>
             </div>
           )}
 
-          <div className="flex justify-between items-center text-text-secondary font-medium">
+          <div className="flex items-center justify-between text-text-secondary">
             <span>{t("shipping", "Kargo Bedeli")}</span>
-            <div className="flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-2">
               {isPremium && (
-                <Badge variant="warning" icon={Crown}>
+                <span className="inline-flex items-center gap-1 text-text-tertiary">
+                  <Crown className="h-4 w-4 text-status-warning" strokeWidth={1.5} aria-hidden />
                   {t('priority', 'Öncelikli')}
-                </Badge>
+                </span>
               )}
-              <span className="font-semibold text-status-success">{t("free", "Ücretsiz")}</span>
-            </div>
+              <span className="font-medium text-status-success-text">{t("free", "Ücretsiz")}</span>
+            </span>
           </div>
 
-          <div className="flex justify-between items-center text-text-secondary font-medium">
+          <div className="flex items-center justify-between text-text-secondary">
             <span>{t("tax", "KDV & Hizmet Bedeli")}</span>
-            <span className="font-semibold text-text-primary">Dahil</span>
+            <span className="font-medium text-text-primary">Dahil</span>
           </div>
 
-          {/* Total Row */}
-          <div className="border-t border-border-light pt-3.5 flex items-baseline justify-between gap-4">
+          <div className="flex items-baseline justify-between gap-4 border-t border-border-light pt-4">
             <div>
-              <span className="text-xs font-semibold text-text-secondary block">
-                {t("total", "Toplam Tutar")}
-              </span>
-              <span className="text-xs text-text-muted font-normal">KDV Dahil</span>
+              <span className="block text-sm font-medium text-text-primary">{t("total", "Toplam Tutar")}</span>
+              <span className="text-sm text-text-tertiary">KDV Dahil</span>
             </div>
             <span className="text-2xl font-semibold tabular-nums text-text-price">
               {amount(pricing?.total, 'h-7 w-28')}
@@ -152,41 +127,34 @@ const OrderSummary = ({
           </div>
         </div>
 
-        {/* Priority Shipping Perk */}
-        {isPremium ? (
-          <div className="border-t border-border-light bg-background-secondary px-5 py-2.5 flex items-center gap-2 text-sm text-text-secondary">
-            <Crown className="h-3.5 w-3.5 text-status-warning shrink-0" strokeWidth={1.5} />
-            <span>{t("order_processed_with_priority", "Premium Avantajı: Siparişiniz öncelikli kargolanır.")}</span>
-          </div>
-        ) : onOpenPremiumModal ? (
-          <div className="border-t border-border-light bg-background-secondary px-5 py-2.5 flex items-center justify-between text-sm">
-            <span className="text-text-secondary">{t("priority_shipping_question", "Kargonuz öncelikli hazırlansın mı?")}</span>
-            <button
-              type="button"
-              onClick={onOpenPremiumModal}
-              className="font-semibold text-text-primary hover:underline text-sm"
-            >
-              Premium →
-            </button>
-          </div>
-        ) : null}
+        <div className="space-y-3 p-5 pt-0">
+          {isPremium ? (
+            <p className="flex items-center gap-2 text-sm text-text-secondary">
+              <Crown className="h-4 w-4 shrink-0 text-status-warning" strokeWidth={1.5} aria-hidden />
+              <span>{t("order_processed_with_priority", "Premium Avantajı: Siparişiniz öncelikli kargolanır.")}</span>
+            </p>
+          ) : onOpenPremiumModal ? (
+            <p className="flex items-center justify-between gap-2 text-sm text-text-secondary">
+              <span>{t("priority_shipping_question", "Kargonuz öncelikli hazırlansın mı?")}</span>
+              <button
+                type="button"
+                onClick={onOpenPremiumModal}
+                className="shrink-0 rounded-sm font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              >
+                Premium
+              </button>
+            </p>
+          ) : null}
 
-        {/* Checkout Button */}
-        <div className="p-5 border-t border-border-light bg-background-primary">
-          <button
-            type="button"
-            onClick={onCheckout}
-            disabled={disabled}
-            className="inline-flex items-center justify-center gap-2 rounded bg-primary text-text-inverse hover:bg-primary-hover h-11 px-4 w-full text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40"
-          >
+          <Button onClick={onCheckout} disabled={disabled} className="h-11 w-full">
             <span>{t("proceed_to_checkout", "Ödeme Adımına Geç")}</span>
-            <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
-          </button>
-          <p className="mt-2 text-center text-sm text-text-muted">
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          </Button>
+          <p className="text-center text-sm text-text-tertiary">
             {t("you_will_enter_address_and_payment_on_th", "Sonraki adımda teslimat adresi ve ödeme yöntemi belirlenecektir.")}
           </p>
         </div>
-      </div>
+      </Card>
     </aside>
   );
 };

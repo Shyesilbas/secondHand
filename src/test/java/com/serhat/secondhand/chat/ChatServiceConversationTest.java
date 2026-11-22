@@ -38,8 +38,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * GV-29: deleting a conversation hides it for one side only, and deleting a message leaves a tombstone.
- * KK-10: listing chat input errors map to codes.
+ * Deleting a conversation hides it for one side only, and deleting a message leaves a tombstone.
+ * Listing chat input errors map to codes.
  */
 class ChatServiceConversationTest {
 

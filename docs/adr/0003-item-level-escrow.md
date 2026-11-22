@@ -7,7 +7,7 @@
 Bir sipariş birden fazla satıcıya ait kalem içerebilir ve kalemler ayrı ayrı iptal ya da iade edilebilir. Tek bir sipariş seviyesinde escrow, kısmi iptal ve satıcı bazlı ödeme için yetersiz kalır.
 
 ## Karar
-`escrows` tablosunda her `OrderItem` için bir satır tutulur (`order_item_id` benzersiz). Tutar kampanya ve kupon sonrası net tutardır. Satıcıya aktarım, sipariş tamamlandığında `ESCROW_RELEASED` outbox event'i ve `escrow.released.v1` topic'i üzerinden eWallet'a kredi olarak yapılır ([ADR-0001](0001-transactional-outbox-with-polling.md)). Hold için ikinci bir `payments` satırı oluşturulmaz.
+`escrows` tablosunda her `OrderItem` için bir satır tutulur (`order_item_id` benzersiz). Tutar kampanya ve kupon sonrası net tutardır. Satıcıya aktarım, sipariş tamamlandığında `ESCROW_RELEASED` outbox event'i ve `escrow.released.v1` topic'i üzerinden eWallet'a kredi olarak yapılır ([ADR-0001](0001-transactional-outbox-with-polling.md)). Hold için ikinci bir `payments` satırı oluşturulmaz. Platform kuponu indirimi satıcıyı etkilemez: kalemin kupon payı `platform_subsidy` kolonunda tutulur, serbest bırakmada satıcıya `amount + platform_subsidy` ödenir, iade ise yalnızca `amount` kadardır.
 
 ## Sonuçlar
 - Kazanç: Kalem bazlı iptal/iade ve çoklu satıcı siparişi doğal olarak modellenir.

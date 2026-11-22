@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Check, Sparkles } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { AGREEMENT_TYPE_LABELS } from '../../../../agreements/agreements.js';
 import { formatCurrency } from '../../../formatters.js';
 import Card from '../Card.jsx';
@@ -37,7 +37,7 @@ const PremiumUpgradePlanStep = ({
           <span className="text-sm font-semibold text-text-primary">
             {t('premium_plan_title', 'PRO Üyelik Planı')}
           </span>
-          <p className="mt-0.5 text-xs text-text-tertiary">
+          <p className="mt-0.5 text-sm text-text-tertiary">
             {t('auto_renews_monthly', 'Aylık yenilenir, dilediğiniz an tek tıkla iptal edilebilir.')}
           </p>
         </div>
@@ -46,32 +46,29 @@ const PremiumUpgradePlanStep = ({
           <span className="text-2xl font-semibold tabular-nums tracking-tight text-text-price">
             {premiumPrice != null ? formatCurrency(premiumPrice, 'TRY') : '—'}
           </span>
-          <span className="text-xs font-normal text-text-tertiary">
+          <span className="text-sm font-normal text-text-tertiary">
             / {t('per_month', 'ay')}
           </span>
         </div>
       </Card>
 
       <Card padding="none" className="overflow-hidden">
-        <div className="grid grid-cols-12 border-b border-border-light bg-background-secondary px-4 py-2.5 text-xs font-semibold">
+        <div className="grid grid-cols-12 bg-background-secondary px-4 py-2.5 text-sm font-medium">
           <div className="col-span-5 text-text-secondary">{t('privileges', 'Ayrıcalık')}</div>
           <div className="col-span-3 text-text-muted">{t('standard', 'Standart')}</div>
-          <div className="col-span-4 flex items-center gap-1.5 text-text-primary">
-            <Sparkles className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.5} />
-            <span>{t('pro_membership', 'PRO Plan')}</span>
-          </div>
+          <div className="col-span-4 text-text-primary">{t('pro_membership', 'PRO Plan')}</div>
         </div>
 
         <div className="divide-y divide-border-light text-sm">
           {features.map((feature) => (
             <div
               key={feature.label}
-              className="grid grid-cols-12 items-center px-4 py-3 transition-colors hover:bg-background-secondary"
+              className="grid grid-cols-12 items-center px-4 py-3"
             >
               <div className="col-span-5 pr-2 font-medium text-text-primary">{feature.label}</div>
               <div className="col-span-3 tabular-nums text-text-muted">{feature.free}</div>
-              <div className="col-span-4 flex items-center gap-1.5 font-semibold tabular-nums text-text-primary">
-                <Check className="h-3.5 w-3.5 shrink-0 text-status-success" strokeWidth={2} />
+              <div className="col-span-4 flex items-center gap-1.5 font-medium tabular-nums text-text-primary">
+                <Check className="h-3.5 w-3.5 shrink-0 text-status-success" strokeWidth={1.5} aria-hidden />
                 <span>{feature.premium}</span>
               </div>
             </div>
@@ -79,7 +76,7 @@ const PremiumUpgradePlanStep = ({
         </div>
       </Card>
 
-      <div className="space-y-2 border-t border-border-light pt-3">
+      <div className="space-y-2">
         {agreements && agreements.length > 0 ? (
           agreements.map((agreement) => {
             const isChecked = acceptedAgreements.has(agreement.agreementId);
@@ -119,9 +116,6 @@ const PremiumUpgradePlanStep = ({
         )}
       </div>
 
-      <p className="text-center text-sm text-text-tertiary">
-        {t('cancel_anytime_note', 'Dilediğiniz an tek tıkla iptal edebilirsiniz · Taahhüt yoktur')}
-      </p>
     </div>
   );
 };

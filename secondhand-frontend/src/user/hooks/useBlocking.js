@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userService } from '../services/userService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const BLOCK_KEYS = Object.freeze({
   blockedUsers: ['users', 'blocked'],
@@ -42,7 +43,7 @@ const useBlockMutation = (mutationFn, successMessage) => {
       invalidateAfterBlockChange(queryClient);
       showSuccess('', successMessage);
     },
-    onError: (err) => showError('', err?.response?.data?.message || 'İşlem tamamlanamadı.'),
+    onError: (err) => showError('', getErrorMessage(err, 'İşlem tamamlanamadı.')),
   });
 };
 
@@ -61,6 +62,6 @@ export const useUpdateUserSettings = () => {
       queryClient.setQueryData(BLOCK_KEYS.settings, settings);
       queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
     },
-    onError: (err) => showError('', err?.response?.data?.message || 'Ayar kaydedilemedi.'),
+    onError: (err) => showError('', getErrorMessage(err, 'Ayar kaydedilemedi.')),
   });
 };

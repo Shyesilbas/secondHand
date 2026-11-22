@@ -4,6 +4,8 @@ import { useEnums } from '../../../common/hooks/useEnums.js';
 import { getListingConfig } from '../../config/listingConfig.js';
 import { toDisplayText } from '../../utils/listingDisplayFormat.js';
 import ListingAttributeDetails from '../attributes/ListingAttributeDetails.jsx';
+import { detailLabel } from '../../config/listingFormCopy.js';
+import { DETAIL_GRID } from './detailGrid.js';
 
 const getValueByPath = (obj, path) => {
   if (!obj || !path) return undefined;
@@ -16,10 +18,10 @@ const getValueByPath = (obj, path) => {
 };
 
 const DetailRow = ({ label, value }) => (
-  <div className="flex items-center justify-between gap-4 py-2.5 border-b border-border-light text-sm">
-    <dt className="text-text-secondary font-normal shrink-0">{label}</dt>
-    <dd className="font-medium text-text-primary text-right tabular-nums break-words">
-      {value || '-'}
+  <div className="min-w-0">
+    <dt className="text-sm text-text-tertiary">{detailLabel(label)}</dt>
+    <dd className="mt-1 break-words text-sm font-medium tabular-nums text-text-primary">
+      {value || '—'}
     </dd>
   </div>
 );
@@ -58,9 +60,9 @@ const GenericListingDetails = ({ listing, flat = false }) => {
   });
 
   const content = (
-    <div className="space-y-2">
+    <div>
       {sections.length > 1 && (
-        <div className="flex flex-wrap gap-1.5 border-b border-border-light pb-3 mb-2">
+        <div className="mb-5 flex flex-wrap gap-1.5">
           {sections.map((tab) => {
             const isActive = activeSection === tab.id;
             return (
@@ -73,7 +75,7 @@ const GenericListingDetails = ({ listing, flat = false }) => {
                   : 'border-border-light bg-background-secondary text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
                   }`}
               >
-                {tab.label}
+                {detailLabel(tab.label)}
               </button>
             );
           })}
@@ -89,9 +91,9 @@ const GenericListingDetails = ({ listing, flat = false }) => {
           renderRow={(row) => <DetailRow key={row.key} label={row.label} value={row.value} />}
         />
       ) : visibleFields.length === 0 ? (
-        <p className="text-sm text-text-muted py-3">{t("no_features_specified", "Belirtilmiş özellik bulunmuyor.")}</p>
+        <p className="text-sm text-text-muted">{t("no_features_specified", "Belirtilmiş özellik bulunmuyor.")}</p>
       ) : (
-        <dl className="grid grid-cols-1 md:grid-cols-2 md:gap-x-12">
+        <dl className={DETAIL_GRID}>
           {visibleFields.map((field) => {
             const raw = field.key ? getValueByPath(listing, field.key) : undefined;
             const resolved =

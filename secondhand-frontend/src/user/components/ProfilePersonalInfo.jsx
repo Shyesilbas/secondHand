@@ -109,7 +109,7 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate, isUpdatingPhone }) => {
                 {field.action && (
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="ghost"
                     size="sm"
                     onClick={field.action.onClick}
                     title={field.action.title}

@@ -79,11 +79,11 @@ const InboxNotificationsPanel = () => {
           <section key={group.key} aria-labelledby={`notif-group-${group.key}`}>
             <h2
               id={`notif-group-${group.key}`}
-              className="border-b border-border-light bg-background-secondary px-4 py-1.5 text-xs font-medium text-text-tertiary"
+              className="px-5 pb-1.5 pt-4 text-sm font-medium text-text-tertiary"
             >
               {t(group.labelKey, group.defaultLabel)}
             </h2>
-            <ul className="divide-y divide-border-light">
+            <ul>
               {group.items.map((notification) => (
                 <NotificationRow key={notification.id} notification={notification} onMarkAsRead={markAsRead} />
               ))}
@@ -102,26 +102,11 @@ const InboxNotificationsPanel = () => {
   }
 
   return (
-    <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col overflow-hidden rounded border border-border-light bg-background-primary shadow-sm">
-      <header className="shrink-0 border-b border-border-light">
-        <div className="flex items-center justify-between gap-3 px-4 pt-3">
-          <div className="min-w-0">
-            <h1 className="text-lg font-semibold text-text-primary">{t('notifications', 'Bildirimler')}</h1>
-            <p className="text-sm text-text-tertiary">
-              {unreadCount > 0
-                ? t('unread_notifications_count', { defaultValue: '{{count}} okunmamış', count: unreadCount })
-                : t('all_caught_up', 'Hepsini okudun')}
-            </p>
-          </div>
-          {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead}>
-              <CheckCheck className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-              <span>{t('mark_all_read_btn', 'Tümünü okundu yap')}</span>
-            </Button>
-          )}
-        </div>
+    <div className="flex h-full min-h-0 w-full flex-col gap-3">
+      <header className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{t('notifications', 'Bildirimler')}</h1>
         <Tabs
-          className="mt-2 px-2"
+          variant="segmented"
           borderBottom={false}
           ariaLabel={t('notification_views', 'Bildirim görünümü')}
           activeKey={view}
@@ -129,11 +114,21 @@ const InboxNotificationsPanel = () => {
           items={VIEWS.map((item) => ({
             key: item.key,
             label: t(item.labelKey, item.defaultLabel),
+            count: item.key === NOTIFICATION_VIEWS.UNREAD && unreadCount > 0 ? unreadCount : undefined,
           }))}
         />
+        {unreadCount > 0 && (
+          <Button variant="secondary" size="sm" className="ml-auto" onClick={markAllAsRead}>
+            <CheckCheck className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            <span>{t('mark_all_read_btn', 'Tümünü okundu yap')}</span>
+          </Button>
+        )}
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto" aria-busy={isLoading}>
+      <div
+        className="min-h-0 flex-1 overflow-y-auto rounded border border-border-light bg-background-primary shadow-sm"
+        aria-busy={isLoading}
+      >
         {content}
       </div>
     </div>

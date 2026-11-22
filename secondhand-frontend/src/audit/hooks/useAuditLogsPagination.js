@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { auditLogService } from '../services/auditLogService.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import logger from '../../common/utils/logger.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
  const { enums } = useEnums();
@@ -35,6 +36,7 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
  }
  },
  enabled: !!userEmail,
+ placeholderData: keepPreviousData,
  staleTime: 2 * 60 * 1000,
  });
 
@@ -223,7 +225,7 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
  currentPage,
  pageSize,
  isLoading,
- error: error ? (error.response?.data?.message || error.message) : null,
+ error: error ? getErrorMessage(error, 'Loglar yüklenemedi.') : null,
  filters,
  hasActiveFilters,
  goToPage,

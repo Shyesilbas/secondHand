@@ -6,6 +6,7 @@ import { orderService } from '../services/orderService.js';
 import { paymentService } from '../../payments/services/paymentService.js';
 import { PAYMENT_QUERY_KEYS } from '../../payments/paymentSchema.js';
 import { ORDER_QUERY_KEYS, hasOrderAction } from '../orderConstants.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { orderItemIds, reviewItemKey, useOrderItemReviews } from './useOrderItemReviews.js';
 import { useOrderSearch } from './useOrderSearch.js';
 import {
@@ -226,7 +227,7 @@ export const useOrderFlow = ({
  if (payment) setReceiptPayment(payment);
  else notification.showError('Receipt', ORDER_MESSAGES.RECEIPT_NOT_FOUND);
  } catch (err) {
- notification.showError('Receipt', err?.response?.data?.message || ORDER_MESSAGES.RECEIPT_LOAD_FAILED);
+ notification.showError('Receipt', getErrorMessage(err, ORDER_MESSAGES.RECEIPT_LOAD_FAILED));
  }
  }, [notification]);
 
@@ -267,7 +268,7 @@ export const useOrderFlow = ({
  await orderService.completeOrder(orderId);
  refresh();
  } catch (err) {
- notification.showError('Error', err?.response?.data?.message || ORDER_MESSAGES.COMPLETE_ORDER_FAILED);
+ notification.showError('Error', getErrorMessage(err, ORDER_MESSAGES.COMPLETE_ORDER_FAILED));
  }
  },
  { confirmLabel: ORDER_MESSAGES.CONFIRM_ORDER_BUTTON, cancelLabel: ORDER_MESSAGES.CANCEL_ORDER_BUTTON }

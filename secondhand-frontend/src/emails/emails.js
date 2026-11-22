@@ -96,6 +96,48 @@ export const EMAIL_TYPE_LABELS = {
   [EMAIL_TYPES.MODERATION_APPEAL_OUTCOME]: 'İtiraz Sonucu'
 };
 
+export const EMAIL_TYPE_BADGE_VARIANTS = {
+  [EMAIL_TYPES.VERIFICATION]: 'warning',
+  [EMAIL_TYPES.VERIFICATION_CODE]: 'warning',
+  [EMAIL_TYPES.PASSWORD_RESET]: 'error',
+  [EMAIL_TYPES.WELCOME]: 'success',
+  [EMAIL_TYPES.PHONE_UPDATE]: 'warning',
+  [EMAIL_TYPES.NOTIFICATION]: 'neutral',
+  [EMAIL_TYPES.OFFER_RECEIVED]: 'neutral',
+  [EMAIL_TYPES.OFFER_COUNTER_RECEIVED]: 'neutral',
+  [EMAIL_TYPES.OFFER_ACCEPTED]: 'success',
+  [EMAIL_TYPES.OFFER_REJECTED]: 'error',
+  [EMAIL_TYPES.OFFER_EXPIRED]: 'neutral',
+  [EMAIL_TYPES.OFFER_COMPLETED]: 'success',
+  [EMAIL_TYPES.PROMOTIONAL]: 'neutral',
+  [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'warning',
+  [EMAIL_TYPES.PAYMENT_SUCCESS]: 'success',
+  [EMAIL_TYPES.PAYMENT_RECEIPT]: 'success',
+  [EMAIL_TYPES.AGREEMENT_UPDATED]: 'neutral',
+  [EMAIL_TYPES.AGREEMENT_UPDATE]: 'neutral',
+  [EMAIL_TYPES.SYSTEM]: 'neutral',
+  [EMAIL_TYPES.ORDER_CONFIRMATION]: 'success',
+  [EMAIL_TYPES.ORDER_CANCELLED]: 'error',
+  [EMAIL_TYPES.ORDER_COMPLETED]: 'success',
+  [EMAIL_TYPES.ORDER_REFUNDED]: 'warning',
+  [EMAIL_TYPES.SALE_NOTIFICATION]: 'success',
+  [EMAIL_TYPES.MEMBERSHIP_ACTIVATED]: 'neutral',
+  [EMAIL_TYPES.MEMBERSHIP_UPGRADE]: 'neutral',
+  [EMAIL_TYPES.GREAT_SELLER]: 'success',
+  [EMAIL_TYPES.PRICE_CHANGE]: 'neutral',
+  [EMAIL_TYPES.NEW_LISTING]: 'neutral',
+  [EMAIL_TYPES.NEW_LISTING_NOTIFICATION]: 'neutral',
+  [EMAIL_TYPES.AUDIT_ALERT]: 'error',
+  [EMAIL_TYPES.COMPLAINT_SUBMITTED]: 'neutral',
+  [EMAIL_TYPES.COMPLAINT_RESOLVED]: 'success',
+  [EMAIL_TYPES.COMPLAINT_DISMISSED]: 'neutral',
+  [EMAIL_TYPES.MODERATION_WARNING]: 'warning',
+  [EMAIL_TYPES.MODERATION_LISTING_SUSPENDED]: 'warning',
+  [EMAIL_TYPES.MODERATION_TEMP_BAN]: 'error',
+  [EMAIL_TYPES.MODERATION_PERM_BAN]: 'error',
+  [EMAIL_TYPES.MODERATION_APPEAL_OUTCOME]: 'neutral'
+};
+
 export const EMAIL_TYPE_DOT_COLORS = {
   [EMAIL_TYPES.VERIFICATION]: 'bg-status-warning',
   [EMAIL_TYPES.VERIFICATION_CODE]: 'bg-status-warning',
@@ -215,36 +257,45 @@ export const extractEmailPreview = (rawContent, subject = '') => {
   return formatMonetaryAmountsInText(text);
 };
 
-// The backend layout (templates/emails/layout.html) owns the email design. The inbox only adapts it to the
-// reading pane: the subject is already shown above the frame, so the email's own header is hidden.
+// The backend layout (templates/emails/layout.html) owns the email design. The inbox flattens the outer
+// email chrome so the message flows directly inside the unified scrolling reading pane without nested boxes.
 const EDITORIAL_EMAIL_STYLE = `
 <style id="sh-editorial-email-style">
   html, body {
+    height: auto !important;
+    min-height: 0 !important;
     margin: 0 !important;
-    padding: 16px 20px !important;
-    background-color: #FAFAF9 !important;
+    padding: 16px 24px 36px !important;
+    background-color: #FFFFFF !important;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
     color: #44403C;
   }
   .container {
     max-width: 640px;
-    margin: 0 auto;
-    background-color: #FFFFFF;
-    border: 1px solid #E7E5E4;
-    border-radius: 8px;
-    overflow: hidden;
+    margin: 0 !important;
+    background-color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible;
   }
   .header {
     display: none !important;
   }
   .content {
-    padding: 20px 24px;
+    padding: 0 !important;
+  }
+  .footer {
+    border-top: 1px solid #E7E5E4 !important;
+    margin-top: 20px !important;
+    padding: 14px 0 0 !important;
+    background-color: transparent !important;
   }
   @media (max-width: 640px) {
     html, body {
-      padding: 10px 8px !important;
+      padding: 16px 20px 32px !important;
     }
   }
 </style>

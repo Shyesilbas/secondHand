@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, RefreshCw } from 'lucide-react';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { adminCouponApi } from '../services/adminCouponApi.js';
 import { Button, PageHeader } from '../../common/components/ui/index.js';
 import AdminCouponsTable from '../components/AdminCouponsTable.jsx';
@@ -90,7 +91,7 @@ const AdminCouponsPage = () => {
       invalidate();
       closeCouponModal();
     },
-    onError: (e) => showError('Create failed', e?.response?.data?.message || e.message)
+    onError: (e) => showError('Create failed', getErrorMessage(e, 'Coupon could not be created.'))
   });
 
   const updateMut = useMutation({
@@ -100,7 +101,7 @@ const AdminCouponsPage = () => {
       invalidate();
       closeCouponModal();
     },
-    onError: (e) => showError('Update failed', e?.response?.data?.message || e.message)
+    onError: (e) => showError('Update failed', getErrorMessage(e, 'Coupon could not be updated.'))
   });
 
   const openCreate = () => {

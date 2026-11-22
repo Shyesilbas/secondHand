@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import ListingCard from '../../listing/components/ListingCard.jsx';
 import { Button, Card, EmptyState, SkeletonCard } from '../../common/components/ui/index.js';
 import { LISTING_GRID_GAP, LISTING_ROW_COLUMNS, LISTING_ROW_SIZE, listingRowItemClass } from '../../listing/components/listingGridLayout.js';
@@ -29,10 +29,7 @@ const EmptyCartView = ({
             <Button onClick={() => navigate(ROUTES.LISTINGS)}>{t('browse_listings')}</Button>
             {isAuthenticated ? (
               <Link to={ROUTES.FAVORITES} className={buttonClasses('secondary')}>
-                <span className="inline-flex items-center justify-center gap-1.5">
-                  <Heart className="h-4 w-4 text-text-secondary" strokeWidth={1.75} />
-                  {t('favorites')}
-                </span>
+                {t('favorites')}
               </Link>
             ) : (
               <Link to={ROUTES.LOGIN} className={buttonClasses('secondary')}>
@@ -54,7 +51,7 @@ const EmptyCartView = ({
                 {CART_MESSAGES.EMPTY_CART_FAVORITES_SUB}
               </p>
             </div>
-            <Link to={ROUTES.FAVORITES} className="text-sm font-medium text-text-primary hover:underline">
+            <Link to={ROUTES.FAVORITES} className="text-sm font-medium text-text-link transition-colors duration-150 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
               {CART_MESSAGES.EMPTY_CART_SEE_ALL_FAVORITES} →
             </Link>
           </div>
@@ -76,7 +73,7 @@ const EmptyCartView = ({
               ))}
             </div>
           ) : (
-            <p className="rounded border border-dashed border-border-light py-8 text-center text-sm text-text-secondary">
+            <p className="rounded bg-background-secondary py-8 text-center text-sm text-text-secondary">
               {t('no_favorites_yet_tap_the_heart_on_a_list')}
             </p>
           )}

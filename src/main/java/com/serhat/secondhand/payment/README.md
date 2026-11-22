@@ -22,7 +22,7 @@ Executes payments through pluggable providers, guards against double charges wit
 - **Change rule:** Post-payment side effects are `PaymentCompletedHandler` beans with a narrow `supports` condition and an explicit `@Order`; they run after commit and never change payment state.
 
 ## Redis, Outbox & Kafka
-- Idempotency key: see above. Spring cache `payment:stats` (`PaymentStatsService`, key `user:<id>:<ALL|provider>`), evicted per payer and recipient by `PaymentStatsCacheEvictor`; TTL in `CacheConfig`. **Change rule:** never `allEntries`/`clear()` this cache, and add a provider to `CACHED_PROVIDER_FILTERS` only together with its eviction.
+- Idempotency key: see above. Spring cache `payment:stats` (`PaymentStatsService`, key `user:<id>:<ALL|provider>`), evicted per payer and recipient by `PaymentStatsCacheEvictor`; TTL in `CacheConfig`. **Seller view of item payments:** one payment row serves buyer and seller; for the seller (receiver) `PaymentStatsService.getMyPayments` and the `getPaymentStats` incoming/escrow sums add the escrow's `platformSubsidy`, so the amount equals the escrow payout, while the buyer keeps the amount actually paid. The seller receipt mail and notification (`PaymentCompletionDispatcher`) use the same payout amount. **Change rule:** never `allEntries`/`clear()` this cache, and add a provider to `CACHED_PROVIDER_FILTERS` only together with its eviction.
 - Outbox: `payment_outbox_events`, polled by `PaymentOutboxWorker` (`app.payment.outbox.fixed-delay-ms`).
 - Topic: `payment.completed.v1` (`PaymentCompletedKafkaEvent`).
 

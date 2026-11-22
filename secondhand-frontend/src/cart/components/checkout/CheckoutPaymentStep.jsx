@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowRight, Loader2, Truck, Users, Wallet } from 'lucide-react';
+import { AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
 import { formatCurrency } from '../../../common/formatters.js';
 import { ewalletService } from '../../../ewallet/services/ewalletService.js';
@@ -11,13 +11,10 @@ import CheckoutStepFooter from './CheckoutStepFooter.jsx';
 import logger from '../../../common/utils/logger.js';
 
 // One review tile (delivery or payment): label row with an optional action, then the details.
-const ReviewTile = ({ icon: Icon, title, action, children }) => (
+const ReviewTile = ({ title, action, children }) => (
   <div className="flex flex-col rounded bg-background-secondary p-4">
     <div className="flex min-h-6 items-center justify-between gap-3">
-      <p className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-        <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-        {title}
-      </p>
+      <p className="text-sm font-medium text-text-secondary">{title}</p>
       {action}
     </div>
     <div className="mt-3 space-y-0.5 text-sm text-text-primary">{children}</div>
@@ -123,7 +120,6 @@ const CheckoutPaymentStep = ({
       <div className="space-y-8 px-5 py-6 sm:px-6">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <ReviewTile
-            icon={isMeetup ? Users : Truck}
             title={isMeetup ? t('checkout_meetup', 'Elden güvenli buluşma') : t('checkout_cargo_address', 'Kargo adresi')}
             action={editButton}
           >
@@ -146,7 +142,6 @@ const CheckoutPaymentStep = ({
           </ReviewTile>
 
           <ReviewTile
-            icon={Wallet}
             title={t('checkout_pay_with_wallet', 'Cüzdan ile ödeme')}
             action={!hasEnoughBalance && (
               <button type="button" onClick={() => navigate(ROUTES.EWALLET)} className={TILE_LINK}>

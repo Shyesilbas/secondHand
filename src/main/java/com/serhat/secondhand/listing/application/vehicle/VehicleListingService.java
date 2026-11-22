@@ -167,6 +167,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
                 .map(listingMapper::toVehicleDto);
     }
 
+    @Transactional(readOnly = true)
     public VehicleListingDto getVehicleDetails(UUID id) {
         VehicleListing vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new com.serhat.secondhand.core.exception.BusinessException(

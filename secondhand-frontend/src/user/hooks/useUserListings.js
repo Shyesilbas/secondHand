@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { listingService } from '../../listing/services/listingService.js';
 import { normalizeArrayResponse } from '../../common/utils/normalizeArrayResponse.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useUserListings = (userId, options = {}) => {
  const enabled = options.enabled ?? true;
@@ -30,7 +31,7 @@ export const useUserListings = (userId, options = {}) => {
  return {
  listings,
  isLoading: query.isLoading,
- error: query.error ? query.error.response?.data?.message || query.error.message || 'Failed to fetch listings' : null,
+ error: query.error ? getErrorMessage(query.error, 'Failed to fetch listings') : null,
  pagination,
  refetch: query.refetch,
  loadPage: setPage,

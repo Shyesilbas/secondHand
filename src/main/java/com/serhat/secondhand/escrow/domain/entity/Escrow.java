@@ -51,6 +51,11 @@ public class Escrow {
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
+    /** Platform-funded coupon share of this line: paid to the seller on release, never refunded to the buyer. */
+    @Column(name = "platform_subsidy", nullable = false, precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal platformSubsidy = BigDecimal.ZERO;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     @Builder.Default
@@ -72,4 +77,10 @@ public class Escrow {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    /** What the seller receives: the buyer-paid amount plus the platform-funded coupon share. */
+    public BigDecimal sellerPayout() {
+        BigDecimal paid = amount != null ? amount : BigDecimal.ZERO;
+        return platformSubsidy != null ? paid.add(platformSubsidy) : paid;
+    }
 }

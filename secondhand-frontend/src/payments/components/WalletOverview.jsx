@@ -4,7 +4,7 @@ import { ArrowDownRight, ArrowUpRight, Pencil } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
 import WalletOperationModal from './modals/WalletOperationModal.jsx';
 import { WALLET_OPERATION_MODES as MODES } from '../paymentSchema.js';
-import { Badge, Button, Card } from '../../common/components/ui/index.js';
+import { Button, Card } from '../../common/components/ui/index.js';
 
 const EditButton = ({ label, onClick }) => (
   <Button variant="ghost" size="sm" onClick={onClick} aria-label={label} className="-mr-2 shrink-0">
@@ -61,9 +61,9 @@ export const EWalletOverview = ({
         <Card className="flex flex-col">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-text-tertiary">{t("available_balance")}</p>
-            <Badge variant="success" dot>{t("active")}</Badge>
+            <span className="inline-flex items-center gap-1.5 text-sm text-text-tertiary"><span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />{t("active")}</span>
           </div>
-          <p className="mt-2 text-3xl font-semibold tabular-nums tracking-tight text-text-price">{formatCurrency(eWallet.balance || 0)}</p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-text-price">{formatCurrency(eWallet.balance || 0)}</p>
           <div className="mt-6 grid grid-cols-2 gap-2 pt-1 lg:mt-auto">
             <Button onClick={() => setActiveModal(MODES.DEPOSIT)}>
               <ArrowDownRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
@@ -99,14 +99,14 @@ export const EWalletOverview = ({
                   {spendKnown ? (
                     <span className="font-medium tabular-nums text-text-primary">{formatCurrency(totalAmount)}</span>
                   ) : (
-                    <button type="button" onClick={onLoadStatistics} className="font-medium text-text-link transition-colors hover:text-text-linkHover">
+                    <button type="button" onClick={onLoadStatistics} className="font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover">
                       {t("reveal")}
                     </button>
                   )}
                 </div>
                 {spendKnown && (
                   <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-background-tertiary" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(spentPercentage)}>
-                    <div className={`h-full rounded-full transition-all duration-500 ${barTone}`} style={{ width: `${spentPercentage}%` }} />
+                    <div className={`h-full rounded-full ${barTone}`} style={{ width: `${spentPercentage}%` }} />
                   </div>
                 )}
                 {statisticsLoaded && statsData && (

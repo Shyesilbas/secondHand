@@ -6,6 +6,7 @@ import { formatCurrency } from '../../../common/formatters.js';
 import { formatCouponDiscount, formatCouponKindLabel } from '../../../coupon/utils/couponUiFormat.js';
 import { Ticket } from 'lucide-react';
 import { Button, EmptyState, Modal, Skeleton } from '../../../common/components/ui/index.js';
+import { getErrorMessage } from '../../../common/utils/errorUtils.js';
 
 const ActiveCouponsModal = ({
   isOpen,
@@ -21,7 +22,7 @@ const ActiveCouponsModal = ({
     staleTime: 5 * 60 * 1000,
   });
 
-  const error = queryError?.response?.data?.message || queryError?.message || null;
+  const error = queryError ? getErrorMessage(queryError, 'Kuponlar yüklenemedi.') : null;
   const sorted = useMemo(() => {
     return [...(coupons || [])].sort((a, b) => String(a.code).localeCompare(String(b.code)));
   }, [coupons]);
@@ -44,19 +45,19 @@ const ActiveCouponsModal = ({
           description={t("no_active_coupons_desc", "Şu anda sepetinize uygulanabilecek aktif kampanya kuponu bulunmuyor.")}
         />
       ) : (
-        <ul className="divide-y divide-border-light">
+        <ul className="space-y-2">
           {sorted.map(c => (
-            <li key={c.id} className="flex flex-col justify-between gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center">
+            <li key={c.id} className="flex flex-col justify-between gap-3 rounded bg-background-secondary p-4 sm:flex-row sm:items-center">
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded border border-border bg-background-secondary px-2 py-0.5 font-mono text-xs font-semibold text-text-primary">{c.code}</span>
+                  <span className="rounded bg-background-primary px-2 py-0.5 font-mono text-sm font-semibold text-text-primary">{c.code}</span>
                   <span className="text-sm font-medium text-text-price">
                     {formatCouponKindLabel(c.discountKind)}: {formatCouponDiscount(c)}
                   </span>
                 </div>
                 {c.title?.trim?.() && <p className="text-sm font-medium text-text-primary">{c.title.trim()}</p>}
                 {c.description?.trim?.() && <p className="text-sm text-text-secondary">{c.description.trim()}</p>}
-                <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs tabular-nums text-text-tertiary">
+                <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm tabular-nums text-text-tertiary">
                   {c.minSubtotal != null && <span>Alt limit: {formatCurrency(c.minSubtotal, 'TRY')}</span>}
                   {c.maxDiscount != null && <span>Maks. indirim: {formatCurrency(c.maxDiscount, 'TRY')}</span>}
                   {c.usageLimitGlobal != null && <span>Kalan limit: {c.usageRemainingGlobal}</span>}

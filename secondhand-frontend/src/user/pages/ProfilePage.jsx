@@ -2,12 +2,6 @@ import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  Ban as BanIcon,
-  MapPin as MapPinIcon,
-  ShieldCheck as ShieldCheckIcon,
-  User as UserIcon
-} from 'lucide-react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { usePhoneUpdate } from '../hooks/usePhoneUpdate.js';
 import { Card, Tabs } from '../../common/components/ui/index.js';
@@ -40,37 +34,33 @@ const ProfilePage = () => {
   const tabs = [
     {
       key: 'personal',
-      label: t('personal_info', 'Kişisel Bilgiler'),
-      icon: UserIcon
+      label: t('personal_info', 'Kişisel Bilgiler')
     },
     {
       key: 'addresses',
-      label: t('addresses', 'Adreslerim'),
-      icon: MapPinIcon
+      label: t('addresses', 'Adreslerim')
     },
     {
       key: 'security',
-      label: t('account_and_security', 'Hesap & Güvenlik'),
-      icon: ShieldCheckIcon
+      label: t('account_and_security', 'Hesap & Güvenlik')
     },
     {
       key: 'blocked',
-      label: t('blocked_users', 'Engellediğim Kullanıcılar'),
-      icon: BanIcon
+      label: t('blocked_users', 'Engellediğim Kullanıcılar')
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background-page py-6 sm:py-8">
+    <div className="bg-background-page py-6 sm:py-8">
       <PageContainer className="max-w-4xl space-y-5">
         {/* 1. Profile Header Card */}
-        <Card as="section" shadow={false} className="sm:p-6">
+        <Card as="section" className="sm:p-6">
           <ProfileHeader user={user} />
         </Card>
 
         {/* 2. Tabbed Settings Surface */}
-        <div className="rounded border border-border-light bg-background-primary overflow-hidden shadow-sm">
-          <div className="border-b border-border-light bg-background-primary px-4 sm:px-6">
+        <Card padding="none" className="overflow-hidden">
+          <div className="border-b border-border-light px-4 sm:px-6">
             <Tabs
               items={tabs.map((tab) => ({ ...tab, id: `profile-tab-${tab.key}` }))}
               activeKey={activeTab}
@@ -103,7 +93,7 @@ const ProfilePage = () => {
               <BlockedUsersList isActive={activeTab === 'blocked'} />
             )}
           </main>
-        </div>
+        </Card>
       </PageContainer>
     </div>
   );

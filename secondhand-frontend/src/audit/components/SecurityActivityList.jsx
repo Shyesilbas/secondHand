@@ -129,7 +129,7 @@ const SecurityActivityList = ({
             className="group flex cursor-pointer items-center justify-between gap-4 px-5 py-3.5 transition-colors duration-150 hover:bg-background-secondary focus:outline-none focus-visible:bg-background-secondary"
           >
             <div className="flex min-w-0 flex-1 items-start gap-3.5">
-              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded border border-border-light bg-background-secondary">
+              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded bg-background-secondary">
                 {renderEventIcon(log.eventType, log.eventStatus)}
               </div>
 
@@ -138,7 +138,7 @@ const SecurityActivityList = ({
                   <h4 className="text-sm font-medium text-text-primary">
                     {getEventTypeDisplay(log.eventType)}
                   </h4>
-                  <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${statusBadge.textClass}`}>
+                  <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${statusBadge.textClass}`}>
                     <span className={`h-1.5 w-1.5 rounded-full ${statusBadge.dotClass}`} aria-hidden />
                     {statusBadge.labelKey ? t(statusBadge.labelKey, statusBadge.label) : statusBadge.label}
                   </span>
@@ -150,7 +150,7 @@ const SecurityActivityList = ({
                   </p>
                 )}
 
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-tertiary">
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-tertiary">
                   <span className="inline-flex items-center gap-1.5 truncate">
                     {renderDeviceIcon(log.userAgent)}
                     <span className="truncate">{browserDetails}</span>
@@ -169,7 +169,7 @@ const SecurityActivityList = ({
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
-              <span className="text-xs tabular-nums text-text-tertiary">
+              <span className="text-sm tabular-nums text-text-tertiary">
                 {formatDateTime(log.createdAt)}
               </span>
               <ChevronRight

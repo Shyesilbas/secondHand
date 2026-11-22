@@ -2,7 +2,7 @@ import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Search, Wallet, ArrowUpRight, ArrowDownLeft, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import { Download, Search, Wallet, SlidersHorizontal } from 'lucide-react';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
 import PaymentHistory from '../components/PaymentHistory.jsx';
 import PaymentNavigation from '../components/PaymentNavigation.jsx';
@@ -16,7 +16,8 @@ import PageHeader from '../../common/components/ui/PageHeader.jsx';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
-import { inputNormal } from '../../common/components/forms/inputStyles.js';
+import Card from '../../common/components/ui/Card.jsx';
+import { inputNormal, selectCompact } from '../../common/components/forms/inputStyles.js';
 import { PAGE_SIZE_OPTIONS_5_10_20_50 } from '../../common/constants/pagination.js';
 const PaymentsPage = () => {
  const {
@@ -55,9 +56,9 @@ const PaymentsPage = () => {
  const closeFilterSidebar = useCallback(() => setShowFilters(false), [setShowFilters]);
  const summary = [
  { key: 'total', label: t('payments_total_volume'), value: paymentStats?.totalAmount },
- { key: 'in', label: t('incoming'), value: paymentStats?.incomingAmount, icon: ArrowDownLeft },
- { key: 'out', label: t('outgoing'), value: paymentStats?.outgoingAmount, icon: ArrowUpRight },
- { key: 'escrow', label: t('payments_escrow_protection'), value: paymentStats?.escrowAmount, icon: ShieldCheck },
+ { key: 'in', label: t('incoming'), value: paymentStats?.incomingAmount },
+ { key: 'out', label: t('outgoing'), value: paymentStats?.outgoingAmount },
+ { key: 'escrow', label: t('payments_escrow_protection'), value: paymentStats?.escrowAmount },
  ];
  // Search and direction run on the backend (`searchTerm`, `paymentDirection`) across every page.
  // Only a change in this box writes the filter, so the sidebar's seller input is not overwritten.
@@ -91,10 +92,10 @@ const PaymentsPage = () => {
  const startItem = totalElements === 0 ? 0 : currentPage * pageSize + 1;
  const endItem = Math.min((currentPage + 1) * pageSize, totalElements);
 
- return <div className="min-h-screen bg-background-page">
+ return <div className="bg-background-page">
  <PaymentNavigation showFilters={showFilters} onCloseFilters={closeFilterSidebar} filters={filters} onFilterChange={handleFilterChange} onResetFilters={resetAll} hasActiveFilters={hasActiveFilters} />
 
- <div className={`flex flex-col transition-all duration-300 ${showFilters ? 'lg:ml-80' : ''}`}>
+ <div className={`flex flex-col ${showFilters ? 'lg:ml-80' : ''}`}>
  <PageContainer className="py-8">
  <PageHeader
  title={t("finances")}
@@ -110,23 +111,17 @@ const PaymentsPage = () => {
  />
 
  {/* Summary: one panel, four figures. Only incoming is tinted; outgoing is normal spending, not an error. */}
- <dl className="mt-8 grid grid-cols-2 overflow-hidden rounded border border-border-light bg-background-primary shadow-sm lg:grid-cols-4">
- {summary.map((item, index) => {
- const Icon = item.icon;
- return <div key={item.key} className={`p-5 ${index % 2 === 1 ? 'border-l border-border-light' : ''} ${index >= 2 ? 'border-t border-border-light lg:border-t-0' : ''} ${index === 2 ? 'lg:border-l' : ''}`}>
- <dt className="flex items-center gap-1.5 text-sm text-text-secondary">
- {Icon ? <Icon className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden /> : null}
- {item.label}
- </dt>
- <dd className={`mt-1.5 text-xl font-semibold tabular-nums tracking-tight ${item.key === 'in' ? 'text-status-success-text' : 'text-text-primary'}`}>
+ <dl className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+ {summary.map(item => <Card key={item.key} shadow={false} padding="compact">
+ <dt className="text-sm text-text-tertiary">{item.label}</dt>
+ <dd className={`mt-1 text-xl font-semibold tabular-nums tracking-tight ${item.key === 'in' ? 'text-status-success-text' : 'text-text-primary'}`}>
  {paymentStats ? formatCurrency(item.value) : <Skeleton className="h-7 w-28" />}
  </dd>
- </div>;
- })}
+ </Card>)}
  </dl>
 
  {/* Toolbar: filters and search on the left, direction on the right. */}
- <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+ <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div className="flex min-w-0 flex-1 items-center gap-2">
  <button type="button" onClick={toggleFilterSidebar} aria-expanded={showFilters} className="relative inline-flex h-10 shrink-0 items-center gap-2 rounded border border-border bg-background-primary px-3 text-sm font-medium text-text-primary transition-colors duration-150 hover:border-card-border-hover hover:bg-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
  <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} aria-hidden />
@@ -158,7 +153,7 @@ const PaymentsPage = () => {
  <Pagination page={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
  <label className="flex items-center gap-2 text-sm text-text-tertiary">
  {t("per_page")}
- <select value={pageSize} onChange={e => handlePageSizeChange(Number(e.target.value))} className={`${inputNormal} h-9 w-auto py-1`}>
+ <select value={pageSize} onChange={e => handlePageSizeChange(Number(e.target.value))} className={selectCompact}>
  {PAGE_SIZE_OPTIONS_5_10_20_50.map(size => <option key={size} value={size}>{size}</option>)}
  </select>
  </label>

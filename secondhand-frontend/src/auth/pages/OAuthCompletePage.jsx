@@ -6,6 +6,7 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { useAuth } from '../AuthContext.jsx';
 import { authService } from '../services/authService.js';
 import { useGenderEnum } from '../../common/hooks/useGenderEnum.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import Button from '../../common/components/ui/Button.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
@@ -154,7 +155,7 @@ const OAuthCompletePage = () => {
  });
  } catch (err) {
  setErrors({
- submit: err.response?.data?.message || t('registration_failed_retry', 'Kayıt tamamlanamadı. Lütfen tekrar dene.')
+ submit: getErrorMessage(err, t('registration_failed_retry', 'Kayıt tamamlanamadı. Lütfen tekrar dene.'))
  });
  } finally {
  setSubmitting(false);

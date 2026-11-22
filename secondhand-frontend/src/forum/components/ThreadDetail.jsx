@@ -1,183 +1,325 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
-import { ChevronUp, ChevronDown, MessageSquarePlus, Trash2, X, Send, MessageCircle, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, MessageCircle, MessageSquarePlus, Send, Trash2, X } from 'lucide-react';
+import { Badge, Button, Card, EmptyState, ErrorState, Skeleton } from '../../common/components/ui/index.js';
+import { inputNormal, selectCompact } from '../../common/components/forms/inputStyles.js';
 import { CommentItem, CommentSkeleton } from './CommentItem.jsx';
-import { FORUM_MESSAGES, FORUM_REACTIONS, FORUM_THREAD_STATUS_OPTIONS, FORUM_THREAD_STATUSES } from '../forumConstants.js';
+import {
+  FORUM_CATEGORIES,
+  FORUM_REACTIONS,
+  FORUM_THREAD_STATUS_OPTIONS,
+  FORUM_THREAD_STATUSES,
+  formatForumAuthor,
+} from '../forumConstants.js';
 import { formatForumDateTime } from '../utils/forumDateFormat.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { buttonClasses } from '../../common/components/ui/Button.jsx';
-export const ThreadDetailSkeleton = () => <div className="rounded border border-border-light bg-background-primary overflow-hidden animate-pulse">
- <div className="px-6 py-5 border-b border-border-light">
- <div className="h-6 w-2/3 bg-background-tertiary rounded mb-3" />
- <div className="h-4 w-1/3 bg-background-tertiary rounded" />
- </div>
- <div className="p-6">
- <div className="h-4 w-full bg-background-tertiary rounded mb-2" />
- <div className="h-4 w-5/6 bg-background-tertiary rounded mb-2" />
- <div className="h-4 w-4/6 bg-background-tertiary rounded" />
- </div>
- <div className="border-t border-border-light">
- <CommentSkeleton />
- <CommentSkeleton />
- </div>
- </div>;
+
+const CATEGORY_BADGE = {
+  [FORUM_CATEGORIES.SUGGESTIONS]: {
+    labelKey: 'forum_cat_suggestion_singular',
+    fallback: 'Öneri',
+    variant: 'warning',
+  },
+  [FORUM_CATEGORIES.COMPLAINTS]: {
+    labelKey: 'forum_cat_complaint_singular',
+    fallback: 'Şikayet',
+    variant: 'error',
+  },
+};
+
+export const ThreadDetailSkeleton = () => (
+  <Card padding="none" className="overflow-hidden">
+    <div className="border-b border-border-light px-6 py-5">
+      <div className="mb-3 flex items-center gap-2">
+        <Skeleton className="h-5 w-16 rounded-sm" />
+        <Skeleton className="h-4 w-20" />
+      </div>
+      <Skeleton className="mb-2.5 h-6 w-2/3" />
+      <Skeleton className="h-4 w-1/3" />
+    </div>
+    <div className="space-y-2 p-6">
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-5/6" />
+      <Skeleton className="h-4 w-4/6" />
+    </div>
+    <div className="border-t border-border-light">
+      <CommentSkeleton />
+      <CommentSkeleton />
+    </div>
+  </Card>
+);
+
 export const ThreadDetail = ({
- thread,
- threadId,
- currentUserId,
- threadReaction,
- commentsTree,
- commentsLoading,
- commentsError,
- commentsHasMore,
- onLoadMoreComments,
- draftComment,
- onDraftChange,
- onReplyTarget,
- onSubmitComment,
- onReactThread,
- onReactComment,
- onChangeThreadStatus,
- onDeleteThread
+  thread,
+  threadId,
+  currentUserId,
+  threadReaction,
+  commentsTree,
+  commentsLoading,
+  commentsError,
+  commentsHasMore,
+  onLoadMoreComments,
+  onRetryComments,
+  draftComment,
+  onDraftChange,
+  onReplyTarget,
+  onSubmitComment,
+  onReactThread,
+  onReactComment,
+  onChangeThreadStatus,
+  onDeleteThread
 }) => {
- const {
- t
- } = useTranslation();
- const { showConfirmation } = useNotification();
- const [statusUpdating, setStatusUpdating] = useState(false);
- const [composerOpen, setComposerOpen] = useState(false);
- const isLiked = threadReaction === FORUM_REACTIONS.LIKE;
- const isDisliked = threadReaction === FORUM_REACTIONS.DISLIKE;
- const netVotes = (Number(thread?.totalLikes) || 0) - (Number(thread?.totalDislikes) || 0);
- const isOwner = useMemo(() => {
- const a = Number(thread?.userId);
- const b = Number(currentUserId);
- if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
- return a === b;
- }, [currentUserId, thread?.userId]);
- const canManage = isOwner && !!thread?.id && !String(thread?.id || '').startsWith('temp-');
- if (!threadId) {
- return <div className="rounded border border-border bg-background-secondary p-10 text-center shadow-sm">
- <MessageCircle className="mx-auto mb-5 block h-5 w-5 shrink-0 text-secondary-300" strokeWidth={1.5} aria-hidden />
- <p className="text-base font-semibold text-text-primary">{FORUM_MESSAGES.SELECT_THREAD_TITLE}</p>
- <p className="text-sm text-text-muted mt-1.5 max-w-xs mx-auto">{FORUM_MESSAGES.SELECT_THREAD_DESCRIPTION}</p>
- </div>;
- }
- const commentCount = commentsTree?.roots?.length || 0;
- return <div className="rounded border border-border-light bg-background-primary shadow-sm overflow-hidden">
+  const { t } = useTranslation();
+  const { showConfirmation } = useNotification();
+  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(false);
 
- {/* ── Thread Header ─────────────────────────────────── */}
- <div className="px-6 py-5 border-b border-border-light">
- <div className="flex items-start justify-between gap-4">
- <div className="min-w-0 flex-1">
- <h2 className="text-lg font-semibold text-text-primary tracking-tight">
- {thread?.title || FORUM_MESSAGES.SELECT_THREAD_TITLE}
- </h2>
- <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-muted">
- {thread?.authorDisplayName && <span className="inline-flex items-center gap-1.5">
- <User className="w-3 h-3" strokeWidth={1.5} />
- <span className="font-medium text-text-secondary">{thread.authorDisplayName}</span>
- </span>}
- <span className="tabular-nums">{formatForumDateTime(thread?.createdAt)}</span>
- </div>
- </div>
+  const isLiked = threadReaction === FORUM_REACTIONS.LIKE;
+  const isDisliked = threadReaction === FORUM_REACTIONS.DISLIKE;
+  const netVotes = (Number(thread?.totalLikes) || 0) - (Number(thread?.totalDislikes) || 0);
 
- {canManage && <div className="flex items-center gap-2 shrink-0">
- <select value={thread?.status || FORUM_THREAD_STATUSES.OPEN} onChange={async e => {
- const next = e.target.value;
- setStatusUpdating(true);
- try {
- await onChangeThreadStatus?.(threadId, next);
- } finally {
- setStatusUpdating(false);
- }
- }} disabled={statusUpdating} className="h-9 rounded border border-border-light bg-background-primary px-3 text-sm font-medium text-text-secondary focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-card-border-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition">
- {FORUM_THREAD_STATUS_OPTIONS.map(statusOption => <option key={statusOption.id} value={statusOption.id}>{statusOption.label}</option>)}
- </select>
- <button type="button" onClick={() => showConfirmation(t("delete"), FORUM_MESSAGES.DELETE_THREAD_CONFIRM, () => onDeleteThread?.(threadId), {
- confirmLabel: t("delete")
- })} className="h-9 w-9 rounded border border-border-light bg-background-primary hover:bg-background-secondary hover:border-border text-text-muted hover:text-status-error-text inline-flex items-center justify-center transition-colors duration-150" title={t("delete")}>
- <Trash2 className="w-4 h-4" strokeWidth={1.5} />
- </button>
- </div>}
- </div>
- </div>
+  const isOwner = useMemo(() => {
+    const a = Number(thread?.userId);
+    const b = Number(currentUserId);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+    return a === b;
+  }, [currentUserId, thread?.userId]);
 
- {/* ── Thread Body ───────────────────────────────────── */}
- <div className="px-6 py-5">
- <div className="max-w-prose text-base text-text-secondary whitespace-pre-wrap break-words leading-relaxed">
- {thread?.description || ''}
- </div>
+  const canManage = isOwner && !!thread?.id && !String(thread?.id || '').startsWith('temp-');
 
- {/* Voting bar */}
- <div className="mt-5 flex items-center gap-1">
- <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded border transition-colors duration-150 ${isLiked ? 'border-primary bg-primary text-text-inverse' : 'border-border-light bg-background-primary text-text-muted hover:text-text-primary hover:border-border hover:bg-background-secondary'}`} onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.LIKE)} title={t("upvote")}>
- <ChevronUp className="w-5 h-5" strokeWidth={1.5} />
- </button>
- <span className={`inline-flex items-center justify-center min-w-9 h-9 text-sm font-semibold tabular-nums ${netVotes > 0 ? 'text-text-primary' : netVotes < 0 ? 'text-status-error' : 'text-text-muted'}`}>
- {netVotes}
- </span>
- <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded border transition-colors duration-150 ${isDisliked ? 'border-border bg-background-secondary text-status-error-text' : 'border-border-light bg-background-primary text-text-muted hover:text-status-error-text hover:border-border hover:bg-background-secondary'}`} onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.DISLIKE)} title={t("downvote")}>
- <ChevronDown className="w-5 h-5" strokeWidth={1.5} />
- </button>
- </div>
- </div>
+  if (!threadId) {
+    return (
+      <EmptyState
+        icon={MessageCircle}
+        title={t('forum_select_thread_title', 'Bir konu seçin')}
+        description={t('forum_select_thread_desc', 'Detayları ve yorumları görmek için soldaki listeden bir konu seçin.')}
+        className="py-16 shadow-sm"
+      />
+    );
+  }
 
- {/* ── Comments Section ──────────────────────────────── */}
- <div className="border-t border-border-light">
- {/* Comments header */}
- <div className="px-6 py-4 flex items-center justify-between gap-3">
- <div className="flex items-center gap-2">
- <h3 className="text-sm font-medium text-text-primary">{t("comments")}</h3>
- <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-sm bg-background-tertiary text-xs font-semibold text-text-secondary tabular-nums">
- {commentCount}
- </span>
- {draftComment?.parentCommentId ? <span className="text-xs text-text-primary font-medium ml-2">{t("replying")}<button type="button" className="ml-1.5 text-xs text-text-muted hover:text-text-secondary" onClick={() => onReplyTarget?.(null)}>{t("cancel")}</button>
- </span> : null}
- </div>
- <button type="button" onClick={() => setComposerOpen(v => !v)} className={`h-9 w-9 rounded border inline-flex items-center justify-center transition-colors duration-150 ${composerOpen ? 'border-primary bg-primary text-text-inverse' : 'border-border-light bg-background-primary hover:bg-background-tertiary text-text-muted hover:text-text-secondary'}`} title={composerOpen ? FORUM_MESSAGES.CLOSE : FORUM_MESSAGES.WRITE_COMMENT}>
- {composerOpen ? <X className="w-4 h-4" strokeWidth={1.5} /> : <MessageSquarePlus className="w-4 h-4" strokeWidth={1.5} />}
- </button>
- </div>
+  const commentCount = commentsTree?.roots?.length || 0;
+  const catMeta = CATEGORY_BADGE[thread?.category] || CATEGORY_BADGE[FORUM_CATEGORIES.SUGGESTIONS];
+  const authorName = formatForumAuthor(t, thread?.authorDisplayName);
 
- {/* Comment composer */}
- {composerOpen && !draftComment?.parentCommentId && <div className="px-6 pb-5">
- <div className="rounded border border-border-light bg-background-secondary overflow-hidden focus-within:border-card-border-hover focus-within:ring-2 focus-within:ring-border-focus transition duration-150">
- <textarea value={draftComment?.content || ''} onChange={e => onDraftChange?.(e.target.value)} placeholder={t("share_your_thoughts")} className="w-full min-h-24 bg-transparent p-4 text-sm text-text-primary placeholder-text-muted focus:outline-none resize-none" />
- <div className="px-4 py-3 border-t border-border-light bg-background-primary flex items-center justify-end">
- <button type="button" onClick={onSubmitComment} className={buttonClasses('primary', 'sm')}>
- <Send className="w-3.5 h-3.5" strokeWidth={1.5} />{t("post")}</button>
- </div>
- </div>
- </div>}
+  return (
+    <Card padding="none" className="overflow-hidden">
+      <header className="border-b border-border-light px-6 py-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Badge variant={catMeta.variant} size="sm">
+                {t(catMeta.labelKey, catMeta.fallback)}
+              </Badge>
+              <span className="text-sm font-medium text-text-secondary">{authorName}</span>
+              <span className="text-text-tertiary" aria-hidden>·</span>
+              <time dateTime={thread?.createdAt || undefined} className="text-sm tabular-nums text-text-tertiary">
+                {formatForumDateTime(thread?.createdAt)}
+              </time>
+            </div>
+            <h2 className="text-lg font-semibold text-text-primary">
+              {thread?.title || t('forum_untitled', 'Başlıksız konu')}
+            </h2>
+          </div>
 
- {commentsError && <div className="px-6 pb-4">
- <div className="rounded border border-border bg-background-secondary px-4 py-3 text-sm text-status-error-text font-medium">
- {commentsError}
- </div>
- </div>}
+          {canManage && (
+            <div className="flex shrink-0 items-center gap-2">
+              <select
+                aria-label={t('forum_status_label', 'Konu durumu')}
+                value={thread?.status || FORUM_THREAD_STATUSES.OPEN}
+                onChange={async (e) => {
+                  const next = e.target.value;
+                  setStatusUpdating(true);
+                  try {
+                    await onChangeThreadStatus?.(threadId, next);
+                  } finally {
+                    setStatusUpdating(false);
+                  }
+                }}
+                disabled={statusUpdating}
+                className={`${selectCompact} disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                {FORUM_THREAD_STATUS_OPTIONS.map((statusOption) => (
+                  <option key={statusOption.id} value={statusOption.id}>
+                    {t(statusOption.labelKey, statusOption.label)}
+                  </option>
+                ))}
+              </select>
+              <Button
+                variant="danger"
+                size="icon"
+                onClick={() =>
+                  showConfirmation(
+                    t('delete', 'Sil'),
+                    t('forum_delete_thread_confirm', 'Bu konuyu silmek istediğinize emin misiniz?'),
+                    () => onDeleteThread?.(threadId),
+                    { confirmLabel: t('delete', 'Sil') }
+                  )
+                }
+                title={t('delete', 'Sil')}
+                aria-label={t('delete', 'Sil')}
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              </Button>
+            </div>
+          )}
+        </div>
+      </header>
 
- {commentsLoading && commentsTree?.roots?.length === 0 ? <div>
- <CommentSkeleton />
- <CommentSkeleton />
- <CommentSkeleton />
- </div> : <div>
- {commentsTree?.roots?.length ? <div className="px-5 pb-4 space-y-2.5">
- {commentsTree.roots.map(c => <CommentItem key={c?.id} comment={c} depth={0} childrenMap={commentsTree.childrenMap} activeReplyId={draftComment?.parentCommentId || null} replyDraft={draftComment} onReplyDraftChange={onDraftChange} onSubmitReply={onSubmitComment} onCancelReply={() => onReplyTarget?.(null)} onReply={id => {
- setComposerOpen(false);
- onReplyTarget?.(id);
- }} onReact={onReactComment} threadId={threadId} />)}
- </div> : <div className="px-6 py-12 text-center">
- <p className="text-sm font-semibold text-text-muted">{FORUM_MESSAGES.NO_COMMENTS_YET}</p>
- <p className="text-sm text-text-muted mt-1">{FORUM_MESSAGES.BE_FIRST_TO_COMMENT}</p>
- </div>}
- </div>}
+      <div className="px-6 py-5">
+        <div className="max-w-prose whitespace-pre-wrap break-words text-base leading-relaxed text-text-secondary">
+          {thread?.description || ''}
+        </div>
 
- {commentsHasMore && <div className="px-6 py-4 border-t border-border-light flex justify-center">
- <button type="button" onClick={onLoadMoreComments} disabled={commentsLoading} className={buttonClasses('secondary')}>
- {commentsLoading ? 'Loading...' : FORUM_MESSAGES.LOAD_MORE}
- </button>
- </div>}
- </div>
- </div>;
+        <div className="mt-5 flex items-center gap-1">
+          <Button
+            variant={isLiked ? 'primary' : 'secondary'}
+            size="icon"
+            onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.LIKE)}
+            title={t('upvote', 'Beğen')}
+            aria-label={t('upvote', 'Beğen')}
+            aria-pressed={isLiked}
+          >
+            <ChevronUp className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          </Button>
+          <span
+            className={`inline-flex h-8 min-w-8 items-center justify-center text-sm font-semibold tabular-nums ${
+              netVotes > 0 ? 'text-text-primary' : netVotes < 0 ? 'text-status-error-text' : 'text-text-tertiary'
+            }`}
+          >
+            {netVotes}
+          </span>
+          <Button
+            variant={isDisliked ? 'danger' : 'secondary'}
+            size="icon"
+            onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.DISLIKE)}
+            title={t('downvote', 'Beğenme')}
+            aria-label={t('downvote', 'Beğenme')}
+            aria-pressed={isDisliked}
+          >
+            <ChevronDown className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          </Button>
+        </div>
+      </div>
+
+      <section className="border-t border-border-light" aria-label={t('comments', 'Yorumlar')}>
+        <div className="flex items-center justify-between gap-3 px-6 py-4">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-text-primary">{t('comments', 'Yorumlar')}</h3>
+            <Badge variant="muted" size="sm">
+              {commentCount}
+            </Badge>
+            {draftComment?.parentCommentId ? (
+              <span className="ml-2 text-xs font-medium text-text-secondary">
+                {t('replying', 'Yanıtlanıyor...')}
+                <button
+                  type="button"
+                  className="ml-1.5 rounded-sm text-xs text-text-link hover:text-text-linkHover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+                  onClick={() => onReplyTarget?.(null)}
+                >
+                  {t('cancel', 'İptal')}
+                </button>
+              </span>
+            ) : null}
+          </div>
+
+          <Button
+            variant={composerOpen ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setComposerOpen((v) => !v)}
+          >
+            {composerOpen ? (
+              <>
+                <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                <span>{t('close', 'Kapat')}</span>
+              </>
+            ) : (
+              <>
+                <MessageSquarePlus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                <span>{t('forum_write_comment', 'Yorum yaz')}</span>
+              </>
+            )}
+          </Button>
+        </div>
+
+        {composerOpen && !draftComment?.parentCommentId && (
+          <div className="space-y-2.5 px-6 pb-5">
+            <textarea
+              value={draftComment?.content || ''}
+              onChange={(e) => onDraftChange?.(e.target.value)}
+              aria-label={t('forum_write_comment', 'Yorum yaz')}
+              placeholder={t('share_your_thoughts', 'Düşüncelerinizi paylaşın...')}
+              rows={3}
+              className={`${inputNormal} resize-none`}
+            />
+            <div className="flex justify-end">
+              <Button size="sm" onClick={onSubmitComment} disabled={!String(draftComment?.content || '').trim()}>
+                <Send className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                <span>{t('post', 'Gönder')}</span>
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {commentsError && (
+          <div className="px-6 pb-4">
+            <ErrorState
+              size="compact"
+              bordered={false}
+              title={t('forum_load_comments_failed', 'Yorumlar yüklenemedi')}
+              description={commentsError}
+              onRetry={onRetryComments}
+            />
+          </div>
+        )}
+
+        {commentsLoading && commentsTree?.roots?.length === 0 ? (
+          <div>
+            <CommentSkeleton />
+            <CommentSkeleton />
+            <CommentSkeleton />
+          </div>
+        ) : commentsTree?.roots?.length ? (
+          <div className="space-y-1 px-6 pb-5">
+            {commentsTree.roots.map((c) => (
+              <CommentItem
+                key={c?.id}
+                comment={c}
+                depth={0}
+                childrenMap={commentsTree.childrenMap}
+                activeReplyId={draftComment?.parentCommentId || null}
+                replyDraft={draftComment}
+                onReplyDraftChange={onDraftChange}
+                onSubmitReply={onSubmitComment}
+                onCancelReply={() => onReplyTarget?.(null)}
+                onReply={(id) => {
+                  setComposerOpen(false);
+                  onReplyTarget?.(id);
+                }}
+                onReact={onReactComment}
+                threadId={threadId}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="px-6 py-10 text-center">
+            <p className="text-sm font-medium text-text-secondary">
+              {t('forum_no_comments_yet', 'Henüz yorum yok')}
+            </p>
+            <p className="mt-1 text-sm text-text-tertiary">
+              {t('forum_be_first_to_comment', 'İlk yorumu siz yapın.')}
+            </p>
+          </div>
+        )}
+
+        {commentsHasMore && (
+          <div className="flex justify-center border-t border-border-light px-6 py-4">
+            <Button variant="secondary" size="sm" onClick={onLoadMoreComments} disabled={commentsLoading}>
+              {commentsLoading ? t('loading', 'Yükleniyor...') : t('load_more', 'Daha fazla yükle')}
+            </Button>
+          </div>
+        )}
+      </section>
+    </Card>
+  );
 };

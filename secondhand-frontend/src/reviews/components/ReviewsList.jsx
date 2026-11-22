@@ -1,53 +1,72 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { memo } from 'react';
-import { AlertCircle, MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import ReviewCard from './ReviewCard.jsx';
-import { SkeletonList } from '../../common/components/ui/index.js';
-import { REVIEW_LIMITS, REVIEW_MESSAGES } from '../reviewConstants.js';
-import { buttonClasses } from '../../common/components/ui/Button.jsx';
+import { Button, Card, EmptyState, Skeleton } from '../../common/components/ui/index.js';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
+import { REVIEW_LIMITS } from '../reviewConstants.js';
+
+const RowSkeleton = () => (
+  <div className="flex items-start gap-3 py-4" aria-hidden>
+    <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+    <div className="flex-1 space-y-2">
+      <Skeleton className="h-4 w-40" />
+      <Skeleton className="h-3.5 w-24" />
+      <Skeleton className="h-4 w-3/4" />
+    </div>
+  </div>
+);
+
+/** One card, reviews as divided rows; `perspective` is 'received' or 'given'. */
 const ReviewsList = memo(({
- reviews,
- loading,
- error,
- hasMore,
- onLoadMore,
- onRetry,
- showLoadMore = true
+  reviews,
+  loading,
+  error,
+  hasMore,
+  onLoadMore,
+  onRetry,
+  title,
+  perspective = 'received',
+  showLoadMore = true
 }) => {
- const { t } = useTranslation();
- if (loading && reviews.length === 0) {
- return <div className="space-y-4">
- {Array.from({
- length: REVIEW_LIMITS.SKELETON_ROWS
- }).map((_, index) => <SkeletonList key={'review-skeleton-' + index} />)}
- </div>;
- }
- if (error) {
- return <div className="bg-background-primary rounded border border-border-light shadow-sm p-8 text-center max-w-lg mx-auto mt-4">
- <AlertCircle className="mx-auto mb-4 block h-5 w-5 shrink-0 text-status-error-text" strokeWidth={1.5} aria-hidden />
- <h3 className="text-lg font-semibold tracking-tight text-text-primary mb-2">{REVIEW_MESSAGES.ERROR_OCCURRED_TITLE}</h3>
- <p className="text-text-secondary mb-6">{error}</p>
- <button type="button" onClick={() => (onRetry ?? onLoadMore)?.()} className={buttonClasses()}>
- {REVIEW_MESSAGES.TRY_AGAIN}
- </button>
- </div>;
- }
- if (reviews.length === 0) {
- return <div className="bg-background-primary rounded border border-border-light p-12 text-center mt-4">
- <MessageSquare className="mx-auto mb-6 block h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
- <h3 className="text-xl font-semibold tracking-tight text-text-primary mb-3">{REVIEW_MESSAGES.NO_REVIEWS_YET}</h3>
- <p className="text-text-secondary max-w-sm mx-auto">{t("no_reviews_have_been_made_to_this_user")}</p>
- </div>;
- }
- return <div className="space-y-4">
- {reviews.map(review => <ReviewCard key={review.id} review={review} />)}
- 
- {hasMore && showLoadMore && <div className="text-center py-8">
- <button onClick={onLoadMore} disabled={loading} className="bg-background-secondary border border-border-light text-text-primary px-8 py-3 rounded hover:bg-background-tertiary font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition">
- {loading ? REVIEW_MESSAGES.LOADING : REVIEW_MESSAGES.LOAD_MORE}
- </button>
- </div>}
- </div>;
+  const { t } = useTranslation();
+  const isGiven = perspective === 'given';
+
+  if (error) {
+    return <ErrorState title={t('reviews_load_failed', 'Değerlendirmeler yüklenemedi')} description={error} onRetry={onRetry ?? onLoadMore} />;
+  }
+
+  if (!loading && reviews.length === 0) {
+    return (
+      <EmptyState
+        icon={MessageSquare}
+        title={isGiven ? t('no_reviews_given_yet', 'Henüz değerlendirme yapmadın') : t('no_reviews_received_yet', 'Henüz değerlendirme alınmadı')}
+        description={isGiven
+          ? t('no_reviews_given_desc', 'Tamamlanan siparişlerini değerlendirdiğinde burada görünür.')
+          : t('no_reviews_received_desc', 'Alıcılar siparişlerini değerlendirdiğinde burada görünür.')}
+      />
+    );
+  }
+
+  return (
+    <Card shadow={false}>
+      {title && <h2 className="mb-1 text-lg font-semibold text-text-primary">{title}</h2>}
+      <div className="divide-y divide-border-light">
+        {reviews.map((review) => (
+          <ReviewCard key={review.id} review={review} variant="inline" perspective={perspective} showListing />
+        ))}
+        {loading && Array.from({ length: REVIEW_LIMITS.SKELETON_ROWS }).map((_, i) => <RowSkeleton key={i} />)}
+      </div>
+      {hasMore && showLoadMore && (
+        <div className="mt-2 border-t border-border-light pt-4 text-center">
+          <Button variant="secondary" onClick={onLoadMore} disabled={loading}>
+            {loading ? t('loading', 'Yükleniyor...') : t('load_more', 'Daha fazla yükle')}
+          </Button>
+        </div>
+      )}
+    </Card>
+  );
 });
+
 ReviewsList.displayName = 'ReviewsList';
 export default ReviewsList;

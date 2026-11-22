@@ -33,6 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -54,3 +56,12 @@ jobs:
 
       - name: Run repository consistency and lint checks
         run: ./scripts/verify.sh
+
+      - name: Build the project report (fails when its facts drift from the code)
+        run: |
+          pip install -r scripts/project_report/requirements.txt
+          python3 scripts/project_report/build_project_report.py "$RUNNER_TEMP/project_report.pdf"
+
+      - name: Remind which docs may need an update
+        if: github.event_name == 'pull_request'
+        run: python3 scripts/check_docs.py --changed=origin/${{ github.base_ref }}

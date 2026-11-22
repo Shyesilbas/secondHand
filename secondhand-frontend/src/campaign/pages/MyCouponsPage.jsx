@@ -6,6 +6,7 @@ import PageContainer from '@/common/components/layout/PageContainer';
 import { campaignService } from '../../listing/services/campaignService.js';
 import { listingService } from '../../listing/services/listingService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import Button from '../../common/components/ui/Button.jsx';
 import Card from '../../common/components/ui/Card.jsx';
 import PageHeader from '../../common/components/ui/PageHeader.jsx';
@@ -64,7 +65,7 @@ const MyCouponsPage = () => {
       showSuccess(t('campaign_deleted_title', 'Kampanya silindi'), t('campaign_deleted_text', 'İndirim artık ilanlarına uygulanmıyor.'));
       refreshCampaignAffectedQueries(queryClient);
     },
-    onError: (e) => showError(t('campaign_delete_failed', 'Silinemedi'), e?.response?.data?.message || t('campaign_delete_failed_text', 'Kampanya silinemedi. Lütfen tekrar dene.')),
+    onError: (e) => showError(t('campaign_delete_failed', 'Silinemedi'), getErrorMessage(e, t('campaign_delete_failed_text', 'Kampanya silinemedi. Lütfen tekrar dene.'))),
   });
 
   const confirmDelete = (campaign) => {

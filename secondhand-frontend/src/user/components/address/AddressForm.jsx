@@ -193,7 +193,7 @@ const AddressForm = ({
             <span className="font-medium text-text-primary">
               {t('main_address', 'Varsayılan Adres')}
             </span>
-            <span className="mt-0.5 block text-xs text-text-tertiary">
+            <span className="mt-0.5 block text-sm text-text-tertiary">
               {t(
                 'use_as_default_for_checkout_and_delivery',
                 'Ödeme ve teslimat adımlarında varsayılan olarak kullan'

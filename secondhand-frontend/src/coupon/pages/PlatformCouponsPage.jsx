@@ -5,12 +5,13 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ExternalLink, RefreshCw } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
-import { formatDateTime } from '../../common/formatters.js';
+import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { couponService } from '../../cart/services/couponService.js';
-import { formatCouponDiscount, formatCouponKindLabel } from '../utils/couponUiFormat.js';
+import { formatCouponDiscount } from '../utils/couponUiFormat.js';
 import { SkeletonList } from '../../common/components/ui/Skeleton.jsx';
-import { PageHeader, Tabs } from '../../common/components/ui/index.js';
+import { ErrorState, PageHeader, Tabs } from '../../common/components/ui/index.js';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 const TABS = {
     ACTIVE: 'active',
     PARTICIPATED: 'participated'
@@ -19,39 +20,6 @@ function sortActive(list) {
     return [...(list || [])].sort((a, b) => String(a.code).localeCompare(String(b.code)));
 }
 
-/** limit null → sınırsız; aksi halde kalan / limit */
-function LimitCell({
-    limit,
-    remaining
-}) {
-    const {
-        t
-    } = useTranslation();
-    if (limit == null) {
-        return <span className="text-text-muted">{t("s_n_rs_z")}</span>;
-    }
-    const r = remaining != null ? remaining : '—';
-    return <span className="tabular-nums">
-        <span className="font-semibold text-text-primary">{r}</span>
-        <span className="font-normal text-text-muted"> / {limit}</span>
-    </span>;
-}
-function CouponPeriod({
-    startsAt,
-    endsAt
-}) {
-    const {
-        t
-    } = useTranslation();
-    if (!startsAt && !endsAt) {
-        return <span className="text-text-muted">{t("s_re_s_n_r_yok")}</span>;
-    }
-    return <div className="text-sm leading-snug text-text-secondary">
-        {startsAt ? <div>{t("ba_lang")}{formatDateTime(startsAt)}</div> : null}
-        {endsAt ? <div>{t("biti")}{formatDateTime(endsAt)}</div> : null}
-        {!startsAt && endsAt ? <div>{t("biti")}{formatDateTime(endsAt)}</div> : null}
-    </div>;
-}
 const PlatformCouponsPage = () => {
     const {
         t
@@ -67,7 +35,6 @@ const PlatformCouponsPage = () => {
         queryKey: ['coupons', 'redemptions'],
         queryFn: () => couponService.redemptions(),
         select: d => Array.isArray(d) ? d : [],
-        enabled: tab === TABS.PARTICIPATED,
         staleTime: 30_000
     });
     const isFetching = tab === TABS.ACTIVE ? activeQ.isFetching : participationsQ.isFetching;
@@ -77,11 +44,13 @@ const PlatformCouponsPage = () => {
     };
     const activeList = activeQ.data ?? [];
     const participationsList = participationsQ.data ?? [];
+    // Sum of the discount each redemption snapshotted at checkout (backend is the source of truth).
+    const totalSavings = participationsList.reduce((sum, row) => sum + (Number(row.discountAmount) || 0), 0);
     const loading = tab === TABS.ACTIVE ? activeQ.isLoading : participationsQ.isLoading;
     const error = tab === TABS.ACTIVE ? activeQ.error : participationsQ.error;
     const ordersHref = orderId => orderId != null ? `${ROUTES.MY_ORDERS}?orderId=${encodeURIComponent(String(orderId))}` : null;
     const tableShell = 'rounded border border-border-light bg-background-primary shadow-sm overflow-hidden';
-    return <div className="min-h-screen bg-background-page">
+    return <div>
         <PageContainer className="py-8">
             <div className="mb-4">
                 <PageHeader
@@ -92,7 +61,7 @@ const PlatformCouponsPage = () => {
                         </Link>
                     }
                     title={t("platform_kuponlar")}
-                    subtitle={t("size_uygun_kodlar_ve_kullan_m_ge_mi_iniz")}
+                    subtitle={t("kupon_alt_baslik", "Kullanabileceğin kodlar ve geçmiş kullanımların")}
                     actions={
                         <button type="button" onClick={() => refetch()} disabled={isFetching} className={buttonClasses('secondary', 'sm')}>
                             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} strokeWidth={1.5} />{t("yenile")}
@@ -100,6 +69,12 @@ const PlatformCouponsPage = () => {
                     }
                 />
             </div>
+
+            {totalSavings > 0 && <p className="mb-4 text-sm text-text-secondary">
+                {t("kupon_tasarruf_ozeti", "Şu ana kadar kuponlarla")}{' '}
+                <span className="font-semibold tabular-nums text-text-price">{formatCurrency(totalSavings)}</span>{' '}
+                {t("kupon_tasarruf_ozeti_son", "tasarruf ettin.")}
+            </p>}
 
             <Tabs
                 variant="segmented"
@@ -118,78 +93,47 @@ const PlatformCouponsPage = () => {
                 <SkeletonList />
             </div>}
 
-            {!loading && error && <div className="rounded border border-border bg-background-secondary px-4 py-3 text-sm text-status-error-text">
-                {error?.response?.data?.message || error?.message || 'Yüklenemedi.'}
-            </div>}
+            {!loading && error && (
+                <ErrorState
+                    title={t("coupons_load_failed", "Kuponlar yüklenemedi")}
+                    description={getErrorMessage(error, t("coupons_load_failed", "Kuponlar yüklenemedi."))}
+                    onRetry={refetch}
+                />
+            )}
 
             {!loading && !error && tab === TABS.ACTIVE && activeList.length === 0 && <div className="rounded border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("u_an_size_atanm_kullan_labilir_kupon_yok")}</div>}
 
             {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length === 0 && <div className="rounded border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("hen_z_bir_sipari_te_kupon_kullanmad_n_z")}</div>}
 
-            {!loading && !error && tab === TABS.ACTIVE && activeList.length > 0 && <div className={tableShell}>
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[720px] border-collapse text-left text-sm">
-                        <thead>
-                            <tr className="border-b border-border-light bg-background-secondary text-xs font-semibold text-text-secondary">
-                                <th className="whitespace-nowrap px-4 py-3">{t("kod")}</th>
-                                <th className="min-w-44 px-4 py-3">{t("kampanya")}</th>
-                                <th className="whitespace-nowrap px-4 py-3">{t("i_ndirim")}</th>
-                                <th className="whitespace-nowrap px-4 py-3">{t("genel_hak")}<span className="mt-0.5 block font-normal normal-case tracking-normal text-text-muted">{t("global_kalan_limit")}</span>
-                                </th>
-                                <th className="whitespace-nowrap px-4 py-3">{t("size_zel")}<span className="mt-0.5 block font-normal normal-case tracking-normal text-text-muted">{t("ki_i_ba_kalan_limit")}</span>
-                                </th>
-                                <th className="min-w-36 px-4 py-3">{t("ge_erlilik")}</th>
-                                <th className="whitespace-nowrap px-4 py-3 text-right">{t("i_lem")}</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border-light">
-                            {activeList.map(c => <tr key={c.id} className="bg-background-primary transition-colors hover:bg-background-secondary">
-                                <td className="align-top px-4 py-3 text-sm font-semibold text-text-primary">{c.code}</td>
-                                <td className="align-top px-4 py-3">
-                                    <div className="max-w-56 truncate font-semibold text-text-primary" title={c.title}>
-                                        {c.title?.trim() || '—'}
-                                    </div>
-                                    {c.description?.trim() && <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-text-secondary" title={c.description.trim()}>
-                                        {c.description.trim()}
-                                    </p>}
-                                    {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && <p className="mt-1 text-xs text-text-tertiary">{c.eligibleTypes.join(', ')}</p>}
-                                </td>
-                                <td className="align-top whitespace-nowrap px-4 py-3">
-                                    <span className="inline-flex flex-col gap-1">
-                                        <span className="w-fit rounded-sm border border-border bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
-                                            {formatCouponKindLabel(c.discountKind)}
-                                        </span>
-                                        <span className="text-sm font-semibold tabular-nums text-text-price">{formatCouponDiscount(c)}</span>
-                                    </span>
-                                </td>
-                                <td className="align-top whitespace-nowrap px-4 py-3 text-sm">
-                                    <LimitCell limit={c.usageLimitGlobal} remaining={c.usageRemainingGlobal} />
-                                </td>
-                                <td className="align-top whitespace-nowrap px-4 py-3 text-sm">
-                                    <LimitCell limit={c.usageLimitPerUser} remaining={c.usageRemainingPerUser} />
-                                </td>
-                                <td className="align-top px-4 py-3">
-                                    <CouponPeriod startsAt={c.startsAt} endsAt={c.endsAt} />
-                                </td>
-                                <td className="align-top whitespace-nowrap px-4 py-3 text-right">
-                                    <Link to={ROUTES.CHECKOUT} className={buttonClasses('primary', 'sm')}>{t("deme")}<ExternalLink className="h-3.5 w-3.5 opacity-90" strokeWidth={1.5} />
-                                    </Link>
-                                </td>
-                            </tr>)}
-                        </tbody>
-                    </table>
-                </div>
-                <p className="border-t border-border-light bg-background-secondary px-4 py-2.5 text-sm text-text-muted">{t("genel_hak_kampanyan_n_t_m_kullan_c_lar_i")}</p>
-            </div>}
+            {!loading && !error && tab === TABS.ACTIVE && activeList.length > 0 && <ul className="space-y-3">
+                {activeList.map(c => <li key={c.id} className="flex flex-col gap-4 rounded border border-border-light bg-background-primary p-5 shadow-sm sm:flex-row sm:items-center">
+                    <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                            <span className="text-lg font-semibold tabular-nums text-text-price">{formatCouponDiscount(c)}</span>
+                            <span className="text-sm font-semibold tracking-wide text-text-primary">{c.code}</span>
+                        </div>
+                        <p className="mt-1 truncate text-base font-medium text-text-primary" title={c.title}>{c.title?.trim() || c.code}</p>
+                        {c.description?.trim() && <p className="mt-0.5 line-clamp-2 text-sm text-text-secondary">{c.description.trim()}</p>}
+                        <p className="mt-2 text-sm text-text-tertiary tabular-nums">
+                            {c.usageLimitPerUser != null && <>{t("kupon_kalan_hakkin", "Kalan hakkın")}: {c.usageRemainingPerUser ?? '—'} / {c.usageLimitPerUser}{' · '}</>}
+                            {c.endsAt ? t("kupon_son_gun", "Son kullanım") + ': ' + formatDateTime(c.endsAt) : t("s_re_s_n_r_yok")}
+                        </p>
+                    </div>
+                    <Link to={ROUTES.CHECKOUT} className={buttonClasses('primary', 'sm') + ' shrink-0 self-start sm:self-center'}>
+                        {t("kupon_odemeye_git", "Ödemeye git")}
+                    </Link>
+                </li>)}
+            </ul>}
 
             {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length > 0 && <div className={tableShell}>
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[560px] border-collapse text-left text-sm">
+                    <table className="w-full min-w-[640px] border-collapse text-left text-sm">
                         <thead>
                             <tr className="border-b border-border-light bg-background-secondary text-xs font-semibold text-text-secondary">
                                 <th className="whitespace-nowrap px-4 py-3">{t("kod")}</th>
                                 <th className="min-w-48 px-4 py-3">{t("kampanya")}</th>
                                 <th className="whitespace-nowrap px-4 py-3">{t("kullan_ld")}</th>
+                                <th className="whitespace-nowrap px-4 py-3 text-right">{t("kupon_tasarruf_sutunu", "Tasarruf")}</th>
                                 <th className="whitespace-nowrap px-4 py-3 text-right">{t("sipari")}</th>
                             </tr>
                         </thead>
@@ -204,6 +148,9 @@ const PlatformCouponsPage = () => {
                                 </td>
                                 <td className="align-top whitespace-nowrap px-4 py-3 text-sm text-text-secondary">
                                     {row.redeemedAt ? formatDateTime(row.redeemedAt) : '—'}
+                                </td>
+                                <td className="align-top whitespace-nowrap px-4 py-3 text-right text-sm font-semibold tabular-nums text-text-price">
+                                    {Number(row.discountAmount) > 0 ? formatCurrency(row.discountAmount) : '—'}
                                 </td>
                                 <td className="align-top whitespace-nowrap px-4 py-3 text-right text-sm font-semibold">
                                     {ordersHref(row.orderId) ? <Link to={ordersHref(row.orderId)} className="inline-flex items-center gap-1 text-primary hover:text-primary-hover hover:underline">

@@ -18,6 +18,25 @@ An enterprise-grade, high-concurrency C2C second-hand marketplace platform featu
 
 > **AI Agents & Contributors:** Start with [`AGENTS.md`](AGENTS.md) for cross-cutting standards, testing rules, and skill mappings.
 
+## Where to Read Next
+
+| You are... | Start here |
+| :--- | :--- |
+| A new developer | [`docs/getting-started-and-developer-guide.md`](docs/getting-started-and-developer-guide.md) (setup, workflow, tests, troubleshooting) |
+| Curious what the product does | [`docs/product-overview-and-user-journeys.md`](docs/product-overview-and-user-journeys.md) (roles, buyer and seller flows, coupons, offers) |
+| Working on one module | The module hub `README.md` under `src/main/java/com/serhat/secondhand/<module>/` or `secondhand-frontend/src/<module>/` |
+| Looking for the "why" | [`docs/adr/README.md`](docs/adr/README.md) (six architecture decision records) and the deep dives in [`docs/README.md`](docs/README.md) |
+| On call or debugging production | [`docs/operations-runbook.md`](docs/operations-runbook.md) (outbox requeue, DLT, stock drift, Flyway) |
+
+## Key Features
+
+- **Listings:** six verticals (vehicle, electronics, real estate, books, clothing, sports) with rule-driven forms, price history, paid showcases, best sellers on the home page, and bulk status changes in My Listings.
+- **Buying:** reserved stock during checkout, per-seller orders, escrow-held payments, cargo or safe meetup delivery, 48-hour refund window.
+- **Pricing:** seller campaigns (paid by the seller) and platform coupons (paid by the platform, with remaining uses and total savings shown on the Coupons page).
+- **Negotiation:** offers with counter-offers; an accepted offer holds the stock until its payment deadline.
+- **Trust:** reviews, follows, complaints with a moderation queue, user blocking, audit trail and security devices page.
+- **Communication:** real-time chat, notification feed and in-app inbox, Aura AI search assistant.
+
 ---
 
 ## Architecture Overview
@@ -72,17 +91,19 @@ flowchart TD
 
 ## Domain & Directory Map
 
-Each backend module has a dedicated `README.md` defining its business invariants, state machines, and public APIs. Most modules correspond directly to a directory under `secondhand-frontend/src/`.
+Each backend module has a hub `README.md`; most modules map to a directory under `secondhand-frontend/src/`.
 
-| Domain | Backend Packages | Frontend Directories | Responsibilities & Architectural Highlights |
+| Domain | Backend Packages | Frontend Directories | Focus |
 | :--- | :--- | :--- | :--- |
-| **Money** | `checkout`, `order`, `payment`, `escrow`, `ewallet`, `coupon`, `pricing`, `campaign`, `offer` | `src/payments`, `src/ewallet`, `src/order`, `src/cart`, `src/coupon`, `src/campaign`, `src/offer` | Escrow-backed payments, internal e-wallet with pessimistic row locks, safe meetup delivery (OTP/QR verification), transactional outbox publishing, Lua-based coupon limiters. |
-| **Identity & Users** | `auth`, `user`, `core/jwt`, `core/security` | `src/auth`, `src/user` | Stateless JWT with refresh token rotation (HttpOnly cookies), Google OAuth2 SSO, user addresses, prestige Great Seller badges, subscription plans (`BASIC`, `PLUS`, `PRO`) with daily Aura question quotas. |
-| **Stock & Reservations** | `cart`, `inventory` | `src/cart` | Two-tier optimistic shopping cart, atomic Redis Lua stock reservations with 15-minute anti-hoarding TTL, background drift reconciliation scheduler. |
-| **Product & Catalogs** | `listing`, `showcase`, `favorite`, `favoritelist`, `review`, `follow`, `forum` | `src/listing`, `src/showcase`, `src/vehicle`, `src/electronics`, `src/realEstate`, `src/books`, `src/clothing`, `src/sports`, `src/favorites`, `src/favoritelist`, `src/reviews`, `src/follow`, `src/forum` | 6 polymorphic vertical catalogs (JPA Joined table inheritance), rule-driven forms, attribute engine, paid showcases, private broadcast offers to favoriters, and community forum threads. |
-| **Communications** | `chat`, `notification`, `email` | `src/chat`, `src/inbox`, `src/notification`, `src/emails` | Dual-channel chat (11 REST endpoints + STOMP WebSocket), hybrid notification feed (personal + system broadcasts), Kafka-dispatched transactional email rendered via Thymeleaf into in-app inboxes. |
-| **AI & Complaints** | `ai`, `complaint` | `src/ai`, `src/complaint` | "Aura" assistant: multi-vertical search planning via Gemini API and live price advisor. User complaints are stored; AI moderation is a [proposal](docs/proposals/aura-trust-safety-and-complaint-moderation.md), not implemented. |
-| **Core & Platform** | `core`, `agreements`, `dashboard`, `shipping`, `exchange`, `cloudinary` | `src/admin`, `src/audit`, `src/agreements`, `src/dashboard`, `src/comparison` | Central `ResultResponses` envelope, dynamic `@PublicEndpoint` registry, Redis rate limiting, audit logging, legal terms consent, carrier adapters (`CargoProviderPort`), and currency conversion. |
+| **Money** | `checkout`, `order`, `payment`, `escrow`, `ewallet`, `coupon`, `pricing`, `campaign`, `offer` | `payments`, `ewallet`, `order`, `cart`, `coupon`, `campaign`, `offer` | Escrow-backed payments, eWallet, coupons and campaigns |
+| **Identity & Users** | `auth`, `user`, `core/jwt`, `core/security` | `auth`, `user` | JWT sessions, Google SSO, addresses, plans |
+| **Stock** | `cart`, `inventory` | `cart` | Redis stock reservations, reconciliation |
+| **Product** | `listing`, `showcase`, `favorite`, `favoritelist`, `review`, `follow`, `forum` | `listing`, `showcase`, `vehicle`, `electronics`, `realEstate`, `books`, `clothing`, `sports`, `favorites`, `favoritelist`, `reviews`, `follow`, `forum` | Six polymorphic verticals, showcases, social features |
+| **Communications** | `chat`, `notification`, `email` | `chat`, `inbox`, `notification`, `emails` | Chat, notification feed, in-app email |
+| **AI & Complaints** | `ai`, `complaint` | `ai`, `complaint` | Aura assistant, complaint moderation |
+| **Core & Platform** | `core`, `agreements`, `dashboard`, `shipping`, `exchange`, `cloudinary` | `admin`, `audit`, `agreements`, `dashboard`, `comparison` | Result envelope, rate limiting, audit, carriers, currency |
+
+Rules, invariants and APIs of each module live in its hub `README.md`, not here.
 
 > **Deep Dive Documentation:** For architectural blueprints, state machine diagrams, and concurrency guarantees, visit [`docs/README.md`](docs/README.md).
 
@@ -161,21 +182,41 @@ Supported seed keys: `vehicle`, `electronics`, `clothing`, `books`, `sports`, `r
 
 ## Testing & Verification
 
-Unit tests use plain Mockito with zero Spring context startup overhead for sub-second feedback:
+Unit tests use plain Mockito with no Spring context startup, so feedback is fast:
 
 ```bash
-# Run targeted unit tests
-mvn test -Dmaven.test.skip=false -Dtest=ErrorCodeStatusesTest,RateLimitingFilterTest
+# All unit tests, or one class
+mvn test
+mvn test -Dtest=CouponServiceTest
 
-# Verify documentation consistency (class names, links, Redis keys, terms)
-python3 scripts/check_docs.py
+# Unit tests plus JaCoCo coverage (what CI runs)
+mvn -B verify
 
-# Verify frontend/backend API route contract parity
-python3 scripts/check_api_endpoints.py
+# Integration test (needs Docker, mutates dev stock): ask before running
+mvn test -Pintegration-tests -Dtest=ConcurrentStockAndPaymentIntegrationTest
 
-# Frontend lint & build
+# Frontend lint and build
 cd secondhand-frontend && npm run lint && npm run build
+
+# Repo consistency: docs drift, API route parity, zero-emoji scan, frontend lint
+./scripts/verify.sh
 ```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs `mvn -B verify`, the frontend build and `./scripts/verify.sh` on every push and pull request.
+
+---
+
+## Troubleshooting
+
+| Symptom | Fix |
+| :--- | :--- |
+| Flyway checksum error on startup | One-time `flyway repair`, command in [`docs/database-migration-and-seeding-guide.md`](docs/database-migration-and-seeding-guide.md) |
+| New migration not applied | Restart the backend; Flyway applies pending versions at startup |
+| `connection refused` on 5433, 6379 or 9092 | `docker compose up -d` |
+| Aura, image upload or Google sign-in fails | The matching `GEMINI_*`, `CLOUDINARY_*` or `GOOGLE_*` value in `.env` is empty |
+| HTTP 429 | Rate limit; tune the `RATE_LIMIT_*` variables |
+
+In dev there is no SMTP: emails are written to the `emails` table and shown in the in-app inbox (`/inbox`).
 
 ---
 

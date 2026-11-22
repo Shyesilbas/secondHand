@@ -11,18 +11,18 @@ export const formatCouponDiscount = (coupon) => {
 export const formatCouponKindLabel = (kind) => {
  switch (kind) {
  case 'ORDER_PERCENT':
- return 'Cart % discount';
+ return 'Sepette yüzde indirim';
  case 'ORDER_FIXED':
- return 'Cart fixed discount';
+ return 'Sepette sabit indirim';
  case 'TYPE_PERCENT':
- return 'Type % discount';
+ return 'Kategoriye yüzde indirim';
  case 'TYPE_FIXED':
- return 'Type fixed discount';
+ return 'Kategoriye sabit indirim';
  case 'THRESHOLD_FIXED':
- return 'Threshold fixed discount';
+ return 'Tutar üstü sabit indirim';
  case 'THRESHOLD_PERCENT':
- return 'Threshold % discount';
+ return 'Tutar üstü yüzde indirim';
  default:
- return kind || 'Discount';
+ return kind || 'İndirim';
  }
 };

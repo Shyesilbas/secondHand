@@ -303,8 +303,26 @@ public class OrderEmailListener {
                             : orderDto.getPaymentProviderName())
                     : null;
 
+            String currencyName = orderDto.getCurrency() != null ? orderDto.getCurrency().name() : "TRY";
+            BigDecimal couponTotal = sellerItems.stream()
+                    .map(OrderItemDto::getCouponDiscount)
+                    .filter(java.util.Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            boolean couponUsed = couponTotal.signum() > 0;
+            // Seller-set price: the pre-campaign, pre-coupon line price; old rows without it fall back to paid + coupon.
+            BigDecimal listingAmount = sellerItems.stream()
+                    .map(i -> i.getOriginalUnitPrice() != null && i.getQuantity() != null
+                            ? i.getOriginalUnitPrice().multiply(BigDecimal.valueOf(i.getQuantity()))
+                            : i.getTotalPrice().add(i.getCouponDiscount() != null ? i.getCouponDiscount() : BigDecimal.ZERO))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
             var data = OrderConfirmationEmailData.builder()
                     .userName(seller.getName())
+                    .couponCode(couponUsed ? orderDto.getCouponCode() : null)
+                    .listingAmount(couponUsed ? formatMoney(listingAmount, currencyName) : null)
+                    .couponDiscountAmount(couponUsed ? formatMoney(couponTotal, currencyName) : null)
+                    .paidAmount(couponUsed ? formatMoney(total, currencyName) : null)
+                    .payoutAmount(couponUsed ? formatMoney(total.add(couponTotal), currencyName) : null)
                     .orderNumber(getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()))
                     .totalAmount(
                             formatMoney(total, orderDto.getCurrency() != null ? orderDto.getCurrency().name() : "TRY"))

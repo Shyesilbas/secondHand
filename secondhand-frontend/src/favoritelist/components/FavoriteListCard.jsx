@@ -69,36 +69,36 @@ const FavoriteListCard = ({
  </div>
 
  {isOwner && <div className="absolute top-3 right-3">
- <button onClick={e => {
+ <button type="button" onClick={e => {
  e.preventDefault();
  e.stopPropagation();
  setShowMenu(!showMenu);
- }} className="w-8 h-8 bg-background-primary/90 rounded flex items-center justify-center hover:bg-background-primary transition-colors shadow-sm">
- <MoreVertical className="w-4 h-4 text-text-secondary" strokeWidth={1.5} />
+ }} aria-label={t("options", "Seçenekler")} className="flex h-8 w-8 items-center justify-center rounded bg-background-primary text-text-secondary shadow-sm transition-colors hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
+ <MoreVertical className="w-4 h-4" strokeWidth={1.5} aria-hidden />
  </button>
  
  {showMenu && <div className="absolute top-full right-0 mt-1 bg-background-primary rounded shadow-md border border-border py-1 min-w-36 z-10" onClick={e => e.stopPropagation()}>
- <button onClick={e => {
+ <button type="button" onClick={e => {
  e.preventDefault();
  setShowEditModal(true);
  setShowMenu(false);
- }} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-text-secondary hover:bg-secondary">
- <Pencil className="w-4 h-4" strokeWidth={1.5} />{t("edit")}</button>
- <button onClick={e => {
+ }} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-text-secondary hover:bg-background-secondary hover:text-text-primary">
+ <Pencil className="w-4 h-4" strokeWidth={1.5} aria-hidden />{t("edit")}</button>
+ <button type="button" onClick={e => {
  e.preventDefault();
  handleDelete();
- }} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-status-error-text hover:bg-background-secondary">
- <Trash2 className="w-4 h-4" strokeWidth={1.5} />{t("delete")}</button>
+ }} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-status-error-text hover:bg-status-error-bg">
+ <Trash2 className="w-4 h-4" strokeWidth={1.5} aria-hidden />{t("delete")}</button>
  </div>}
  </div>}
 
- {list.isPublic && !isOwner && user && <button onClick={handleLikeToggle} className={`absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition shadow-md ${isLiked ? 'bg-status-error text-white' : 'bg-background-primary/90 text-text-secondary hover:bg-background-primary'}`}>
- <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} strokeWidth={1.5} />
+ {list.isPublic && !isOwner && user && <button type="button" onClick={handleLikeToggle} aria-label={isLiked ? t("unlike", "Beğenmekten vazgeç") : t("like", "Beğen")} className={`absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${isLiked ? 'bg-status-error text-white' : 'bg-background-primary text-text-secondary hover:text-text-primary'}`}>
+ <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} strokeWidth={1.5} aria-hidden />
  </button>}
  </div>
 
  <div className="p-4">
- <h3 className="text-sm font-medium text-text-primary group- transition-colors truncate">
+ <h3 className="truncate text-sm font-medium text-text-primary transition-colors">
  {list.name}
  </h3>
  

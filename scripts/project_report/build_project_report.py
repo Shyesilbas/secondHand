@@ -323,8 +323,20 @@ check("Math.pow(2, event.getAttemptCount())" in _ow, "Order outbox backoff formu
 # ---- Cache TTL -----------------------------------------------------------------------------------
 _cc = jread("core/config/CacheConfig.java")
 CACHE_VERSION = jconst("core/config/CacheConfig.java", "CACHE_VERSION")
-_ttl_var = {m.group(1): dur(m.group(2)) for m in re.finditer(
-    r"RedisCacheConfiguration (\w+) = defaultConfig\.entryTtl\((Duration\.of\w+\(\d+\))\)", _cc)}
+def _ttl_expr(expr):
+    """Literal Duration or a `Type.CONSTANT` declared as `Duration.ofX(n)` in the code base."""
+    if expr.startswith("Duration."):
+        return dur(expr)
+    const = expr.rsplit(".", 1)[-1]
+    for f in (ROOT / "src" / "main" / "java").rglob("*.java"):
+        m = re.search(r"Duration " + re.escape(const) + r"\s*=\s*(Duration\.of\w+\(\d+L?\))", f.read_text(encoding="utf-8"))
+        if m:
+            return dur(m.group(1))
+    raise ValueError(expr)
+
+
+_ttl_var = {m.group(1): _ttl_expr(m.group(2)) for m in re.finditer(
+    r"RedisCacheConfiguration (\w+) = defaultConfig\.entryTtl\(([\w.]+(?:\(\d+L?\))?)\)", _cc)}
 CACHE_DEFAULT_TTL = dur(re.search(r"defaultCacheConfig\(\)\s*\.entryTtl\((Duration\.of\w+\(\d+\))\)", _cc).group(1))
 CACHES = [(m.group(1), _ttl_var[m.group(2)]) for m in re.finditer(r'withCacheConfiguration\("([^"]+)",\s*(\w+)\)', _cc)]
 SCAN_BATCH = int(re.search(r"BatchStrategies\.scan\((\d+)\)", _cc).group(1))
@@ -615,7 +627,7 @@ def database():
     s = [H2N("Veritabanı: PostgreSQL, Flyway ve Şema")]
     s.append(para(
         f"Kalıcı veri PostgreSQL'dedir ve şema yalnızca Flyway migration'larıyla değişir. Kaynakta {len(MIG)} migration dosyası bulunur "
-        f"(V1 baseline'dan V59'a, aralarda boşluklar var); toplam {MIG_TABLES} tablo oluşturulur ve {MIG_INDEXES} indeks tanımlanır. "
+        f"(V1 baseline'dan V61'e, aralarda boşluklar var); toplam {MIG_TABLES} tablo oluşturulur ve {MIG_INDEXES} indeks tanımlanır. "
         f"JPA tarafında {N_ENTITIES} entity vardır."))
     s.append(Paragraph("Migration kuralları", H3))
     s += bullets([
@@ -661,9 +673,10 @@ def database():
             ["V33 - V38", "Eksik entity tabloları, şema-entity hizalama, ilan arama indeksleri, yabancı anahtar indeksleri, refresh token hash'leme"],
             ["V39 - V46", "İlan öznitelikleri, araç/elektronik/emlak/kitap/giyim tip kuralları ve katalogları, sentetik ilan tablosu"],
             ["V47 - V53", "Fiyat kolonu genişletme, teklif ödeme süresi, şikayet moderasyonu (V49-V50), sipariş kalemi kampanya atfı, ödeme-sipariş bağı"],
-            ["V54 - V59", "Sohbet moderasyonu/engelleme/gizleme, mesaj silme izi, kullanıcı adı trigram indeksi, yabancı anahtar ve bileşik indeksler"]]
+            ["V54 - V59", "Sohbet moderasyonu/engelleme/gizleme, mesaj silme izi, kullanıcı adı trigram indeksi, yabancı anahtar ve bileşik indeksler"],
+            ["V60 - V61", "Kupon kullanımında indirim tutarı anlık görüntüsü (tasarruf toplamı), platform kuponu için kalem kupon payı ve escrow platform_subsidy"]]
     s += table(rows, [3.4, 13.0])
-    check(MIG[-1].name.startswith("V59__") or any(p.name.startswith("V59") for p in MIG), "Migration kronolojisi guncel degil (V59 yok)")
+    check(any(p.name.startswith("V61") for p in MIG), "Migration kronolojisi guncel degil (V61 yok)")
     return s
 
 
@@ -697,6 +710,8 @@ def redis_section():
         "v4:inventory:pending:": "Ödemesi alınmış, PostgreSQL'den henüz düşülmemiş adet",
         "v4:coupon:usage:global:": "Kuponun toplam kullanım sayacı",
         "v4:coupon:usage:user:": "Kuponun kullanıcı başına kullanım sayacı",
+        "v4:payment:otp_fail:": "Ödeme doğrulama kodunda kullanıcı başına hatalı deneme sayacı; sınırda kod reddedilir (PAYMENT_VERIFICATION_LOCKED)",
+        "v4:ai:summary:new_reviews:": "AI yorum özeti cache'i için yeni değerlendirme sayacı; eşik dolunca özet yenilenir",
         "v4:payment:idempotency:": "Ödeme tekrar koruması (PENDING/DONE)",
         "v4:lock:scheduler": "ShedLock kilitleri için önek",
         "v4:lock:complaint:worker": "Şikayet inceleme işçisi kilidi",
@@ -1113,7 +1128,9 @@ def escrow_section():
     s.append(Paragraph("Tutar bölüştürme", H3))
     s.append(para(
         "Siparişe kupon ya da indirim uygulandıysa her kalemin escrow tutarı, ödenen toplamın kalemin ürün fiyatındaki payına göre 2 basamak (HALF_UP) hesaplanır. "
-        "Yuvarlama farkının havuzda açık yaratmaması için son kalem kalan bakiyeyi alır. hold idempotenttir: order_item_id için kayıt varsa o kalem atlanır."))
+        "Yuvarlama farkının havuzda açık yaratmaması için son kalem kalan bakiyeyi alır. hold idempotenttir: order_item_id için kayıt varsa o kalem atlanır. "
+        "Platform kuponunun kalem payı order_items.coupon_discount alanında tutulur ve escrow kaydına platform_subsidy olarak geçer: amount alıcının ödediği net tutardır ve iade tabanıdır; "
+        "serbest bırakmada satıcıya amount + platform_subsidy ödenir, iade ve iptalde alıcıya yalnızca amount döner. Satıcının kazancını yalnızca kendi kampanyaları düşürür."))
     s.append(Paragraph("Serbest bırakma (release)", H3))
     s += bullets([
         "release, escrow satırlarını PESSIMISTIC_WRITE ile kilitler (findByOrderIdAndStatusForUpdate), kaydı COMPLETED yapar, releasedAt yazar ve aynı transaction'da escrow_outbox_events'e ESCROW_RELEASED olayını ekler.",
@@ -1303,7 +1320,7 @@ def pricing_section():
         ["1", "Satır fiyatı", "ilan fiyatı x adet. Teklif yalnızca teklif ilanının satırını değiştirir: miktar teklifin adedi, satır toplamı teklifin toplam fiyatı olur"],
         ["2", "Kampanya (satır bazlı)", "Satıcının uygulanabilir kampanyaları arasından en yüksek birim indirimi veren seçilir; kampanyalar birleşmez. PERCENT: birim fiyat x değer / 100, FIXED: değer; indirim birim fiyatı geçemez. minQuantity: aynı kampanyaya giren satırların toplam miktarı yetmezse atlanır"],
         ["3", "Kupon (sepet bazlı)", "Kampanya sonrası toplamlar üzerinden hesaplanır; uygun satırlara satır toplamıyla orantılı dağıtılır, yuvarlama farkı son satıra yazılır"],
-        ["4", "Sonuç", "toplam = kampanya sonrası ara toplam - kupon indirimi; satıcı başına ödenecek tutar net satır toplamlarıdır"],
+        ["4", "Sonuç", "toplam = kampanya sonrası ara toplam - kupon indirimi; alıcının ödediği tutar net satır toplamlarıdır. Satıcıya ödenen tutar kupon payını (platform_subsidy) da içerir; yalnızca satıcı kampanyası kazancı düşürür"],
     ], [0.7, 3.4, 12.3])
     s.append(para("<b>İndirim dışı kategoriler.</b> Gayrimenkul (REAL_ESTATE) ve araç (VEHICLE) ilanlarına kampanya, kupon ve teklif indirimi uygulanmaz; bu kural tek yerde tanımlıdır (DiscountEligibility)."))
     s.append(Paragraph("Kupon", H3))
@@ -1321,7 +1338,7 @@ def pricing_section():
         "Kupon satırı findByCodeIgnoreCaseForUpdate ile kilitlenir.",
         "apply_coupon_with_limit.lua global ve kullanıcı sayaçlarını tek atomik çağrıda kontrol edip artırır (TTL 30 gün). Aşımda COUPON_USAGE_LIMIT_REACHED.",
         "Sayaç artırıldıysa bir TransactionSynchronization kaydedilir: checkout commit edilmezse release_coupon_usage.lua sayaçları geri azaltır (sıfırın altına inmez).",
-        "PostgreSQL limitleri tekrar kontrol edilir ve coupon_redemptions satırı yazılır. Kupon bir kez, indirim alan ilk siparişe bağlanarak kullanılır.",
+        "PostgreSQL limitleri tekrar kontrol edilir ve coupon_redemptions satırı yazılır; satırda kuponun toplam indirimi (discount_amount) saklanır ve Kuponlarım sayfasındaki toplam tasarruf bundan hesaplanır. Kupon bir kez, indirim alan ilk siparişe bağlanarak kullanılır.",
         "Redis erişilemezse limiter 'sayılmadı' döner; karar kupon satır kilidi altındaki PostgreSQL kontrollerine kalır (kupon için Redis fail-open'dır).",
     ])
     s.append(Paragraph("Önizleme ile checkout farkı", H3))
@@ -1628,7 +1645,8 @@ def main():
     for w in WARN:
         print("UYARI:", w)
     print(f"{out} ({len(WARN)} uyari)")
+    return 1 if WARN else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

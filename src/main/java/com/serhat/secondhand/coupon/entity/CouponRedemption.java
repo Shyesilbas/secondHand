@@ -2,6 +2,7 @@ package com.serhat.secondhand.coupon.entity;
 
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.user.domain.entity.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -47,6 +49,11 @@ public class CouponRedemption {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
+
+    /** Coupon discount the checkout received (whole checkout, not only the linked order). */
+    @Column(name = "discount_amount", nullable = false, precision = 19, scale = 2)
+    @Builder.Default
+    private BigDecimal discountAmount = BigDecimal.ZERO;
 
     @CreationTimestamp
     private LocalDateTime redeemedAt;

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import {
   CheckCircle,
   ChevronRight,
@@ -139,7 +140,7 @@ export const ListingQuickActionsModal = ({
           await listingService.updatePrice(listing.id, priceVal);
           saved.price = priceVal;
         } catch (e) {
-          failed.push(e?.response?.data?.message || t('price_update_failed', 'Fiyat güncellenemedi.'));
+          failed.push(getErrorMessage(e, t('price_update_failed', 'Fiyat güncellenemedi.')));
         }
       }
       if (qtyDirty) {
@@ -147,7 +148,7 @@ export const ListingQuickActionsModal = ({
           await listingService.updateQuantity(listing.id, qty);
           saved.qty = qty;
         } catch (e) {
-          failed.push(e?.response?.data?.message || t('stock_update_failed', 'Stok güncellenemedi.'));
+          failed.push(getErrorMessage(e, t('stock_update_failed', 'Stok güncellenemedi.')));
         }
       }
       setBaseline(saved);

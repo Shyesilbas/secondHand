@@ -22,13 +22,13 @@ const NotificationRow = ({ notification, onMarkAsRead }) => {
 
   const body = (
     <>
-      <p className={`truncate text-sm ${isUnread ? 'font-semibold text-text-primary' : 'text-text-secondary'}`}>{title}</p>
+      <p className={`truncate text-base ${isUnread ? 'font-semibold text-text-primary' : 'text-text-secondary'}`}>{title}</p>
       {message && <p className="mt-0.5 line-clamp-2 text-sm text-text-tertiary">{message}</p>}
     </>
   );
 
   return (
-    <li className="flex items-start gap-3 px-4 py-3 transition-colors duration-150 hover:bg-background-secondary">
+    <li className="flex items-start gap-3 px-5 py-3.5 transition-colors duration-150 hover:bg-background-secondary">
       <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded bg-background-tertiary text-text-secondary">
         <Icon className="h-4 w-4" strokeWidth={1.5} aria-hidden />
       </span>

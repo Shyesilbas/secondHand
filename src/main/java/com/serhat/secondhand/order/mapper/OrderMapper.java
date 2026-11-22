@@ -151,6 +151,7 @@ public class OrderMapper {
                 .campaignName(orderItem.getCampaignName())
                 .originalUnitPrice(orderItem.getOriginalUnitPrice())
                 .campaignDiscount(orderItem.getCampaignDiscount())
+                .couponDiscount(orderItem.getCouponDiscount())
                 .currency(orderItem.getCurrency())
                 .notes(orderItem.getNotes())
                 .createdAt(orderItem.getCreatedAt())

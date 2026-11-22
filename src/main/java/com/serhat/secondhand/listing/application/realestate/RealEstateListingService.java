@@ -158,6 +158,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
         return genericFilterService.filter(filters, RealEstateListing.class, predicateBuilder);
     }
 
+    @Transactional(readOnly = true)
     public RealEstateListingDto getRealEstateDetails(UUID id) {
         RealEstateListing realEstateListing = realEstateRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Real Estate listing not found"));

@@ -32,7 +32,7 @@ erDiagram
     users ||--o{ coupon_redemptions : "user_id"
 ```
 
-- `escrows` kalem başına tek satırdır ([ADR-0003](adr/0003-item-level-escrow.md)).
+- `escrows` kalem başına tek satırdır ([ADR-0003](adr/0003-item-level-escrow.md)). `amount` alıcının ödediği (kupon sonrası) paydır, `platform_subsidy` platformun karşıladığı kupon payıdır; satıcıya `amount + platform_subsidy` ödenir. `order_items.coupon_discount` bu payın kaynağıdır, `coupon_redemptions.discount_amount` ise checkout'un toplam kupon indirimi snapshot'ıdır (kuponlar sayfasındaki toplam tasarruf).
 - `shippings` siparişle bire bir ilişkilidir (`UNIQUE (order_id)`).
 - Para hareketleri `payment` tablosunda; satıcı bakiyesi `ewallet` üzerindedir.
 

@@ -15,7 +15,7 @@ const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:n
 // Shared dialog shell: Esc and backdrop close it, focus moves in and stays inside while open.
 // Esc is handled on the panel and stopped there, so a dialog opened from another dialog closes alone.
 // `header` replaces the default title row; `title` still names the dialog for screen readers.
-const Modal = ({ isOpen, onClose, title, description, header, footer, size = 'md', children }) => {
+const Modal = ({ isOpen, onClose, title, description, header, footer, size = 'md', ariaLabelledBy, children }) => {
  const panelRef = useRef(null);
 
  useEffect(() => {
@@ -62,7 +62,8 @@ const Modal = ({ isOpen, onClose, title, description, header, footer, size = 'md
  ref={panelRef}
  role="dialog"
  aria-modal="true"
- aria-label={title}
+ aria-labelledby={ariaLabelledBy || undefined}
+ aria-label={ariaLabelledBy ? undefined : title}
  tabIndex={-1}
  onKeyDown={handleKeyDown}
  className={`flex max-h-[90vh] w-full ${SIZES[size]} flex-col rounded-t-md sm:rounded-md border-t sm:border border-border bg-background-primary shadow-md outline-none`}

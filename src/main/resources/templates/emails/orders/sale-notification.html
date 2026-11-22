@@ -4,10 +4,25 @@
 <body>
 <section>
     <p>İlanınız için yeni bir sipariş alındı. Satış tutarı, alıcı teslimatı onaylayana kadar güvenli havuz hesabında tutulur.</p>
-    <div class="amount">
+    <div class="amount" th:if="${#strings.isEmpty(payoutAmount)}">
         <div class="amount-label">Satış Tutarı</div>
         <div class="amount-value" th:text="${totalAmount}">0,00 TRY</div>
     </div>
+    <th:block th:if="${!#strings.isEmpty(payoutAmount)}">
+        <div class="amount">
+            <div class="amount-label">Size Aktarılacak Tutar</div>
+            <div class="amount-value" th:text="${payoutAmount}">0,00 TRY</div>
+        </div>
+        <table class="details" role="presentation">
+            <tr><td class="label">İlan fiyatı (sizin belirlediğiniz)</td><td class="value" th:text="${listingAmount}">0,00 TRY</td></tr>
+            <tr><td class="label">Alıcının ödediği</td><td class="value" th:text="${paidAmount}">0,00 TRY</td></tr>
+            <tr><td class="label">Size aktarılan</td><td class="value" th:text="${payoutAmount}">0,00 TRY</td></tr>
+        </table>
+        <div class="note">
+            <div class="note-title">Kupon kullanıldı<span th:if="${!#strings.isEmpty(couponCode)}" th:text="' (' + ${couponCode} + ')'"></span></div>
+            <div>Alıcı platform kuponu kullandı ve <span th:text="${couponDiscountAmount}">0,00 TRY</span> indirim aldı. Bu indirim platform tarafından karşılanır; alıcının ödediği tutara eklenerek size aktarılır, kazancınız azalmaz.</div>
+        </div>
+    </th:block>
     <table class="details" role="presentation">
         <tr th:if="${!#strings.isEmpty(orderNumber)}"><td class="label">Sipariş</td><td class="value" th:text="${orderNumber}">#ORD-1234</td></tr>
         <tr th:if="${!#strings.isEmpty(orderDate)}"><td class="label">Tarih</td><td class="value" th:text="${orderDate}">30.06.2026 12:00</td></tr>

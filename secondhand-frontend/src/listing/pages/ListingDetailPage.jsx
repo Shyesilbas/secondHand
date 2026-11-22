@@ -11,8 +11,9 @@ import { listingStatusLabel } from '../../ai/utils/auraListingContext.js';
 import { trackView } from '../services/listingAddonService.js';
 import { getOrCreateSessionId } from '../../common/utils/sessionId.js';
 import { getListingFavoriteCount } from '../../favorites/favorites.js';
-import { AlertTriangle, ArrowLeft, BarChart3, ChevronRight, Sparkles } from 'lucide-react';
+import { ArrowLeft, BarChart3, ChevronRight, Sparkles } from 'lucide-react';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
+import ErrorState from '../../common/components/ui/ErrorState.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import { useCart } from '../../cart/hooks/useCart.js';
@@ -73,20 +74,16 @@ const DetailSkeleton = () => (
 const DetailError = ({ error }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background-page p-4">
-      <div className={`${CARD} w-full max-w-md p-8 text-center`}>
-        <AlertTriangle className="mx-auto mb-4 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
-        <h1 className="mb-2 text-lg font-semibold text-text-primary">
-          {t("listing_unavailable", "İlan Bulunamadı")}
-        </h1>
-        <p className="mb-6 text-sm text-text-secondary">
-          {error || t("listing_unavailable_desc", "Bu ilan yayından kaldırılmış, satılmış veya silinmiş olabilir.")}
-        </p>
-        <Link to={ROUTES.LISTINGS} className={`${buttonClasses()} w-full`}>
-          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-          <span>{t("back_to_listings", "İlanlara Dön")}</span>
-        </Link>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background-page p-4">
+      <ErrorState
+        title={t("listing_unavailable", "İlan bulunamadı")}
+        description={error || t("listing_unavailable_desc", "Bu ilan yayından kaldırılmış, satılmış veya silinmiş olabilir.")}
+        className="w-full max-w-md"
+      />
+      <Link to={ROUTES.LISTINGS} className={buttonClasses('secondary', 'sm')}>
+        <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+        <span>{t("back_to_listings", "İlanlara dön")}</span>
+      </Link>
     </div>
   );
 };
@@ -355,7 +352,7 @@ const ListingDetailPage = () => {
                   </Button>
                 }
               >
-                <AuraSummary type="listing" id={listing.id} listing={listing} />
+                <AuraSummary type="listing" id={listing.id} listing={listing} textClassName="text-base" />
               </DetailSection>
             </div>
 

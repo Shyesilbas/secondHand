@@ -4,6 +4,7 @@ import { favoriteService } from '../services/favoriteService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { FAVORITE_DEFAULTS, FAVORITE_MESSAGES } from '../favoriteConstants.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useFavorites = (page = FAVORITE_DEFAULTS.PAGE, size = FAVORITE_DEFAULTS.PAGE_SIZE, options = {}) => {
     const { user, isAuthenticated } = useAuthState();
@@ -63,7 +64,7 @@ export const useFavorites = (page = FAVORITE_DEFAULTS.PAGE, size = FAVORITE_DEFA
         onError: (err) => {
             notification.showError(
                 FAVORITE_MESSAGES.ERROR_TITLE,
-                err.response?.data?.message || FAVORITE_MESSAGES.TOGGLE_FAVORITE_FAILED
+                getErrorMessage(err, FAVORITE_MESSAGES.TOGGLE_FAVORITE_FAILED)
             );
         }
     });
@@ -76,7 +77,7 @@ export const useFavorites = (page = FAVORITE_DEFAULTS.PAGE, size = FAVORITE_DEFA
         favorites,
         pagination,
         isLoading,
-        error: error?.response?.data?.message || error?.message,
+        error: error ? getErrorMessage(error, FAVORITE_MESSAGES.LOAD_FAVORITES_FAILED || 'Favoriler yüklenemedi.') : null,
         fetchFavorites: refetch, // Alias for backward compatibility
         loadPage,
         toggleFavorite,

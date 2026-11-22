@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePlan } from '@/common/hooks/usePlan';
 import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { useCart } from '../hooks/useCart.js';
 import CartItemCard from '../components/CartItemCard.jsx';
@@ -13,7 +14,7 @@ import OrderSummary from '../components/OrderSummary.jsx';
 import ClearCartModal from '../components/ClearCartModal.jsx';
 import EmptyCartView from '../components/EmptyCartView.jsx';
 import CartBundlesSection from '../components/CartBundlesSection.jsx';
-import { Alert, Badge, Button, Card, PageHeader } from '../../common/components/ui/index.js';
+import { Alert, Button, Card, PageHeader } from '../../common/components/ui/index.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_MESSAGES } from '../cartConstants.js';
 import { couponService } from '../services/couponService.js';
@@ -137,7 +138,7 @@ const ShoppingCartPage = () => {
         }
       } else {
         const e = pricingData.couponError;
-        const message = e?.response?.data?.message || e?.response?.data?.error || CART_MESSAGES.COUPON_APPLY_FAILED;
+        const message = getErrorMessage(e, CART_MESSAGES.COUPON_APPLY_FAILED);
         setCouponError(message);
         setAppliedCouponCode(null);
       }
@@ -216,7 +217,7 @@ const ShoppingCartPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background-page">
+      <div className="bg-background-page">
         <PageContainer className="space-y-4 py-8" aria-busy="true">
           <Skeleton className="h-8 w-48" />
           <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
@@ -235,25 +236,25 @@ const ShoppingCartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background-page">
+    <div className="bg-background-page">
       <PageContainer className="py-6 sm:py-8">
         <PageHeader
           back={
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary transition hover:text-text-primary"
+              className="inline-flex items-center gap-1.5 rounded-sm text-sm font-medium text-text-secondary transition-colors duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             >
-              <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span>{t('continue_shopping', 'Alışverişe Devam Et')}</span>
             </button>
           }
           title={t('shopping_cart', 'Alışveriş Sepeti')}
           badge={
             cartCount > 0 ? (
-              <Badge variant="neutral" className="tabular-nums">
+              <span className="text-sm tabular-nums text-text-tertiary">
                 {cartCount} {cartCount === 1 ? t('item', 'ürün') : t('items', 'ürün')}
-              </Badge>
+              </span>
             ) : undefined
           }
           actions={
@@ -261,7 +262,7 @@ const ShoppingCartPage = () => {
               <button
                 type="button"
                 onClick={() => setShowClearModal(true)}
-                className="text-sm font-medium text-text-secondary transition hover:text-status-error"
+                className="rounded-sm text-sm font-medium text-text-secondary transition-colors duration-150 hover:text-status-error-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               >
                 {t('clear_all', 'Sepeti Temizle')}
               </button>
@@ -317,12 +318,9 @@ const ShoppingCartPage = () => {
               />
 
               <Card padding="none" className="overflow-hidden">
-                <div className="flex items-center justify-between border-b border-border-light bg-background-primary px-5 py-3.5">
-                  <h2 className="text-sm font-semibold text-text-primary">
-                    {t('your_items', 'Ürünleriniz')} ({cartCount})
-                  </h2>
-                  <span className="text-sm text-text-muted">Güvenli rezervasyon</span>
-                </div>
+                <h2 className="px-5 pb-1 pt-4 text-base font-semibold text-text-primary">
+                  {t('your_items', 'Ürünleriniz')} ({cartCount})
+                </h2>
                 <div className="divide-y divide-border-light">
                   {cartItems.map((item) => (
                     <CartItemCard

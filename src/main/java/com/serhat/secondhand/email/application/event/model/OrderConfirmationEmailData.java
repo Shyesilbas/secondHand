@@ -25,4 +25,10 @@ public class OrderConfirmationEmailData {
     private String orderDate;
     private String paymentMethod;
     private String notes;
+    /** Seller sale mail breakdown; all null when no platform coupon was used. */
+    private String couponCode;
+    private String listingAmount;
+    private String couponDiscountAmount;
+    private String paidAmount;
+    private String payoutAmount;
 }

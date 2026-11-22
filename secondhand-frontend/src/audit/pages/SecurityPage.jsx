@@ -9,7 +9,6 @@ import {
   ArrowLeft,
   LogOut,
   SlidersHorizontal,
-  Activity,
 } from 'lucide-react';
 import SecuritySummary from '../components/SecuritySummary.jsx';
 import SecurityDevices from '../components/SecurityDevices.jsx';
@@ -78,7 +77,7 @@ const SecurityPage = () => {
   if (isLoading) return <LoadingSkeleton />;
 
   return (
-    <div className="min-h-screen bg-background-page pb-20 text-text-primary">
+    <div className="bg-background-page pb-20 text-text-primary">
       <PageContainer className="py-8">
         <PageHeader
           className="mb-6"
@@ -127,11 +126,10 @@ const SecurityPage = () => {
           {/* Card Controls Header */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border-light px-5 py-4">
             <div className="flex items-center gap-2.5">
-              <Activity className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
               <h2 className="text-sm font-semibold text-text-primary">
                 {t('login_activity', 'Güvenlik Hareketleri')}
               </h2>
-              <span className="rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 text-xs font-medium tabular-nums text-text-secondary">
+              <span className="text-sm tabular-nums text-text-tertiary">
                 {totalElements} {t('events', 'kayıt')}
               </span>
             </div>
@@ -173,7 +171,7 @@ const SecurityPage = () => {
 
           {/* Pagination Controls */}
           {shouldShowPagination && (
-            <div className="border-t border-border-light bg-background-secondary p-4">
+            <div className="border-t border-border-light p-4">
               <PaginationControls
                 shouldShowPagination={shouldShowPagination}
                 currentPage={currentPage}
@@ -211,7 +209,7 @@ const SecurityPage = () => {
 };
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-background-page pb-20">
+  <div className="bg-background-page pb-20">
     <PageContainer className="space-y-6 py-6 sm:py-10">
       <Skeleton className="h-6 w-24" />
       <div className="space-y-2">

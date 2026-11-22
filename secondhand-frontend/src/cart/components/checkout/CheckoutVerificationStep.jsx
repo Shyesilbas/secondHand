@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState, memo } from 'react';
-import { RotateCw, Clock, KeyRound, Loader2 } from 'lucide-react';
+import { RotateCw, Loader2 } from 'lucide-react';
 import { OTP_CODE_LENGTH, sanitizeOtpInput } from '../../../common/constants/otp.js';
 import { findLatestOtpWithEmail } from '../../../payments/utils/otp.js';
 import OtpDigitInputGroup from '../../../payments/components/verification/OtpDigitInputGroup.jsx';
@@ -101,14 +101,12 @@ const CheckoutVerificationStep = ({
     <div>
       <div className="mx-auto max-w-md space-y-5 px-5 py-8 sm:px-6">
         <div className="text-center">
-          <KeyRound className="mx-auto h-5 w-5 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-          <h2 className="mt-3 text-base font-semibold text-text-primary">{t('checkout_verify_title', 'Ödemeyi doğrula')}</h2>
+          <h2 className="text-lg font-semibold text-text-primary">{t('checkout_verify_title', 'Ödemeyi doğrula')}</h2>
           <p className="mt-1 text-sm text-text-secondary">
             {t('checkout_code_sent', { defaultValue: 'E-posta adresine {{length}} haneli bir kod gönderdik.', length: OTP_CODE_LENGTH })}
           </p>
           {ttlActive && (
-            <p className={`mt-2 inline-flex items-center gap-1.5 text-sm tabular-nums ${ttlExpired ? 'text-status-error-text' : 'text-text-tertiary'}`}>
-              <Clock className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+            <p className={`mt-2 text-sm tabular-nums ${ttlExpired ? 'text-status-error-text' : 'text-text-tertiary'}`}>
               {ttlExpired
                 ? t('checkout_code_expired', 'Kodun süresi doldu, yeni kod iste.')
                 : t('checkout_code_time_left', { defaultValue: 'Kodun kalan süresi {{time}}', time: ttlFormatted })}

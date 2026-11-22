@@ -75,6 +75,7 @@ public class EscrowService {
                     .buyer(buyer)
                     .seller(seller)
                     .amount(escrowAmountsByItemId.getOrDefault(item.getId(), item.getTotalPrice()))
+                    .platformSubsidy(item.getCouponDiscount() != null ? item.getCouponDiscount() : BigDecimal.ZERO)
                     .status(PaymentStatus.ESCROW)
                     .listingId(item.getListing().getId())
                     .listingTitle(item.getListing().getTitle())
@@ -105,7 +106,7 @@ public class EscrowService {
         return escrowRepository.findByOrderIdInAndSellerIdAndStatus(orderIds, sellerId, PaymentStatus.ESCROW).stream()
                 .collect(Collectors.groupingBy(
                         e -> e.getOrder().getId(),
-                        Collectors.mapping(Escrow::getAmount, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                        Collectors.mapping(Escrow::sellerPayout, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
                 ));
     }
 
@@ -113,8 +114,8 @@ public class EscrowService {
     private static final Set<PaymentStatus> SELLER_EARNING_STATUSES = EnumSet.of(PaymentStatus.ESCROW, PaymentStatus.COMPLETED);
 
     /**
-     * Per order, the seller's share: escrow amounts (coupon already allocated per line at checkout)
-     * that are held or released. Cancelled and refunded lines are excluded.
+     * Per order, the seller's share: the buyer-paid escrow amount plus the platform-funded coupon share
+     * of lines that are held or released. Cancelled and refunded lines are excluded.
      */
     @Transactional(readOnly = true)
     public Map<Long, BigDecimal> sumSellerAmountsByOrderIds(List<Long> orderIds, Long sellerId) {
@@ -123,7 +124,7 @@ public class EscrowService {
         return escrowRepository.findByOrderIdInAndSellerIdAndStatusIn(orderIds, sellerId, SELLER_EARNING_STATUSES).stream()
                 .collect(Collectors.groupingBy(
                         e -> e.getOrder().getId(),
-                        Collectors.mapping(Escrow::getAmount, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                        Collectors.mapping(Escrow::sellerPayout, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
                 ));
     }
 
@@ -163,7 +164,7 @@ public class EscrowService {
             escrowOutboxService.enqueueEscrowReleased(escrow);
 
             log.info("Released {} for seller {} (Order: {}) via Transactional Outbox", 
-                    escrow.getAmount(), escrow.getSeller().getEmail(), order.getOrderNumber());
+                    escrow.sellerPayout(), escrow.getSeller().getEmail(), order.getOrderNumber());
         }
 
         return Result.success();

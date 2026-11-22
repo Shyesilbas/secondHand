@@ -27,7 +27,7 @@ const EWalletPaymentMethod = ({ eWallet, feeQuote }) => {
  const { t } = useTranslation();
  if (!eWallet) {
  return (
- <div className="rounded border border-dashed border-border py-6 text-center">
+ <div className="rounded bg-background-secondary py-6 text-center">
  <p className="mb-1 text-sm font-medium text-text-primary">{t("ewallet_not_found")}</p>
  <p className="text-sm text-text-tertiary max-w-xs mx-auto">{t("you_need_to_create_an_ewallet_first_to_u")}</p>
  </div>
@@ -37,14 +37,14 @@ const EWalletPaymentMethod = ({ eWallet, feeQuote }) => {
  const hasSufficientBalance = feeQuote?.sufficientBalance === true;
 
  return (
- <div className="flex items-center justify-between rounded border border-border p-4">
+ <div className="flex items-center justify-between rounded bg-background-secondary p-4">
  <div>
  <p className="text-sm font-medium text-text-primary">{t("ewallet")}</p>
- <p className="text-xs text-text-tertiary">{t("digital_wallet")}</p>
+ <p className="text-sm text-text-tertiary">{t("digital_wallet")}</p>
  </div>
  <div className="text-right">
  <p className="text-base font-semibold tabular-nums text-text-primary">{formatPaymentAmount(balance)}</p>
- <p className={`text-xs ${hasSufficientBalance ? 'text-text-secondary' : 'text-status-warning-text'}`}>
+ <p className={`text-sm ${hasSufficientBalance ? 'text-text-secondary' : 'text-status-warning-text'}`}>
  {hasSufficientBalance ? t("sufficient_balance") : t("insufficient_balance")}
  </p>
  </div>
@@ -189,26 +189,26 @@ const PaymentVerificationModal = ({
  <Modal
  isOpen={isOpen}
  onClose={handleClose}
- title={isReview ? 'Payment confirmation' : 'Verify security code'}
- description={isReview ? 'Review payment details before initiating' : 'Enter the code sent to your email'}
+ title={isReview ? t('payment_confirmation', 'Ödeme onayı') : t('verify_security_code', 'Güvenlik kodunu doğrula')}
+ description={isReview ? t('review_payment_details', 'Başlatmadan önce ödeme ayrıntılarını kontrol et') : t('enter_code_sent_to_email', 'E-postana gönderilen kodu gir')}
  size="md"
  footer={
  <>
  <Button variant="secondary" onClick={handleClose}>{t("cancel")}</Button>
  {isReview ? (
  <Button onClick={handleStart} disabled={!canStartPayment || isProcessing}>
- {isProcessing ? 'Processing...' : 'Confirm and proceed'}
+ {isProcessing ? t('processing', 'İşleniyor') + '...' : t('confirm_and_proceed', 'Onayla ve devam et')}
  </Button>
  ) : (
  <Button onClick={handleVerify} disabled={isProcessing || (verificationCode || '').length !== OTP_CODE_LENGTH || otpTtlExpired}>
- {isProcessing ? 'Verifying...' : 'Verify and pay fee'}
+ {isProcessing ? t('verifying', 'Doğrulanıyor') + '...' : t('verify_and_pay_fee', 'Doğrula ve ücreti öde')}
  </Button>
  )}
  </>
  }
  >
  <div className="space-y-5">
- <dl className="flex items-start justify-between gap-4 border-b border-border-light pb-4">
+ <dl className="flex items-start justify-between gap-4">
  <div className="min-w-0">
  <dt className="text-sm text-text-secondary">{t("listing")}</dt>
  <dd className="mt-0.5 truncate text-sm font-medium text-text-primary">{selectedListing?.title}</dd>
@@ -251,13 +251,13 @@ const PaymentVerificationModal = ({
  type="button"
  onClick={handleResend}
  disabled={isResendingCode}
- className="text-sm text-text-secondary underline-offset-2 transition-colors hover:text-text-primary hover:underline disabled:opacity-50"
+ className="text-sm rounded-sm text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50"
  >
- {isResendingCode ? 'Sending code...' : 'Resend verification code'}
+ {isResendingCode ? t('sending_code', 'Kod gönderiliyor') + '...' : t('resend_verification_code', 'Kodu tekrar gönder')}
  </button>
  {otpTtlActive && (
  <span className={`text-sm tabular-nums ${otpTtlExpired ? 'text-status-warning-text' : 'text-text-tertiary'}`}>
- {otpTtlExpired ? 'Code expired' : <>{t("expires_in")}: {otpTtlFormatted}</>}
+ {otpTtlExpired ? t('code_expired', 'Kodun süresi doldu') : <>{t("expires_in")}: {otpTtlFormatted}</>}
  </span>
  )}
  </div>

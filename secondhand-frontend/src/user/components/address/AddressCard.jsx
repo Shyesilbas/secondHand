@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Building2, Home, MapPin, Pencil, Trash2 } from 'lucide-react';
 import { USER_ADDRESS_TYPES } from '../../userConstants.js';
-import Badge from '../../../common/components/ui/Badge.jsx';
 
 const formatNeighborhood = (neighborhoodKey) => {
   if (!neighborhoodKey) return '';
@@ -51,10 +50,8 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
 
   return (
     <div
-      className={`flex flex-col justify-between rounded border p-4 shadow-sm hover:shadow-md transition ${
-        address.mainAddress
-          ? 'border-accent-teal ring-1 ring-accent-teal bg-background-primary'
-          : 'border-border bg-background-primary hover:border-card-border-hover'
+      className={`flex flex-col justify-between rounded bg-background-secondary p-4 ${
+        address.mainAddress ? 'border border-accent-teal ring-1 ring-accent-teal' : ''
       }`}
     >
       <div>
@@ -69,9 +66,10 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
               {getAddressTypeLabel(address.addressType)}
             </h3>
             {address.mainAddress && (
-              <Badge variant="success" dot>
+              <span className="inline-flex items-center gap-1.5 text-sm text-text-tertiary">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-status-success" aria-hidden />
                 {t('main', 'Varsayılan')}
-              </Badge>
+              </span>
             )}
           </div>
 
@@ -79,7 +77,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
             <button
               type="button"
               onClick={() => onEdit(address)}
-              className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-primary"
+              className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors duration-150 hover:bg-background-tertiary hover:text-text-primary"
               title={t('update_address', 'Adresi düzenle')}
               aria-label={t('update_address', 'Adresi düzenle')}
             >
@@ -89,7 +87,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
             <button
               type="button"
               onClick={() => onDelete(address.id, address.addressType)}
-              className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors hover:bg-status-error-bg hover:text-status-error-text"
+              className="flex h-8 w-8 items-center justify-center rounded text-text-muted transition-colors duration-150 hover:bg-status-error-bg hover:text-status-error-text"
               title={t('delete_address', 'Adresi sil')}
               aria-label={t('delete_address', 'Adresi sil')}
             >
@@ -102,7 +100,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
           <p className="font-medium text-text-primary leading-snug">{address.addressLine}</p>
           {locationParts.length > 0 && <p>{locationParts.join(', ')}</p>}
           {postalCountryParts.length > 0 && (
-            <p className="text-xs text-text-tertiary tabular-nums">
+            <p className="text-sm text-text-tertiary tabular-nums">
               {postalCountryParts.join(' · ')}
             </p>
           )}
@@ -110,11 +108,11 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
       </div>
 
       {!address.mainAddress && (
-        <div className="mt-3.5 border-t border-border-light pt-2.5 flex justify-end">
+        <div className="mt-3 flex justify-end">
           <button
             type="button"
             onClick={() => onSelectAsMain(address.id)}
-            className="text-xs font-medium text-text-secondary transition-colors hover:text-text-primary cursor-pointer"
+            className="cursor-pointer text-sm font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover"
             title={t('set_as_main_address', 'Varsayılan adres olarak ayarla')}
           >
             {t('set_main', 'Varsayılan Yap')}

@@ -11,10 +11,11 @@ Holds buyer purchase funds in custody (`escrows` table, one row per `OrderItem`)
 
 ## Business Rules & Invariants
 - **Item-Level Escrow Ledger (`EscrowService.hold`):** Writes one `Escrow` row per `OrderItem` (unique on `order_item_id`) with net post-campaign/post-coupon `amount`, audit snapshot fields (`listingTitle`, `listingNo`), and `PaymentStatus.ESCROW`, then evicts the buyer's and sellers' `payment:stats` entries. Never create a second `payments` row to represent the hold.
+- **Platform Coupon Subsidy (`Escrow.platformSubsidy`):** `hold` copies `OrderItem.couponDiscount` into `platform_subsidy`; `amount` stays the buyer-paid net. Release pays the seller `Escrow.sellerPayout()` (`amount + platformSubsidy`) through `EscrowOutboxService`; refund and cancel return only `amount`. Seller earnings sums (`sumSellerAmountsByOrderIds`, `EscrowRepository`) use the same payout. Seller campaigns are the only discount that lowers the payout.
 - **Pre-Release Refund Boundary (`EscrowService.refund`):** Reversals to `PaymentStatus.REFUNDED` (crediting the buyer's eWallet) are permitted only while in `PaymentStatus.ESCROW`. Once released to `COMPLETED`, funds belong to the seller and cannot be clawed back via escrow.
 - **Outbox-Decoupled Seller Payout (`EscrowService.releaseEscrowForOrder`):** Order completion marks `Escrow` rows `PaymentStatus.COMPLETED` (`releasedAt = now()`) and enqueues an `ESCROW_RELEASED` event into `escrow_outbox_events` in the same ACID transaction without mutating the seller's wallet synchronously.
 - **Fail-Loud Idempotent Consumer (`EscrowKafkaConsumer`):** Consumes `escrow.released.v1`, validates required event fields (`PaymentErrorCodes.ESCROW_RELEASE_EVENT_INVALID` routes malformed events to `escrow.released.v1.DLT` after retries), deduplicates via `ProcessedKafkaEventRepository` (`escrow:release:{escrowId}` in `processed_kafka_events`), and credits the seller via `IEWalletService.creditWalletQuietly`.
-- **Change rule:** Refunds are possible only while the escrow row is unreleased, and always go to the buyer.
+- **Change rule:** Refunds are possible only while the escrow row is unreleased, and always go to the buyer. Never refund `platformSubsidy` and never pay the seller `amount` alone for a coupon order; use `sellerPayout()`.
 
 ## Redis, Outbox & Kafka
 - Cache eviction: `PaymentStatsCacheEvictor` drops the buyer's and seller's `payment:stats` entries on every escrow state change (after commit).

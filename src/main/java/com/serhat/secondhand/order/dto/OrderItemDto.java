@@ -28,6 +28,8 @@ public class OrderItemDto {
     private String campaignName;
     private BigDecimal originalUnitPrice;
     private BigDecimal campaignDiscount;
+    /** This line's share of the platform coupon; totalPrice is already net of it. */
+    private BigDecimal couponDiscount;
     private Currency currency;
     private String notes;
     private LocalDateTime createdAt;

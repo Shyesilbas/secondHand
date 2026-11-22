@@ -160,11 +160,11 @@ const CheckoutAddressStep = ({
   return (
     <div>
       {/* Same step header as the payment and verification steps. */}
-      <div className="border-b border-border-light px-5 py-5 sm:px-6 sm:py-6">
-        <h2 className="text-base font-semibold text-text-primary">{t('checkout_delivery_title', 'Teslimat')}</h2>
+      <div className="px-5 pt-6 sm:px-6">
+        <h2 className="text-lg font-semibold text-text-primary">{t('checkout_delivery_title', 'Teslimat')}</h2>
         <p className="mt-1 text-sm text-text-secondary">{t('checkout_delivery_desc', 'Ürünlerin nasıl ve nereye ulaşacağını seç.')}</p>
       </div>
-      <div className="divide-y divide-border-light">
+      <div>
         <Section title={t('delivery_method', 'Teslimat yöntemi')}>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" role="radiogroup">
             {deliveryOptions.map(option => {
@@ -192,7 +192,7 @@ const CheckoutAddressStep = ({
 
           {isMeetup && (
             <div className="mt-4">
-              <p className="mb-2 text-xs font-medium text-text-tertiary">{t('checkout_meetup_point', 'Buluşma noktası')}</p>
+              <p className="mb-2 text-sm font-medium text-text-tertiary">{t('checkout_meetup_point', 'Buluşma noktası')}</p>
               <div className="flex flex-wrap gap-2">
                 {PREDEFINED_HUBS.map(hub => {
                   const selected = !customLocationActive && meetupLocation === hub;
@@ -206,10 +206,10 @@ const CheckoutAddressStep = ({
                         setCustomLocationActive(false);
                       }}
                       className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm transition-colors duration-150 ${
-                        selected ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
+                        selected ? 'border-accent-teal text-text-primary ring-1 ring-accent-teal' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
                       }`}
                     >
-                      {selected && <Check className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />}
+                      {selected && <Check className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />}
                       {hub}
                     </button>
                   );
@@ -222,7 +222,7 @@ const CheckoutAddressStep = ({
                     if (PREDEFINED_HUBS.includes(meetupLocation)) setMeetupLocation('');
                   }}
                   className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm transition-colors duration-150 ${
-                    customLocationActive ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
+                    customLocationActive ? 'border-accent-teal text-text-primary ring-1 ring-accent-teal' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
                   }`}
                 >
                   <MapPin className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
@@ -249,7 +249,7 @@ const CheckoutAddressStep = ({
           action={hasAddresses ? addAddressButton : null}
         >
           {!hasAddresses ? (
-            <div className="rounded border border-dashed border-border p-6 text-center">
+            <div className="rounded bg-background-secondary p-6 text-center">
               <p className="text-sm font-medium text-text-primary">{t('no_saved_addresses', 'Kayıtlı adresin yok')}</p>
               <p className="mt-1 text-sm text-text-secondary">{t('checkout_add_first_address', 'Siparişi tamamlamak için bir adres ekle.')}</p>
               <Button size="sm" className="mt-4" onClick={() => setIsAddAddressModalOpen(true)}>
@@ -277,13 +277,14 @@ const CheckoutAddressStep = ({
                         <span className="flex items-center gap-2">
                           <span className="truncate text-sm font-medium text-text-primary">{address.title || t('address', 'Adres')}</span>
                           {address.mainAddress && (
-                            <span className="inline-flex shrink-0 items-center rounded-sm border border-border bg-background-secondary px-1.5 py-0.5 text-xs font-medium text-text-secondary">
+                            <span className="inline-flex shrink-0 items-center gap-1.5 text-sm text-text-tertiary">
+                              <span className="h-1.5 w-1.5 rounded-full bg-text-tertiary" aria-hidden />
                               {t('default', 'Varsayılan')}
                             </span>
                           )}
                         </span>
                         <span className="mt-0.5 line-clamp-2 block text-sm text-text-secondary">{address.addressLine}</span>
-                        <span className="mt-0.5 block text-xs text-text-tertiary">
+                        <span className="mt-0.5 block text-sm text-text-tertiary">
                           {[address.city, address.state].filter(Boolean).join(' / ')} {address.postalCode}
                         </span>
                       </span>
@@ -333,7 +334,7 @@ const CheckoutAddressStep = ({
           {extrasOpen ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-text-tertiary">{t('order_name', 'Sipariş adı')}</span>
+                <span className="mb-1 block text-sm font-medium text-text-tertiary">{t('order_name', 'Sipariş adı')}</span>
                 <input
                   type="text"
                   className={inputNormal}
@@ -344,7 +345,7 @@ const CheckoutAddressStep = ({
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-text-tertiary">{t('notes', 'Teslimat notu')}</span>
+                <span className="mb-1 block text-sm font-medium text-text-tertiary">{t('notes', 'Teslimat notu')}</span>
                 <input
                   type="text"
                   className={inputNormal}

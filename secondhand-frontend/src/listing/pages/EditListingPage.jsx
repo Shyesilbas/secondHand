@@ -8,8 +8,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { LISTING_KEYS } from '../hooks/useListingData.js';
 import { listingTypeRegistry, getListingConfig } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { AlertTriangle, ArrowLeft } from 'lucide-react';
-import { Button, Skeleton } from '../../common/components/ui/index.js';
+import { ArrowLeft } from 'lucide-react';
+import { Button, ErrorState, Skeleton } from '../../common/components/ui/index.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import logger from '../../common/utils/logger.js';
 
 // --- Components ---
@@ -24,19 +25,22 @@ const PageLoader = () => {
  </div>
  );
 };
-const PageError = ({ error, onBack }) => {
- const { t } = useTranslation();
- return (
- <div className="min-h-screen bg-background-page flex items-center justify-center p-4">
- <div className="w-full max-w-md rounded border border-border-light bg-background-primary p-6 text-center shadow-sm">
- <AlertTriangle className="mx-auto mb-3 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
- <h3 className="text-lg font-semibold text-text-primary">{t("something_went_wrong")}</h3>
- <p className="mt-1 text-sm text-text-secondary">{error}</p>
- <Button variant="secondary" onClick={onBack} className="mt-5">
- <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />{t("go_back_to_listings")}</Button>
- </div>
- </div>
- );
+const PageError = ({ error, onBack, onRetry }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background-page p-4">
+      <ErrorState
+        title={t('something_went_wrong', 'Bir şeyler ters gitti')}
+        description={error}
+        onRetry={onRetry}
+        className="w-full max-w-md"
+      />
+      <Button variant="ghost" size="sm" onClick={onBack}>
+        <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+        <span>{t('go_back_to_listings', 'İlanlara dön')}</span>
+      </Button>
+    </div>
+  );
 };
 const EditListingPage = ({
  service = null,
@@ -63,7 +67,7 @@ const EditListingPage = ({
  }
  return null;
  }, [type, service]);
- const { data, isLoading, error: queryError } = useQuery({
+ const { data, isLoading, error: queryError, refetch } = useQuery({
  queryKey: ['listings', 'edit', id],
  queryFn: async () => {
  // Without an explicit type, read the base listing first to pick the type-specific editor service.
@@ -74,7 +78,7 @@ const EditListingPage = ({
  enabled: !!id,
  staleTime: 0
  });
- const error = queryError ? queryError.response?.data?.message || queryError.message || 'Failed to load listing details.' : null;
+ const error = queryError ? getErrorMessage(queryError, 'İlan detayları yüklenemedi.') : null;
 
  // 2. Authorization Check
  useEffect(() => {
@@ -107,7 +111,7 @@ const EditListingPage = ({
  }
  };
  if (isLoading) return <PageLoader />;
- if (error) return <PageError error={error} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
+ if (error) return <PageError error={error} onRetry={refetch} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
  if (!data) return <PageError error="Listing not found" onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
 
  // 4. Render Form

@@ -1,124 +1,174 @@
 import PageContainer from '@/common/components/layout/PageContainer';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Copy, Package } from 'lucide-react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { useEnums } from '../../common/hooks/useEnums.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { ORDER_QUERY_KEYS } from '../orderConstants.js';
 import { ORDER_TIME } from '../constants/orderUiConstants.js';
 import { orderService } from '../services/orderService.js';
-import { formatDateTime, formatCurrency } from '../../common/formatters.js';
+import { formatCurrency, formatDateTime } from '../../common/formatters.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
+import { getOrderStatusBadgeVariant, getOrderStatusLabel } from '../utils/statusPresentation.js';
 import { ShippingDetailsSection } from '../components/orderDetails/ShippingDetailsSection.jsx';
-import { Badge, PageHeader } from '../../common/components/ui/index.js';
-import { buttonClasses } from '../../common/components/ui/Button.jsx';
-const Panel = ({
- children,
- className = ''
-}) => <div className={`rounded border border-border-light bg-background-primary shadow-sm ${className}`}>
- {children}
- </div>;
+import { Badge, Button, Card, EmptyState, ErrorState, PageHeader, Skeleton } from '../../common/components/ui/index.js';
+
+const Panel = ({ children, className = '' }) => (
+  <Card className={className}>{children}</Card>
+);
 
 /** Uygulama içi sipariş kargo özeti (/profile/orders/... veya /profile/i-sold/... altında kullanılabilir.) */
 const OrderShipmentPage = () => {
- const {
- t
- } = useTranslation();
- const {
- orderId
- } = useParams();
- const navigate = useNavigate();
- const location = useLocation();
- const notification = useNotification();
- const isSellerView = location.pathname.includes(`${ROUTES.I_SOLD}/`);
- const scope = isSellerView ? 'seller' : 'buyer';
- const {
- data: order,
- isLoading,
- error,
- refetch
- } = useQuery({
- queryKey: ORDER_QUERY_KEYS.orderShipment(scope, orderId),
- queryFn: () => isSellerView ? orderService.getSellerOrderById(orderId) : orderService.getById(orderId),
- enabled: Boolean(orderId),
- staleTime: ORDER_TIME.ORDERS_LIST_STALE_MS
- });
- const backPath = isSellerView ? ROUTES.I_SOLD : ROUTES.MY_ORDERS;
- const formattedOrderDate = order?.createdAt
- ? new Date(order.createdAt).toLocaleDateString('tr-TR', {
- day: 'numeric',
- month: 'long',
- year: 'numeric',
- })
- : '';
- const title = order?.name || order?.orderItems?.[0]?.listing?.title || formattedOrderDate || t('shipment_tracking', 'Shipment');
- const copyTracking = () => {
- const n = order?.shipping?.trackingNumber;
- if (!n) return;
- navigator.clipboard.writeText(String(n)).then(() => {
- notification.showSuccess('Copied', 'Tracking number copied to clipboard.');
- }).catch(() => {
- notification.showWarning('Clipboard', 'Unable to copy — select the number manually.');
- });
- };
- const errorMessage = useMemo(() => {
- if (!error) return null;
- const m = error?.response?.data?.message || error?.message;
- return m || 'Could not load this order.';
- }, [error]);
- return <div className="min-h-[calc(100vh-8rem)] bg-background-secondary pb-16">
- <PageContainer narrow className="pt-8 sm:pt-10 space-y-6">
- <div className="flex items-center gap-3">
- <button type="button" onClick={() => navigate(backPath)} className="inline-flex items-center gap-2 text-sm font-semibold text-text-secondary hover:text-text-primary py-2">
- <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />{t("back_to_orders")}</button>
- </div>
+  const { t } = useTranslation();
+  const { enums } = useEnums();
+  const { orderId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const notification = useNotification();
+  const isSellerView = location.pathname.includes(`${ROUTES.I_SOLD}/`);
+  const scope = isSellerView ? 'seller' : 'buyer';
 
- <PageHeader
- title={t("shipment_tracking")}
- subtitle={title}
- badge={order?.status ? <Badge variant="primary">{t("order_status")}{order.status}</Badge> : null}
- />
+  const { data: order, isLoading, error, refetch } = useQuery({
+    queryKey: ORDER_QUERY_KEYS.orderShipment(scope, orderId),
+    queryFn: () => (isSellerView ? orderService.getSellerOrderById(orderId) : orderService.getById(orderId)),
+    enabled: Boolean(orderId),
+    staleTime: ORDER_TIME.ORDERS_LIST_STALE_MS
+  });
 
- {isLoading ? <Panel className="p-12 flex flex-col items-center justify-center animate-pulse">
- <Package className="w-10 h-10 text-secondary-300 mb-3" strokeWidth={1.5} />
- <span className="text-sm font-medium text-text-muted">{t("loading_shipment")}</span>
- </Panel> : null}
+  const backPath = isSellerView ? ROUTES.I_SOLD : ROUTES.MY_ORDERS;
+  const formattedOrderDate = order?.createdAt
+    ? new Date(order.createdAt).toLocaleDateString('tr-TR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : '';
+  const title =
+    order?.name ||
+    order?.orderItems?.[0]?.listing?.title ||
+    formattedOrderDate ||
+    t('shipment_tracking', 'Kargo takibi');
 
- {errorMessage && !isLoading ? <Panel className="p-6 border-border bg-background-secondary">
- <p className="text-sm font-semibold text-status-error-text">{errorMessage}</p>
- <button type="button" className="mt-3 text-sm font-semibold text-primary hover:text-primary underline" onClick={() => refetch()}>{t("try_again")}</button>
- </Panel> : null}
+  const copyTracking = () => {
+    const n = order?.shipping?.trackingNumber;
+    if (!n) return;
+    navigator.clipboard
+      .writeText(String(n))
+      .then(() => {
+        notification.showSuccess(t('copied', 'Kopyalandı'), t('tracking_number_copied', 'Takip numarası panoya kopyalandı.'));
+      })
+      .catch(() => {
+        notification.showWarning(t('clipboard', 'Pano'), t('copy_failed_manual', 'Kopyalanamadı — numarayı elle seçin.'));
+      });
+  };
 
- {order && !isLoading ? <>
- {order.orderItems?.length ? <Panel className="p-5">
- <h2 className="text-lg font-semibold text-text-primary mb-3">{t("items")}</h2>
- <ul className="space-y-2">
- {order.orderItems.map(item => <li key={item.id ?? `${item.listing?.id}-${item.quantity}`} className="flex justify-between gap-3 text-sm">
- <span className="font-medium text-text-primary line-clamp-2">{item.listing?.title || '—'}</span>
- <span className="text-text-secondary whitespace-nowrap tabular-nums">{formatCurrency(item.totalPrice, order.currency)}</span>
- </li>)}
- </ul>
- </Panel> : null}
+  const errorMessage = useMemo(() => {
+    if (!error) return null;
+    return getErrorMessage(error, t('od_load_failed', 'Sipariş detayları yüklenemedi.'));
+  }, [error, t]);
 
- {order.shipping ? <ShippingDetailsSection shipping={order.shipping} deliveryAddress={order.shippingAddress} CardComponent={Panel} /> : <Panel className="p-10 text-center">
- <Package className="w-12 h-12 text-secondary-300 mx-auto mb-4" strokeWidth={1.5} />
- <p className="text-sm font-semibold text-text-primary">{t("no_shipment_yet")}</p>
- <p className="text-sm text-text-tertiary mt-1">{t("shipping_details_appear_after_the_seller")}</p>
- </Panel>}
+  return (
+    <div className="min-h-screen bg-background-page pb-16">
+      <PageContainer narrow className="space-y-6 pt-8 sm:pt-10">
+        <PageHeader
+          back={
+            <Button variant="ghost" size="sm" onClick={() => navigate(backPath)}>
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span>{t('back_to_orders', 'Siparişlere dön')}</span>
+            </Button>
+          }
+          title={t('shipment_tracking', 'Kargo takibi')}
+          subtitle={title}
+          badge={
+            order?.status ? (
+              <Badge variant={getOrderStatusBadgeVariant(order.status)} dot>
+                {getOrderStatusLabel(t, enums, order.status)}
+              </Badge>
+            ) : null
+          }
+        />
 
- {order.shipping?.trackingNumber ? <div className="flex flex-wrap items-center gap-3">
- <button type="button" onClick={copyTracking} className={buttonClasses('secondary', 'sm')}>
- <Copy className="w-3.5 h-3.5" strokeWidth={1.5} />{t("copy_tracking_number")}</button>
- </div> : null}
+        {isLoading ? (
+          <Card className="space-y-4" aria-busy="true" aria-label={t('loading_shipment', 'Kargo bilgileri yükleniyor')}>
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </Card>
+        ) : null}
 
- <div className="pt-4 text-center border-t border-border-light">
- <Link to={backPath} className="text-sm font-semibold text-primary hover:text-primary">{t("view_full_order")}</Link>
- <span className="mx-2 text-secondary-300">·</span>
- <span className="text-xs text-text-muted">{order.updatedAt ? `Updated ${formatDateTime(order.updatedAt)}` : ''}</span>
- </div>
- </> : null}
- </PageContainer>
- </div>;
+        {errorMessage && !isLoading ? (
+          <ErrorState
+            title={t('od_load_failed', 'Sipariş detayları yüklenemedi')}
+            description={errorMessage}
+            onRetry={refetch}
+          />
+        ) : null}
+
+        {order && !isLoading ? (
+          <>
+            {order.orderItems?.length ? (
+              <Card>
+                <h2 className="mb-3 text-base font-semibold text-text-primary">{t('items', 'Ürünler')}</h2>
+                <ul className="divide-y divide-border-light">
+                  {order.orderItems.map((item) => (
+                    <li
+                      key={item.id ?? `${item.listing?.id}-${item.quantity}`}
+                      className="flex justify-between gap-3 py-2.5 text-sm first:pt-0 last:pb-0"
+                    >
+                      <span className="line-clamp-2 font-medium text-text-primary">{item.listing?.title || '—'}</span>
+                      <span className="whitespace-nowrap tabular-nums text-text-secondary">
+                        {formatCurrency(item.totalPrice, order.currency)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            ) : null}
+
+            {order.shipping ? (
+              <ShippingDetailsSection
+                shipping={order.shipping}
+                deliveryAddress={order.shippingAddress}
+                CardComponent={Panel}
+              />
+            ) : (
+              <EmptyState
+                icon={Package}
+                title={t('no_shipment_yet', 'Henüz kargo bilgisi yok')}
+                description={t('shipping_details_appear_after_the_seller', 'Kargo detayları satıcı ürünü gönderdikten sonra görünür.')}
+              />
+            )}
+
+            {order.shipping?.trackingNumber ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <Button variant="secondary" size="sm" onClick={copyTracking}>
+                  <Copy className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                  <span>{t('copy_tracking_number', 'Takip numarasını kopyala')}</span>
+                </Button>
+              </div>
+            ) : null}
+
+            <div className="border-t border-border-light pt-4 text-center">
+              <Link to={backPath} className="text-sm font-medium text-text-link hover:text-text-linkHover hover:underline">
+                {t('view_full_order', 'Siparişlere dön')}
+              </Link>
+              {order.updatedAt && (
+                <>
+                  <span className="mx-2 text-text-tertiary" aria-hidden>·</span>
+                  <span className="text-sm tabular-nums text-text-tertiary">
+                    {t('last_updated', 'Son güncelleme')}: {formatDateTime(order.updatedAt)}
+                  </span>
+                </>
+              )}
+            </div>
+          </>
+        ) : null}
+      </PageContainer>
+    </div>
+  );
 };
+
 export default OrderShipmentPage;

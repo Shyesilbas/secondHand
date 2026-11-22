@@ -190,11 +190,10 @@ const SecurityDevices = ({
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-light px-5 py-4">
         <div className="flex items-center gap-2.5">
-          <Laptop className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
           <h2 className="text-sm font-semibold text-text-primary">
             {t('devices_and_sessions', 'Cihazlar ve Oturumlar')}
           </h2>
-          <span className="rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 text-xs font-medium tabular-nums text-text-secondary">
+          <span className="text-sm tabular-nums text-text-tertiary">
             {devices.length} {t('device_unit', 'cihaz')}
           </span>
         </div>
@@ -203,7 +202,7 @@ const SecurityDevices = ({
           <button
             type="button"
             onClick={() => onFilterByDevice('')}
-            className="inline-flex items-center gap-1.5 rounded border border-border-light bg-background-secondary px-2.5 py-1 text-xs font-medium text-text-secondary transition-colors hover:text-text-primary cursor-pointer"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded px-2.5 py-1 text-sm font-medium text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary"
           >
             <X className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
             <span>{t('clear_device_filter', 'Cihaz Filtresini Kaldır')}</span>
@@ -224,7 +223,7 @@ const SecurityDevices = ({
               className="flex flex-col justify-between gap-3 px-5 py-3.5 sm:flex-row sm:items-center"
             >
               <div className="flex min-w-0 items-start gap-3.5">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded border border-border-light bg-background-secondary">
+                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded bg-background-secondary">
                   <DeviceIcon type={device.deviceType} strokeWidth={1.5} />
                 </div>
 
@@ -234,29 +233,29 @@ const SecurityDevices = ({
                       {device.deviceLabel}
                       {device.osLabel ? ` · ${device.osLabel}` : ''}
                     </h3>
-                    <span className="rounded-sm bg-background-secondary px-1.5 py-0.5 text-xs font-medium text-text-secondary">
+                    <span className="text-sm text-text-tertiary">
                       {device.browserLabel}
                     </span>
 
                     {device.isCurrentDevice ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-primary">
+                      <span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
                         <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
                         <span>{t('current_device', 'Bu cihaz · Aktif')}</span>
                       </span>
                     ) : device.lastEventType === 'LOGOUT' ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs text-text-tertiary">
+                      <span className="inline-flex items-center gap-1.5 text-sm text-text-tertiary">
                         <span className="h-1.5 w-1.5 rounded-full bg-text-muted" aria-hidden />
                         <span>{t('logged_out_device', 'Çıkış yapıldı')}</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs text-text-secondary">
+                      <span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
                         <span className="h-1.5 w-1.5 rounded-full bg-text-tertiary" aria-hidden />
                         <span>{t('recognized_device', 'Tanınan cihaz')}</span>
                       </span>
                     )}
                   </div>
 
-                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-tertiary">
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-tertiary">
                     {device.ipAddress ? (
                       <span className="inline-flex items-center gap-1 font-mono">
                         <Globe className="h-3 w-3 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
@@ -295,7 +294,7 @@ const SecurityDevices = ({
                     onClick={() =>
                       onFilterByDevice(isFiltered ? '' : filterToken)
                     }
-                    className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer ${isFiltered
+                    className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer ${isFiltered
                         ? 'border-accent-teal bg-accent-teal-50 text-accent-teal-800'
                         : 'border-border-light bg-background-primary text-text-secondary hover:border-border hover:text-text-primary'
                       }`}

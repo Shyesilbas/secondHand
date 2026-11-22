@@ -16,8 +16,6 @@ public interface CouponRedemptionRepository extends JpaRepository<CouponRedempti
     long countByCoupon(Coupon coupon);
     long countByCouponAndUser(Coupon coupon, User user);
 
-    @Query("SELECT DISTINCT r.coupon.id FROM CouponRedemption r WHERE r.user.id = :userId")
-    List<UUID> findDistinctCouponIdsByUser_Id(@Param("userId") Long userId);
 
     @Query("""
             SELECT r FROM CouponRedemption r

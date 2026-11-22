@@ -112,7 +112,7 @@ const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activ
  <div className="flex flex-wrap items-center gap-2">
  <h1 className="truncate text-2xl font-semibold text-text-primary">{fullName}</h1>
  {isOwnProfile && (
- <Badge variant="muted" size="sm">{t('public_view', 'Herkese açık görünüm')}</Badge>
+ <span className="text-sm text-text-tertiary">{t('public_view', 'Herkese açık görünüm')}</span>
  )}
  </div>
  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-text-tertiary">

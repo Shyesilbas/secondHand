@@ -46,7 +46,7 @@ sequenceDiagram
         Note over ES: escrows tablosuna ESCROW statüsünde kayıt aç
     end
 
-    CO->>CS: redeem(couponCode, userId, couponOrder)
+    CO->>CS: redeem(couponCode, userId, couponOrder, couponDiscount)
     CO->>CO: offerService.markCompleted(acceptedOffer)
     CO->>CO: cartRepository.deleteByUserId(userId)
 
@@ -90,10 +90,10 @@ Pazaryerinde bir alıcı, tek bir sepette birden fazla farklı satıcının ür�
 - Ödeme başarılı olduğunda:
   - Siparişin `paymentStatus` değeri `PaymentStatus.COMPLETED` yapılır.
   - Sipariş statüsü teslimat modeline göre `OrderStatus.CONFIRMED` veya `OrderStatus.MEETUP_PENDING` olarak güncellenir.
-  - `EscrowService.hold(order)` çağrılarak her bir sipariş kalemi için `escrows` tablosunda `PaymentStatus.ESCROW` statüsünde bloke kaydı açılır. Para hiçbir koşulda doğrudan satıcıya aktarılmaz.
+  - `EscrowService.hold(order)` çağrılarak her bir sipariş kalemi için `escrows` tablosunda `PaymentStatus.ESCROW` statüsünde bloke kaydı açılır. Para hiçbir koşulda doğrudan satıcıya aktarılmaz. Platform kuponu indirimi olan kalemlerde kuponun kalem payı (`order_items.coupon_discount`) escrow kaydına `platform_subsidy` olarak yazılır: `amount` alıcının ödediği net tutar ve iade tabanı kalır, serbest bırakmada satıcıya `amount + platform_subsidy` ödenir ([escrow-lifecycle-and-state-machine.md](escrow-lifecycle-and-state-machine.md)).
 
 ### 2.5. Post-Payment Finalizasyonu ve Sepet Temizliği
-- **Kupon Redemption:** Eğer kupon kullanılmışsa, `couponService.redeem()` çağrılır ve indirimden faydalanan ilk sipariş ile kupon kullanımı mühürlenir (`coupon_redemptions` tablosu).
+- **Kupon Redemption:** Eğer kupon kullanılmışsa, `couponService.redeem()` çağrılır ve indirimden faydalanan ilk sipariş ile kupon kullanımı mühürlenir (`coupon_redemptions` tablosu). Satıra kuponun toplam indirimi `discount_amount` olarak da yazılır; Kuponlarım sayfasındaki toplam tasarruf bu snapshot'tan gelir.
 - **Teklif Kapatma:** Eğer işlem bir pazarlık teklifine dayanıyorsa, `offerService.markCompleted()` teklifi koşullu `UPDATE` ile (`ACCEPTED` + version kontrolü) `OfferStatus.COMPLETED` yapar; eşzamanlı ikinci checkout `OFFER_CONCURRENT_MODIFICATION` alır. Teklifin stok tutması başarıda diğer rezervasyonlar gibi pending'e çevrilir (bkz. [offer-system-and-concurrency-locks.md](offer-system-and-concurrency-locks.md) §6).
 - **Finalizasyon hatası:** Kupon redemption veya teklif kapatma başarısız olursa ödemeler ve siparişler de geri alınır (`rollbackCheckout` + `releaseReservedStock`).
 - **Sepet Sıfırlama:** `cartRepository.deleteByUserId(userId)` ile alıcının sepeti temizlenir.

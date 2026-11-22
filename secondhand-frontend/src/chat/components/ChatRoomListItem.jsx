@@ -1,112 +1,147 @@
-import { useTranslation } from "react-i18next";
-import { useState } from 'react';
-import { EllipsisVertical as EllipsisVerticalIcon, Trash2 as TrashIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Trash2 } from 'lucide-react';
+import { Badge, Button } from '../../common/components/ui/index.js';
+import { formatDateTime, formatSmartEmailDate } from '../../common/formatters.js';
 import { CHAT_ROOM_TYPES } from '../chatConstants.js';
 import { sameChatId } from '../chatIdUtils.js';
-const ChatRoomListItem = ({
-    room,
-    isSelected,
-    onClick,
-    onListingClick,
-    userId,
-    onDeleteConversation
-}) => {
-    const {
-        t
-    } = useTranslation();
-    const [showOptions, setShowOptions] = useState(false);
-    const unreadCount = room.unreadCount || 0;
-    const handleDeleteClick = e => {
-        e.stopPropagation();
-        onDeleteConversation(room.id);
-        setShowOptions(false);
-    };
-    const getRoomTitle = () => {
-        if (room.otherParticipantName) return room.otherParticipantName;
-        if (room.listingTitle) return room.listingTitle;
-        if (room.roomName) return room.roomName;
-        if (room.title) return room.title;
-        return '';
-    };
-    const getRoomSubtitle = () => {
-        if (room.roomType === CHAT_ROOM_TYPES.LISTING) return 'Listing Chat';
-        if (room.roomType === CHAT_ROOM_TYPES.DIRECT) return 'Direct Message';
-        return '';
-    };
-    const getLastMessageSenderName = () => {
-        if (!room.lastMessageSenderId) return '';
-        return sameChatId(room.lastMessageSenderId, userId) ? 'You' : room.lastMessageSenderName || `User ${room.lastMessageSenderId}`;
-    };
-    const title = getRoomTitle();
-    return <div className={`relative cursor-pointer transition-colors duration-150 ease-in-out ${isSelected ? 'bg-background-tertiary border-l-2 border-l-primary' : 'hover:bg-background-secondary'}`} onClick={onClick}>
-        <div className="flex justify-between items-start">
-            <div className="flex-1 min-w-0">
-                <div className="p-4 border-b border-border-light">
-                    <div className="flex items-start space-x-3 w-full">
-                        <div className="flex-shrink-0">
-                            <div className="w-12 h-12 bg-secondary-700 rounded flex items-center justify-center">
-                                <span className="text-sm font-semibold text-white tracking-tight">
-                                    {title ? title.charAt(0).toUpperCase() : '?'}
-                                </span>
-                            </div>
-                        </div>
 
-                        <div className="flex-1 min-w-0 pr-2">
-                            <div className="flex items-start justify-between mb-1.5">
-                                <div className="flex-1 min-w-0 mr-2">
-                                    <h3 className={`text-sm font-medium text-text-primary truncate tracking-tight ${isSelected ? ' ' : ' '}`}>
-                                        {title}
-                                    </h3>
-                                </div>
-
-                                <div className="flex items-center space-x-2 flex-shrink-0">
-                                    {unreadCount > 0 && <span className="flex items-center justify-center min-w-5 h-5 px-1.5 text-xs font-semibold text-white bg-primary rounded-sm">
-                                        {unreadCount > 99 ? '99+' : unreadCount}
-                                    </span>}
-                                    {room.lastMessageTime && <span className="text-xs text-text-tertiary whitespace-nowrap tracking-tight">
-                                        {new Date(room.lastMessageTime).toLocaleDateString()}
-                                    </span>}
-                                </div>
-                            </div>
-
-                            {room.listingId && onListingClick && <div className="mb-1.5">
-                                <button onClick={e => {
-                                    e.stopPropagation();
-                                    onListingClick(room.listingId, e);
-                                }} className="text-xs text-text-secondary hover:text-text-primary hover:underline transition-colors duration-150 ease-in-out break-words tracking-tight">
-                                    {room.listingTitle}
-                                </button>
-                            </div>}
-
-                            <p className={`text-sm line-clamp-2 break-words tracking-tight ${isSelected ? 'text-text-secondary' : 'text-text-tertiary'}`}>
-                                {room.lastMessageRemoved ? <span className="italic">{t('last_message_removed_by_moderation', 'Bu mesaj sistem tarafından silindi.')}</span> : room.lastMessage ? <span>
-                                    <span className="font-semibold">
-                                        {getLastMessageSenderName()}:
-                                    </span>{' '}
-                                    {room.lastMessage}
-                                </span> : getRoomSubtitle()}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="relative p-2">
-                <button onClick={e => {
-                    e.stopPropagation();
-                    setShowOptions(!showOptions);
-                }} className="text-text-muted hover:text-text-secondary transition-colors duration-150 ease-in-out p-1.5 rounded hover:bg-background-tertiary">
-                    <EllipsisVerticalIcon className="w-4 h-4" strokeWidth={1.5} />
-                </button>
-
-                {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border rounded shadow-md z-10 min-w-36">
-                    <button onClick={handleDeleteClick} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-colors duration-150 ease-in-out rounded mx-1 my-1 tracking-tight">
-                        <TrashIcon className="w-4 h-4" strokeWidth={1.5} />
-                        <span>{t("delete_chat")}</span>
-                    </button>
-                </div>}
-            </div>
-        </div>
-    </div>;
+const getInitials = (title) => {
+  const cleaned = String(title || '').trim();
+  if (!cleaned) return '?';
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
 };
+
+const ChatRoomListItem = ({
+  room,
+  isSelected,
+  onClick,
+  userId,
+  onDeleteConversation
+}) => {
+  const { t } = useTranslation();
+  const unreadCount = room.unreadCount || 0;
+  const hasUnread = unreadCount > 0;
+
+  const title =
+    room.otherParticipantName ||
+    room.listingTitle ||
+    room.roomName ||
+    room.title ||
+    t('user', 'Kullanıcı');
+
+  const subtitle =
+    room.roomType === CHAT_ROOM_TYPES.LISTING
+      ? t('chat_listing_subtitle', 'İlan sohbeti')
+      : room.roomType === CHAT_ROOM_TYPES.DIRECT
+        ? t('chat_direct_subtitle', 'Direkt mesaj')
+        : '';
+
+  const lastMessageSender = room.lastMessageSenderId
+    ? sameChatId(room.lastMessageSenderId, userId)
+      ? t('you', 'Siz')
+      : room.lastMessageSenderName || `${t('user', 'Kullanıcı')} #${room.lastMessageSenderId}`
+    : '';
+
+  return (
+    <li className="group relative">
+      <button
+        type="button"
+        onClick={onClick}
+        aria-current={isSelected ? 'true' : undefined}
+        className={`flex w-full items-start gap-3 border-l-2 px-4 py-3.5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus ${
+          isSelected
+            ? 'border-l-accent-teal bg-accent-teal-50'
+            : 'border-l-transparent bg-background-primary hover:bg-background-secondary'
+        }`}
+      >
+        <div
+          aria-hidden
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+            isSelected
+              ? 'bg-accent-teal-100 text-accent-teal-800'
+              : 'bg-background-tertiary text-text-secondary'
+          }`}
+        >
+          {getInitials(title)}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <span
+              className={`truncate text-sm ${
+                hasUnread || isSelected
+                  ? 'font-semibold text-text-primary'
+                  : 'font-medium text-text-primary'
+              }`}
+            >
+              {title}
+            </span>
+
+            <div className="flex shrink-0 items-center gap-1.5 transition-opacity duration-150 md:group-hover:opacity-0 md:group-focus-within:opacity-0">
+              {hasUnread && (
+                <Badge variant="primary" size="sm">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </Badge>
+              )}
+              {room.lastMessageTime && (
+                <time
+                  dateTime={room.lastMessageTime}
+                  className={`whitespace-nowrap text-xs tabular-nums ${
+                    hasUnread ? 'font-medium text-text-primary' : 'text-text-tertiary'
+                  }`}
+                >
+                  {formatSmartEmailDate(room.lastMessageTime) || formatDateTime(room.lastMessageTime)}
+                </time>
+              )}
+            </div>
+          </div>
+
+          {room.listingTitle && (
+            <p
+              className={`mt-0.5 truncate text-xs font-medium ${
+                isSelected ? 'text-accent-teal-800' : 'text-text-secondary'
+              }`}
+            >
+              {room.listingTitle}
+            </p>
+          )}
+
+          <p className="mt-0.5 line-clamp-1 text-sm text-text-tertiary">
+            {room.lastMessageRemoved ? (
+              <span className="italic">
+                {t('last_message_removed_by_moderation', 'Bu mesaj sistem tarafından silindi.')}
+              </span>
+            ) : room.lastMessage ? (
+              <>
+                {lastMessageSender ? (
+                  <span className="font-medium text-text-secondary">{lastMessageSender}: </span>
+                ) : null}
+                {room.lastMessage}
+              </>
+            ) : (
+              subtitle
+            )}
+          </p>
+        </div>
+      </button>
+
+      {onDeleteConversation && (
+        <div className="pointer-events-none absolute right-2.5 top-3 hidden opacity-0 transition-opacity duration-150 md:block group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+          <Button
+            variant="danger"
+            size="icon"
+            onClick={() => onDeleteConversation(room.id)}
+            title={t('delete_chat', 'Sohbeti sil')}
+            aria-label={`${t('delete_chat', 'Sohbeti sil')}: ${title}`}
+          >
+            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+          </Button>
+        </div>
+      )}
+    </li>
+  );
+};
+
 export default ChatRoomListItem;

@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import { FileText } from 'lucide-react';
 import { useRequiredAgreements } from '../../agreements/hooks/useAgreements.js';
 import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
@@ -62,8 +61,8 @@ const PaymentAgreementsSection = ({
             key={agreement.agreementId}
             className={`flex items-center gap-3 rounded border px-4 py-3 text-sm transition-colors duration-150 has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-border-focus ${
               isChecked
-                ? 'border-accent-teal bg-accent-teal-50'
-                : 'border-border bg-background-primary hover:border-card-border-hover'
+                ? 'border-accent-teal bg-background-primary ring-1 ring-accent-teal'
+                : 'border-transparent bg-background-secondary'
             }`}
           >
             {/* The label covers the row, so a click anywhere but "Read" toggles the checkbox. */}
@@ -85,7 +84,6 @@ const PaymentAgreementsSection = ({
               onClick={() => handleAgreementClick(agreement)}
               className="inline-flex shrink-0 items-center gap-1.5 rounded px-2 py-1 text-sm font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             >
-              <FileText className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span>{t('read', 'Oku')}</span>
             </button>
           </div>

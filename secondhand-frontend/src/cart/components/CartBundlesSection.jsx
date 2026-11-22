@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Check, ShoppingBag } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { Button, Card } from '../../common/components/ui/index.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency } from '../../common/formatters.js';
@@ -21,7 +21,7 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
               className="flex items-center justify-between gap-3 text-sm"
             >
               <div className="flex min-w-0 items-center gap-2.5">
-                <Check className="h-4 w-4 shrink-0 text-status-success-icon" strokeWidth={2} />
+                <Check className="h-4 w-4 shrink-0 text-status-success-icon" strokeWidth={1.5} aria-hidden />
                 <div className="min-w-0">
                   <span className="mr-1 font-semibold text-text-primary">
                     {a.sellerName || t('seller', 'Satıcı')} {t('bundle_unlocked', 'Paket İndirimi')}:
@@ -38,7 +38,7 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
               <button
                 type="button"
                 onClick={() => navigate(ROUTES.USER_PROFILE(a.sellerId))}
-                className="shrink-0 text-sm font-medium text-text-secondary hover:text-text-primary hover:underline"
+                className="shrink-0 rounded-sm text-sm font-medium text-text-link transition-colors duration-150 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               >
                 {t('view_seller', 'Satıcıyı Gör')}
               </button>
@@ -55,13 +55,13 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
               <Card key={s.campaignId} padding="normal">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div>
                       <span className="text-sm font-semibold text-text-secondary">
                         {t('exclusive_bundle_from', 'Özel Satıcı Paketi:')}{' '}
                         <button
                           type="button"
                           onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
-                          className="font-semibold text-text-primary hover:underline"
+                          className="rounded-sm font-semibold text-text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                         >
                           {s.sellerName || t('seller', 'Satıcı')}
                         </button>
@@ -100,8 +100,7 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
                     onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
                     className="shrink-0 self-start sm:self-center"
                   >
-                    <ShoppingBag className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.5} />
-                    <span>{t('complete_bundle', 'Paketi Tamamla')}</span>
+                    {t('complete_bundle', 'Paketi Tamamla')}
                   </Button>
                 </div>
               </Card>

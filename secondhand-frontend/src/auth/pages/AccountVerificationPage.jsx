@@ -102,7 +102,7 @@ const AccountVerificationPage = () => {
             {countdown > 0 ? (
               <span className="tabular-nums">{t('auth_resend_in', { defaultValue: '{{s}} sn sonra yeni kod isteyebilirsin', s: countdown })}</span>
             ) : (
-              <button type="button" onClick={sendCode} disabled={isSending} className="underline hover:text-text-primary disabled:opacity-50">
+              <button type="button" onClick={sendCode} disabled={isSending} className="rounded-sm text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50">
                 {t('auth_resend_code', 'Kodu tekrar gönder')}
               </button>
             )}
@@ -110,8 +110,8 @@ const AccountVerificationPage = () => {
         </form>
       )}
 
-      <div className="mt-6 border-t border-border-light pt-4 text-center">
-        <Link to={ROUTES.PROFILE} className="text-sm text-text-secondary hover:text-text-primary">
+      <div className="mt-6 text-center">
+        <Link to={ROUTES.PROFILE} className="rounded-sm text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
           {t('auth_verify_later', 'Daha sonra')}
         </Link>
       </div>

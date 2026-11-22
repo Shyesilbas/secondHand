@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/** GV-27, GV-28, PF-17: view statistics cache keys and view tracking identity and ordering. */
+/** View statistics cache keys and view tracking identity and ordering. */
 class ListingViewServiceTest {
 
     private final ListingViewRepository viewRepository = mock(ListingViewRepository.class);

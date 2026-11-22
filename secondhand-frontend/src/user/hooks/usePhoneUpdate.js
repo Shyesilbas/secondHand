@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { userService } from '../services/userService.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const usePhoneUpdate = () => {
  const { updateUser } = useAuth();
@@ -32,7 +33,7 @@ export const usePhoneUpdate = () => {
  notification.showSuccess('Success', 'Phone number updated successfully. Please refresh the page to see the changes.');
  return true;
  } catch (error) {
- notification.showError('Error', error.response?.data?.message || error.message || 'An error occurred while updating phone number. Please try again.');
+ notification.showError('Error', getErrorMessage(error, 'An error occurred while updating phone number. Please try again.'));
  return false;
  } finally {
  setIsUpdating(false);
