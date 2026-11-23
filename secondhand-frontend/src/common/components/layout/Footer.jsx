@@ -34,7 +34,7 @@ const Footer = () => {
   const isLoadingPricing = isLoading;
 
   return (
-    <footer className="bg-primary text-secondary-300">
+    <footer className="bg-background-dark text-secondary-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <BrandMark size="sm" tone="inverse" />
@@ -42,6 +42,9 @@ const Footer = () => {
           <nav aria-label={t("secondhand")} className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <Link to={ROUTES.ABOUT} className={LINK}>
               {t("about_secondhand")}
+            </Link>
+            <Link to={ROUTES.FEES} className={LINK}>
+              {t("fees_title", "Komisyon ve ücretler")}
             </Link>
             <Link to={ROUTES.FORUM} className={LINK}>
               {t("forum_community")}
@@ -123,6 +126,7 @@ const Footer = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <div className="text-sm font-semibold text-white">{t("listing_fee")}</div>
+                  <div className="text-sm text-secondary-400">{t("listing_fee_scope", "Yalnızca araç ve emlak ilanları")}</div>
                   {feeConfig && (
                     <div className="space-y-0.5 text-sm">
                       <div className={PRICE_ROW}>

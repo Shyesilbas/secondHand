@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
-import { theme } from '../../common/theme/theme.js';
+import { resolveMapColors } from '../../common/theme/themeTokens.js';
+import { useColorScheme } from '../../common/hooks/useColorScheme.js';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 
@@ -14,6 +15,7 @@ const AREA_RADIUS_METERS = 400;
  */
 const RealEstateMap = ({ listing }) => {
 	const { t } = useTranslation();
+	const { isDark } = useColorScheme();
 	const containerRef = useRef(null);
 	const [state, setState] = useState('loading');
 	const lat = Number(listing?.latitude);
@@ -31,8 +33,8 @@ const RealEstateMap = ({ listing }) => {
 					maxZoom: 18,
 					attribution: '&copy; OpenStreetMap',
 				}).addTo(map);
-				const color = theme.colors.primary.DEFAULT;
-				L.circle([lat, lon], { radius: AREA_RADIUS_METERS, color, weight: 1, fillColor: color, fillOpacity: 0.15 }).addTo(map);
+				const color = resolveMapColors().areaColor;
+				L.circle([lat, lon], { radius: AREA_RADIUS_METERS, color, weight: 1.5, fillColor: color, fillOpacity: 0.15 }).addTo(map);
 				setState('ready');
 			})
 			.catch(() => {
@@ -49,7 +51,11 @@ const RealEstateMap = ({ listing }) => {
 			{state === 'error' && <Alert type="error" message={t("map_load_failed", "Harita yüklenemedi.")} />}
 			<div className="relative h-72 w-full overflow-hidden rounded border border-border-light">
 				{state === 'loading' && <Skeleton className="absolute inset-0 h-full w-full" />}
-				<div ref={containerRef} className="h-full w-full" aria-label={t("approximate_listing_location", "İlanın yaklaşık konumu")} />
+				<div
+					ref={containerRef}
+					className={`h-full w-full ${isDark ? 'brightness-90 contrast-110' : ''}`}
+					aria-label={t("approximate_listing_location", "İlanın yaklaşık konumu")}
+				/>
 			</div>
 			<p className="text-sm text-text-secondary">
 				{t("real_estate_map_hint", "Yaklaşık konum gösteriliyor; tam adres ilan sahibiyle görüşülerek öğrenilir.")}

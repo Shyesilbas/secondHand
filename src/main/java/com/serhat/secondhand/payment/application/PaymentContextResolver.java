@@ -22,7 +22,8 @@ public class PaymentContextResolver {
             PaymentTransactionType.EWALLET_DEPOSIT,
             PaymentTransactionType.EWALLET_WITHDRAWAL,
             PaymentTransactionType.EWALLET_PAYMENT_RECEIVED,
-            PaymentTransactionType.MEMBERSHIP_PAYMENT
+            PaymentTransactionType.MEMBERSHIP_PAYMENT,
+            PaymentTransactionType.SHIPPING_FEE
     );
 
     public record InferredPaymentData(PaymentDirection direction, PaymentTransactionType transactionType) {}

@@ -1,0 +1,4 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{emails/layout.html :: page(title=(${headerTitle} ?: 'Duyuru'), body=~{emails/message-body.html :: body}, actionUrl=(${actionUrl} ?: '/fees'), actionText=(${actionText} ?: 'Komisyon ve Ücretler'))}">
+</html>

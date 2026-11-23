@@ -50,6 +50,7 @@ public class ListingFeePaymentService {
                 .taxPercentage(listingConfig.getFee().getTax())
                 .taxAmount(listingCommandService.calculateListingFeeTax())
                 .totalCreationFee(totalFee)
+                .feeBearingTypes(com.serhat.secondhand.listing.domain.entity.enums.base.ListingType.creationFeeTypes())
                 .build();
     }
 

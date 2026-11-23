@@ -26,7 +26,8 @@ class MembershipQuoteTest {
         when(eWalletService.checkBalance(7L, new BigDecimal("149.90")))
                 .thenReturn(new BalanceCheckDto(false, BigDecimal.ZERO, new BigDecimal("49.90")));
         MembershipService service = new MembershipService(mock(UserRepository.class), mock(PaymentProcessor.class),
-                mock(PaymentRequestFactory.class), props, eWalletService);
+                mock(PaymentRequestFactory.class), props, eWalletService,
+                mock(com.serhat.secondhand.user.application.SystemAccountService.class));
 
         MembershipQuoteDto quote = service.getUpgradeQuote(7L);
 

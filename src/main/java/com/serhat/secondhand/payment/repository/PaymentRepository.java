@@ -29,11 +29,11 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID>, JpaSpec
 
        @Query("SELECT COUNT(p), " +
                      "SUM(CASE WHEN p.isSuccess = true THEN 1 ELSE 0 END), " +
-                     "SUM(CASE WHEN (p.toUser.id = :userId AND (p.fromUser.id IS NULL OR p.fromUser.id != :userId) AND p.isSuccess = true AND p.status = 'COMPLETED') THEN p.amount + COALESCE(e.platformSubsidy, 0) ELSE 0 END), "
+                     "SUM(CASE WHEN (p.toUser.id = :userId AND (p.fromUser.id IS NULL OR p.fromUser.id != :userId) AND p.isSuccess = true AND p.status = 'COMPLETED') THEN p.amount + COALESCE(e.platformSubsidy, 0) - COALESCE(e.commissionAmount, 0) - COALESCE(e.shippingDeduction, 0) ELSE 0 END), "
                      +
                      "SUM(CASE WHEN (p.fromUser.id = :userId AND (p.toUser.id IS NULL OR p.toUser.id != :userId) AND p.isSuccess = true) THEN p.amount ELSE 0 END), "
                      +
-                     "SUM(CASE WHEN (p.toUser.id = :userId AND (p.fromUser.id IS NULL OR p.fromUser.id != :userId) AND p.isSuccess = true AND p.orderItemId IS NOT NULL AND p.status = 'ESCROW') THEN p.amount + COALESCE(e.platformSubsidy, 0) ELSE 0 END) "
+                     "SUM(CASE WHEN (p.toUser.id = :userId AND (p.fromUser.id IS NULL OR p.fromUser.id != :userId) AND p.isSuccess = true AND p.orderItemId IS NOT NULL AND p.status = 'ESCROW') THEN p.amount + COALESCE(e.platformSubsidy, 0) - COALESCE(e.commissionAmount, 0) - COALESCE(e.shippingDeduction, 0) ELSE 0 END) "
                      +
                      "FROM Payment p LEFT JOIN Escrow e ON e.orderItem.id = p.orderItemId WHERE (p.fromUser.id = :userId OR p.toUser.id = :userId) " +
                      "AND (:providerName IS NULL OR p.providerName = :providerName)")

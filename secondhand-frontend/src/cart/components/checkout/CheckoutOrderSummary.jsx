@@ -6,7 +6,7 @@ import Skeleton from '../../../common/components/ui/Skeleton.jsx';
 import { getCheckoutCurrency, indexPricedLines } from '../../utils/pricedLines.js';
 
 // Line and total amounts come only from the backend pricing preview; skeletons show while it loads.
-const CheckoutOrderSummary = ({ cartItems = [], pricing }) => {
+const CheckoutOrderSummary = ({ cartItems = [], pricing, shippingFee = 0, deliveryMethod, freeShippingThreshold = null }) => {
   const { t } = useTranslation();
   const currency = getCheckoutCurrency(cartItems);
   const pricedLines = indexPricedLines(pricing);
@@ -78,11 +78,20 @@ const CheckoutOrderSummary = ({ cartItems = [], pricing }) => {
           )}
           <div className="flex justify-between text-text-secondary">
             <dt>{t('shipping', 'Kargo')}</dt>
-            <dd>{t('free', 'Ücretsiz')}</dd>
+            <dd className="tabular-nums">
+              {deliveryMethod === 'SAFE_MEETUP' || !(shippingFee > 0)
+                ? t('free', 'Ücretsiz')
+                : formatCurrency(shippingFee, currency)}
+            </dd>
           </div>
+          {deliveryMethod !== 'SAFE_MEETUP' && Number(freeShippingThreshold) > 0 ? (
+            <p className="text-sm text-text-tertiary">
+              {t('checkout_free_shipping_hint', 'Bir satıcıdan {{amount}} ve üzeri alışverişte kargo ücretsiz.', { amount: formatCurrency(freeShippingThreshold, currency) })}
+            </p>
+          ) : null}
           <div className="flex items-baseline justify-between pt-2">
             <dt className="font-medium text-text-primary">{t('order_total', 'Sipariş toplamı')}</dt>
-            <dd className="text-lg font-semibold tabular-nums text-text-price">{amount(pricing?.total, currency, 'h-6 w-24')}</dd>
+            <dd className="text-lg font-semibold tabular-nums text-text-price">{pricing ? formatCurrency(Number(pricing.total) + (Number(shippingFee) || 0), currency) : <Skeleton className="h-6 w-24" />}</dd>
           </div>
         </dl>
       </div>

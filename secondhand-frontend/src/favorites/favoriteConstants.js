@@ -6,14 +6,14 @@ export const FAVORITE_DEFAULTS = Object.freeze({
 });
 
 export const FAVORITE_MESSAGES = Object.freeze({
- SUCCESS_TITLE: 'Success',
- ERROR_TITLE: 'Error',
- ADDED_TO_FAVORITES: 'Added to favorites',
- REMOVED_FROM_FAVORITES: 'Removed from favorites',
- TOGGLE_FAVORITE_FAILED: 'Failed to toggle favorite',
- BUTTON_ADDED: 'Added to Favorites!',
- BUTTON_REMOVED: 'Removed from Favorites!',
- UPDATE_FAVORITES_FAILED: 'Failed to update favorites',
+ SUCCESS_TITLE: 'Başarılı',
+ ERROR_TITLE: 'Hata',
+ ADDED_TO_FAVORITES: 'Favorilere eklendi',
+ REMOVED_FROM_FAVORITES: 'Favorilerden çıkarıldı',
+ TOGGLE_FAVORITE_FAILED: 'Favori durumu güncellenemedi',
+ BUTTON_ADDED: 'Favorilere eklendi',
+ BUTTON_REMOVED: 'Favorilerden çıkarıldı',
+ UPDATE_FAVORITES_FAILED: 'Favoriler güncellenemedi',
 });
 
 export const FAVORITES_PAGE_TABS = Object.freeze({

@@ -190,6 +190,7 @@ public class EnumCatalogService {
         configMap.put("taxPercentage", config.getTaxPercentage());
         configMap.put("taxAmount", config.getTaxAmount());
         configMap.put("totalCreationFee", config.getTotalCreationFee());
+        configMap.put("feeBearingTypes", config.getFeeBearingTypes());
 
         String configHash = String.valueOf(
                 (config.getCreationFee().hashCode()

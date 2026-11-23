@@ -159,7 +159,7 @@ public class CheckoutOrchestrator {
 
             List<OrderDto> orderDtos = orders.stream().map(orderMapper::toDto).toList();
             BigDecimal totalAmount = orders.stream()
-                    .map(Order::getTotalAmount)
+                    .map(o -> o.getTotalAmount() != null ? o.getTotalAmount().add(o.getShippingFee()) : null)
                     .filter(java.util.Objects::nonNull)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             return Result.success(new CheckoutResultDto(orderDtos, totalAmount));

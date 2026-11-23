@@ -50,3 +50,4 @@ Generated from code; the hook files are the source of truth.
 ### Mandatory eWallet Spending Limit Check
 - In Step 2 (Payment), before OTP generation, `useCheckout` evaluates monthly spending limits via `ewalletService.checkSpendingWarning`.
 - If the cart total exceeds the user's configured warning threshold, `EWalletSpendingWarningModal` prompts the buyer for explicit confirmation.
+- **Shipping line:** the cart summary shows the same cargo estimate (`countShippingOrders` in `utils/shipping.js`, "Ücretsiz" when every seller order is above the threshold) with a one-line free-shipping note; `CheckoutPage` computes the flat shipping fee client-side as `useFeeSchedule` fee times the number of seller orders below `freeShippingThreshold` (goods total after coupon from `pricing.items`) with CARGO delivery, and `useCheckout.calculateTotal` adds it to the total (`CheckoutOrderSummary`). The backend charges the same fee per seller order.

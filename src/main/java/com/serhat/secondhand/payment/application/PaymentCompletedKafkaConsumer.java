@@ -48,6 +48,10 @@ public class PaymentCompletedKafkaConsumer {
 
                 PaymentDto paymentDto = paymentMapper.toDto(payment);
 
+                // The order confirmation already covers the cargo fee; no separate receipt.
+                if (payment.getTransactionType() == com.serhat.secondhand.payment.entity.PaymentTransactionType.SHIPPING_FEE) {
+                    return;
+                }
                 if (event.fromUserId() != null) {
                     userRepository.findById(event.fromUserId()).ifPresent(sender -> {
                         paymentNotificationService.sendPaymentSuccessNotification(sender, paymentDto);

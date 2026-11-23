@@ -13,7 +13,11 @@ const MainLayout = () => {
  // Aura and the inbox scroll their own panes; the shell is locked to the viewport so composers and
  // lists end at the screen edge whatever the header height is (verification bar, mobile search row).
  const lockViewport = pathname === ROUTES.AURA_CHAT || pathname === ROUTES.INBOX;
- const fullHeightWizard = lockViewport || pathname === ROUTES.CREATE_LISTING;
+ const hideFooter =
+ lockViewport ||
+ pathname === ROUTES.CREATE_LISTING ||
+ pathname === ROUTES.SHOPPING_CART ||
+ pathname === ROUTES.CHECKOUT;
  return (
  <ListingActionProvider>
  <div
@@ -25,7 +29,7 @@ const MainLayout = () => {
  <main className="flex flex-1 flex-col min-h-0">
  <Outlet />
  </main>
- {!fullHeightWizard ? <Footer /> : null}
+ {!hideFooter ? <Footer /> : null}
  <AuraChatWidget />
  <GlobalActionModal />
  </div>

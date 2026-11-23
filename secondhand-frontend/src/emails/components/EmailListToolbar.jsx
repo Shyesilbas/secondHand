@@ -8,14 +8,13 @@ import {
   Trash2,
   X
 } from 'lucide-react';
-import { Badge, Button, Tabs } from '../../common/components/ui/index.js';
+import { Button, Tabs } from '../../common/components/ui/index.js';
 import { inputNormal } from '../../common/components/forms/inputStyles.js';
 import { EMAIL_FOLDER_ITEMS } from '../emailConstants.js';
 
 const EmailListToolbar = ({
   embedded,
   onBack,
-  globalUnreadCount,
   filterType,
   onSelectFolder,
   searchTerm,
@@ -38,9 +37,10 @@ const EmailListToolbar = ({
   }));
 
   return (
-    <header className="shrink-0 bg-background-primary">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
-        <div className="flex min-w-0 items-center gap-2.5">
+    <header className="shrink-0 border-b border-border-light bg-background-primary">
+      <h1 className="sr-only">{t('mailbox', 'Posta kutusu')}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 px-4 sm:px-5">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5">
           {!embedded && (
             <Button
               variant="ghost"
@@ -52,18 +52,20 @@ const EmailListToolbar = ({
               <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
             </Button>
           )}
-          <h1 className="truncate text-lg font-semibold text-text-primary">
-            {t('mailbox', 'Posta kutusu')}
-          </h1>
-          {globalUnreadCount > 0 && (
-            <Badge variant="neutral" dot>
-              {t('emails_unread_count', { defaultValue: '{{count}} okunmadı', count: globalUnreadCount })}
-            </Badge>
-          )}
+          <Tabs
+            items={tabItems}
+            activeKey={filterType}
+            onChange={onSelectFolder}
+            ariaLabel={t('mail_folders', 'E-posta kategorileri')}
+            variant="underline"
+            borderBottom={false}
+            className="min-w-0"
+            tabClassName="py-3"
+          />
         </div>
 
-        <div className="flex w-full items-center gap-1.5 sm:w-auto">
-          <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-initial">
+        <div className="flex w-full shrink-0 items-center gap-1.5 pb-2.5 pt-1 sm:w-auto sm:py-2">
+          <div className="relative min-w-0 flex-1 sm:w-60 sm:flex-initial">
             <Search
               className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary"
               strokeWidth={1.5}
@@ -129,16 +131,6 @@ const EmailListToolbar = ({
             <Trash2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
           </Button>
         </div>
-      </div>
-
-      <div className="px-4 sm:px-5">
-        <Tabs
-          items={tabItems}
-          activeKey={filterType}
-          onChange={onSelectFolder}
-          ariaLabel={t('mail_folders', 'E-posta kategorileri')}
-          variant="underline"
-        />
       </div>
     </header>
   );

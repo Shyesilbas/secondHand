@@ -64,7 +64,7 @@ const OrderStepper = ({ currentStatus, deliveryMethod, statusLabel }) => {
               <div
                 className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold tabular-nums transition-colors duration-150 ${
                   isDone
-                    ? 'border-primary bg-primary text-white'
+                    ? 'border-primary bg-primary text-text-inverse'
                     : isCurrent
                       ? 'border-accent-teal bg-background-primary text-text-primary ring-1 ring-accent-teal'
                       : 'border-border bg-background-primary text-text-tertiary'

@@ -61,7 +61,7 @@ const FollowButton = memo(({
  return <div className={`relative ${className}`} ref={dropdownRef}>
  <button onClick={handleMainClick} disabled={isToggling} className={`${sizeClasses[size]}
  inline-flex items-center justify-center gap-2 font-medium rounded transition-colors duration-150
- ${isFollowing ? 'bg-background-secondary text-text-primary hover:bg-background-tertiary border border-border-light' : 'bg-primary text-white hover:bg-primary-hover'}
+ ${isFollowing ? 'bg-background-secondary text-text-primary hover:bg-background-tertiary border border-border-light' : 'bg-primary text-text-inverse hover:bg-primary-hover'}
  disabled:opacity-50 disabled:cursor-not-allowed
  `}>
  {isToggling ? <Loader2 className={`${iconSizes[size]} animate-spin`} strokeWidth={1.5} /> : isFollowing ? <UserCheck className={iconSizes[size]} strokeWidth={1.5} /> : <UserPlus className={iconSizes[size]} strokeWidth={1.5} />}

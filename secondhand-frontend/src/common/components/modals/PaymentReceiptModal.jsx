@@ -46,6 +46,7 @@ const PaymentReceiptModal = ({
   } = useTranslation();
   if (!payment) return null;
   const isIncoming = payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING;
+  const breakdown = payment.sellerBreakdown || null;
   const transactionId = String(payment.paymentId || payment.id || 'N/A').slice(0, 12);
 
   return <Modal isOpen={isOpen} onClose={onClose} title={t("digital_invoice")} size="sm" footer={<>
@@ -69,6 +70,16 @@ const PaymentReceiptModal = ({
       <InfoRow label={t("payment_method")} value={payment.providerName} />
       <InfoRow label={t("reference_id")} value={transactionId} isCopyable />
       {payment.listingTitle && <InfoRow label={t("product_item")} value={payment.listingTitle} />}
+      {breakdown && <>
+        <InfoRow label={t("receipt_sale_amount", "Satış tutarı")} value={formatCurrency(breakdown.saleAmount)} />
+        {Number(breakdown.commission) > 0 && <InfoRow
+          label={breakdown.commissionRate != null
+            ? t("receipt_commission_rate", "Komisyon (%{{rate}})", { rate: Number(breakdown.commissionRate) })
+            : t("receipt_commission", "Komisyon")}
+          value={`-${formatCurrency(breakdown.commission)}`} />}
+        {Number(breakdown.shippingDeduction) > 0 && <InfoRow label={t("receipt_shipping_deduction", "Kargo kesintisi")} value={`-${formatCurrency(breakdown.shippingDeduction)}`} />}
+        <InfoRow label={t("receipt_net_payout", "Size aktarılan")} value={formatCurrency(breakdown.netAmount)} />
+      </>}
       <InfoRow label={t("sender")} value={payment.senderDisplayName || t("anonymous", "Anonim")} />
       <InfoRow label={t("recipient")} value={payment.receiverDisplayName || t("anonymous", "Anonim")} />
     </dl>

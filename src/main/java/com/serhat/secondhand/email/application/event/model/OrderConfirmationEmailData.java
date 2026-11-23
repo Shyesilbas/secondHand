@@ -31,4 +31,7 @@ public class OrderConfirmationEmailData {
     private String couponDiscountAmount;
     private String paidAmount;
     private String payoutAmount;
+    private String commissionAmount;
+    private String shippingDeductionAmount;
+    private String commissionRate;
 }

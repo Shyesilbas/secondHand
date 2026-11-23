@@ -9,6 +9,8 @@ import { useCheckout } from '../hooks/useCheckout.js';
 import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx';
 import CheckoutStep from '../components/checkout/CheckoutStep.jsx';
+import { useFeeSchedule } from '../../fees/hooks/useFeeSchedule.js';
+import { countShippingOrders } from '../utils/shipping.js';
 import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary.jsx';
 import { couponService } from '../services/couponService.js';
 import { offerService } from '../../offer/services/offerService.js';
@@ -163,10 +165,23 @@ const CheckoutPage = () => {
     : couponDropped ? t('checkout_coupon_no_longer_applies', CART_MESSAGES.COUPON_NO_LONGER_APPLIES) : null;
 
   // Payable total from the backend preview only; null until it loads, and payment stays disabled meanwhile.
-  const calculateTotal = useCallback(() => getPricedTotal(pricing), [pricing]);
+  const calculateGoodsTotal = useCallback(() => getPricedTotal(pricing), [pricing]);
 
   const effectiveCartCount = offerId ? Math.max(cartCount, 1) : cartCount;
-  const checkout = useCheckout(effectiveCartCount, calculateTotal, resetCartState, appliedCouponCode, offerId);
+  // Cargo fee is charged once per seller order; orders are split by seller at checkout.
+  const { schedule: feeSchedule } = useFeeSchedule();
+  // A seller order at or above the free-shipping threshold ships free: the seller carries the fee.
+  const sellerOrderCount = useMemo(
+    () => countShippingOrders(
+      pricing,
+      feeSchedule?.freeShippingThreshold,
+      new Set(displayCartItems.map((item) => item.listing?.sellerId).filter(Boolean)).size,
+    ).paid,
+    [pricing, feeSchedule, displayCartItems]
+  );
+  const checkout = useCheckout(effectiveCartCount, calculateGoodsTotal, resetCartState, appliedCouponCode, offerId,
+    { feePerOrder: feeSchedule?.shippingFee, orderCount: sellerOrderCount });
+  const calculateTotal = checkout.calculateTotal;
   const [currentStep, setCurrentStep] = useState(CART_CHECKOUT_DEFAULTS.INITIAL_STEP);
 
   const steps = CART_CHECKOUT_STEPS;
@@ -214,7 +229,7 @@ const CheckoutPage = () => {
 
   const reservationExpired = timeLeft <= 0;
   const summary = (
-    <CheckoutOrderSummary cartItems={displayCartItems} pricing={pricing} />
+    <CheckoutOrderSummary cartItems={displayCartItems} pricing={pricing} shippingFee={checkout.shippingFee} deliveryMethod={checkout.deliveryMethod} freeShippingThreshold={feeSchedule?.freeShippingThreshold} />
   );
 
   return (

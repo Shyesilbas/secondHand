@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderService } from '../../order/services/orderService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -11,7 +11,8 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { CART_CHECKOUT_DEFAULTS, CART_MESSAGES, CART_PAYMENT_TYPES } from '../cartConstants.js';
 import { getCheckoutErrorMessage } from '../utils/checkoutError.js';
 
-export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCode, offerId) => {
+// shipping = { feePerOrder, orderCount }: the flat cargo fee is charged once per seller order that is below the free-shipping threshold, cargo delivery only.
+export const useCheckout = (cartCount, calculateGoodsTotal, resetCartState, couponCode, offerId, shipping = {}) => {
  const navigate = useNavigate();
  const { showError, showSuccess } = useNotification();
  
@@ -31,6 +32,14 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
  const [notes, setNotes] = useState('');
  const [orderName, setOrderName] = useState('');
  const [deliveryMethod, setDeliveryMethod] = useState('CARGO');
+ const shippingFee = deliveryMethod === 'SAFE_MEETUP'
+ ? 0
+ : (Number(shipping.feePerOrder) || 0) * (Number(shipping.orderCount) || 0);
+ // Goods total from the pricing preview plus the cargo fee; null until the preview loads.
+ const calculateTotal = useCallback(() => {
+ const goods = calculateGoodsTotal();
+ return goods == null ? null : goods + shippingFee;
+ }, [calculateGoodsTotal, shippingFee]);
  const [meetupLocation, setMeetupLocation] = useState('');
 
  useEffect(() => {
@@ -194,6 +203,8 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
 
  handleCheckout,
  proceedDisabled,
+ shippingFee,
+ calculateTotal,
  sendVerificationCode,
  emails,
  fetchEmails,

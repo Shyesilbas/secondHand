@@ -31,7 +31,7 @@ class EmailTemplatesRenderTest {
     /** Frontend routes an email may link to (see secondhand-frontend/src/common/constants/routes.js). */
     private static final List<String> KNOWN_ROUTES = List.of(
             "/listings", "/security", "/agreements", "/profile", "/profile/orders", "/profile/i-sold",
-            "/offers", "/complaints", "/my-listings", "/my-showcases", "/payments", "/payment-methods");
+            "/offers", "/complaints", "/my-listings", "/my-showcases", "/payments", "/payment-methods", "/fees");
 
     private static final Pattern HREF = Pattern.compile("href=\"([^\"]*)\"");
     private static final Pattern EMPTY_VALUE_CELL = Pattern.compile("<td class=\"value\">\\s*</td>");

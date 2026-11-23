@@ -133,7 +133,7 @@ const ProfileAccountStatus = ({ user }) => {
         >
           <span
             aria-hidden="true"
-            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out ${
+            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-background-primary shadow-sm transition-transform duration-200 ease-in-out ${
               messagingOn ? 'translate-x-5' : 'translate-x-0'
             }`}
           />

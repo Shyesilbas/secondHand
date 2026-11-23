@@ -3,8 +3,204 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light dark;
+
+    /* Light palette (space-separated RGB channels for Tailwind alpha support) */
+    --color-primary: 15 23 42;
+    --color-primary-hover: 41 53 72;
+    --color-secondary-200: 226 232 240;
+
+    --color-bg-page: 245 247 250;
+    --color-bg-primary: 255 255 255;
+    --color-bg-secondary: 248 250 252;
+    --color-bg-tertiary: 241 245 249;
+    --color-bg-dark: 15 23 42;
+
+    --color-text-primary: 15 23 42;
+    --color-text-secondary: 51 65 85;
+    --color-text-tertiary: 88 101 120;
+    --color-text-muted: 88 101 120;
+    --color-text-inverse: 255 255 255;
+    --color-text-link: 15 118 110;
+    --color-text-link-hover: 17 94 89;
+    --color-text-price: 15 118 110;
+
+    --color-border-light: 226 232 240;
+    --color-border: 203 213 225;
+    --color-border-hover: 148 163 184;
+    --color-border-dark: 100 116 139;
+    --color-border-focus: 15 118 110;
+
+    --color-accent-teal: 15 118 110;
+    --color-accent-teal-50: 240 253 250;
+    --color-accent-teal-800: 17 94 89;
+
+    --color-status-success-bg: 240 253 244;
+    --color-status-success-border: 187 247 208;
+    --color-status-success-text: 21 128 61;
+    --color-status-success-icon: 22 163 74;
+    --color-status-success: 22 163 74;
+
+    --color-status-error-bg: 255 241 242;
+    --color-status-error-border: 254 205 211;
+    --color-status-error-text: 190 18 60;
+    --color-status-error-icon: 225 29 72;
+    --color-status-error: 225 29 72;
+
+    --color-status-warning-bg: 255 251 235;
+    --color-status-warning-border: 253 230 138;
+    --color-status-warning-text: 180 83 9;
+    --color-status-warning-icon: 217 119 6;
+    --color-status-warning: 217 119 6;
+
+    --color-status-info-bg: 240 249 255;
+    --color-status-info-border: 186 230 253;
+    --color-status-info-text: 7 89 133;
+    --color-status-info-icon: 2 132 199;
+    --color-status-info: 2 132 199;
+
+    --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+    --shadow-default: 0 2px 6px -1px rgba(15, 23, 42, 0.07), 0 1px 3px 0 rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 8px 20px -6px rgba(15, 23, 42, 0.12), 0 2px 6px -2px rgba(15, 23, 42, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
+  }
+
+  :root:has(> head > meta[name="color-scheme"][content="dark"]),
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  :root:has(> head > meta[name="color-scheme"][content="light"]),
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-primary: 15 118 110;
+      --color-primary-hover: 17 132 123;
+      --color-secondary-200: 36 49 68;
+
+      --color-bg-page: 11 17 32;
+      --color-bg-primary: 17 24 39;
+      --color-bg-secondary: 30 41 59;
+      --color-bg-tertiary: 38 51 72;
+      --color-bg-dark: 9 14 26;
+
+      --color-text-primary: 241 245 249;
+      --color-text-secondary: 203 213 225;
+      --color-text-tertiary: 148 163 184;
+      --color-text-muted: 148 163 184;
+      --color-text-inverse: 255 255 255;
+      --color-text-link: 45 212 191;
+      --color-text-link-hover: 94 234 212;
+      --color-text-price: 45 212 191;
+
+      --color-border-light: 35 48 68;
+      --color-border: 51 65 85;
+      --color-border-hover: 71 85 105;
+      --color-border-dark: 148 163 184;
+      --color-border-focus: 45 212 191;
+
+      --color-accent-teal: 45 212 191;
+      --color-accent-teal-50: 13 46 44;
+      --color-accent-teal-800: 94 234 212;
+
+      --color-status-success-bg: 5 46 28;
+      --color-status-success-border: 20 83 45;
+      --color-status-success-text: 74 222 128;
+      --color-status-success-icon: 34 197 94;
+      --color-status-success: 34 197 94;
+
+      --color-status-error-bg: 49 16 25;
+      --color-status-error-border: 127 29 45;
+      --color-status-error-text: 253 164 175;
+      --color-status-error-icon: 251 113 133;
+      --color-status-error: 225 29 72;
+
+      --color-status-warning-bg: 46 30 6;
+      --color-status-warning-border: 120 53 15;
+      --color-status-warning-text: 252 211 77;
+      --color-status-warning-icon: 245 158 11;
+      --color-status-warning: 245 158 11;
+
+      --color-status-info-bg: 8 37 56;
+      --color-status-info-border: 12 74 110;
+      --color-status-info-text: 125 211 252;
+      --color-status-info-icon: 56 189 248;
+      --color-status-info: 56 189 248;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+      --shadow-default: 0 2px 6px -1px rgba(0, 0, 0, 0.45), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 10px 24px -6px rgba(0, 0, 0, 0.55), 0 4px 10px -2px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 14px 28px -4px rgba(0, 0, 0, 0.6), 0 6px 12px -4px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --color-primary: 15 118 110;
+    --color-primary-hover: 17 132 123;
+    --color-secondary-200: 36 49 68;
+
+    --color-bg-page: 11 17 32;
+    --color-bg-primary: 17 24 39;
+    --color-bg-secondary: 30 41 59;
+    --color-bg-tertiary: 38 51 72;
+    --color-bg-dark: 9 14 26;
+
+    --color-text-primary: 241 245 249;
+    --color-text-secondary: 203 213 225;
+    --color-text-tertiary: 148 163 184;
+    --color-text-muted: 148 163 184;
+    --color-text-inverse: 255 255 255;
+    --color-text-link: 45 212 191;
+    --color-text-link-hover: 94 234 212;
+    --color-text-price: 45 212 191;
+
+    --color-border-light: 35 48 68;
+    --color-border: 51 65 85;
+    --color-border-hover: 71 85 105;
+    --color-border-dark: 148 163 184;
+    --color-border-focus: 45 212 191;
+
+    --color-accent-teal: 45 212 191;
+    --color-accent-teal-50: 13 46 44;
+    --color-accent-teal-800: 94 234 212;
+
+    --color-status-success-bg: 5 46 28;
+    --color-status-success-border: 20 83 45;
+    --color-status-success-text: 74 222 128;
+    --color-status-success-icon: 34 197 94;
+    --color-status-success: 34 197 94;
+
+    --color-status-error-bg: 49 16 25;
+    --color-status-error-border: 127 29 45;
+    --color-status-error-text: 253 164 175;
+    --color-status-error-icon: 251 113 133;
+    --color-status-error: 225 29 72;
+
+    --color-status-warning-bg: 46 30 6;
+    --color-status-warning-border: 120 53 15;
+    --color-status-warning-text: 252 211 77;
+    --color-status-warning-icon: 245 158 11;
+    --color-status-warning: 245 158 11;
+
+    --color-status-info-bg: 8 37 56;
+    --color-status-info-border: 12 74 110;
+    --color-status-info-text: 125 211 252;
+    --color-status-info-icon: 56 189 248;
+    --color-status-info: 56 189 248;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+    --shadow-default: 0 2px 6px -1px rgba(0, 0, 0, 0.45), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 10px 24px -6px rgba(0, 0, 0, 0.55), 0 4px 10px -2px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 14px 28px -4px rgba(0, 0, 0, 0.6), 0 6px 12px -4px rgba(0, 0, 0, 0.4);
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
+    accent-color: rgb(var(--color-accent-teal));
   }
 
   body {
@@ -39,7 +235,7 @@
 select:not([multiple]):not([size]):not(.appearance-none) {
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B6560' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 1rem 1rem;

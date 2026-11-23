@@ -1,12 +1,14 @@
-import {useEffect} from 'react';
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {cartService} from '../services/cartService.js';
-import {useAuthState} from '../../auth/AuthContext.jsx';
-import {useNotification} from '../../notification/NotificationContext.jsx';
-import {cacheService} from '../../common/services/cacheService.js';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { cartService } from '../services/cartService.js';
+import { useAuthState } from '../../auth/AuthContext.jsx';
+import { useNotification } from '../../notification/NotificationContext.jsx';
+import { cacheService } from '../../common/services/cacheService.js';
 import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useCart = (options = {}) => {
+ const { t } = useTranslation();
  const { user } = useAuthState();
  const queryClient = useQueryClient();
  const { showSuccess, showError } = useNotification();
@@ -76,10 +78,10 @@ export const useCart = (options = {}) => {
  invalidateCart();
  const qty = Number(variables?.quantity) || 1;
  syncCartCount(getStoredCartCount() + qty);
- showSuccess(null, 'Added to cart successfully.', { toast: true });
+ showSuccess(null, t('cart_added_success', 'Ürün sepete eklendi.'), { toast: true });
  },
  onError: (err) => {
- showError(null, getErrorMessage(err, 'Failed to add item to cart.'), { toast: true });
+ showError(null, getErrorMessage(err, t('cart_add_failed', 'Ürün sepete eklenemedi.')), { toast: true });
  }
  });
 
@@ -96,7 +98,7 @@ export const useCart = (options = {}) => {
  syncCartCount(getStoredCartCount() - removedQty);
  },
  onError: (err) => {
- showError(null, getErrorMessage(err, 'Failed to remove item from cart.'), { toast: true });
+ showError(null, getErrorMessage(err, t('cart_remove_failed', 'Ürün sepetten kaldırılamadı.')), { toast: true });
  }
  });
 
@@ -114,7 +116,7 @@ export const useCart = (options = {}) => {
  syncCartCount(getStoredCartCount() - previousQty + nextQty);
  },
  onError: (err) => {
- showError(null, getErrorMessage(err, 'Failed to update cart item.'), { toast: true });
+ showError(null, getErrorMessage(err, t('cart_update_failed', 'Sepet güncellenemedi.')), { toast: true });
  }
  });
 
@@ -125,7 +127,7 @@ export const useCart = (options = {}) => {
  syncCartCount(0);
  },
  onError: (err) => {
- showError(null, getErrorMessage(err, 'Failed to clear cart.'), { toast: true });
+ showError(null, getErrorMessage(err, t('cart_clear_failed', 'Sepet temizlenemedi.')), { toast: true });
  }
  });
 
@@ -150,6 +152,10 @@ export const useCart = (options = {}) => {
  isAdding: addToCartMutation.isPending,
  isAddingToCart: addToCartMutation.isPending,
  isUpdating: updateCartItemMutation.isPending,
+ isUpdatingCart: updateCartItemMutation.isPending,
  isRemoving: removeFromCartMutation.isPending,
+ isRemovingFromCart: removeFromCartMutation.isPending,
+ isClearing: clearCartMutation.isPending,
+ isClearingCart: clearCartMutation.isPending,
  };
 };

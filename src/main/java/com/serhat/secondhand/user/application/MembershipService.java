@@ -31,6 +31,7 @@ public class MembershipService {
     private final PaymentRequestFactory paymentRequestFactory;
     private final com.serhat.secondhand.core.config.AppConfigProperties appConfigProperties;
     private final IEWalletService eWalletService;
+    private final SystemAccountService systemAccountService;
 
     public MembershipStatusDto getStatus(Long userId) {
         User user = userRepository.findById(userId)
@@ -122,7 +123,7 @@ public class MembershipService {
         String idempotencyKey = "membership-autorenew-" + user.getId() + "-" + java.time.LocalDate.now();
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .fromUserId(user.getId())
-                .toUserId(null)
+                .toUserId(systemAccountService.getSystemUser().getId())
                 .receiverName("SYSTEM")
                 .receiverSurname("MEMBERSHIP")
                 .amount(premiumPrice)

@@ -1,23 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const baseClassName = 'flex items-center gap-3 px-4 py-3 hover:bg-background-secondary transition-colors duration-150 ease-in-out rounded';
+const HeaderMenuItem = ({ to, onClick, icon: Icon, label, labelKey, rightContent }) => {
+  const { t } = useTranslation();
+  const textToShow = labelKey ? t(labelKey) : (label ? t(label) : '');
 
-const HeaderMenuItem = ({ to, onClick, icon: Icon, label, labelKey, rightContent, compact = false }) => {
-    const { t } = useTranslation();
-    const className = compact
-        ? 'flex items-center px-4 py-2.5 text-sm text-text-secondary hover:bg-background-secondary hover:text-text-primary transition-colors duration-150 ease-in-out rounded mx-1 cursor-pointer'
-        : baseClassName;
-
-    const textToShow = labelKey ? t(labelKey) : (label ? t(label) : '');
-
-    return (
-        <Link to={to} onClick={onClick} className={className}>
-            <Icon className={compact ? 'w-4 h-4 mr-3' : 'w-4 h-4 text-text-secondary'} />
-            <span className={compact ? '' : 'text-sm font-medium text-text-primary'}>{textToShow}</span>
-            {rightContent}
-        </Link>
-    );
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className="flex items-center gap-2.5 rounded px-3 py-2 text-sm text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+    >
+      <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+      <span className="min-w-0 flex-1 truncate font-medium text-text-primary">{textToShow}</span>
+      {rightContent}
+    </Link>
+  );
 };
 
 export default HeaderMenuItem;

@@ -34,7 +34,7 @@ Bu doküman platformu kullanıcının gözünden anlatır: kim ne yapabilir, bir
 
 ## 5. Fiyat, Kampanya ve Kuponlar
 - **Satıcı kampanyası:** satıcının kendi ilanında yaptığı indirimdir ve satıcının geliri buna göre azalır.
-- **Platform kuponu:** admin tanımlar (yüzde, sabit tutar, tür bazlı veya alt tutar eşikli). Kupon indirimini platform karşılar: alıcı daha az öder, satıcı kuponsuz tutarı alır. Fark escrow kaydında `platform_subsidy` olarak tutulur ve iptal/iadede alıcıya geri verilmez.
+- **Platform kuponu:** admin tanımlar (yüzde, sabit tutar, tür bazlı veya alt tutar eşikli). Kupon indirimini platform karşılar: alıcı daha az öder, satıcı kuponsuz tutarı alır. Fark escrow kaydında `platform_subsidy` olarak tutulur ve iptal/iadede alıcıya geri verilmez. Platform payı sistem hesabından ödenir.
 - **Limitler:** kupon kullanıcı başına ve genel olarak sınırlanabilir; "Kuponlarım" sayfası kalan hakkı, son kullanma tarihini ve bugüne kadar kuponlarla yapılan toplam tasarrufu gösterir ([pricing-coupon-and-campaign-architecture.md](pricing-coupon-and-campaign-architecture.md)).
 - Emlak ve araç ilanları indirim ve kupon kapsamı dışındadır.
 

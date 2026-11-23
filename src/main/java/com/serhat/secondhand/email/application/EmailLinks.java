@@ -16,6 +16,7 @@ public final class EmailLinks {
     public static final String MY_SHOWCASES = "/my-showcases";
     public static final String PROFILE = "/profile";
     public static final String AGREEMENTS = "/agreements";
+    public static final String FEES = "/fees";
 
     private EmailLinks() {
     }

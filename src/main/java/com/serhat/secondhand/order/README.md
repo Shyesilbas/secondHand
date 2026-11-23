@@ -12,6 +12,8 @@ Manages the post-checkout order lifecycle for cargo (`DeliveryMethod.CARGO`) and
 
 ## Business Rules & Invariants
 - **Time Windows (`OrderBusinessConstants`):**
+- **Shipping fee:** `Order.shippingFee` (flat `app.platform.shipping-fee`, zero for SAFE_MEETUP) is charged to the buyer per seller order as a separate `SHIPPING_FEE` payment to the system account; `totalAmount` stays goods-only. It is refunded once, only when every item is cancelled (`shippingFeeRefunded`, `EscrowService.refundShippingFee`). Seller view nulls it and adds `sellerGross` / `sellerCommission` (`OrderQueryService.applySellerEarnings`).
+- **Free shipping (`OrderCreationService.applyShipping`):** a cargo order whose goods total after coupon is at or above `app.platform.shipping.free-threshold` (`FREE_SHIPPING_THRESHOLD`, default 1000, zero disables) gets `shippingFee` 0 and `sellerShippingCharge` equal to the flat fee; both are fixed at order time and never recomputed. The buyer view hides `sellerShippingCharge`; the seller view adds `sellerShippingDeduction`.
   - `STATUS_UPDATE_INTERVAL_MINUTES` (5m): `CONFIRMED` -> `PROCESSING` automatic transition.
   - `SHIP_DEADLINE_HOURS` (72h): unshipped cargo orders are auto-cancelled by `OrderCompletionScheduler`.
 - **Banned seller (`BannedSellerOrderCancellationListener`):** after a `UserBannedEvent` commits, unshipped cargo orders whose every item belongs to that seller are cancelled and refunded (`OrderCancellationService.cancelForRestrictedSeller`, one transaction per order, cause `SELLER_RESTRICTED`). Mixed-seller and meetup orders keep their normal deadline paths.

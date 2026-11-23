@@ -155,6 +155,9 @@ export const listingService = {
     deactivateListing: async (id) => {
         return put(API_ENDPOINTS.LISTINGS.DEACTIVATE(id));
     },
+    publishListing: async (id) => {
+        return put(API_ENDPOINTS.LISTINGS.PUBLISH(id));
+    },
     activateListing: async (id) => {
         return put(API_ENDPOINTS.LISTINGS.ACTIVATE(id));
     },

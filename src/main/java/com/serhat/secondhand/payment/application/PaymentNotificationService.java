@@ -98,6 +98,7 @@ public class PaymentNotificationService {
                         case EWALLET_PAYMENT_RECEIVED -> "Ödeme Alma";
                         case SHOWCASE_PAYMENT -> "İlan Öne Çıkarma";
                         case MEMBERSHIP_PAYMENT -> "Premium Üyelik";
+                        case SHIPPING_FEE -> "Kargo Ücreti";
                 };
         }
 
@@ -206,6 +207,8 @@ public class PaymentNotificationService {
                         case MEMBERSHIP_PAYMENT -> new ReceiptCopy("Premium Üyelik Ödemesi",
                                         "Premium üyelik ödemeniz alındı.", "Ödenen Tutar", "Profilimi Görüntüle",
                                         EmailLinks.PROFILE);
+                        case SHIPPING_FEE -> new ReceiptCopy("Kargo Ücreti Ödendi", "Kargo ücretiniz alındı.",
+                                        "Ödenen Tutar", "Siparişlerimi Gör", EmailLinks.MY_ORDERS);
                 };
         }
 

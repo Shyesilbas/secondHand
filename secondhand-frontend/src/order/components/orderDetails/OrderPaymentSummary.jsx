@@ -27,7 +27,16 @@ export const OrderPaymentSummary = React.memo(({
   const { t } = useTranslation();
   const { currency, subtotal, couponDiscount, paymentProviderName, paymentStatus } = selectedOrder;
   // Seller view: backend sellerTotal (escrow share, cancelled/refunded lines excluded); buyer view: order total.
-  const total = isSellerView ? selectedOrder.sellerTotal : selectedOrder.totalAmount;
+  const shippingFee = Number(selectedOrder.shippingFee) || 0;
+  const sellerCommission = Number(selectedOrder.sellerCommission) || 0;
+  const sellerGross = Number(selectedOrder.sellerGross) || 0;
+  const sellerShippingDeduction = Number(selectedOrder.sellerShippingDeduction) || 0;
+  const hasSellerDeductions = sellerCommission > 0 || sellerShippingDeduction > 0;
+  const commissionRate = sellerGross > 0 ? Math.round((sellerCommission / sellerGross) * 1000) / 10 : null;
+  // Buyer total adds the cargo fee, which is paid to the platform and is not part of totalAmount.
+  const total = isSellerView
+    ? selectedOrder.sellerTotal
+    : (selectedOrder.totalAmount != null ? Number(selectedOrder.totalAmount) + shippingFee : null);
   const { requiredAgreements: agreements = [] } = useRequiredAgreements('ONLINE_PAYMENT');
   const [selectedAgreement, setSelectedAgreement] = useState(null);
 
@@ -58,6 +67,31 @@ export const OrderPaymentSummary = React.memo(({
             <Row label={t('od_coupon_discount', 'Kupon indirimi')}>-{formatCurrency(couponDiscount, currency)}</Row>
           ) : null}
 
+          {!isSellerView && shippingFee > 0 ? (
+            <Row label={t('shipping_fee', 'Kargo ücreti')}>
+              {formatCurrency(shippingFee, currency)}
+              {selectedOrder.shippingFeeRefunded ? ` (${t('refunded', 'İade edildi')})` : ''}
+            </Row>
+          ) : null}
+
+          {isSellerView && hasSellerDeductions ? (
+            <>
+              <Row label={t('od_sale_amount', 'Satış tutarı')}>{formatCurrency(sellerGross, currency)}</Row>
+              {sellerCommission > 0 ? (
+                <Row label={commissionRate != null
+                  ? t('od_commission_rate', 'Komisyon (%{{rate}})', { rate: commissionRate })
+                  : t('od_commission', 'Komisyon')}>
+                  -{formatCurrency(sellerCommission, currency)}
+                </Row>
+              ) : null}
+              {sellerShippingDeduction > 0 ? (
+                <Row label={t('od_shipping_deduction', 'Kargo kesintisi (ücretsiz kargo)')}>
+                  -{formatCurrency(sellerShippingDeduction, currency)}
+                </Row>
+              ) : null}
+            </>
+          ) : null}
+
           {paymentProviderName ? (
             <Row label={t('payment_method', 'Ödeme yöntemi')}>{paymentMethodLabel}</Row>
           ) : null}
@@ -75,7 +109,7 @@ export const OrderPaymentSummary = React.memo(({
         </dl>
 
         <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-border-light pt-4">
-          <span className="text-sm font-semibold text-text-primary">{t('od_total', 'Toplam')}</span>
+          <span className="text-sm font-semibold text-text-primary">{isSellerView && hasSellerDeductions ? t('od_net_payout', 'Size aktarılan') : t('od_total', 'Toplam')}</span>
           <span className="text-xl font-semibold tabular-nums tracking-tight text-text-price">
             {total != null ? formatCurrency(total, currency) : '—'}
           </span>

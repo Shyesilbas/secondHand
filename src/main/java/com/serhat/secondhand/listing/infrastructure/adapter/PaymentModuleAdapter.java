@@ -27,6 +27,7 @@ public class PaymentModuleAdapter implements ListingFeePaymentPort {
     private final PaymentProcessor paymentProcessor;
     private final PaymentRepository paymentRepository;
     private final ListingRepository listingRepository;
+    private final com.serhat.secondhand.user.application.SystemAccountService systemAccountService;
 
     @Override
     public Result<UUID> processListingFee(ListingFeePaymentRequest request) {
@@ -66,7 +67,7 @@ public class PaymentModuleAdapter implements ListingFeePaymentPort {
 
         return PaymentRequest.builder()
                 .fromUserId(request.userId())
-                .toUserId(null)
+                .toUserId(systemAccountService.getSystemUser().getId())
                 .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
                 .receiverSurname(PaymentProcessingConstants.PAYMENT_RECEIVER_SURNAME)
                 .listingId(request.listingId())

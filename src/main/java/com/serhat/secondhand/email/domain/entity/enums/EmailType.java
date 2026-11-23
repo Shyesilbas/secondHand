@@ -24,6 +24,7 @@ public enum EmailType {
     NEW_LISTING_NOTIFICATION("New Listing Notification"),
     AGREEMENT_UPDATE("Agreement Updated"),
     AGREEMENT_UPDATED("Agreement Updated"),
+    PLATFORM_ANNOUNCEMENT("Platform Announcement"),
     GREAT_SELLER("Great Seller Achievement"),
     GREAT_SELLER_ACHIEVEMENT("Great Seller Achievement"),
     SYSTEM("System"),

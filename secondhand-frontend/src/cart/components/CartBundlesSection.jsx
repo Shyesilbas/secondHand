@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
-import { Button, Card } from '../../common/components/ui/index.js';
+import { Card } from '../../common/components/ui/index.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { formatBundleValue } from '../utils/pricedLines.js';
 
 const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   return (
     <>
@@ -35,13 +35,12 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
                   </span>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => navigate(ROUTES.USER_PROFILE(a.sellerId))}
-                className="shrink-0 rounded-sm text-sm font-medium text-text-link transition-colors duration-150 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              <Link
+                to={ROUTES.USER_PROFILE(a.sellerId)}
+                className="shrink-0 rounded-sm text-sm font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
               >
                 {t('view_seller', 'Satıcıyı Gör')}
-              </button>
+              </Link>
             </Card>
           ))}
         </div>
@@ -50,7 +49,8 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
       {pendingBundles.length > 0 && (
         <div className="space-y-3">
           {pendingBundles.map((s) => {
-            const progress = (s.qualifyingQuantity / s.minQuantity) * 100;
+            const progress = Math.min(100, (s.qualifyingQuantity / s.minQuantity) * 100);
+            const discountText = formatBundleValue(s, formatCurrency, currency);
             return (
               <Card key={s.campaignId} padding="normal">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -58,50 +58,49 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
                     <div>
                       <span className="text-sm font-semibold text-text-secondary">
                         {t('exclusive_bundle_from', 'Özel Satıcı Paketi:')}{' '}
-                        <button
-                          type="button"
-                          onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
+                        <Link
+                          to={ROUTES.USER_PROFILE(s.sellerId)}
                           className="rounded-sm font-semibold text-text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                         >
                           {s.sellerName || t('seller', 'Satıcı')}
-                        </button>
+                        </Link>
                       </span>
                     </div>
 
                     <p className="mt-1.5 text-sm text-text-secondary">
-                      {t('add', 'Ekle:')}{' '}
-                      <strong className="text-text-primary">
-                        {s.remainingQuantity} {t('more_item', 'ürün daha')}
-                      </strong>{' '}
-                      → sepette{' '}
-                      <span className="font-semibold text-status-success-text">
-                        {formatBundleValue(s, formatCurrency, currency)} indirim
-                      </span>{' '}
-                      kazanın.
+                      {t('bundle_progress_label', {
+                        defaultValue: '{{remaining}} ürün daha ekleyin, sepette {{discount}} indirim kazanın.',
+                        remaining: s.remainingQuantity,
+                        discount: discountText
+                      })}
                     </p>
 
                     <div className="mt-2.5 space-y-1">
-                      <div className="h-1.5 w-full overflow-hidden rounded-sm bg-background-tertiary">
+                      <div
+                        role="progressbar"
+                        aria-valuenow={s.qualifyingQuantity}
+                        aria-valuemin={0}
+                        aria-valuemax={s.minQuantity}
+                        className="h-1.5 w-full overflow-hidden rounded-sm bg-background-tertiary"
+                      >
                         <div
-                          className="h-full bg-primary transition-colors duration-150"
-                          style={{ width: `${Math.min(100, progress)}%` }}
+                          className="h-full bg-primary transition-all duration-150"
+                          style={{ width: `${progress}%` }}
                         />
                       </div>
-                      <div className="flex justify-between text-sm tabular-nums text-text-muted">
+                      <div className="flex justify-between text-sm tabular-nums text-text-tertiary">
                         <span>{s.qualifyingQuantity} {t('items_in_cart', 'ürün sepette')}</span>
-                        <span>Hedef: {s.minQuantity} {t('items', 'ürün')}</span>
+                        <span>{t('bundle_target', 'Hedef')}: {s.minQuantity} {t('items', 'ürün')}</span>
                       </div>
                     </div>
                   </div>
 
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
-                    className="shrink-0 self-start sm:self-center"
+                  <Link
+                    to={ROUTES.USER_PROFILE(s.sellerId)}
+                    className={`${buttonClasses('secondary', 'sm')} shrink-0 self-start sm:self-center`}
                   >
                     {t('complete_bundle', 'Paketi Tamamla')}
-                  </Button>
+                  </Link>
                 </div>
               </Card>
             );

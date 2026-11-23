@@ -7,7 +7,8 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { computeHistoryStats, computePercentageChange, formatHistoryDateLabel, getHistoryCurrency, sortPriceHistoryAsc, sortPriceHistoryDesc } from '../utils/priceHistoryUtils.js';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { Card } from '../../common/components/ui/index.js';
-import { theme } from '../../common/theme/theme.js';
+import { resolveChartColors } from '../../common/theme/themeTokens.js';
+import { useColorScheme } from '../../common/hooks/useColorScheme.js';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
@@ -46,9 +47,14 @@ const PriceHistoryTab = ({
   currency
 }) => {
   const { t } = useTranslation();
+  const { colorScheme } = useColorScheme();
   const stats = useMemo(() => computeHistoryStats(priceHistory || [], currency), [priceHistory, currency]);
   const currencyCode = stats?.currency || currency || 'TRY';
   const historyAsc = useMemo(() => sortPriceHistoryAsc(priceHistory || []), [priceHistory]);
+  const chartColors = useMemo(() => {
+    void colorScheme;
+    return resolveChartColors();
+  }, [colorScheme]);
 
   const chartData = useMemo(() => {
     const labels = [];
@@ -85,25 +91,25 @@ const PriceHistoryTab = ({
       datasets: [{
         label: 'Price',
         data: prices,
-        borderColor: theme.colors.text.primary,
+        borderColor: chartColors.line,
         backgroundColor: context => {
           const ctx = context.chart.ctx;
           const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-          gradient.addColorStop(0, 'rgba(15, 23, 42, 0.16)');
-          gradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
+          gradient.addColorStop(0, chartColors.areaTop);
+          gradient.addColorStop(1, chartColors.areaBottom);
           return gradient;
         },
         borderWidth: 2,
         pointRadius: 3,
         pointHoverRadius: 5,
-        pointBackgroundColor: theme.colors.background.primary,
-        pointBorderColor: theme.colors.text.primary,
+        pointBackgroundColor: chartColors.pointFill,
+        pointBorderColor: chartColors.line,
         pointBorderWidth: 2,
         fill: true,
         tension: 0.25
       }]
     };
-  }, [historyAsc, currencyCode, t]);
+  }, [historyAsc, currencyCode, t, chartColors.line, chartColors.areaTop, chartColors.areaBottom, chartColors.pointFill]);
 
   const chartOptions = useMemo(() => ({
     responsive: true,
@@ -117,9 +123,9 @@ const PriceHistoryTab = ({
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.92)',
-        titleColor: theme.colors.background.secondary,
-        bodyColor: theme.colors.background.secondary,
+        backgroundColor: chartColors.tooltipBg,
+        titleColor: chartColors.tooltipText,
+        bodyColor: chartColors.tooltipText,
         padding: 10,
         cornerRadius: 6,
         displayColors: false,
@@ -138,7 +144,7 @@ const PriceHistoryTab = ({
           display: false
         },
         ticks: {
-          color: theme.colors.text.tertiary,
+          color: chartColors.tick,
           font: {
             size: 10
           }
@@ -146,11 +152,11 @@ const PriceHistoryTab = ({
       },
       y: {
         grid: {
-          color: 'rgba(148, 163, 184, 0.18)',
+          color: chartColors.grid,
           borderDash: [6, 6]
         },
         ticks: {
-          color: theme.colors.text.tertiary,
+          color: chartColors.tick,
           font: {
             size: 10
           },
@@ -181,7 +187,7 @@ const PriceHistoryTab = ({
       intersect: false,
       mode: 'index'
     }
-  }), [currencyCode, chartData]);
+  }), [currencyCode, chartData, chartColors.tooltipBg, chartColors.tooltipText, chartColors.tick, chartColors.grid]);
 
   const historyDesc = useMemo(() => sortPriceHistoryDesc(priceHistory || []), [priceHistory]);
 
@@ -289,7 +295,7 @@ const PriceHistoryTab = ({
         </div>
         <div className="p-4 sm:p-5">
           <div className="h-56">
-            <Line data={chartData} options={chartOptions} />
+            <Line key={colorScheme} data={chartData} options={chartOptions} />
           </div>
         </div>
       </Card>

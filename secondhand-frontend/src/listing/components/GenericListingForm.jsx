@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { listingService } from '../services/listingService.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 import { useMutation } from '@tanstack/react-query';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useFormState } from '../../common/forms/hooks/useFormState.js';
@@ -20,7 +22,7 @@ import Button from '../../common/components/ui/Button.jsx';
 import { validationRegistry } from '../validation/ValidationRegistry.js';
 import { resolveEnumLabel, toDisplayText } from '../utils/listingDisplayFormat.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { MapPin, Package, FileText } from 'lucide-react';
+import { MapPin, Package, FileText, Info } from 'lucide-react';
 import { cacheService } from '../../common/services/cacheService.js';
 import { FieldError, OptionToggle, SectionCard, SectionStack } from '../../common/components/forms/FormPrimitives.jsx';
 import ListingAttributeSection from './attributes/ListingAttributeSection.jsx';
@@ -127,6 +129,8 @@ const GenericListingForm = ({
     validateStep: (step, data) => validationRegistry.getStepErrors(listingType, step, data, enums),
     validateAll: data => validationRegistry.getAllErrors(listingType, data, enums)
   });
+  // Vehicle and real estate pay a creation fee; every other type is free to list and pays commission on sale.
+  const requiresListingFee = (enums?.listingFeeConfig?.feeBearingTypes || []).includes(listingType);
   const submitIntentRef = React.useRef('DRAFT');
   const {
     handleSubmit
@@ -137,6 +141,7 @@ const GenericListingForm = ({
     successMessage: () => {
       if (submitIntentRef.current === 'DRAFT') return t('listing_saved_draft', 'İlan taslak olarak kaydedildi.');
       if (isEdit && !isDraft) return t('listing_updated', 'İlan güncellendi.');
+      if (!requiresListingFee) return t('listing_published', 'İlan yayınlandı.');
       return t('listing_saved_to_payment', 'İlan kaydedildi, ödeme sayfasına yönlendiriliyorsun.');
     },
     errorMessage: (isEdit ? t('listing_update_failed', 'İlan güncellenemedi.') : t('listing_save_failed', 'İlan kaydedilemedi.')),
@@ -151,8 +156,13 @@ const GenericListingForm = ({
         navigate(redirectRoute || ROUTES.MY_LISTINGS);
       } else {
         const id = isEdit ? initialData?.id : response?.id || response?.data?.id;
-        if (id) {
+        if (id && requiresListingFee) {
           navigate(`${ROUTES.PAY_LISTING_FEE}?listingId=${id}`);
+        } else if (id) {
+          // Fee-free types publish right away; a failed publish leaves the saved draft in My Listings.
+          listingService.publishListing(id)
+            .catch(err => notification.showError(t('publish_failed', 'İlan yayınlanamadı'), getErrorMessage(err, t('listing_publish_retry', 'İlan taslak olarak kaydedildi, İlanlarım sayfasından yayınlayabilirsin.'))))
+            .finally(() => navigate(redirectRoute || ROUTES.MY_LISTINGS));
         } else {
           // Fallback if ID is null
           navigate(redirectRoute || ROUTES.MY_LISTINGS);
@@ -549,6 +559,16 @@ const GenericListingForm = ({
         <div className="flex items-center gap-2 rounded border border-border-light bg-background-secondary px-3.5 py-2.5">
           <span className="h-1.5 w-1.5 rounded-full bg-status-success shrink-0" />
           <p className="text-sm font-medium text-text-secondary">{t("your_listing_is_ready_to_publish", "İlanınız yayınlanmaya hazır.")}</p>
+        </div>
+        <div className="flex items-start gap-2 rounded bg-background-secondary px-3.5 py-2.5">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+          <p className="text-sm text-text-secondary">
+            {requiresListingFee
+              ? t('listing_fee_note', 'Bu ilan türü için yayınlamadan önce ilan oluşturma ücreti ödenir; satışta komisyon kesilmez.')
+              : t('listing_commission_note', 'Bu ilan türünde ilan ücreti alınmaz. Satış gerçekleşince tutara göre komisyon kesilir.')}
+            {' '}
+            <Link to={ROUTES.FEES} className="text-text-link hover:underline">{t('fees_title', 'Komisyon ve ücretler')}</Link>
+          </p>
         </div>
       </div>
     );

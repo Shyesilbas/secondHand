@@ -64,6 +64,7 @@ export const API_ENDPOINTS = {
         UPDATE_PRICE_BATCH: '/v1/listings/price/batch',
         UPDATE_STATUS_BATCH: '/v1/listings/status/batch',
         RELIST: (id) => `/v1/listings/${id}/relist`,
+        PUBLISH: (id) => `/v1/listings/${id}/publish`,
         ACTIVATE: (id) => `/v1/listings/${id}/reactivate`,
         DEACTIVATE: (id) => `/v1/listings/${id}/deactivate`,
         STATISTICS: '/v1/listings/statistics',
@@ -127,6 +128,9 @@ export const API_ENDPOINTS = {
     },
     ENUMS: {
         ALL: '/v1/enums/all',
+    },
+    FEES: {
+        SCHEDULE: '/v1/fees',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',

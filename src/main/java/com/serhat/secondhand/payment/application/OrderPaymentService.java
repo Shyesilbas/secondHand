@@ -43,6 +43,11 @@ public class OrderPaymentService {
 
         List<PaymentRequest> paymentRequests = paymentRequestFactory.buildOrderPaymentRequests(
                 user, order, request, pricing, orderNumber, orderExternalId);
+        if (order.getShippingFee() != null && order.getShippingFee().signum() > 0) {
+            paymentRequests = new ArrayList<>(paymentRequests);
+            paymentRequests.add(paymentRequestFactory.buildShippingFeePaymentRequest(
+                    user, order, request, orderNumber, orderExternalId));
+        }
         log.debug("Created {} payment requests for order", paymentRequests.size());
 
         return processPaymentBatch(user.getId(), paymentRequests);
@@ -81,7 +86,8 @@ public class OrderPaymentService {
     }
 
     private Result<Void> validatePurchaseRequest(PaymentRequest request) {
-        if (request.transactionType() != PaymentTransactionType.ITEM_PURCHASE) {
+        if (request.transactionType() != PaymentTransactionType.ITEM_PURCHASE
+                && request.transactionType() != PaymentTransactionType.SHIPPING_FEE) {
             return Result.error(PaymentErrorCodes.INVALID_TXN_TYPE);
         }
         if (request.paymentDirection() != PaymentDirection.OUTGOING) {

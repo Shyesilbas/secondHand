@@ -131,8 +131,8 @@ public class OrderQueryService {
                 .map(order -> {
                     MetadataContext metadata = fetchMetadata(order);
                     OrderDto orderDto = buildSellerOrderDto(order, sellerId, metadata);
-                    orderDto.setSellerTotal(escrowService.sumSellerAmountsByOrderIds(List.of(order.getId()), sellerId)
-                            .getOrDefault(order.getId(), BigDecimal.ZERO));
+                    applySellerEarnings(orderDto, escrowService.sellerEarningsByOrderIds(List.of(order.getId()), sellerId)
+                            .get(order.getId()));
                     return orderDto;
                 })
                 .map(Result::success)
@@ -154,16 +154,23 @@ public class OrderQueryService {
 
         List<Long> orderIds = orderList.stream().map(Order::getId).toList();
         Map<Long, BigDecimal> escrowAmounts = escrowService.sumPendingAmountsByOrderIds(orderIds, sellerId);
-        Map<Long, BigDecimal> sellerTotals = escrowService.sumSellerAmountsByOrderIds(orderIds, sellerId);
+        Map<Long, EscrowService.SellerEarnings> sellerEarnings = escrowService.sellerEarningsByOrderIds(orderIds, sellerId);
         
         MetadataContext metadata = fetchBulkMetadata(orderList);
 
         return Result.success(orders.map(order -> {
             OrderDto orderDto = buildSellerOrderDto(order, sellerId, metadata);
             orderDto.setEscrowAmount(escrowAmounts.getOrDefault(order.getId(), BigDecimal.ZERO));
-            orderDto.setSellerTotal(sellerTotals.getOrDefault(order.getId(), BigDecimal.ZERO));
+            applySellerEarnings(orderDto, sellerEarnings.get(order.getId()));
             return orderDto;
         }));
+    }
+
+    private static void applySellerEarnings(OrderDto orderDto, EscrowService.SellerEarnings earnings) {
+        orderDto.setSellerTotal(earnings != null ? earnings.payout() : BigDecimal.ZERO);
+        orderDto.setSellerGross(earnings != null ? earnings.gross() : BigDecimal.ZERO);
+        orderDto.setSellerCommission(earnings != null ? earnings.commission() : BigDecimal.ZERO);
+        orderDto.setSellerShippingDeduction(earnings != null ? earnings.shippingDeduction() : BigDecimal.ZERO);
     }
 
     private record MetadataContext(
@@ -240,12 +247,16 @@ public class OrderQueryService {
         orderDto.setCouponCode(null);
         orderDto.setCouponDiscount(null);
         orderDto.setDiscountTotal(null);
+        orderDto.setShippingFee(null);
+        orderDto.setShippingFeeRefunded(false);
+        orderDto.setSellerShippingCharge(null);
         applyView(orderDto, orderViewPolicy.sellerView(order, sellerId));
         return orderDto;
     }
 
     private OrderDto applyBuyerView(OrderDto orderDto, Order order) {
         if (orderDto == null) return null;
+        orderDto.setSellerShippingCharge(null);
         applyView(orderDto, orderViewPolicy.buyerView(order));
         return orderDto;
     }

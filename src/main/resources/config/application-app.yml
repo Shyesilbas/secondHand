@@ -40,6 +40,20 @@ app:
       quantity: ${CART_DEFAULT_QUANTITY:1}
     scheduler:
       cleanup-fixed-rate-ms: ${CART_SCHEDULER_CLEANUP_FIXED_RATE_MS:60000}
+  platform:
+    system-account-email: ${SYSTEM_ACCOUNT_EMAIL:system@secondhand.internal}
+    commission:
+      effective-from: ${COMMISSION_EFFECTIVE_FROM:2026-11-22T00:00:00}
+      bands:
+        - min-amount: 0
+          rate-percent: 7
+        - min-amount: 1000
+          rate-percent: 6
+        - min-amount: 10000
+          rate-percent: 4
+    shipping:
+      fee: ${SHIPPING_FEE:49.90}
+      free-threshold: ${FREE_SHIPPING_THRESHOLD:1000}
   listing:
     creation:
       fee: 249.00

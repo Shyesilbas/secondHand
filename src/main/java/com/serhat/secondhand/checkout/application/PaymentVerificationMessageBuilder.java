@@ -159,6 +159,7 @@ public class PaymentVerificationMessageBuilder {
             case EWALLET_WITHDRAWAL -> "Cüzdandan Para Çekme";
             case EWALLET_PAYMENT_RECEIVED -> "Cüzdan Ödeme Tahsilatı";
             case MEMBERSHIP_PAYMENT -> "Premium Üyelik Ödemesi";
+            case SHIPPING_FEE -> "Kargo Ücreti";
         };
     }
 

@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '../../common/formatters.js';
 import { Check, ChevronDown, ChevronUp, Copy, Trash2 } from 'lucide-react';
-import { Badge, Button } from '../../common/components/ui/index.js';
-import { EMAIL_TYPE_BADGE_VARIANTS, EMAIL_TYPE_LABELS, getProcessedContent, stripEmailEmojis } from '../emails.js';
+import { Button } from '../../common/components/ui/index.js';
+import { getProcessedContent, stripEmailEmojis } from '../emails.js';
+import { useColorScheme } from '../../common/hooks/useColorScheme.js';
 import { extractOtpFromEmailRecord } from '../../payments/utils/otp.js';
 
 const DEFAULT_IFRAME_HEIGHT = 320;
@@ -44,16 +45,23 @@ const EmailContent = ({
   const iframeRef = useRef(null);
   const resizeObserverRef = useRef(null);
 
+  const { colorScheme } = useColorScheme();
   const detectedCode = useMemo(() => extractOtpFromEmailRecord(email), [email]);
-  const processedHtml = useMemo(() => getProcessedContent(email?.content), [email?.content]);
+  const processedHtml = useMemo(
+    () => getProcessedContent(email?.content, { colorScheme }),
+    [email?.content, colorScheme]
+  );
 
   const measureIframeHeight = useCallback(() => {
     const doc = iframeRef.current?.contentDocument;
     const body = doc?.body;
-    if (!body) return;
-    const measured = Math.ceil(body.scrollHeight);
+    const html = doc?.documentElement;
+    if (!body || !html) return;
+    // Measure natural box height (offsetHeight + body.scrollHeight) rather than html.scrollHeight
+    // so the iframe grows to eliminate internal scrollbars and can also shrink on wider viewports.
+    const measured = Math.ceil(Math.max(body.offsetHeight, body.scrollHeight, html.offsetHeight));
     if (measured > 0) {
-      setIframeHeight(measured + 8);
+      setIframeHeight(measured + 4);
     }
   }, []);
 
@@ -61,14 +69,29 @@ const EmailContent = ({
     resizeObserverRef.current?.disconnect();
     measureIframeHeight();
 
-    const body = iframeRef.current?.contentDocument?.body;
+    const doc = iframeRef.current?.contentDocument;
+    const body = doc?.body;
+    const html = doc?.documentElement;
+
+    if (doc?.fonts?.ready) {
+      doc.fonts.ready.then(measureIframeHeight).catch(() => {});
+    }
+
     if (body && typeof ResizeObserver !== 'undefined') {
       const observer = new ResizeObserver(() => {
         measureIframeHeight();
       });
       observer.observe(body);
+      if (html) observer.observe(html);
       resizeObserverRef.current = observer;
     }
+
+    doc?.querySelectorAll('img').forEach((img) => {
+      if (!img.complete) {
+        img.addEventListener('load', measureIframeHeight, { once: true });
+        img.addEventListener('error', measureIframeHeight, { once: true });
+      }
+    });
   }, [measureIframeHeight]);
 
   useEffect(() => {
@@ -86,8 +109,6 @@ const EmailContent = ({
   if (!email) return null;
 
   const cleanSubject = stripEmailEmojis(email.subject || '').trim() || t('untitled_email', '(Başlıksız e-posta)');
-  const categoryLabel = EMAIL_TYPE_LABELS[email.emailType] || email.emailType || t('email', 'Bildirim');
-  const badgeVariant = EMAIL_TYPE_BADGE_VARIANTS[email.emailType] || 'neutral';
   const showSender = Boolean(email.senderEmail && !email.senderEmail.toLowerCase().includes('noreply'));
 
   const handleCopyCode = async () => {
@@ -103,11 +124,29 @@ const EmailContent = ({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-background-primary">
-      {/* Slim fixed utility bar: keeps navigation and delete reachable without consuming reading height */}
-      <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-border-light bg-background-primary px-5 sm:px-6">
-        <Badge variant={badgeVariant} dot>
-          {categoryLabel}
-        </Badge>
+      {/* Single compact reading header: subject, date/sender and actions in one row */}
+      <header className="flex shrink-0 items-start justify-between gap-4 border-b border-border-light bg-background-primary px-5 py-3.5 sm:px-6">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg font-semibold leading-snug text-text-primary">
+            {cleanSubject}
+          </h2>
+
+          {(email.sentAt || showSender) && (
+            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-text-tertiary">
+              {email.sentAt && (
+                <time className="tabular-nums" dateTime={email.sentAt}>
+                  {formatFullEmailDate(email.sentAt)}
+                </time>
+              )}
+              {email.sentAt && showSender && <span aria-hidden>·</span>}
+              {showSender && (
+                <span>
+                  {t('sender', 'Gönderen')}: <span className="font-medium text-text-secondary">{email.senderEmail}</span>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="flex shrink-0 items-center gap-1">
           {detectedCode && (
@@ -120,7 +159,7 @@ const EmailContent = ({
             >
               {copiedCode ? (
                 <>
-                  <Check className="h-3.5 w-3.5 text-status-success" strokeWidth={1.75} aria-hidden />
+                  <Check className="h-3.5 w-3.5 text-status-success" strokeWidth={1.5} aria-hidden />
                   <span>{t('copied', 'Kopyalandı')}</span>
                 </>
               ) : (
@@ -170,35 +209,12 @@ const EmailContent = ({
             </Button>
           )}
         </div>
-      </div>
+      </header>
 
-      {/* Single unified reading scroll surface: subject, metadata and auto-sized email body scroll together */}
+      {/* Single unified reading scroll surface for the auto-sized email body */}
       <div ref={scrollContainerRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-background-primary">
-        <header className="px-5 pt-5 pb-4 sm:px-6">
-          <h2 className="text-xl font-semibold leading-snug text-text-primary">
-            {cleanSubject}
-          </h2>
-
-          {(email.sentAt || showSender) && (
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-tertiary">
-              {email.sentAt && (
-                <time className="tabular-nums" dateTime={email.sentAt}>
-                  {formatFullEmailDate(email.sentAt)}
-                </time>
-              )}
-              {email.sentAt && showSender && <span aria-hidden>·</span>}
-              {showSender && (
-                <span>
-                  {t('sender', 'Gönderen')}: <span className="font-medium text-text-secondary">{email.senderEmail}</span>
-                </span>
-              )}
-            </div>
-          )}
-
-          <div className="mt-4 border-b border-border-light" />
-        </header>
-
         <iframe
+          key={`${email.id}-${colorScheme}`}
           ref={iframeRef}
           srcDoc={processedHtml}
           onLoad={handleIframeLoad}

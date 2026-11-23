@@ -27,7 +27,7 @@ const CompareFloatingBar = memo(() => {
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 min-w-0">
                             <div className="p-1.5 bg-primary rounded shrink-0">
-                                <Scale className="w-4 h-4 text-white" strokeWidth={1.5} />
+                                <Scale className="w-4 h-4 text-text-inverse" strokeWidth={1.5} />
                             </div>
                             <div className="min-w-0">
                                 <span className="text-sm font-semibold text-text-primary truncate block">{t("compare_category", { defaultValue: "Compare {{category}}", category: getListingTypeLabel(category) })}
@@ -71,7 +71,7 @@ const CompareFloatingBar = memo(() => {
 
                         <div className="flex sm:flex-col flex-shrink-0 justify-center sm:justify-between gap-2 sm:border-l sm:border-border-light sm:pl-4 sm:min-w-32">
                             <button type="button" onClick={openModal} disabled={!canCompare} className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded text-sm font-semibold transition-colors duration-150
- ${canCompare ? 'bg-primary text-white hover:bg-primary' : 'bg-background-tertiary text-text-muted cursor-not-allowed'}
+ ${canCompare ? 'bg-primary text-text-inverse hover:bg-primary-hover' : 'bg-background-tertiary text-text-muted cursor-not-allowed'}
  `}>
                                 <Scale className="w-4 h-4 shrink-0" strokeWidth={1.5} />{t("compare")}</button>
                             {!canCompare && <p className="text-center text-xs text-text-tertiary sm:text-left">{t("add_at_least_2_items")}</p>}

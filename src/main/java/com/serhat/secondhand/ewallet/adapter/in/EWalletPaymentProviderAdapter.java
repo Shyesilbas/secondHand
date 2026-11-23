@@ -31,6 +31,12 @@ public class EWalletPaymentProviderAdapter implements PaymentProviderPort {
 
     @Override
     public PaymentResult process(User fromUser, User toUser, BigDecimal amount, UUID listingId, PaymentRequest request) {
-        return eWalletService.processEWalletPayment(fromUser, toUser, amount, listingId);
+        PaymentResult result = eWalletService.processEWalletPayment(fromUser, toUser, amount, listingId);
+        // Platform fees are income of the system account right away; item payments are held in escrow instead.
+        if (result.success() && toUser != null && request != null && request.transactionType() != null
+                && request.transactionType().isPlatformFee()) {
+            eWalletService.creditWalletQuietly(toUser, amount);
+        }
+        return result;
     }
 }

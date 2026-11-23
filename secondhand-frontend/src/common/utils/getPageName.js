@@ -30,6 +30,7 @@ const PATH_MATCHERS = [
  { test: (p) => p === '/payments', page: 'PaymentsPage' },
  { test: (p) => p === '/inbox', page: 'InboxPage' },
  { test: (p) => p === '/agreements/all', page: 'AgreementsPage' },
+ { test: (p) => p === '/fees', page: 'FeesPage' },
  { test: (p) => p === '/profile/orders', page: 'MyOrdersPage' },
  { test: (p) => p === '/profile/i-sold', page: 'ISoldPage' },
  { test: (p) => p === '/security', page: 'SecurityPage' },

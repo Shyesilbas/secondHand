@@ -1,6 +1,7 @@
 package com.serhat.secondhand.order.application.listener;
 
 import com.serhat.secondhand.email.application.EmailLinks;
+import com.serhat.secondhand.escrow.application.CommissionService;
 import org.springframework.web.util.HtmlUtils;
 import com.serhat.secondhand.email.application.event.EmailEventPublisher;
 import com.serhat.secondhand.email.application.event.impl.*;
@@ -47,6 +48,7 @@ public class OrderEmailListener {
     private final IUserService userService;
     private final OrderLogService orderLog;
     private final OrderRepository orderRepository;
+    private final CommissionService commissionService;
     private final TransactionTemplate readOnlyTx;
 
     public OrderEmailListener(EmailEventPublisher emailEventPublisher,
@@ -55,6 +57,7 @@ public class OrderEmailListener {
             IUserService userService,
             OrderLogService orderLog,
             OrderRepository orderRepository,
+            CommissionService commissionService,
             PlatformTransactionManager transactionManager) {
         this.emailEventPublisher = emailEventPublisher;
         this.emailConfig = emailConfig;
@@ -62,6 +65,7 @@ public class OrderEmailListener {
         this.userService = userService;
         this.orderLog = orderLog;
         this.orderRepository = orderRepository;
+        this.commissionService = commissionService;
         this.readOnlyTx = new TransactionTemplate(transactionManager);
         this.readOnlyTx.setReadOnly(true);
     }
@@ -309,6 +313,23 @@ public class OrderEmailListener {
                     .filter(java.util.Objects::nonNull)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             boolean couponUsed = couponTotal.signum() > 0;
+            BigDecimal commissionTotal = BigDecimal.ZERO;
+            java.util.Set<BigDecimal> commissionRates = new java.util.HashSet<>();
+            for (OrderItemDto item : sellerItems) {
+                BigDecimal gross = item.getTotalPrice().add(item.getCouponDiscount() != null ? item.getCouponDiscount() : BigDecimal.ZERO);
+                var commission = commissionService.quote(
+                        item.getListing() != null ? item.getListing().getType() : null, orderDto.getCreatedAt(), gross);
+                commissionTotal = commissionTotal.add(commission.amount());
+                if (commission.ratePercent() != null) {
+                    commissionRates.add(commission.ratePercent().stripTrailingZeros());
+                }
+            }
+            boolean commissionApplied = commissionTotal.signum() > 0;
+            BigDecimal shippingDeduction = orderDto.getSellerShippingCharge() != null
+                    ? orderDto.getSellerShippingCharge() : BigDecimal.ZERO;
+            boolean shippingDeducted = shippingDeduction.signum() > 0;
+            boolean showBreakdown = couponUsed || commissionApplied || shippingDeducted;
+            BigDecimal payout = total.add(couponTotal).subtract(commissionTotal).subtract(shippingDeduction);
             // Seller-set price: the pre-campaign, pre-coupon line price; old rows without it fall back to paid + coupon.
             BigDecimal listingAmount = sellerItems.stream()
                     .map(i -> i.getOriginalUnitPrice() != null && i.getQuantity() != null
@@ -319,10 +340,14 @@ public class OrderEmailListener {
             var data = OrderConfirmationEmailData.builder()
                     .userName(seller.getName())
                     .couponCode(couponUsed ? orderDto.getCouponCode() : null)
-                    .listingAmount(couponUsed ? formatMoney(listingAmount, currencyName) : null)
+                    .listingAmount(showBreakdown ? formatMoney(listingAmount, currencyName) : null)
                     .couponDiscountAmount(couponUsed ? formatMoney(couponTotal, currencyName) : null)
-                    .paidAmount(couponUsed ? formatMoney(total, currencyName) : null)
-                    .payoutAmount(couponUsed ? formatMoney(total.add(couponTotal), currencyName) : null)
+                    .paidAmount(showBreakdown ? formatMoney(total, currencyName) : null)
+                    .commissionAmount(commissionApplied ? formatMoney(commissionTotal, currencyName) : null)
+                    .commissionRate(commissionApplied && commissionRates.size() == 1
+                            ? commissionRates.iterator().next().toPlainString() : null)
+                    .shippingDeductionAmount(shippingDeducted ? formatMoney(shippingDeduction, currencyName) : null)
+                    .payoutAmount(showBreakdown ? formatMoney(payout, currencyName) : null)
                     .orderNumber(getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()))
                     .totalAmount(
                             formatMoney(total, orderDto.getCurrency() != null ? orderDto.getCurrency().name() : "TRY"))

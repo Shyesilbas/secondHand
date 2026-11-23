@@ -371,7 +371,15 @@ export const ListingQuickActionsModal = ({
                   onClick={actions.handleEdit}
                 />
               )}
-              {status === LISTING_STATUS.DRAFT && (
+              {status === LISTING_STATUS.DRAFT && !actions.requiresListingFee && (
+                <ActionRow
+                  icon={CreditCard}
+                  title={t('publish_now', 'Şimdi yayınla')}
+                  description={t('publish_free_desc', 'Bu ilan türünde ilan ücreti yok; satışta komisyon kesilir')}
+                  onClick={actions.handlePublish}
+                />
+              )}
+              {status === LISTING_STATUS.DRAFT && actions.requiresListingFee && (
                 <ActionRow
                   icon={CreditCard}
                   title={t('pay_fee', 'İlan ücretini öde')}

@@ -66,6 +66,8 @@ export const ROUTES = {
  MY_LISTS: '/my-lists',
  FAVORITE_LIST_DETAIL: (listId) => `/lists/${listId}`,
  ABOUT: '/about',
+ /** Public commission and fee schedule */
+ FEES: '/fees',
  /** Platform coupon management (ADMIN only; route also guarded in UI) */
  ADMIN_COUPONS: '/admin/coupons',
 };

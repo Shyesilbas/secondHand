@@ -32,7 +32,9 @@ class OrderCreationServiceTest {
     private final OrderRepository orderRepository = mock(OrderRepository.class);
     private final AddressService addressService = mock(AddressService.class);
     private final OrderCreationService service =
-            new OrderCreationService(orderRepository, addressService, mock(OrderLogService.class));
+            new OrderCreationService(orderRepository,
+                    com.serhat.secondhand.testsupport.PlatformFeeTestConfig.standard(java.time.LocalDateTime.of(2026, 12, 1, 0, 0)),
+                    addressService, mock(OrderLogService.class));
 
     private final User buyer = user(1L);
 
@@ -103,6 +105,54 @@ class OrderCreationServiceTest {
         assertThat(orderB.getCouponCode()).isNull();
         assertThat(orderA.getOrderNumber()).isNotEqualTo(orderB.getOrderNumber());
     }
+    @Test
+    void cargoOrdersCarryTheFlatShippingFeePerSellerOrder_safeMeetupCarriesNone() {
+        Address address = mock(Address.class);
+        when(address.getUser()).thenReturn(buyer);
+        when(addressService.getAddressById(10L)).thenReturn(Optional.of(address));
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+        Cart a = cart(user(2L), "100", 1);
+        Cart b = cart(user(3L), "200", 1);
+        PricingResultDto pricing = PricingResultDto.builder()
+                .items(List.of(priced(a, "100", "100", "0", "100"), priced(b, "200", "200", "0", "200")))
+                .build();
+
+        List<Order> cargo = service.createOrders(buyer, List.of(a, b),
+                CheckoutRequest.builder().shippingAddressId(10L).build(), pricing).getData();
+        assertThat(cargo).extracting(Order::getShippingFee).allSatisfy(fee -> assertThat(fee).isEqualByComparingTo("49.90"));
+        // the fee is not part of the goods total that escrow and refunds are computed from
+        assertThat(cargo.get(0).getTotalAmount()).isEqualByComparingTo("100");
+
+        List<Order> meetup = service.createOrders(buyer, List.of(a, b),
+                CheckoutRequest.builder().shippingAddressId(10L)
+                        .deliveryMethod(com.serhat.secondhand.order.entity.enums.DeliveryMethod.SAFE_MEETUP)
+                        .meetupLocation("Kadikoy").build(), pricing).getData();
+        assertThat(meetup).extracting(Order::getShippingFee).allSatisfy(fee -> assertThat(fee).isEqualByComparingTo("0"));
+    }
+
+    @Test
+    void orderAtOrAboveTheFreeShippingThresholdChargesTheSellerInsteadOfTheBuyer() {
+        Address address = mock(Address.class);
+        when(address.getUser()).thenReturn(buyer);
+        when(addressService.getAddressById(10L)).thenReturn(Optional.of(address));
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+        Cart big = cart(user(2L), "1000", 1);
+        Cart small = cart(user(3L), "999.99", 1);
+        PricingResultDto pricing = PricingResultDto.builder()
+                .items(List.of(priced(big, "1000", "1000", "0", "1000"), priced(small, "999.99", "999.99", "0", "999.99")))
+                .build();
+
+        List<Order> orders = service.createOrders(buyer, List.of(big, small),
+                CheckoutRequest.builder().shippingAddressId(10L).build(), pricing).getData();
+
+        Order free = orders.get(0);
+        assertThat(free.getShippingFee()).isEqualByComparingTo("0");
+        assertThat(free.getSellerShippingCharge()).isEqualByComparingTo("49.90");
+        Order paid = orders.get(1);
+        assertThat(paid.getShippingFee()).isEqualByComparingTo("49.90");
+        assertThat(paid.getSellerShippingCharge()).isEqualByComparingTo("0");
+    }
+
     @Test
     void campaignLine_recordsCampaignIdAndLineDiscount_plainLineRecordsZero() {
         Address address = mock(Address.class);

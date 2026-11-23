@@ -56,6 +56,20 @@ public class Escrow {
     @Builder.Default
     private BigDecimal platformSubsidy = BigDecimal.ZERO;
 
+    /** Seller commission taken from the payout on release; fixed when the escrow is held, zero when none applies. */
+    @Column(name = "commission_amount", nullable = false, precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal commissionAmount = BigDecimal.ZERO;
+
+    /** This item's share of the seller-carried shipping fee (free shipping orders); withheld on release, zero otherwise. */
+    @Column(name = "shipping_deduction", nullable = false, precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal shippingDeduction = BigDecimal.ZERO;
+
+    /** Commission rate in percent that produced {@code commissionAmount}; null when no commission applied. */
+    @Column(name = "commission_rate", precision = 5, scale = 2)
+    private BigDecimal commissionRate;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     @Builder.Default
@@ -78,9 +92,16 @@ public class Escrow {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    /** What the seller receives: the buyer-paid amount plus the platform-funded coupon share. */
-    public BigDecimal sellerPayout() {
+    /** Seller gross: the buyer-paid amount plus the platform-funded coupon share; the commission base. */
+    public BigDecimal sellerGross() {
         BigDecimal paid = amount != null ? amount : BigDecimal.ZERO;
         return platformSubsidy != null ? paid.add(platformSubsidy) : paid;
+    }
+
+    /** What the seller receives: the gross minus the commission and the shipping deduction. */
+    public BigDecimal sellerPayout() {
+        BigDecimal commission = commissionAmount != null ? commissionAmount : BigDecimal.ZERO;
+        BigDecimal shipping = shippingDeduction != null ? shippingDeduction : BigDecimal.ZERO;
+        return sellerGross().subtract(commission).subtract(shipping);
     }
 }

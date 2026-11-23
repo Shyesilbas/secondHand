@@ -150,24 +150,33 @@ const UnifiedSearchBar = ({
  };
  return <div ref={searchRef} className={`relative ${className}`}>
  <div className="relative">
- <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={activeTab === 'users' ? t('search_users_placeholder', 'Kullanıcı ara...') : t('search_listings_placeholder', 'İlan ara...')} className="h-9 w-full rounded border border-border bg-background-primary pl-9 pr-44 text-sm text-text-primary placeholder:text-text-muted transition-colors duration-150 hover:border-card-border-hover focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" />
+ <input
+ ref={inputRef}
+ type="text"
+ value={query}
+ onChange={handleInputChange}
+ onFocus={handleFocus}
+ aria-label={activeTab === 'users' ? t('search_users_placeholder', 'Kullanıcı ara...') : t('search_listings_placeholder', 'İlan ara...')}
+ placeholder={activeTab === 'users' ? t('search_users_placeholder', 'Kullanıcı ara...') : t('search_listings_placeholder', 'İlan ara...')}
+ className="h-9 w-full rounded border border-border-light bg-background-secondary pl-9 pr-44 text-sm text-text-primary placeholder:text-text-muted transition-colors duration-150 hover:border-border focus:border-border-focus focus:bg-background-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
+ />
 
  <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary">
  {isLoading
- ? <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} aria-hidden />
+ ? <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" strokeWidth={1.5} aria-hidden />
  : <Search className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
  </div>
 
  {/* Segmented scope toggle: 6px chips inside the 8px field so the inner corners never outgrow the outer one. */}
  <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center">
  <div className="flex items-center rounded-sm bg-background-tertiary p-0.5" role="group" aria-label={t('search_scope', 'Arama kapsamı')}>
- {[['listings', t("listings")], ['users', t("users")]].map(([tab, label]) => (
+ {[['listings', t('listings', 'İlanlar')], ['users', t('users', 'Kullanıcılar')]].map(([tab, label]) => (
  <button
  key={tab}
  type="button"
  onClick={() => handleTabChange(tab)}
  aria-pressed={activeTab === tab}
- className={`rounded-sm px-2.5 py-0.5 text-xs font-medium transition-colors duration-150 ${activeTab === tab ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-tertiary hover:text-text-primary'}`}
+ className={`rounded-sm px-2.5 py-0.5 text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${activeTab === tab ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-tertiary hover:text-text-primary'}`}
  >
  {label}
  </button>
@@ -176,7 +185,7 @@ const UnifiedSearchBar = ({
  </div>
  </div>
 
- {isVisible && <div className="absolute top-full left-0 right-0 z-dropdown mt-1.5 max-h-80 rounded border border-border bg-background-primary shadow-md sm:max-h-96 overflow-y-auto">
+ {isVisible && <div className="absolute left-0 right-0 top-full z-tooltip mt-1.5 max-h-80 overflow-y-auto rounded border border-border bg-background-primary shadow-md sm:max-h-96">
  <SearchResults results={results} activeTab={activeTab} selectedIndex={selectedIndex} isLoading={isLoading} query={query} onResultSelect={handleResultSelect} />
  </div>}
  </div>;

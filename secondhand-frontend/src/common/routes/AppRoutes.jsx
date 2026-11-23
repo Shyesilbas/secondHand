@@ -15,6 +15,7 @@ import AdminRoute from './AdminRoute.jsx';
 // Critical Routes - Eager loaded (always needed on initial load)
 import HomePage from '../../home/pages/HomePage.jsx';
 import AboutPage from '../../home/pages/AboutPage.jsx';
+const FeesPage = lazy(() => import('../../fees/pages/FeesPage.jsx'));
 
 // High Priority - Lazy loaded (frequently accessed)
 const ListingsPage = lazy(() => import('../../listing/pages/ListingsPage.jsx'));
@@ -149,6 +150,9 @@ const AppRoutes = () => {
  <Route element={<MainLayout />}>
  <Route path={ROUTES.HOME} element={<HomePage />} />
  <Route path={ROUTES.ABOUT} element={<AboutPage />} />
+ <Route path={ROUTES.FEES} element={<Suspense fallback={<PageLoader />}>
+ <FeesPage />
+ </Suspense>} />
  <Route path={ROUTES.LISTINGS_PREFILTER} element={<Suspense fallback={<PageLoader />}>
  <ListingsPrefilterPage />
  </Suspense>} />

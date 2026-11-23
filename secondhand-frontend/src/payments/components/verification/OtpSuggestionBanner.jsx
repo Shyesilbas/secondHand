@@ -5,6 +5,7 @@ import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { OTP_CODE_LENGTH } from '../../../common/constants/otp.js';
 import Button from '../../../common/components/ui/Button.jsx';
 import { getProcessedContent } from '../../../emails/emails.js';
+import { useColorScheme } from '../../../common/hooks/useColorScheme.js';
 
 const looksLikeHtml = (text) => /<\/?[a-z][\s\S]*>/i.test(text);
 
@@ -14,6 +15,7 @@ const looksLikeHtml = (text) => /<\/?[a-z][\s\S]*>/i.test(text);
  */
 const EmailBody = ({ content }) => {
   const { t } = useTranslation();
+  const { colorScheme } = useColorScheme();
   const frameRef = useRef(null);
   const [height, setHeight] = useState(240);
 
@@ -28,9 +30,10 @@ const EmailBody = ({ content }) => {
 
   return (
     <iframe
+      key={colorScheme}
       ref={frameRef}
       title={t('payment_email_preview', 'Doğrulama e-postası')}
-      srcDoc={getProcessedContent(content)}
+      srcDoc={getProcessedContent(content, { colorScheme })}
       sandbox="allow-same-origin"
       referrerPolicy="no-referrer"
       onLoad={fitHeight}

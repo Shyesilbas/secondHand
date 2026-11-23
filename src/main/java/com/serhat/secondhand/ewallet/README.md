@@ -15,6 +15,7 @@ Manages internal user virtual balances (`e_wallets` table), deposits, withdrawal
 - **Non-Negative Floor & 2-Decimal Precision:** `EWalletValidator` enforces `amount > 0`, `balance >= amount` on debits, and optional `walletLimit`. Balances are scaled to 2 decimal places (`RoundingMode.HALF_UP`) via `EWalletBalanceUtil.scale`.
 - **Proactive Monthly Spending Warning:** If `monthlyCompletedOutgoingSpend + requestedAmount > spendingWarningLimit`, the check endpoint alerts the user without blocking transactions.
 - **Payment Provider Adapter:** `EWalletPaymentProviderAdapter` implements `PaymentProviderPort` (`supports("EWALLET")`).
+- **Platform fee credit:** for `PaymentTransactionType.isPlatformFee()` payments the adapter credits the system wallet (`SystemAccountService`); the system wallet may go negative (signed `creditWalletQuietly`) when it funds platform coupon subsidies.
 - **Change rule:** Every balance mutation runs inside `findByUserWithLock`; no network calls while the lock is held.
 - **Change rule:** `fromUser` is never null, including system refunds.
 

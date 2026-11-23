@@ -221,7 +221,7 @@ const OrderSuccessModal = ({
                     className="flex items-start justify-between gap-3 rounded border border-border bg-background-secondary px-3 py-2.5 text-sm"
                   >
                     <div className="flex min-w-0 items-start gap-2">
-                      <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-primary text-white">
+                      <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-primary text-text-inverse">
                         <Check className="h-3 w-3" strokeWidth={2} aria-hidden />
                       </span>
                       <div className="min-w-0 leading-relaxed text-text-secondary">

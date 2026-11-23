@@ -32,7 +32,7 @@ erDiagram
     users ||--o{ coupon_redemptions : "user_id"
 ```
 
-- `escrows` kalem başına tek satırdır ([ADR-0003](adr/0003-item-level-escrow.md)). `amount` alıcının ödediği (kupon sonrası) paydır, `platform_subsidy` platformun karşıladığı kupon payıdır; satıcıya `amount + platform_subsidy` ödenir. `order_items.coupon_discount` bu payın kaynağıdır, `coupon_redemptions.discount_amount` ise checkout'un toplam kupon indirimi snapshot'ıdır (kuponlar sayfasındaki toplam tasarruf).
+- `escrows` kalem başına tek satırdır ([ADR-0003](adr/0003-item-level-escrow.md)). `amount` alıcının ödediği (kupon sonrası) paydır, `platform_subsidy` platformun karşıladığı kupon payıdır; satıcıya `amount + platform_subsidy - commission_amount` ödenir. `commission_amount` ve `commission_rate` hold sırasında yazılan satış komisyonudur (V62). V62 ayrıca `orders.shipping_fee` / `shipping_fee_refunded` kolonlarını ve sistem kullanıcısını (`system@secondhand.internal`) ve cüzdanını ekler; ilan, vitrin, üyelik ve kargo ücretleri bu hesaba ödenir. `order_items.coupon_discount` bu payın kaynağıdır, `coupon_redemptions.discount_amount` ise checkout'un toplam kupon indirimi snapshot'ıdır (kuponlar sayfasındaki toplam tasarruf). `shipping_deduction` ücretsiz kargoda satıcının payından düşülen kargo bedelidir; `orders.seller_shipping_charge` bu bedelin sipariş anında sabitlenmiş halidir.
 - `shippings` siparişle bire bir ilişkilidir (`UNIQUE (order_id)`).
 - Para hareketleri `payment` tablosunda; satıcı bakiyesi `ewallet` üzerindedir.
 

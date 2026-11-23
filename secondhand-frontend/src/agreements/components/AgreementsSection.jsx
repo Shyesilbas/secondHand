@@ -1,66 +1,64 @@
-import { useTranslation } from "react-i18next";
-import { FileText as DocumentTextIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { agreementLabel } from '../agreements.js';
+import { Alert, Button } from '../../common/components/ui/index.js';
+
 const AgreementsSection = ({
-    agreements,
-    acceptedAgreements,
-    onToggle,
-    onRead,
-    error
+  agreements,
+  acceptedAgreements,
+  onToggle,
+  onRead,
+  error
 }) => {
-    const {
-        t
-    } = useTranslation();
-    if (!agreements?.length) return null;
-    return <div className="space-y-4">
-        <div>
-            <h3 className="text-sm font-medium text-text-primary mb-1.5 tracking-tight">{t("agreements")}</h3>
-            <p className="text-sm text-text-secondary tracking-tight">{t("you_must_accept_all_agreements_below_to_")}</p>
-        </div>
+  const { t } = useTranslation();
 
-        <div className="space-y-2">
-            {agreements.map(agreement => {
-                const isChecked = acceptedAgreements.has(agreement.agreementId);
-                return (
-                    <div
-                        key={agreement.agreementId}
-                        className={`flex items-center justify-between gap-3 rounded border px-3 py-2.5 transition-colors duration-150 ${isChecked
-                                ? 'border-border bg-background-secondary'
-                                : 'border-border-light bg-background-primary hover:border-card-border-hover'
-                            }`}
-                    >
-                        <div className="flex min-w-0 items-center gap-2.5">
-                            <input
-                                type="checkbox"
-                                id={`agreement-${agreement.agreementId}`}
-                                checked={isChecked}
-                                onChange={() => onToggle(agreement.agreementId)}
-                                className="h-4 w-4 shrink-0 cursor-pointer rounded-sm border-border text-primary accent-primary focus:ring-border-focus"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => onRead(agreement)}
-                                className="truncate text-left text-sm font-medium text-text-primary underline transition-colors hover:text-primary"
-                            >
-                                {agreementLabel(t, agreement.agreementType)}
-                            </button>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => onRead(agreement)}
-                            className="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-0.5 text-xs font-medium text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
-                        >
-                            <DocumentTextIcon className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                            <span>{t("read", "Oku")}</span>
-                        </button>
-                    </div>
-                );
-            })}
-        </div>
+  if (!agreements?.length) return null;
 
-        {error && <div role="alert" className="p-3 rounded border border-status-error-border bg-status-error-bg">
-            <p className="text-sm text-status-error-text">{error}</p>
-        </div>}
-    </div>;
+  return (
+    <div className="space-y-3">
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary">{t('agreements', 'Sözleşmeler')}</h3>
+        <p className="mt-0.5 text-sm text-text-secondary">
+          {t('you_must_accept_all_agreements_below_to_', 'Devam etmek için aşağıdaki sözleşmeleri onaylamanız gerekir.')}
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        {agreements.map((agreement) => {
+          const isChecked = acceptedAgreements.has(agreement.agreementId);
+          const inputId = `agreement-${agreement.agreementId}`;
+          const label = agreementLabel(t, agreement.agreementType);
+          return (
+            <div
+              key={agreement.agreementId}
+              className={`flex items-center justify-between gap-3 rounded border px-3 py-2.5 transition-colors duration-150 ${
+                isChecked
+                  ? 'border-accent-teal bg-accent-teal-50'
+                  : 'border-border-light bg-background-primary hover:border-border'
+              }`}
+            >
+              <label htmlFor={inputId} className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5">
+                <input
+                  type="checkbox"
+                  id={inputId}
+                  checked={isChecked}
+                  onChange={() => onToggle(agreement.agreementId)}
+                  className="h-4 w-4 shrink-0 cursor-pointer rounded-sm border-border focus:ring-2 focus:ring-border-focus"
+                />
+                <span className={`truncate text-sm font-medium ${isChecked ? 'text-accent-teal-800' : 'text-text-primary'}`}>
+                  {label}
+                </span>
+              </label>
+              <Button variant="ghost" size="sm" onClick={() => onRead(agreement)} className="shrink-0">
+                {t('read', 'Oku')}
+              </Button>
+            </div>
+          );
+        })}
+      </div>
+
+      {error && <Alert type="error" message={error} />}
+    </div>
+  );
 };
+
 export default AgreementsSection;

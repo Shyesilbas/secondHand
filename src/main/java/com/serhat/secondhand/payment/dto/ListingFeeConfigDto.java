@@ -22,4 +22,7 @@ public class ListingFeeConfigDto {
     private BigDecimal taxAmount;
 
     private BigDecimal totalCreationFee;
+
+    /** Listing types that pay the creation fee; all other types pay commission on the sale. */
+    private java.util.List<com.serhat.secondhand.listing.domain.entity.enums.base.ListingType> feeBearingTypes;
 }

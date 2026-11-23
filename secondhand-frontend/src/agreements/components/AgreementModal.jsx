@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Clock as ClockIcon, FileText } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { agreementLabel } from '../agreements.js';
 import { formatDate } from '../../common/formatters.js';
 import { Button, Modal } from '../../common/components/ui/index.js';
@@ -98,88 +98,89 @@ const AgreementModal = ({
       footer={
         <div className={`flex w-full flex-col-reverse gap-3 sm:flex-row sm:items-center ${readOnly ? 'sm:justify-end' : 'sm:justify-between'}`}>
           {!readOnly && (
-            <p className="text-sm text-text-tertiary">
-              {isAccepted
-                ? t('agreement_already_accepted', 'Bu sözleşmeyi onayladınız.')
-                : t('please_read_carefully_before_accepting', 'Onaylamadan önce metni dikkatle okuyun.')}
+            <p className="inline-flex items-center gap-2 text-sm text-text-tertiary">
+              {isAccepted && (
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-status-success" aria-hidden />
+              )}
+              <span>
+                {isAccepted
+                  ? t('agreement_already_accepted', 'Bu sözleşmeyi onayladınız.')
+                  : t('please_read_carefully_before_accepting', 'Onaylamadan önce metni dikkatle okuyun.')}
+              </span>
             </p>
           )}
           <div className="flex items-center justify-end gap-2">
             <Button variant="secondary" onClick={onClose}>
               {t('close', 'Kapat')}
             </Button>
-            {!readOnly && (onAccept || !isAccepted) && (
+            {!readOnly && !isAccepted && (
               <Button onClick={handleAcceptClick} disabled={Boolean(accepting)}>
-                <Check className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-                {accepting
-                  ? t('accepting', 'Onaylanıyor…')
-                  : isAccepted
-                    ? t('accepted', 'Onaylandı')
+                {accepting ? (
+                  <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" strokeWidth={1.5} aria-hidden />
+                ) : (
+                  <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                )}
+                <span>
+                  {accepting
+                    ? t('accepting', 'Onaylanıyor...')
                     : t('i_accept', 'Okudum, onaylıyorum')}
+                </span>
               </Button>
             )}
           </div>
         </div>
       }
     >
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded border border-border-light bg-background-secondary px-3.5 py-2.5 text-xs text-text-secondary">
-          <div className="inline-flex items-center gap-2">
-            <FileText className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-            <span className="font-medium text-text-primary">{title}</span>
-            {agreement.version && (
-              <span className="rounded-sm border border-border bg-background-primary px-1.5 py-0.5 font-medium tabular-nums text-text-secondary">
-                v{agreement.version}
+      <div>
+        {(agreement.version || updatedLabel) && (
+          <div className="mb-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 border-b border-border-light pb-3 text-sm tabular-nums text-text-tertiary">
+            {agreement.version && <span>v{agreement.version}</span>}
+            {agreement.version && updatedLabel && <span aria-hidden>·</span>}
+            {updatedLabel && (
+              <span>
+                {t('updated', 'Güncelleme')}: {updatedLabel}
               </span>
             )}
           </div>
-          {updatedLabel && (
-            <div className="inline-flex items-center gap-1.5 tabular-nums text-text-tertiary">
-              <ClockIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
-              <span>{t('updated', 'Güncelleme')}: {updatedLabel}</span>
-            </div>
-          )}
-        </div>
+        )}
 
-        <div className="rounded border border-border-light bg-background-primary p-4 sm:p-5">
-          {isHtmlContent ? (
-            <div
-              className="legal-prose max-w-prose text-base leading-relaxed text-text-secondary"
-              dangerouslySetInnerHTML={{ __html: safeHtml }}
-            />
-          ) : (
-            <div className="max-w-prose space-y-4 text-base leading-relaxed text-text-secondary">
-              {plainBlocks.map((block, idx) => {
-                if (block.type === 'heading') {
-                  return (
-                    <h3 key={idx} className="text-base font-semibold text-text-primary">
-                      {block.text}
-                    </h3>
-                  );
-                }
-                if (block.type === 'list') {
-                  return (
-                    <ol key={idx} className="divide-y divide-border-light rounded border border-border-light bg-background-secondary">
-                      {block.items.map((item) => (
-                        <li key={item.index} className="flex items-start gap-3 px-3.5 py-2.5 text-base">
-                          <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background-primary text-xs font-semibold tabular-nums text-text-secondary">
-                            {item.index}
-                          </span>
-                          <span className="flex-1 text-text-primary">{item.text}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  );
-                }
+        {isHtmlContent ? (
+          <div
+            className="legal-prose max-w-prose text-base leading-relaxed text-text-secondary"
+            dangerouslySetInnerHTML={{ __html: safeHtml }}
+          />
+        ) : (
+          <div className="max-w-prose space-y-4 text-base leading-relaxed text-text-secondary">
+            {plainBlocks.map((block, idx) => {
+              if (block.type === 'heading') {
                 return (
-                  <p key={idx} className="text-base text-text-secondary">
+                  <h3 key={idx} className="pt-2 text-base font-semibold text-text-primary first:pt-0">
                     {block.text}
-                  </p>
+                  </h3>
                 );
-              })}
-            </div>
-          )}
-        </div>
+              }
+              if (block.type === 'list') {
+                return (
+                  <ol key={idx} className="space-y-2.5 pl-0">
+                    {block.items.map((item) => (
+                      <li key={item.index} className="flex items-start gap-3 text-base">
+                        <span className="mt-0.5 min-w-5 shrink-0 text-sm font-medium tabular-nums text-text-tertiary">
+                          {item.index}.
+                        </span>
+                        <span className="flex-1 text-text-secondary">{item.text}</span>
+                      </li>
+                    ))}
+                  </ol>
+                );
+              }
+              return (
+                <p key={idx} className="text-base text-text-secondary">
+                  {block.text}
+                </p>
+              );
+            })}
+          </div>
+        )}
       </div>
     </Modal>
   );

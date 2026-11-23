@@ -135,3 +135,10 @@ Dağıtık çalışmada çift tetiklenmeyi ShedLock engeller (`@SchedulerLock`).
 | Outbox worker'ları | Kafka'ya yayın | 5 sn |
 
 Bir iş çalışmıyorsa: loglarda başlangıç satırını arayın, uygulamanın birden fazla instance'ta çalışıp kilidi başka instance'ın tutup tutmadığını kontrol edin ve `lockAtMostFor` süresi dolana kadar bekleyin.
+
+## 8. Komisyon Duyurusu ve Platform Ücretleri
+
+- **Ayarlar** (`PlatformFeeConfig`, `app.platform`): `COMMISSION_EFFECTIVE_FROM` (komisyonun geçerli olduğu tarih, varsayılan 2026-11-22), `SHIPPING_FEE` (varsayılan 49,90), `FREE_SHIPPING_THRESHOLD` (varsayılan 1000; bu tutarın üzerindeki satıcı siparişlerinde kargoyu satıcı öder, 0 özelliği kapatır), `SYSTEM_ACCOUNT_EMAIL`.
+- **Duyuru:** ADMIN oturumuyla `POST /api/v1/admin/announcements/commission` bir kez çağrılır, yanıt `{queued}` kuyruğa alınan kullanıcı sayısıdır. Aynı konuyu almış kullanıcılar atlanır; mail kaydı asenkron yazıldığı için art arda hızlı çağrı çift gönderebilir, tekrar çağırmadan önce kuyruğun işlenmesini bekleyin.
+- **Sistem hesabı:** bakiyesi negatife düşebilir (platform kupon payı komisyondan önce çıkar); bakiyeyi `e_wallets` üzerinden sistem kullanıcısı için izleyin.
+- **V62:** sistem kullanıcısı, komisyon kolonları ve kargo kolonlarını ekler; eski bir veritabanında uygulama yeniden başlatılınca uygulanır.

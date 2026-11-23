@@ -35,6 +35,10 @@ public class ListingFeePaymentValidation {
             return ownershipValidation;
         }
 
+        if (!listing.requiresCreationFee()) {
+            return Result.error(PaymentErrorCodes.LISTING_FEE_NOT_REQUIRED);
+        }
+
         if (listing.getStatus() != ListingStatus.DRAFT) {
             return Result.error(PaymentErrorCodes.LISTING_FEE_PAYMENT_NOT_ALLOWED_FOR_STATUS);
         }

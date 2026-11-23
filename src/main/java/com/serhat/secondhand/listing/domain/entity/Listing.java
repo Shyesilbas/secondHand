@@ -177,14 +177,18 @@ public class Listing {
     }
     
     public boolean canBePublished() {
-        return this.status == ListingStatus.DRAFT && this.isListingFeePaid;
+        return this.status == ListingStatus.DRAFT && (this.isListingFeePaid || !requiresCreationFee());
+    }
+
+    public boolean requiresCreationFee() {
+        return this.listingType != null && this.listingType.chargesCreationFee();
     }
     
     private void validateCanPublish() {
         if (this.status != ListingStatus.DRAFT) {
             throw new BusinessException(ListingErrorCodes.INVALID_STATUS_TRANSITION);
         }
-        if (!this.isListingFeePaid) {
+        if (requiresCreationFee() && !this.isListingFeePaid) {
             throw new BusinessException(ListingErrorCodes.LISTING_FEE_NOT_PAID);
         }
     }

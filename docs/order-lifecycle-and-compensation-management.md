@@ -95,6 +95,8 @@ Bir siparişte farklı satıcılara ait birden fazla ürün bulunabilir. Bu nede
 
 ---
 
+Kargo ücreti (`Order.shippingFee`, `SHIPPING_FEE` ödemesi) kalem iptalinde iade edilmez; yalnızca siparişin tüm kalemleri iptal edildiğinde `EscrowService.refundShippingFee` ile bir kez iade edilir (`shippingFeeRefunded`). Satıcı görünümü `sellerGross` ve `sellerCommission` alanlarını taşır.
+
 ## 5. Otomasyon & Tamamlama Scheduler'ı ([`OrderCompletionScheduler.java`](../src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java))
 
 `autoUpdateOrderStatus` her `STATUS_UPDATE_INTERVAL_MINUTES` (5 dk) çalışır. Süreler [`OrderBusinessConstants`](../src/main/java/com/serhat/secondhand/order/util/OrderBusinessConstants.java) içindedir:

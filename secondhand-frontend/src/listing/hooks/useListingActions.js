@@ -6,6 +6,7 @@ import {useNotification} from '../../notification/NotificationContext.jsx';
 import {listingService} from '../services/listingService.js';
 import {useListingActionContext} from '../context/ListingActionContext.jsx';
 import {parseError} from '../../common/errorHandler.js';
+import {useEnums} from '../../common/hooks/useEnums.js';
 
 export const useListingActions = ({
  listing,
@@ -16,6 +17,9 @@ export const useListingActions = ({
  const navigate = useNavigate();
  const notification = useNotification();
  const actionCtx = useListingActionContext();
+ const {enums} = useEnums();
+ // Vehicle and real estate pay a creation fee before publishing; other types publish directly.
+ const requiresListingFee = (enums?.listingFeeConfig?.feeBearingTypes || []).includes(listing?.type);
 
  const listingId = listing?.id;
 
@@ -47,6 +51,18 @@ export const useListingActions = ({
  dismiss(e);
  if (listingId) navigate(`${ROUTES.PAY_LISTING_FEE}?listingId=${listingId}`);
  }, [dismiss, listingId, navigate]);
+
+ const handlePublish = useCallback(async (e) => {
+ dismiss(e);
+ if (!listingId) return;
+ try {
+ await listingService.publishListing(listingId);
+ notification.showSuccess(t('success', 'Başarılı'), t('listing_published', 'İlan yayınlandı.'));
+ fireChanged();
+ } catch (err) {
+ handleApiError(t('publish_failed', 'İlan yayınlanamadı'), err);
+ }
+ }, [dismiss, fireChanged, handleApiError, listingId, notification, t]);
 
  const handleDeactivate = useCallback(async (e) => {
  dismiss(e);
@@ -139,6 +155,8 @@ export const useListingActions = ({
  return {
  handleEdit,
  handlePayListingFee,
+ handlePublish,
+ requiresListingFee,
  handleDeactivate,
  handleReactivate,
  handleMarkAsSold,

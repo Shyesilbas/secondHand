@@ -383,3 +383,7 @@ public class IyzicoPaymentProviderAdapter implements PaymentProviderPort {
 | Optimistic lock retry | Yalnızca çağıranın transaction'ı yoksa, 3 deneme, `50 ms × deneme`. | Eşzamanlı çakışmalarda otomatik tekrar. |
 | Transactional outbox | Ödeme ile aynı transaction'da `payment_outbox_events`, worker `payment.completed.v1` yayınlar. | Bildirim ve handler işleri asenkron ve tekilleştirilmiş çalışır. |
 | Cache eviction | Ödeyen ve alanın `payment:stats` key'leri silinir. | İki tarafın istatistikleri commit sonrası güncellenir; diğer kullanıcılar etkilenmez. |
+
+## Platform ücretleri ve sistem hesabı
+
+`PaymentTransactionType.isPlatformFee()` true olan türler (`LISTING_CREATION`, `SHOWCASE_PAYMENT`, `MEMBERSHIP_PAYMENT`, `SHIPPING_FEE`) alıcı olarak sistem kullanıcısına yönlenir (`PaymentRequestFactory`, `SystemAccountService`); `EWalletPaymentProviderAdapter` tutarı sistem cüzdanına yazar. `SHIPPING_FEE`, kargo siparişi başına ek bir ödemedir (idempotency key `orderNumber-shipping`, `orderItemId` yok), `OrderPaymentService` ürün ödemelerinden sonra ekler; escrow hesabını etkilemez. İlan ücreti yalnızca `ListingType.chargesCreationFee()` olan türlerde (araç, emlak) alınır.

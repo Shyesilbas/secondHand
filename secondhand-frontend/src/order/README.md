@@ -54,3 +54,4 @@ Generated from code; the hook files are the source of truth.
 ### Backend-Driven Actions and Deadlines
 - Every button, form and countdown reads the order's backend fields: `allowedActions` via `hasOrderAction`, `shipDeadline`, `autoCompleteAt`, `meetupCodeExpiresAt` and seller `sellerTotal`. Never derive an action, deadline or amount from `status` or timestamps.
 - Cancellation and refund are per `OrderItem`; `CancelRefundModal` lists only lines with `remainingQuantity > 0`.
+- **Fees on order detail:** `OrderPaymentSummary` shows the shipping fee row (buyer view, included in the paid total) and, in the seller view, gross, commission, shipping deduction (`sellerShippingDeduction`) and net rows from `sellerGross`, `sellerCommission` and `sellerTotal`.

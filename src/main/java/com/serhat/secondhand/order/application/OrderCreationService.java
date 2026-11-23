@@ -39,6 +39,7 @@ import java.util.UUID;
 public class OrderCreationService {
 
     private final OrderRepository orderRepository;
+    private final com.serhat.secondhand.core.config.PlatformFeeConfig platformFeeConfig;
     private final AddressService addressService;
     private final OrderLogService orderLog;
 
@@ -94,6 +95,7 @@ public class OrderCreationService {
             order.setCouponDiscount(amounts.couponDiscount());
             order.setCouponCode(amounts.couponDiscount().signum() > 0 && pricing != null ? pricing.getCouponCode() : null);
             order.setDiscountTotal(amounts.campaignDiscount().add(amounts.couponDiscount()));
+            applyShipping(order);
 
             Order savedOrder = orderRepository.save(order);
             orderLog.logOrderCreated(orderNumber, savedOrder.getId(), user.getEmail());
@@ -101,6 +103,29 @@ public class OrderCreationService {
         }
 
         return Result.success(orders);
+    }
+
+    /**
+     * Cargo orders pay the flat fee; at or above the free-shipping threshold (goods after coupon) the buyer pays nothing and
+     * the same amount becomes the seller's charge. Safe meetup has no shipping at all. Fixed here, never recomputed.
+     */
+    private void applyShipping(Order order) {
+        BigDecimal zero = BigDecimal.ZERO.setScale(2);
+        order.setShippingFee(zero);
+        order.setSellerShippingCharge(zero);
+        if (order.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
+            return;
+        }
+        com.serhat.secondhand.core.config.PlatformFeeConfig.Shipping shipping = platformFeeConfig.getShipping();
+        BigDecimal fee = scale(shipping.getFee());
+        BigDecimal threshold = shipping.getFreeThreshold();
+        boolean free = threshold != null && threshold.signum() > 0
+                && order.getTotalAmount() != null && order.getTotalAmount().compareTo(threshold) >= 0;
+        if (free) {
+            order.setSellerShippingCharge(fee);
+        } else {
+            order.setShippingFee(fee);
+        }
     }
 
     // Sums the priced lines of one seller; a line missing from pricing falls back to the listing price.

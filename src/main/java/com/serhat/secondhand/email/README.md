@@ -15,6 +15,7 @@ Renders localized Thymeleaf emails (`EmailTemplateService`) and delivers them to
 
 ## Redis, Caching & Kafka
 - Kafka topic: `mail.dispatch.v1` (`MailDispatchKafkaEvent`), consumer group `mail-dispatch-consumers`.
+- `EmailType.PLATFORM_ANNOUNCEMENT` (`PlatformAnnouncementEmailEvent`, template `notifications/platform-announcement.html`) is the one-time commission/shipping announcement queued by the core admin endpoint; it links to `EmailLinks.FEES`. The sale notification (`OrderEmailListener`) shows listed price, coupon share, commission and net payout.
 - Unread counts feed `UserBadgeService`, which is not cached, so read and delete changes show up on the next badge fetch.
 
 ## API (`EmailController`, `/api/v1/emails`)

@@ -27,7 +27,7 @@ public interface EscrowRepository extends JpaRepository<Escrow, Long> {
 
     List<Escrow> findByOrderItemIdIn(List<Long> orderItemIds);
 
-    @Query("select coalesce(sum(e.amount + e.platformSubsidy), 0) from Escrow e where e.seller.id = :sellerId and e.status = :status and e.order is not null and e.orderItem is not null and (e.buyer is null or e.buyer.id != :sellerId)")
+    @Query("select coalesce(sum(e.amount + e.platformSubsidy - e.commissionAmount - e.shippingDeduction), 0) from Escrow e where e.seller.id = :sellerId and e.status = :status and e.order is not null and e.orderItem is not null and (e.buyer is null or e.buyer.id != :sellerId)")
     BigDecimal sumAmountBySellerIdAndStatus(@Param("sellerId") Long sellerId, @Param("status") PaymentStatus status);
 
     List<Escrow> findByOrderIdInAndSellerIdAndStatus(List<Long> orderIds, Long sellerId, PaymentStatus status);

@@ -291,7 +291,7 @@ const MyListingsPage = () => {
                         type="button"
                         onClick={applyBulk}
                         disabled={saving}
-                        className="inline-flex items-center justify-center gap-1.5 rounded text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-8 px-3"
+                        className="inline-flex items-center justify-center gap-1.5 rounded text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-text-inverse hover:bg-primary-hover h-8 px-3"
                       >
                         {t("apply")}
                       </button>

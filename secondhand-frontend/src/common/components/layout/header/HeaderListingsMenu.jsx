@@ -2,33 +2,39 @@ import { useTranslation } from 'react-i18next';
 import { Package } from 'lucide-react';
 import HeaderDropdownPanel from './HeaderDropdownPanel.jsx';
 import HeaderMenuItem from './HeaderMenuItem.jsx';
+import { headerIconTriggerClass } from './HeaderIconButton.jsx';
 import { getListingsMenuItems } from './headerMenuConfig.js';
 import { useSellerToShipCount } from '../../../../order/hooks/useSellerToShipCount.js';
 
-const AttentionMark = ({ label }) => (
+const StatusPill = ({ value, label }) => (
   <span
-    className="ml-auto flex h-5 min-w-5 items-center justify-center rounded bg-status-error px-1 text-xs font-semibold text-white"
+    className="ml-auto inline-flex items-center rounded-sm border border-status-error-border bg-status-error-bg px-1.5 py-0.5 text-xs font-medium tabular-nums text-status-error-text"
     aria-label={label}
   >
-    !
+    {value}
   </span>
 );
 
 const HeaderListingsMenu = ({ isOpen, onToggle, onClose, orderCount }) => {
   const { t } = useTranslation();
   const toShipCount = useSellerToShipCount();
-  const toShipLabel = t('orders_to_ship_count', { defaultValue: '{{count}} sipariş kargolanmayı bekliyor', count: toShipCount });
+  const toShipLabel = t('orders_to_ship_count', {
+    defaultValue: '{{count}} sipariş kargolanmayı bekliyor',
+    count: toShipCount
+  });
   const needsAttention = orderCount > 0 || toShipCount > 0;
 
   const rightContentFor = (key) => {
-    if (key === 'orders' && orderCount > 0) return <AttentionMark label={t('orders_awaiting_confirmation', 'Onay bekleyen teslimatın var')} />;
-    if (key === 'sold' && toShipCount > 0) {
+    if (key === 'orders' && orderCount > 0) {
       return (
-        <span className="ml-auto flex items-center gap-1.5 text-xs font-medium text-status-error">
-          {toShipCount}
-          <AttentionMark label={toShipLabel} />
-        </span>
+        <StatusPill
+          value={orderCount > 99 ? '99+' : orderCount}
+          label={t('orders_awaiting_confirmation', 'Onay bekleyen teslimatın var')}
+        />
       );
+    }
+    if (key === 'sold' && toShipCount > 0) {
+      return <StatusPill value={toShipCount > 99 ? '99+' : toShipCount} label={toShipLabel} />;
     }
     return null;
   };
@@ -38,16 +44,18 @@ const HeaderListingsMenu = ({ isOpen, onToggle, onClose, orderCount }) => {
       <button
         type="button"
         onClick={onToggle}
-        aria-label={toShipCount > 0 ? toShipLabel : t('orders', 'Siparişler')}
-        className="group relative p-2.5 text-text-secondary hover:text-text-primary transition-colors duration-150 ease-in-out rounded hover:bg-background-tertiary"
+        title={t('orders', 'Siparişler')}
+        aria-label={toShipCount > 0 ? toShipLabel : t('orders_menu', 'Siparişler ve ilanlar menüsü')}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className={headerIconTriggerClass(isOpen)}
       >
-        <Package className="w-5 h-5 stroke-1.5" strokeWidth={1.5} />
-        {toShipCount > 0 ? (
-          <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-status-error text-xs font-semibold leading-none text-white">
-            !
-          </span>
-        ) : needsAttention && (
-          <span className="absolute top-1 right-1 flex h-2.5 w-2.5 bg-status-error rounded-full border border-white shadow-sm" />
+        <Package className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+        {needsAttention && (
+          <span
+            className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full border border-background-primary bg-status-error"
+            aria-hidden
+          />
         )}
       </button>
       {isOpen && (

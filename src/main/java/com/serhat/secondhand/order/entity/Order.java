@@ -92,6 +92,20 @@ public class Order {
     @Column(name = "discount_total", precision = 10, scale = 2)
     private BigDecimal discountTotal;
 
+    /** Flat cargo fee paid by the buyer to the system account; not part of totalAmount (goods only). */
+    @Column(name = "shipping_fee", nullable = false, precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal shippingFee = BigDecimal.ZERO;
+
+    /** Shipping fee the seller carries when the buyer got free shipping; fixed at order time, zero otherwise. */
+    @Column(name = "seller_shipping_charge", nullable = false, precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal sellerShippingCharge = BigDecimal.ZERO;
+
+    @Column(name = "shipping_fee_refunded", nullable = false)
+    @Builder.Default
+    private boolean shippingFeeRefunded = false;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "currency", length = 10, nullable = false)
     @Builder.Default

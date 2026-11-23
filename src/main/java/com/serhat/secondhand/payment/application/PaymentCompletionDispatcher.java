@@ -26,6 +26,10 @@ public class PaymentCompletionDispatcher {
 
     public void dispatch(Payment payment) {
         PaymentTransactionType txnType = payment.getTransactionType();
+        if (txnType == PaymentTransactionType.SHIPPING_FEE) {
+            // The order confirmation already tells the buyer about the cargo fee; no separate receipt.
+            return;
+        }
         boolean isSaleOrEscrowRelease = txnType == PaymentTransactionType.ITEM_PURCHASE
                 || txnType == PaymentTransactionType.ITEM_SALE;
 
@@ -71,14 +75,13 @@ public class PaymentCompletionDispatcher {
         }
     }
 
-    /** The seller receipt shows the payout: the buyer-paid amount plus the platform-funded coupon share of the item. */
+    /** The seller receipt shows the payout: the buyer-paid amount plus the platform coupon share minus the commission. */
     private BigDecimal sellerReceivedAmount(Payment payment, BigDecimal paidAmount) {
         if (paidAmount == null || payment.getOrderItemId() == null) {
             return paidAmount;
         }
         return escrowRepository.findByOrderItemId(payment.getOrderItemId())
-                .map(Escrow::getPlatformSubsidy)
-                .map(paidAmount::add)
+                .map(escrow -> paidAmount.add(escrow.getPlatformSubsidy()).subtract(escrow.getCommissionAmount()).subtract(escrow.getShippingDeduction()))
                 .orElse(paidAmount);
     }
 }

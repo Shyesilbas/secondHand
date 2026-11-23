@@ -56,3 +56,5 @@ Generated from code; the hook files are the source of truth.
 - Selection maps id to status and survives page changes; "select all my listings" loads every match of the current filter from `listingService.getMyListingSelection`. A selection belongs to the filter it was made under and reads as empty once the filter changes.
 - An action is enabled only when every selected listing allows its transition, because `listingService.updateBatchStatus` is all or nothing on the backend.
 - "Update status" in the header opens `MyListingsStatusModal`: reactivate every inactive listing or deactivate every active one (`listingService.reactivateAllInactive` / `deactivateAllActive`), independent of select mode and paging.
+
+- **Listing fee scope:** `GenericListingForm` and `useListingActions` read `requiresListingFee` from `enums.listingFeeConfig.feeBearingTypes`; fee-bearing types (vehicle, real estate) take the fee payment step, other types publish directly via `listingService.publishListing` and show an info note linking to the fees page.

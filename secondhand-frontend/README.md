@@ -74,6 +74,7 @@ secondhand-frontend/
 │   ├── ewallet/        # Digital wallet balance, limits, and transactions
 │   ├── favoritelist/   # Named custom collections and favorite lists management
 │   ├── favorites/      # Favorite listings and saved lists
+│   ├── fees/           # Public commission and fees page
 │   ├── follow/         # Seller following system
 │   ├── forum/          # Community discussion forum
 │   ├── home/           # Landing page and platform about views

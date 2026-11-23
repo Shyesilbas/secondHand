@@ -94,7 +94,8 @@ class OrderQueryServiceTest {
         when(orderRepository.findByIdForSeller(1L, 10L)).thenReturn(Optional.of(order));
         when(viewPolicy.sellerView(order, 10L)).thenReturn(
                 new OrderViewPolicy.View(Set.of(OrderAction.SHIP), null, null, null, null));
-        when(escrowService.sumSellerAmountsByOrderIds(List.of(1L), 10L)).thenReturn(Map.of(1L, new BigDecimal("80.00")));
+        when(escrowService.sellerEarningsByOrderIds(List.of(1L), 10L)).thenReturn(Map.of(1L,
+                new EscrowService.SellerEarnings(new BigDecimal("86.00"), new BigDecimal("6.00"), BigDecimal.ZERO, new BigDecimal("80.00"))));
         OrderDto mapped = OrderDto.builder()
                 .totalAmount(new BigDecimal("250.00"))
                 .subtotal(new BigDecimal("270.00"))
@@ -107,6 +108,8 @@ class OrderQueryServiceTest {
         OrderDto dto = service.getSellerOrderById(1L, 10L).getData();
 
         assertThat(dto.getSellerTotal()).isEqualByComparingTo("80.00");
+        assertThat(dto.getSellerGross()).isEqualByComparingTo("86.00");
+        assertThat(dto.getSellerCommission()).isEqualByComparingTo("6.00");
         assertThat(dto.getAllowedActions()).containsExactly(OrderAction.SHIP);
         assertThat(dto.getTotalAmount()).isNull();
         assertThat(dto.getSubtotal()).isNull();

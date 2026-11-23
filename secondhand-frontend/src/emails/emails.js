@@ -20,6 +20,7 @@ export const EMAIL_TYPES = {
   AGREEMENT_UPDATED: 'AGREEMENT_UPDATED',
   AGREEMENT_UPDATE: 'AGREEMENT_UPDATE',
   SYSTEM: 'SYSTEM',
+  PLATFORM_ANNOUNCEMENT: 'PLATFORM_ANNOUNCEMENT',
   ORDER_CONFIRMATION: 'ORDER_CONFIRMATION',
   ORDER_CANCELLED: 'ORDER_CANCELLED',
   ORDER_COMPLETED: 'ORDER_COMPLETED',
@@ -74,6 +75,7 @@ export const EMAIL_TYPE_LABELS = {
   [EMAIL_TYPES.AGREEMENT_UPDATED]: 'Sözleşme Güncellemesi',
   [EMAIL_TYPES.AGREEMENT_UPDATE]: 'Sözleşme Güncellemesi',
   [EMAIL_TYPES.SYSTEM]: 'Sistem Bildirimi',
+  [EMAIL_TYPES.PLATFORM_ANNOUNCEMENT]: 'Platform Duyurusu',
   [EMAIL_TYPES.ORDER_CONFIRMATION]: 'Sipariş Onayı',
   [EMAIL_TYPES.ORDER_CANCELLED]: 'Sipariş İptali',
   [EMAIL_TYPES.ORDER_COMPLETED]: 'Sipariş Tamamlandı',
@@ -116,6 +118,7 @@ export const EMAIL_TYPE_BADGE_VARIANTS = {
   [EMAIL_TYPES.AGREEMENT_UPDATED]: 'neutral',
   [EMAIL_TYPES.AGREEMENT_UPDATE]: 'neutral',
   [EMAIL_TYPES.SYSTEM]: 'neutral',
+  [EMAIL_TYPES.PLATFORM_ANNOUNCEMENT]: 'info',
   [EMAIL_TYPES.ORDER_CONFIRMATION]: 'success',
   [EMAIL_TYPES.ORDER_CANCELLED]: 'error',
   [EMAIL_TYPES.ORDER_COMPLETED]: 'success',
@@ -158,6 +161,7 @@ export const EMAIL_TYPE_DOT_COLORS = {
   [EMAIL_TYPES.AGREEMENT_UPDATED]: 'bg-text-muted',
   [EMAIL_TYPES.AGREEMENT_UPDATE]: 'bg-text-muted',
   [EMAIL_TYPES.SYSTEM]: 'bg-text-muted',
+  [EMAIL_TYPES.PLATFORM_ANNOUNCEMENT]: 'bg-primary',
   [EMAIL_TYPES.ORDER_CONFIRMATION]: 'bg-status-success',
   [EMAIL_TYPES.ORDER_CANCELLED]: 'bg-status-error',
   [EMAIL_TYPES.ORDER_COMPLETED]: 'bg-status-success',
@@ -259,23 +263,63 @@ export const extractEmailPreview = (rawContent, subject = '') => {
 
 // The backend layout (templates/emails/layout.html) owns the email design. The inbox flattens the outer
 // email chrome so the message flows directly inside the unified scrolling reading pane without nested boxes.
-const EDITORIAL_EMAIL_STYLE = `
+// Keep padding on body only (never on html): padding on html inflates documentElement.scrollHeight beyond
+// body.scrollHeight, which traps wheel/trackpad scrolling inside the iframe.
+// Color scheme is passed explicitly rather than relying on prefers-color-scheme inside the iframe (Safari ignores parent color-scheme).
+const EMAIL_PALETTES = {
+  light: {
+    scheme: 'light',
+    bg: '#FFFFFF',
+    text: '#334155',
+    heading: '#0F172A',
+    muted: '#586578',
+    border: '#E2E8F0',
+    accent: '#0F766E',
+  },
+  dark: {
+    scheme: 'dark',
+    bg: '#0F172A',
+    text: '#CBD5E1',
+    heading: '#F8FAFC',
+    muted: '#94A3B8',
+    border: '#334155',
+    accent: '#2DD4BF',
+  },
+};
+
+const buildEditorialEmailStyle = (colorScheme = 'light') => {
+  const p = EMAIL_PALETTES[colorScheme === 'dark' ? 'dark' : 'light'];
+  return `
 <style id="sh-editorial-email-style">
-  html, body {
+  :root {
+    color-scheme: ${p.scheme};
+  }
+  html {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: ${p.bg} !important;
+  }
+  body {
+    display: flow-root !important;
     height: auto !important;
     min-height: 0 !important;
     margin: 0 !important;
     padding: 16px 24px 36px !important;
-    background-color: #FFFFFF !important;
+    background-color: ${p.bg} !important;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 15px;
     line-height: 1.6;
-    color: #44403C;
+    color: ${p.text} !important;
+  }
+  img, table {
+    max-width: 100% !important;
   }
   .container {
     max-width: 640px;
     margin: 0 !important;
-    background-color: #FFFFFF !important;
+    background-color: ${p.bg} !important;
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
@@ -287,22 +331,37 @@ const EDITORIAL_EMAIL_STYLE = `
   .content {
     padding: 0 !important;
   }
+  .greeting, .section-title, .note-title, .listing-title, .signoff strong,
+  table.details td.value, table.details tr.total td, .code-value {
+    color: ${p.heading} !important;
+  }
+  .muted, .amount-label, .code-label, .code-hint, .signoff, .footer, table.details td.label {
+    color: ${p.muted} !important;
+  }
+  .amount-value, .listing-price {
+    color: ${p.accent} !important;
+  }
+  table.details td, .signoff, .code-value {
+    border-color: ${p.border} !important;
+  }
   .footer {
-    border-top: 1px solid #E7E5E4 !important;
+    border-top: 1px solid ${p.border} !important;
     margin-top: 20px !important;
     padding: 14px 0 0 !important;
     background-color: transparent !important;
   }
   @media (max-width: 640px) {
-    html, body {
+    body {
       padding: 16px 20px 32px !important;
     }
   }
 </style>
 `;
+};
 
-export const getProcessedContent = (content) => {
+export const getProcessedContent = (content, { colorScheme = 'light' } = {}) => {
   if (!content) return '';
+  const editorialStyle = buildEditorialEmailStyle(colorScheme);
   const formatted = formatMonetaryAmountsInText(String(content));
   const htmlEndIdx = formatted.toLowerCase().indexOf('</html>');
   const bounded = htmlEndIdx !== -1 ? formatted.slice(0, htmlEndIdx + 7) : formatted;
@@ -311,18 +370,18 @@ export const getProcessedContent = (content) => {
   const isHtml = /<[a-z][\s\S]*>/i.test(cleaned);
   if (isHtml) {
     if (/<\/head>/i.test(cleaned)) {
-      return cleaned.replace(/<\/head>/i, `<base target="_top">${EDITORIAL_EMAIL_STYLE}</head>`);
+      return cleaned.replace(/<\/head>/i, `<base target="_top">${editorialStyle}</head>`);
     }
     if (/<head>/i.test(cleaned)) {
-      return cleaned.replace(/<head>/i, `<head><base target="_top">${EDITORIAL_EMAIL_STYLE}`);
+      return cleaned.replace(/<head>/i, `<head><base target="_top">${editorialStyle}`);
     }
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><base target="_top">${EDITORIAL_EMAIL_STYLE}</head><body><div class="container"><div class="content">${cleaned}</div></div></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><base target="_top">${editorialStyle}</head><body><div class="container"><div class="content">${cleaned}</div></div></body></html>`;
   }
 
   const escaped = cleaned
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><base target="_top">${EDITORIAL_EMAIL_STYLE}</head><body><div class="container"><div class="content" style="white-space: pre-wrap; word-wrap: break-word;">${escaped}</div></div></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><base target="_top">${editorialStyle}</head><body><div class="container"><div class="content" style="white-space: pre-wrap; word-wrap: break-word;">${escaped}</div></div></body></html>`;
 };
 

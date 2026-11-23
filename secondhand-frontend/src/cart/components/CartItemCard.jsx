@@ -1,10 +1,11 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Clock, Minus, Plus, Star, X } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
 import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
 import { useReservationTimer } from '../hooks/useReservationTimer.js';
 import { ROUTES } from '../../common/constants/routes.js';
+import { Button } from '../../common/components/ui/index.js';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { hasCampaignOnLine } from '../utils/pricedLines.js';
 
@@ -54,6 +55,7 @@ const CartItemCard = ({
   const isReservationExpiring = Boolean(timeRemaining && timeRemaining.minutes < 3);
 
   const detailUrl = item.listing?.id ? ROUTES.LISTING_DETAIL(item.listing.id) : null;
+  const itemTitle = item.listing?.title || t('item', 'ürün');
 
   return (
     <article className="p-4 sm:p-5">
@@ -61,11 +63,11 @@ const CartItemCard = ({
         {/* Thumbnail */}
         <div className="relative shrink-0">
           {detailUrl ? (
-            <Link to={detailUrl} className="block overflow-hidden rounded bg-background-tertiary">
+            <Link to={detailUrl} className="block overflow-hidden rounded bg-secondary-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
               {item.listing?.imageUrl ? (
                 <img
                   src={item.listing.imageUrl}
-                  alt={item.listing.title || ''}
+                  alt={itemTitle}
                   loading="lazy"
                   className="h-20 w-20 object-cover sm:h-24 sm:w-24"
                   onError={(e) => {
@@ -75,23 +77,23 @@ const CartItemCard = ({
                 />
               ) : null}
               <div
-                className={`h-20 w-20 items-center justify-center bg-background-tertiary sm:h-24 sm:w-24 ${item.listing?.imageUrl ? 'hidden' : 'flex'
+                className={`h-20 w-20 items-center justify-center bg-secondary-200 sm:h-24 sm:w-24 ${item.listing?.imageUrl ? 'hidden' : 'flex'
                   }`}
               >
-                <span className="text-sm font-semibold text-text-muted">
+                <span className="text-sm font-semibold text-text-tertiary">
                   {item.listing?.title?.charAt(0)?.toUpperCase() || '?'}
                 </span>
               </div>
             </Link>
           ) : (
-            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded bg-background-tertiary flex items-center justify-center text-sm font-semibold text-text-muted">
+            <div className="flex h-20 w-20 items-center justify-center rounded bg-secondary-200 text-sm font-semibold text-text-tertiary sm:h-24 sm:w-24">
               {item.listing?.title?.charAt(0)?.toUpperCase() || '?'}
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="min-w-0 flex-1 flex flex-col justify-between">
+        <div className="flex min-w-0 flex-1 flex-col justify-between">
           <div>
             {/* Title & Remove */}
             <div className="flex items-start justify-between gap-3">
@@ -99,12 +101,12 @@ const CartItemCard = ({
                 {detailUrl ? (
                   <Link
                     to={detailUrl}
-                    className="text-sm font-semibold leading-snug text-text-primary hover:text-text-link line-clamp-2"
+                    className="line-clamp-2 text-sm font-semibold leading-snug text-text-primary transition-colors duration-150 hover:text-text-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                   >
                     {item.listing?.title}
                   </Link>
                 ) : (
-                  <p className="text-sm font-semibold leading-snug text-text-primary line-clamp-2">
+                  <p className="line-clamp-2 text-sm font-semibold leading-snug text-text-primary">
                     {item.listing?.title}
                   </p>
                 )}
@@ -114,7 +116,7 @@ const CartItemCard = ({
                   {sellerId ? (
                     <Link
                       to={ROUTES.USER_PROFILE(sellerId)}
-                      className="font-medium text-text-secondary hover:text-text-primary hover:underline"
+                      className="font-medium text-text-secondary transition-colors duration-150 hover:text-text-primary hover:underline"
                     >
                       {sellerName}
                     </Link>
@@ -124,7 +126,7 @@ const CartItemCard = ({
 
                   {sellerTotalReviews > 0 && (
                     <span className="inline-flex items-center gap-0.5 tabular-nums text-text-tertiary">
-                      <span>·</span>
+                      <span aria-hidden>·</span>
                       <Star className="h-3.5 w-3.5 fill-status-warning text-status-warning" aria-hidden strokeWidth={1.5} />
                       <span className="font-medium text-text-secondary">{sellerRating.toFixed(1)}</span>
                       <span>({sellerTotalReviews})</span>
@@ -138,49 +140,59 @@ const CartItemCard = ({
               </div>
 
               {/* Remove button */}
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={handleRemove}
                 disabled={isRemoving}
-                className="shrink-0 rounded p-1.5 text-text-muted transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-40"
-                aria-label={t("remove")}
-                title={t("remove")}
+                className="shrink-0"
+                aria-label={t('remove_item_from_cart', {
+                  defaultValue: '{{title}} ürününü sepetten kaldır',
+                  title: itemTitle
+                })}
               >
-                <X className="h-4 w-4" strokeWidth={1.5} />
-              </button>
+                <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              </Button>
             </div>
 
-            {/* Badges and Reservation status */}
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-              {isLowStock && (
-                <span className="text-status-warning-text">
-                  {t("stock", "Stok: ")} {Number(maxStock)}
-                </span>
-              )}
-
-              {isReserved && !isExpired && (
-                <span
-                  className={`inline-flex items-center gap-1 font-medium tabular-nums ${isReservationExpiring ? 'text-status-error' : 'text-text-secondary'
-                    }`}
-                >
-                  <Clock className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                  <span>
-                    {timeRemaining?.minutes ?? 0}:{(timeRemaining?.seconds ?? 0).toString().padStart(2, '0')}
+            {/* Status row: dot + text */}
+            {(isLowStock || isReserved || hasCampaign) && (
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                {isLowStock && (
+                  <span className="inline-flex items-center gap-1.5 text-status-warning-text">
+                    <span className="h-1.5 w-1.5 rounded-full bg-status-warning" aria-hidden />
+                    <span>{t('stock', 'Stok')}: {Number(maxStock)}</span>
                   </span>
-                  <span className="text-text-muted">{t("reserved", "rezerve")}</span>
-                </span>
-              )}
+                )}
 
-              {isReserved && isExpired && (
-                <span className="text-status-error font-medium">{t("expired", "Süre doldu")}</span>
-              )}
+                {isReserved && !isExpired && (
+                  <span
+                    className={`inline-flex items-center gap-1 font-medium tabular-nums ${isReservationExpiring ? 'text-status-error-text' : 'text-text-secondary'
+                      }`}
+                  >
+                    <Clock className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                    <span>
+                      {timeRemaining?.minutes ?? 0}:{(timeRemaining?.seconds ?? 0).toString().padStart(2, '0')}
+                    </span>
+                    <span className="font-normal text-text-tertiary">{t('reserved', 'rezerve')}</span>
+                  </span>
+                )}
 
-              {hasCampaign && (
-                <span className="text-status-success-text">
-                  {shownLine?.appliedCampaign?.name || t("campaign", "Kampanya")}
-                </span>
-              )}
-            </div>
+                {isReserved && isExpired && (
+                  <span className="inline-flex items-center gap-1.5 font-medium text-status-error-text">
+                    <span className="h-1.5 w-1.5 rounded-full bg-status-error" aria-hidden />
+                    <span>{t('expired', 'Süre doldu')}</span>
+                  </span>
+                )}
+
+                {hasCampaign && (
+                  <span className="inline-flex items-center gap-1.5 text-status-success-text">
+                    <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
+                    <span>{shownLine?.appliedCampaign?.name || t('campaign', 'Kampanya')}</span>
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Bottom Bar: Stepper & Price */}
@@ -191,12 +203,15 @@ const CartItemCard = ({
                 type="button"
                 onClick={() => handleQuantityChange(item.quantity - 1)}
                 disabled={isUpdating || item.quantity <= 1}
-                className="h-9 w-9 flex items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-30 disabled:hover:bg-transparent"
-                aria-label={t("decrease_quantity", "Adet azalt")}
+                className="flex h-9 w-9 items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-40 disabled:hover:bg-transparent"
+                aria-label={t('decrease_item_quantity', {
+                  defaultValue: '{{title}} adedini azalt',
+                  title: itemTitle
+                })}
               >
-                <Minus className="h-3.5 w-3.5" strokeWidth={1.5} />
+                <Minus className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
               </button>
-              <span className="min-w-8 text-center text-sm font-semibold tabular-nums text-text-primary px-1">
+              <span className="min-w-8 px-1 text-center text-sm font-semibold tabular-nums text-text-primary">
                 {item.quantity}
               </span>
               <button
@@ -206,10 +221,13 @@ const CartItemCard = ({
                   isUpdating ||
                   (maxStock != null && Number.isFinite(Number(maxStock)) && item.quantity >= Number(maxStock))
                 }
-                className="h-9 w-9 flex items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-30 disabled:hover:bg-transparent"
-                aria-label={t("increase_quantity", "Adet artır")}
+                className="flex h-9 w-9 items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-40 disabled:hover:bg-transparent"
+                aria-label={t('increase_item_quantity', {
+                  defaultValue: '{{title}} adedini artır',
+                  title: itemTitle
+                })}
               >
-                <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
+                <Plus className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
               </button>
             </div>
 
@@ -218,16 +236,16 @@ const CartItemCard = ({
               <div className={`text-right transition-opacity duration-150 ${isRepricing ? 'opacity-50' : ''}`} aria-busy={isRepricing}>
                 <div className="flex items-baseline justify-end gap-1.5">
                   {hasCampaign && (
-                    <span className="text-sm text-text-tertiary line-through tabular-nums">
+                    <span className="text-sm tabular-nums text-text-tertiary line-through">
                       {formatCurrency(shownLine.originalLineTotal, currency)}
                     </span>
                   )}
-                  <span className="text-base sm:text-lg font-semibold tabular-nums text-text-price">
+                  <span className="text-base font-semibold tabular-nums tracking-tight text-text-price sm:text-lg">
                     {formatCurrency(shownLine.lineSubtotal, currency)}
                   </span>
                 </div>
                 {shownLine.quantity > 1 && (
-                  <p className="mt-0.5 text-sm text-text-tertiary tabular-nums">
+                  <p className="mt-0.5 text-sm tabular-nums text-text-tertiary">
                     {shownLine.quantity} × {formatCurrency(shownLine.campaignUnitPrice, currency)}
                   </p>
                 )}
@@ -243,7 +261,7 @@ const CartItemCard = ({
           {/* Notes if present */}
           {item.notes && (
             <div className="mt-3 rounded bg-background-secondary p-2.5 text-sm text-text-secondary">
-              <span className="font-semibold text-text-primary mr-1">{t("note", "Not:")}</span>
+              <span className="mr-1 font-semibold text-text-primary">{t('note', 'Not:')}</span>
               {item.notes}
             </div>
           )}

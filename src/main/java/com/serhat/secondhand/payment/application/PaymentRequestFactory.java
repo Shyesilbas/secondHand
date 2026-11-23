@@ -22,7 +22,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class PaymentRequestFactory {
+
+    private final com.serhat.secondhand.user.application.SystemAccountService systemAccountService;
 
     public List<PaymentRequest> buildOrderPaymentRequests(User user, Order order,
                                                           CheckoutRequest request, PricingResultDto pricing, String orderNumber, java.util.UUID orderExternalId) {
@@ -33,6 +36,32 @@ public class PaymentRequestFactory {
                     return buildOrderPaymentRequestForItem(user, item, itemAmount.amount(), request, idempotencyKey, orderExternalId);
                 })
                 .collect(Collectors.toList());
+    }
+
+    /** Flat cargo fee, buyer to system account; no order item, so it never touches escrow. */
+    public PaymentRequest buildShippingFeePaymentRequest(User user, Order order, CheckoutRequest request,
+                                                         String orderNumber, java.util.UUID orderExternalId) {
+        Listing listing = order.getOrderItems().get(0).getListing();
+        return PaymentRequest.builder()
+                .fromUserId(user.getId())
+                .toUserId(systemAccountService.getSystemUser().getId())
+                .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
+                .receiverSurname(PaymentProcessingConstants.PAYMENT_RECEIVER_SURNAME)
+                .listingId(listing.getId())
+                .orderItemId(null)
+                .listingTitle(listing.getTitle())
+                .listingNo(listing.getListingNo())
+                .amount(order.getShippingFee())
+                .currency(order.getCurrency() != null ? order.getCurrency().name() : "TRY")
+                .providerName(request.getProviderName() != null ? request.getProviderName() : "EWALLET")
+                .transactionType(PaymentTransactionType.SHIPPING_FEE)
+                .paymentDirection(PaymentDirection.OUTGOING)
+                .verificationCode(request.getPaymentVerificationCode())
+                .agreementsAccepted(request.isAgreementsAccepted())
+                .acceptedAgreementIds(request.getAcceptedAgreementIds())
+                .idempotencyKey(orderNumber + "-shipping")
+                .orderId(orderExternalId)
+                .build();
     }
 
     public PaymentRequest buildOrderPaymentRequestForItem(User user, OrderItem item,
@@ -67,9 +96,9 @@ public class PaymentRequestFactory {
                                                       ShowcasePaymentRequest request, BigDecimal totalCost) {
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
-                .toUserId(null)
-                .receiverName(user.getName())
-                .receiverSurname(user.getSurname())
+                .toUserId(systemAccountService.getSystemUser().getId())
+                .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
+                .receiverSurname(PaymentProcessingConstants.PAYMENT_RECEIVER_SURNAME)
                 .listingId(listing.getId())
                 .orderItemId(null)
                 .listingTitle(listing.getTitle())
@@ -90,9 +119,9 @@ public class PaymentRequestFactory {
                                                          ShowcasePaymentRequest request, BigDecimal additionalCost) {
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
-                .toUserId(null)
-                .receiverName(user.getName())
-                .receiverSurname(user.getSurname())
+                .toUserId(systemAccountService.getSystemUser().getId())
+                .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
+                .receiverSurname(PaymentProcessingConstants.PAYMENT_RECEIVER_SURNAME)
                 .listingId(listing.getId())
                 .orderItemId(null)
                 .listingTitle(listing.getTitle())
@@ -112,8 +141,8 @@ public class PaymentRequestFactory {
     public PaymentRequest buildMembershipPaymentRequest(User user, BigDecimal amount, String providerName, String idempotencyKey, com.serhat.secondhand.user.dto.MembershipUpgradeRequest request) {
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
-                .toUserId(null)
-                .receiverName("SYSTEM")
+                .toUserId(systemAccountService.getSystemUser().getId())
+                .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
                 .receiverSurname("MEMBERSHIP")
                 .listingId(null)
                 .orderItemId(null)

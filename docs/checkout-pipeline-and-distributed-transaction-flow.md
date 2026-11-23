@@ -100,6 +100,8 @@ Pazaryerinde bir alıcı, tek bir sepette birden fazla farklı satıcının ür�
 
 ---
 
+Kargo siparişlerinde `OrderCreationService` sabit kargo ücretini (`app.platform.shipping-fee`) her satıcı siparişine yazar; `OrderPaymentService` ürün ödemelerinden sonra ayrı bir `SHIPPING_FEE` ödemesi ekler ve checkout sonuç toplamı bu ücreti içerir. `Order.totalAmount` yalnızca ürün tutarıdır. Sipariş ürün tutarı (kupon sonrası) `app.platform.shipping.free-threshold` değerine ulaşıyorsa alıcıdan kargo ücreti alınmaz, bedel satıcıya yazılır (`orders.seller_shipping_charge`). Komisyon checkout'ta değil, escrow `hold` anında kalem bazında hesaplanır.
+
 ## 3. Dağıtık Transaction Güvenliği ve Rollback Protokolü
 
 Checkout işlemi dağıtık kaynakları (PostgreSQL, Redis in-memory rezervasyonları, harici payment provider'ları ve Kafka) aynı anda yönettiği için çift yönlü compensation (*two-way compensation*) mimarisi uygulanır:

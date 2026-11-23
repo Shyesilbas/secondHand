@@ -9,7 +9,7 @@ const InlineText = ({ text, isUser }) => {
     <>
       {parts.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={index} className={`font-semibold ${isUser ? 'text-white' : 'text-text-primary'}`}>{part.slice(2, -2)}</strong>;
+          return <strong key={index} className={`font-semibold ${isUser ? 'text-text-inverse' : 'text-text-primary'}`}>{part.slice(2, -2)}</strong>;
         }
         if (part.startsWith('`') && part.endsWith('`')) {
           return <code key={index} className="rounded-sm border border-border bg-background-tertiary px-1.5 py-0.5 font-mono text-xs text-text-primary">{part.slice(1, -1)}</code>;
@@ -21,7 +21,7 @@ const InlineText = ({ text, isUser }) => {
 };
 
 const FormattedText = ({ text, isUser, size = 'sm' }) => (
-  <div className={`space-y-1.5 ${size === 'base' ? 'text-base' : 'text-sm'} leading-relaxed ${isUser ? 'text-white' : 'text-text-primary'}`}>
+  <div className={`space-y-1.5 ${size === 'base' ? 'text-base' : 'text-sm'} leading-relaxed ${isUser ? 'text-text-inverse' : 'text-text-primary'}`}>
     {text.split('\n').map((line, i) => {
       const trimmed = line.trim();
       if (!trimmed) return <div key={i} className="h-1.5" />;
@@ -30,7 +30,7 @@ const FormattedText = ({ text, isUser, size = 'sm' }) => (
       if (/^[-•*] /.test(trimmed)) {
         return (
           <div key={i} className="flex items-start gap-2 py-0.5 pl-1">
-            <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${isUser ? 'bg-white' : 'bg-text-secondary'}`} />
+            <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${isUser ? 'bg-text-inverse' : 'bg-text-secondary'}`} />
             <span className="flex-1"><InlineText text={trimmed.slice(2)} isUser={isUser} /></span>
           </div>
         );
@@ -39,14 +39,14 @@ const FormattedText = ({ text, isUser, size = 'sm' }) => (
       if (numMatch) {
         return (
           <div key={i} className="flex items-start gap-2 py-0.5 pl-1">
-            <span className={`shrink-0 tabular-nums ${isUser ? 'text-white/80' : 'text-text-tertiary'}`}>{numMatch[1]}.</span>
+            <span className={`shrink-0 tabular-nums ${isUser ? 'text-text-inverse opacity-80' : 'text-text-tertiary'}`}>{numMatch[1]}.</span>
             <span className="flex-1"><InlineText text={numMatch[2]} isUser={isUser} /></span>
           </div>
         );
       }
       if (trimmed.startsWith('> ')) {
         return (
-          <blockquote key={i} className={`my-1 border-l-2 py-1 pl-3 ${isUser ? 'border-white/40 text-white/90' : 'border-border text-text-secondary'}`}>
+          <blockquote key={i} className={`my-1 border-l-2 py-1 pl-3 ${isUser ? 'border-current opacity-85' : 'border-border text-text-secondary'}`}>
             <InlineText text={trimmed.slice(2)} isUser={isUser} />
           </blockquote>
         );

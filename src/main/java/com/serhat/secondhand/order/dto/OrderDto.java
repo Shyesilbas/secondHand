@@ -32,6 +32,11 @@ public class OrderDto {
     private String buyerEmail;
     private OrderStatus status;
     private BigDecimal totalAmount;
+    /** Flat cargo fee on top of totalAmount; zero for safe meetup. */
+    private BigDecimal shippingFee;
+    private boolean shippingFeeRefunded;
+    /** Shipping fee the seller carries when the buyer got free shipping; buyer views hide it. */
+    private BigDecimal sellerShippingCharge;
     private BigDecimal subtotal;
     private BigDecimal campaignDiscount;
     private String couponCode;
@@ -81,4 +86,10 @@ public class OrderDto {
     private LocalDateTime meetupCodeExpiresAt;
     /** Seller view only: this seller's share (escrow amounts held or released, excluding cancelled/refunded lines). */
     private BigDecimal sellerTotal;
+    /** Seller view only: buyer-paid amount plus platform coupon share, before commission. */
+    private BigDecimal sellerGross;
+    /** Seller view only: commission withheld from sellerGross; zero when none applies. */
+    private BigDecimal sellerCommission;
+    /** Seller view only: shipping fee withheld from the payout on free-shipping orders; zero otherwise. */
+    private BigDecimal sellerShippingDeduction;
 }

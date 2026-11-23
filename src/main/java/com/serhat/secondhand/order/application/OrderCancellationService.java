@@ -159,6 +159,9 @@ public class OrderCancellationService {
     private Result<OrderDto> finalizeCancellation(Order order, User user, OrderCancellationCause cause, String reason) {
         boolean allItemsCancelled = compensationPlanner.areAllItemsCancelled(order);
         order.applyCancellation(allItemsCancelled);
+        if (allItemsCancelled) {
+            escrowService.refundShippingFee(order);
+        }
 
         Result<Order> savedOrderResult = compensationPersistenceService.saveOrderAndReload(order);
         if (savedOrderResult.isError()) {

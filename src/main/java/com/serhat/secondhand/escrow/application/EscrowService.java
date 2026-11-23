@@ -44,6 +44,8 @@ public class EscrowService {
     private final ApplicationEventPublisher eventPublisher;
     private final com.serhat.secondhand.escrow.outbox.EscrowOutboxService escrowOutboxService;
     private final PaymentStatsCacheEvictor paymentStatsCacheEvictor;
+    private final CommissionService commissionService;
+    private final com.serhat.secondhand.user.application.SystemAccountService systemAccountService;
 
     @Transactional
     public Result<Void> hold(Order order) {
@@ -61,12 +63,17 @@ public class EscrowService {
                 .map(e -> e.getOrderItem().getId())
                 .collect(Collectors.toSet());
         Map<Long, BigDecimal> escrowAmountsByItemId = calculateEscrowAmounts(order);
+        Map<Long, BigDecimal> shippingDeductions = allocateShippingDeduction(order, escrowAmountsByItemId);
 
         for (OrderItem item : order.getOrderItems()) {
             if (existingItemIds.contains(item.getId())) continue;
 
             User seller = item.getListing().getSeller();
             User buyer = order.getUser();
+
+            BigDecimal heldAmount = escrowAmountsByItemId.getOrDefault(item.getId(), item.getTotalPrice());
+            BigDecimal subsidy = item.getCouponDiscount() != null ? item.getCouponDiscount() : BigDecimal.ZERO;
+            CommissionService.Commission commission = commissionService.quote(item, order, heldAmount.add(subsidy));
 
             // 1. Create Escrow Record (Internal tracking)
             Escrow escrow = Escrow.builder()
@@ -75,7 +82,10 @@ public class EscrowService {
                     .buyer(buyer)
                     .seller(seller)
                     .amount(escrowAmountsByItemId.getOrDefault(item.getId(), item.getTotalPrice()))
-                    .platformSubsidy(item.getCouponDiscount() != null ? item.getCouponDiscount() : BigDecimal.ZERO)
+                    .platformSubsidy(subsidy)
+                    .commissionAmount(commission.amount())
+                    .commissionRate(commission.ratePercent())
+                    .shippingDeduction(shippingDeductions.getOrDefault(item.getId(), BigDecimal.ZERO))
                     .status(PaymentStatus.ESCROW)
                     .listingId(item.getListing().getId())
                     .listingTitle(item.getListing().getTitle())
@@ -92,6 +102,42 @@ public class EscrowService {
         }
 
         return Result.success();
+    }
+
+    /**
+     * Splits the seller-carried shipping fee of a free-shipping order across its items by seller gross; the last
+     * item takes the rounding remainder. A deduction never exceeds an item's gross after commission.
+     */
+    private Map<Long, BigDecimal> allocateShippingDeduction(Order order, Map<Long, BigDecimal> escrowAmountsByItemId) {
+        BigDecimal charge = order.getSellerShippingCharge();
+        if (charge == null || charge.signum() <= 0 || order.getOrderItems().isEmpty()) {
+            return Map.of();
+        }
+        Map<Long, BigDecimal> grossByItem = new java.util.LinkedHashMap<>();
+        BigDecimal totalGross = BigDecimal.ZERO;
+        for (OrderItem item : order.getOrderItems()) {
+            BigDecimal paid = escrowAmountsByItemId.getOrDefault(item.getId(), item.getTotalPrice());
+            BigDecimal subsidy = item.getCouponDiscount() != null ? item.getCouponDiscount() : BigDecimal.ZERO;
+            BigDecimal gross = paid.add(subsidy);
+            grossByItem.put(item.getId(), gross);
+            totalGross = totalGross.add(gross);
+        }
+        if (totalGross.signum() <= 0) {
+            return Map.of();
+        }
+        Map<Long, BigDecimal> result = new java.util.LinkedHashMap<>();
+        BigDecimal allocated = BigDecimal.ZERO;
+        int index = 0;
+        for (Map.Entry<Long, BigDecimal> entry : grossByItem.entrySet()) {
+            boolean last = ++index == grossByItem.size();
+            BigDecimal share = last
+                    ? charge.subtract(allocated)
+                    : charge.multiply(entry.getValue()).divide(totalGross, 2, java.math.RoundingMode.HALF_UP);
+            share = share.max(BigDecimal.ZERO).min(entry.getValue());
+            allocated = allocated.add(share);
+            result.put(entry.getKey(), share);
+        }
+        return result;
     }
 
     @Transactional(readOnly = true)
@@ -118,6 +164,23 @@ public class EscrowService {
      * of lines that are held or released. Cancelled and refunded lines are excluded.
      */
     @Transactional(readOnly = true)
+    /** One seller's money on one order: gross (buyer paid + coupon share), commission, shipping deduction, payout (gross - both). */
+    public record SellerEarnings(BigDecimal gross, BigDecimal commission, BigDecimal shippingDeduction, BigDecimal payout) {}
+
+    public Map<Long, SellerEarnings> sellerEarningsByOrderIds(List<Long> orderIds, Long sellerId) {
+        if (orderIds == null || orderIds.isEmpty()) return Map.of();
+
+        return escrowRepository.findByOrderIdInAndSellerIdAndStatusIn(orderIds, sellerId, SELLER_EARNING_STATUSES).stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.getOrder().getId(),
+                        Collectors.collectingAndThen(Collectors.toList(), list -> new SellerEarnings(
+                                list.stream().map(Escrow::sellerGross).reduce(BigDecimal.ZERO, BigDecimal::add),
+                                list.stream().map(Escrow::getCommissionAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
+                                list.stream().map(Escrow::getShippingDeduction).reduce(BigDecimal.ZERO, BigDecimal::add),
+                                list.stream().map(Escrow::sellerPayout).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                ));
+    }
+
     public Map<Long, BigDecimal> sumSellerAmountsByOrderIds(List<Long> orderIds, Long sellerId) {
         if (orderIds == null || orderIds.isEmpty()) return Map.of();
 
@@ -230,6 +293,26 @@ public class EscrowService {
             }
         }
         return Result.success();
+    }
+
+    /**
+     * Gives the cargo fee back to the buyer when every item of the order was cancelled; the system account
+     * gives it up. Runs once per order (shippingFeeRefunded); the caller persists the order.
+     */
+    public void refundShippingFee(Order order) {
+        BigDecimal fee = order.getShippingFee();
+        if (fee == null || fee.signum() <= 0 || order.isShippingFeeRefunded()) {
+            return;
+        }
+        OrderItem anyItem = order.getOrderItems().get(0);
+        var listing = anyItem.getListing();
+        walletService.creditToUser(order.getUser(), fee,
+                new WalletTransactionReference(listing.getId(), listing.getTitle(), listing.getListingNo(),
+                        order.getExternalId(), null),
+                PaymentTransactionKind.REFUND, null);
+        walletService.creditWalletQuietly(systemAccountService.getSystemUser(), fee.negate());
+        order.setShippingFeeRefunded(true);
+        log.info("Refunded shipping fee {} to buyer for order {}", fee, order.getOrderNumber());
     }
 
     // Links the refund payment to its order (Order.externalId, as payment.order_id stores it) and order line.

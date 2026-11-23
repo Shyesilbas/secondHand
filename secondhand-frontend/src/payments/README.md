@@ -48,3 +48,5 @@ Generated from code; the hook files are the source of truth.
   3. `OtpDigitInputGroup` auto-focuses the first digit and auto-advances on keystroke.
   4. `OtpSuggestionBanner` detects newly arrived OTP codes via in-app email polling and offers a one-click "Fill Code" action.
   5. The 6-digit code is submitted with the payment payload (`verificationCode`).
+
+- **Receipt (`PaymentReceiptModal`):** seller-side sale rows show sale amount, commission (with rate), shipping deduction and net payout from `sellerBreakdown`; other rows show the single amount.

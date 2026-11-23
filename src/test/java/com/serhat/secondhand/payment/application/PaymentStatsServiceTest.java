@@ -99,4 +99,41 @@ class PaymentStatsServiceTest {
         assertThat(sellerView.amount()).isEqualByComparingTo("100.00");
         assertThat(buyerView.amount()).isEqualByComparingTo("95.00");
     }
+
+    @Test
+    void myPayments_sellerRowCarriesTheSaleCommissionAndShippingBreakdown() {
+        PaymentRepository paymentRepository = mock(PaymentRepository.class);
+        EscrowRepository escrowRepository = mock(EscrowRepository.class);
+        PaymentMapper mapper = mock(PaymentMapper.class);
+        PaymentContextResolver resolver = mock(PaymentContextResolver.class);
+        PaymentStatsService service = new PaymentStatsService(paymentRepository, escrowRepository, mapper, resolver);
+
+        User buyer = User.builder().id(1L).build();
+        User seller = User.builder().id(2L).build();
+        Payment payment = Payment.builder().fromUser(buyer).toUser(seller).orderItemId(55L)
+                .amount(new BigDecimal("1200.00")).build();
+        PaymentDto base = new PaymentDto(null, "b", "s", new BigDecimal("1200.00"), "TRY", "EWALLET", null,
+                PaymentTransactionType.ITEM_SALE, PaymentDirection.INCOMING, null, null, null, null,
+                PaymentStatus.ESCROW, true, null);
+        when(mapper.toDto(payment)).thenReturn(base);
+        when(resolver.resolve(any(), any())).thenReturn(new PaymentContextResolver.InferredPaymentData(
+                PaymentDirection.INCOMING, PaymentTransactionType.ITEM_SALE));
+        OrderItem item = new OrderItem();
+        item.setId(55L);
+        Escrow escrow = Escrow.builder().orderItem(item).amount(new BigDecimal("1200.00"))
+                .commissionAmount(new BigDecimal("72.00")).commissionRate(new BigDecimal("6"))
+                .shippingDeduction(new BigDecimal("49.90")).build();
+        when(escrowRepository.findByOrderItemIdIn(List.of(55L))).thenReturn(List.of(escrow));
+        when(paymentRepository.findByUserId(eq(2L), any())).thenReturn(new PageImpl<>(List.of(payment)));
+        when(paymentRepository.findByUserId(eq(1L), any())).thenReturn(new PageImpl<>(List.of(payment)));
+
+        PaymentDto sellerView = service.getMyPayments(2L, PageRequest.of(0, 10), null).getContent().get(0);
+        PaymentDto buyerView = service.getMyPayments(1L, PageRequest.of(0, 10), null).getContent().get(0);
+
+        assertThat(sellerView.amount()).isEqualByComparingTo("1078.10");
+        assertThat(sellerView.sellerBreakdown().saleAmount()).isEqualByComparingTo("1200.00");
+        assertThat(sellerView.sellerBreakdown().commission()).isEqualByComparingTo("72.00");
+        assertThat(sellerView.sellerBreakdown().shippingDeduction()).isEqualByComparingTo("49.90");
+        assertThat(buyerView.sellerBreakdown()).isNull();
+    }
 }

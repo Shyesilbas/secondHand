@@ -115,7 +115,7 @@ const AuraChatWidgetPanel = () => {
         <div className={`absolute bottom-16 right-0 origin-bottom-right transition duration-150 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
             <div className="w-96 max-w-[calc(100vw-1.5rem)] h-[min(580px,calc(100vh-6rem))] rounded border border-border bg-background-primary shadow-md overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-3.5 border-b border-border-light bg-primary text-white">
+                <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-3.5 border-b border-border-light bg-background-dark text-white">
                     <button type="button" onClick={() => {
                         setIsOpen(false);
                         const uiContext = buildAuraWidgetUiContext();
@@ -151,7 +151,7 @@ const AuraChatWidgetPanel = () => {
                                     {isUser ? <UserRound className="h-3.5 w-3.5" strokeWidth={1.5} /> : <Bot className="h-3.5 w-3.5" strokeWidth={1.5} />}
                                 </div>
                                 <div className={`min-w-0 max-w-[88%] ${isUser ? 'text-right' : ''}`}>
-                                    <div className={`inline-block rounded px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-white rounded-tr-sm' : 'border border-border bg-background-tertiary text-text-primary rounded-tl-sm'}`}>
+                                    <div className={`inline-block rounded px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-text-inverse rounded-tr-sm' : 'border border-border bg-background-tertiary text-text-primary rounded-tl-sm'}`}>
                                         {m.typing ? <div className="flex items-center gap-1.5 py-0.5">
                                             <span className="w-1.5 h-1.5 rounded-full bg-primary" style={{
                                                 animationDelay: '0ms'

@@ -62,7 +62,7 @@ const MessageBubble = memo(({
       <div
         className={`group relative max-w-xs rounded px-4 py-2.5 lg:max-w-md ${
           isOwnMessage
-            ? 'rounded-br-sm bg-primary text-white'
+            ? 'rounded-br-sm bg-primary text-text-inverse'
             : 'rounded-bl-sm border border-border-light bg-background-primary text-text-primary shadow-sm'
         }`}
       >

@@ -41,7 +41,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
             case 'ACCEPTED':
                 return {
                     bg: 'bg-background-tertiary border-border',
-                    badge: 'bg-primary-hover text-white',
+                    badge: 'bg-primary-hover text-text-inverse',
                     icon: <FiCheckCircle className="w-4 h-4 text-text-primary" strokeWidth={1.5} />,
                     label: t("status_accepted")
                 };
@@ -62,7 +62,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
             default:
                 return {
                     bg: 'bg-background-tertiary border-border',
-                    badge: 'bg-primary text-white',
+                    badge: 'bg-primary text-text-inverse',
                     icon: <FiTag className="w-4 h-4 text-text-primary" strokeWidth={1.5} />,
                     label: t("status_pending")
                 };

@@ -108,7 +108,7 @@ const PayListingFeePage = () => {
                         actions={(
                             <div className="flex items-center gap-2 bg-background-primary border border-border p-2.5 rounded self-start md:self-auto">
                                 <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-primary font-semibold text-xs">
-                                    <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-white text-xs">1</span>
+                                    <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-text-inverse text-xs">1</span>
                                     <span>{t("select", "Select")}</span>
                                 </div>
                                 <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

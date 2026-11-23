@@ -627,7 +627,7 @@ def database():
     s = [H2N("Veritabanı: PostgreSQL, Flyway ve Şema")]
     s.append(para(
         f"Kalıcı veri PostgreSQL'dedir ve şema yalnızca Flyway migration'larıyla değişir. Kaynakta {len(MIG)} migration dosyası bulunur "
-        f"(V1 baseline'dan V61'e, aralarda boşluklar var); toplam {MIG_TABLES} tablo oluşturulur ve {MIG_INDEXES} indeks tanımlanır. "
+        f"(V1 baseline'dan V63'e, aralarda boşluklar var); toplam {MIG_TABLES} tablo oluşturulur ve {MIG_INDEXES} indeks tanımlanır. "
         f"JPA tarafında {N_ENTITIES} entity vardır."))
     s.append(Paragraph("Migration kuralları", H3))
     s += bullets([
@@ -674,9 +674,10 @@ def database():
             ["V39 - V46", "İlan öznitelikleri, araç/elektronik/emlak/kitap/giyim tip kuralları ve katalogları, sentetik ilan tablosu"],
             ["V47 - V53", "Fiyat kolonu genişletme, teklif ödeme süresi, şikayet moderasyonu (V49-V50), sipariş kalemi kampanya atfı, ödeme-sipariş bağı"],
             ["V54 - V59", "Sohbet moderasyonu/engelleme/gizleme, mesaj silme izi, kullanıcı adı trigram indeksi, yabancı anahtar ve bileşik indeksler"],
-            ["V60 - V61", "Kupon kullanımında indirim tutarı anlık görüntüsü (tasarruf toplamı), platform kuponu için kalem kupon payı ve escrow platform_subsidy"]]
+            ["V60 - V61", "Kupon kullanımında indirim tutarı anlık görüntüsü (tasarruf toplamı), platform kuponu için kalem kupon payı ve escrow platform_subsidy"],
+            ["V62 - V63", "Sistem kullanıcısı ve cüzdanı, escrow komisyon kolonları, sipariş kargo ücreti kolonları; ücretsiz kargoda satıcı kargo kesintisi kolonları"]]
     s += table(rows, [3.4, 13.0])
-    check(any(p.name.startswith("V61") for p in MIG), "Migration kronolojisi guncel degil (V61 yok)")
+    check(any(p.name.startswith("V63") for p in MIG), "Migration kronolojisi guncel degil (V63 yok)")
     return s
 
 
@@ -1143,6 +1144,17 @@ def escrow_section():
         "Sipariş kargolanmadan iptal edilirse ya da iade onaylanırsa para satıcıdan çekilmez (çünkü satıcıya henüz geçmemiştir). Escrow CANCELLED/REFUNDED yapıldıktan "
         "sonra tutar aynı transaction'da, senkron olarak alıcı cüzdanına REFUND türüyle yazılır. Bu yolda Kafka ve outbox kullanılmaz. İade kaydı payments tablosunda "
         "siparişe ve sipariş kalemine bağlanır."))
+    s.append(Paragraph("Platform ücretleri ve sistem hesabı", H3))
+    s.append(para(
+        "Komisyon, kargo ve ilan ücretleri seed'li bir sistem kullanıcısının cüzdanına yazılır; platform kupon payı da bu cüzdandan karşılanır ve bakiye negatife düşebilir. "
+        "Komisyon kalem bazında satıcı brütü (alıcının ödediği + kupon payı) üzerinden hesaplanır ve serbest bırakmada payoutdan düşülür."))
+    s += table([
+        ["Ücret", "Kural", "Kaynak"],
+        ["Satış komisyonu", "Dilimli oran (%7 / %6 / %4); araç ve emlak hariç; yürürlük tarihinden sonraki siparişlere", "app.platform.commission"],
+        ["Kargo ücreti", f"Kargolu siparişte satıcı siparişi başına sabit {cfg('app.platform.shipping.fee')} TL, alıcı öder", "app.platform.shipping.fee"],
+        ["Ücretsiz kargo", f"Satıcı siparişi ürün tutarı (kupon sonrası) {cfg('app.platform.shipping.free-threshold')} TL ve üzeriyse alıcı ödemez, satıcının payından düşülür", "app.platform.shipping.free-threshold"],
+        ["İlan ücreti", f"Yalnızca araç ve emlak; {LISTING_FEE} TL + vergi", "app.listing.creation.fee"],
+    ], [3.0, 9.0, 4.4])
     s.append(Paragraph("Uç durumlar", H3))
     s += table([
         ["Senaryo", "Risk", "Önlem"],
@@ -1426,7 +1438,7 @@ def chat_notification_section():
     s.append(para(
         f"{len(EMAIL_TYPES)} e-posta türü tanımlıdır. Gerçek SMTP gönderimi yoktur: e-postalar uygulama içi gelen kutusuna yazılır. Dağıtım mail.dispatch.v1 topic'i "
         "üzerinden mail-dispatch-consumers grubuyla yapılır ve topic'in DLT'si vardır. Mail üreticisi outbox kullanmaz; broker erişilemezse mail kaybolur."))
-    check(len(NOTIF_TYPES) == 24 and len(EMAIL_TYPES) == 45, "Bildirim/e-posta tur sayisi degisti")
+    check(len(NOTIF_TYPES) == 24 and len(EMAIL_TYPES) == 46, "Bildirim/e-posta tur sayisi degisti")
     return s
 
 

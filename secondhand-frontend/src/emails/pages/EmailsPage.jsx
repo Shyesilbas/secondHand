@@ -264,7 +264,6 @@ const EmailsPage = ({ embedded = false }) => {
       <EmailListToolbar
         embedded={embedded}
         onBack={() => navigate(-1)}
-        globalUnreadCount={globalUnreadCount}
         filterType={filterType}
         onSelectFolder={handleFolderSelect}
         searchTerm={searchTerm}
@@ -281,10 +280,10 @@ const EmailsPage = ({ embedded = false }) => {
         disableDeleteAll={isDeleting || filteredEmails.length === 0}
       />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-12">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-12 lg:grid-rows-1">
         <section
           aria-label={selectedFolderLabel}
-          className={`min-h-0 w-full min-w-0 flex-col border-border-light bg-background-primary lg:col-span-5 lg:border-r xl:col-span-4 ${
+          className={`h-full min-h-0 w-full min-w-0 flex-col overflow-hidden border-border-light bg-background-primary lg:col-span-5 lg:border-r xl:col-span-4 ${
             selectedEmail ? 'hidden lg:flex' : 'flex'
           }`}
         >

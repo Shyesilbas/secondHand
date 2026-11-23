@@ -16,9 +16,12 @@
         <table class="details" role="presentation">
             <tr><td class="label">İlan fiyatı (sizin belirlediğiniz)</td><td class="value" th:text="${listingAmount}">0,00 TRY</td></tr>
             <tr><td class="label">Alıcının ödediği</td><td class="value" th:text="${paidAmount}">0,00 TRY</td></tr>
+            <tr th:if="${!#strings.isEmpty(couponDiscountAmount)}"><td class="label">Platform kupon payı</td><td class="value" th:text="'+' + ${couponDiscountAmount}">0,00 TRY</td></tr>
+            <tr th:if="${!#strings.isEmpty(commissionAmount)}"><td class="label">Komisyon<span th:if="${!#strings.isEmpty(commissionRate)}" th:text="' (%' + ${commissionRate} + ')'"></span></td><td class="value" th:text="'-' + ${commissionAmount}">0,00 TRY</td></tr>
+            <tr th:if="${!#strings.isEmpty(shippingDeductionAmount)}"><td class="label">Kargo kesintisi (ücretsiz kargo)</td><td class="value" th:text="'-' + ${shippingDeductionAmount}">0,00 TRY</td></tr>
             <tr><td class="label">Size aktarılan</td><td class="value" th:text="${payoutAmount}">0,00 TRY</td></tr>
         </table>
-        <div class="note">
+        <div class="note" th:if="${!#strings.isEmpty(couponDiscountAmount)}">
             <div class="note-title">Kupon kullanıldı<span th:if="${!#strings.isEmpty(couponCode)}" th:text="' (' + ${couponCode} + ')'"></span></div>
             <div>Alıcı platform kuponu kullandı ve <span th:text="${couponDiscountAmount}">0,00 TRY</span> indirim aldı. Bu indirim platform tarafından karşılanır; alıcının ödediği tutara eklenerek size aktarılır, kazancınız azalmaz.</div>
         </div>

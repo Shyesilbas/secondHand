@@ -34,6 +34,9 @@ public class EscrowOutboxService {
                     escrow.getBuyer() != null ? escrow.getBuyer().getId() : null,
                     escrow.getBuyer() != null ? escrow.getBuyer().getEmail() : null,
                     escrow.sellerPayout(),
+                    escrow.getPlatformSubsidy(),
+                    escrow.getCommissionAmount(),
+                    escrow.getShippingDeduction(),
                     "TRY",
                     LocalDateTime.now()
             );

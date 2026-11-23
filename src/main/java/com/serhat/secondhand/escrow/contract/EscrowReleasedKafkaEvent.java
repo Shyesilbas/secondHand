@@ -14,7 +14,12 @@ public record EscrowReleasedKafkaEvent(
         String sellerEmail,
         Long buyerId,
         String buyerEmail,
+        /** Seller payout: buyer-paid amount plus platform coupon share minus commission. */
         BigDecimal amount,
+        BigDecimal platformSubsidy,
+        BigDecimal commissionAmount,
+        /** Seller-carried shipping fee share withheld from the payout and credited to the system account. */
+        BigDecimal shippingDeduction,
         String currency,
         LocalDateTime releasedAt
 ) {}

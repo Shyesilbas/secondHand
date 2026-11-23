@@ -113,8 +113,8 @@ public class PaymentStatsService {
             paymentsPage = paymentRepository.findByUserId(userId, pageable);
         }
 
-        Map<Long, BigDecimal> subsidyByItemId = platformSubsidiesForSellerRows(paymentsPage.getContent(), userId);
-        return paymentsPage.map(payment -> mapPaymentToDtoOptimized(payment, userId, subsidyByItemId));
+        Map<Long, Escrow> escrowByItemId = escrowsForSellerRows(paymentsPage.getContent(), userId);
+        return paymentsPage.map(payment -> mapPaymentToDtoOptimized(payment, userId, escrowByItemId));
     }
 
     private boolean isFilterPresent(PaymentFilter filter) {
@@ -137,7 +137,7 @@ public class PaymentStatsService {
                 && (payment.getFromUser() == null || !viewerId.equals(payment.getFromUser().getId()));
     }
 
-    private Map<Long, BigDecimal> platformSubsidiesForSellerRows(List<Payment> payments, Long viewerId) {
+    private Map<Long, Escrow> escrowsForSellerRows(List<Payment> payments, Long viewerId) {
         List<Long> itemIds = payments.stream()
                 .filter(p -> isSellerSideItemPayment(p, viewerId))
                 .map(Payment::getOrderItemId)
@@ -147,17 +147,29 @@ public class PaymentStatsService {
             return Map.of();
         }
         return escrowRepository.findByOrderItemIdIn(itemIds).stream()
-                .filter(e -> e.getPlatformSubsidy() != null && e.getPlatformSubsidy().signum() > 0)
-                .collect(Collectors.toMap(e -> e.getOrderItem().getId(), Escrow::getPlatformSubsidy, BigDecimal::add));
+                .collect(Collectors.toMap(e -> e.getOrderItem().getId(), e -> e, (a, b) -> a));
     }
 
-    private PaymentDto mapPaymentToDtoOptimized(Payment payment, Long currentUserId, Map<Long, BigDecimal> subsidyByItemId) {
+    private static PaymentDto.SellerBreakdown sellerBreakdown(BigDecimal paid, Escrow escrow) {
+        BigDecimal subsidy = escrow.getPlatformSubsidy() != null ? escrow.getPlatformSubsidy() : BigDecimal.ZERO;
+        BigDecimal commission = escrow.getCommissionAmount() != null ? escrow.getCommissionAmount() : BigDecimal.ZERO;
+        BigDecimal shipping = escrow.getShippingDeduction() != null ? escrow.getShippingDeduction() : BigDecimal.ZERO;
+        BigDecimal sale = paid.add(subsidy);
+        return new PaymentDto.SellerBreakdown(paid, subsidy, sale, commission, escrow.getCommissionRate(), shipping,
+                sale.subtract(commission).subtract(shipping));
+    }
+
+    private PaymentDto mapPaymentToDtoOptimized(Payment payment, Long currentUserId, Map<Long, Escrow> escrowByItemId) {
         PaymentDto baseDto = paymentMapper.toDto(payment);
         var inferredData = paymentContextResolver.resolve(payment, currentUserId);
-        // The seller sees what is paid out (buyer-paid amount plus platform coupon share); the buyer sees what was paid.
+        // The seller sees what is paid out (buyer-paid amount plus platform coupon share minus commission); the buyer sees what was paid.
         BigDecimal amount = baseDto.amount();
-        if (amount != null && isSellerSideItemPayment(payment, currentUserId)) {
-            amount = amount.add(subsidyByItemId.getOrDefault(payment.getOrderItemId(), BigDecimal.ZERO));
+        PaymentDto.SellerBreakdown breakdown = null;
+        Escrow escrow = amount != null && isSellerSideItemPayment(payment, currentUserId)
+                ? escrowByItemId.get(payment.getOrderItemId()) : null;
+        if (escrow != null) {
+            breakdown = sellerBreakdown(amount, escrow);
+            amount = breakdown.netAmount();
         }
 
         return new PaymentDto(
@@ -176,6 +188,7 @@ public class PaymentStatsService {
                 baseDto.processedAt(),
                 baseDto.status(),
                 baseDto.isSuccess(),
-                baseDto.description());
+                baseDto.description(),
+                breakdown);
     }
 }

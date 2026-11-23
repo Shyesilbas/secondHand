@@ -47,7 +47,10 @@ class EscrowPlatformCouponSubsidyTest {
     private final EscrowService service = new EscrowService(escrowRepository, mock(PaymentRepository.class),
             walletService, mock(ApplicationEventPublisher.class),
             new EscrowOutboxService(outboxRepository, new ObjectMapper().findAndRegisterModules()),
-            mock(PaymentStatsCacheEvictor.class));
+            mock(PaymentStatsCacheEvictor.class),
+            new com.serhat.secondhand.escrow.application.CommissionService(
+                    com.serhat.secondhand.testsupport.PlatformFeeTestConfig.standard(java.time.LocalDateTime.of(2026, 12, 1, 0, 0))),
+            mock(com.serhat.secondhand.user.application.SystemAccountService.class));
 
     private final User buyer = User.builder().id(1L).build();
     private final User seller = User.builder().id(2L).build();

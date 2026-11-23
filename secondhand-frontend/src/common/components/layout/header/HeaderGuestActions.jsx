@@ -4,24 +4,18 @@ import { ROUTES } from '../../../constants/routes.js';
 import { buttonClasses } from '../../ui/Button.jsx';
 
 const HeaderGuestActions = () => {
- const { t } = useTranslation();
+  const { t } = useTranslation();
 
- return (
- <div className="flex items-center gap-2">
- <Link
- to={ROUTES.LOGIN}
- className="rounded px-3 py-2 text-sm font-medium text-text-secondary transition-colors duration-150 hover:bg-background-tertiary hover:text-text-primary"
- >
- {t('common.login')}
- </Link>
- <Link
- to={ROUTES.REGISTER}
- className={buttonClasses('primary', 'sm')}
- >
- {t('common.register')}
- </Link>
- </div>
- );
+  return (
+    <div className="flex items-center gap-1.5">
+      <Link to={ROUTES.LOGIN} className={buttonClasses('ghost', 'sm')}>
+        {t('common.login', 'Giriş Yap')}
+      </Link>
+      <Link to={ROUTES.REGISTER} className={buttonClasses('primary', 'sm')}>
+        {t('common.register', 'Kayıt Ol')}
+      </Link>
+    </div>
+  );
 };
 
 export default HeaderGuestActions;

@@ -45,7 +45,7 @@ const DraftListingsList = ({
  className={`group relative rounded p-4 cursor-pointer transition-colors duration-150 border ${
  isSelected
  ? 'border-accent-teal bg-background-primary ring-1 ring-accent-teal'
- : 'border-border bg-white hover:border-secondary-400'
+ : 'border-border bg-background-primary hover:border-secondary-400'
  }`}
  >
  <div className="flex items-start gap-3.5">
@@ -59,7 +59,7 @@ const DraftListingsList = ({
  }`}
  >
  {isSelected && (
- <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+ <svg className="h-3 w-3 text-text-inverse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
  </svg>
  )}

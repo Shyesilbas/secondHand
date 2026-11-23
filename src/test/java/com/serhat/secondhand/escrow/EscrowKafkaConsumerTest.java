@@ -23,12 +23,15 @@ class EscrowKafkaConsumerTest {
 
     private final IEWalletService walletService = mock(IEWalletService.class);
     private final UserRepository userRepository = mock(UserRepository.class);
+    private final com.serhat.secondhand.user.application.SystemAccountService systemAccountService =
+            mock(com.serhat.secondhand.user.application.SystemAccountService.class);
     private final ProcessedKafkaEventRepository processedEvents = mock(ProcessedKafkaEventRepository.class);
-    private final EscrowKafkaConsumer consumer = new EscrowKafkaConsumer(walletService, userRepository, processedEvents);
+    private final EscrowKafkaConsumer consumer = new EscrowKafkaConsumer(walletService, userRepository,
+            systemAccountService, processedEvents);
 
     private static EscrowReleasedKafkaEvent event(Long escrowId, Long sellerId, BigDecimal amount) {
         return new EscrowReleasedKafkaEvent(escrowId, 10L, "ORD-1", 20L, null, sellerId, "s@x.com",
-                30L, "b@x.com", amount, "TRY", LocalDateTime.now());
+                30L, "b@x.com", amount, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "TRY", LocalDateTime.now());
     }
 
     @Test
@@ -67,11 +70,66 @@ class EscrowKafkaConsumerTest {
     }
 
     @Test
+    void commissionAndCouponSubsidyAreSettledOnTheSystemAccountAsOneSignedMove() {
+        User seller = new User();
+        seller.setId(5L);
+        User system = new User();
+        system.setId(99L);
+        when(systemAccountService.getSystemUser()).thenReturn(system);
+        when(processedEvents.insertIfNotExists(anyString(), anyString())).thenReturn(1);
+        when(userRepository.findById(5L)).thenReturn(Optional.of(seller));
+
+        // commission 70.00 kept, coupon subsidy 20.00 funded: net +50.00 for the system account
+        consumer.consumeEscrowReleased(new EscrowReleasedKafkaEvent(1L, 10L, "ORD-1", 20L, null, 5L, "s@x.com",
+                30L, "b@x.com", new BigDecimal("930.00"), new BigDecimal("20.00"), new BigDecimal("70.00"), BigDecimal.ZERO,
+                "TRY", LocalDateTime.now()));
+
+        verify(walletService).creditWalletQuietly(seller, new BigDecimal("930.00"));
+        verify(walletService).creditWalletQuietly(system, new BigDecimal("50.00"));
+    }
+
+    @Test
+    void subsidyLargerThanCommissionDebitsTheSystemAccount() {
+        User seller = new User();
+        seller.setId(5L);
+        User system = new User();
+        system.setId(99L);
+        when(systemAccountService.getSystemUser()).thenReturn(system);
+        when(processedEvents.insertIfNotExists(anyString(), anyString())).thenReturn(1);
+        when(userRepository.findById(5L)).thenReturn(Optional.of(seller));
+
+        consumer.consumeEscrowReleased(new EscrowReleasedKafkaEvent(1L, 10L, "ORD-1", 20L, null, 5L, "s@x.com",
+                30L, "b@x.com", new BigDecimal("100.00"), new BigDecimal("30.00"), BigDecimal.ZERO, BigDecimal.ZERO,
+                "TRY", LocalDateTime.now()));
+
+        verify(walletService).creditWalletQuietly(system, new BigDecimal("-30.00"));
+    }
+
+    @Test
     void duplicateEvent_isSkipped() {
         when(processedEvents.insertIfNotExists(anyString(), anyString())).thenReturn(0);
 
         consumer.consumeEscrowReleased(event(1L, 5L, new BigDecimal("100.00")));
 
         verifyNoInteractions(walletService, userRepository);
+    }
+
+    @Test
+    void shippingDeductionIsCreditedToTheSystemAccountWithTheCommission() {
+        User seller = new User();
+        seller.setId(5L);
+        User system = new User();
+        system.setId(99L);
+        when(systemAccountService.getSystemUser()).thenReturn(system);
+        when(processedEvents.insertIfNotExists(anyString(), anyString())).thenReturn(1);
+        when(userRepository.findById(5L)).thenReturn(Optional.of(seller));
+
+        // payout already net of commission 70.00 and shipping 49.90; system keeps both
+        consumer.consumeEscrowReleased(new EscrowReleasedKafkaEvent(1L, 10L, "ORD-1", 20L, null, 5L, "s@x.com",
+                30L, "b@x.com", new BigDecimal("880.10"), BigDecimal.ZERO, new BigDecimal("70.00"),
+                new BigDecimal("49.90"), "TRY", LocalDateTime.now()));
+
+        verify(walletService).creditWalletQuietly(seller, new BigDecimal("880.10"));
+        verify(walletService).creditWalletQuietly(system, new BigDecimal("119.90"));
     }
 }

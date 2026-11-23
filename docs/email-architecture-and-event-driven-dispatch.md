@@ -126,6 +126,8 @@ emailEventPublisher.publish(new PaymentSuccessEmailEvent(user, subject, data));
 
 ---
 
+`EmailType.PLATFORM_ANNOUNCEMENT` (`PlatformAnnouncementEmailEvent`, şablon `notifications/platform-announcement.html`) komisyon ve kargo duyurusudur; yalnızca admin endpoint'i `CommissionAnnouncementService` üzerinden tek seferlik kuyruğa alır ve aynı konuyu almış kullanıcıları atlar. Satıcı satış bildirimi (`OrderEmailListener`) ilan fiyatı, kupon payı, komisyon ve net tutarı gösterir.
+
 ## 5. Güvenilirlik ve İdempotency Matrisi
 
 | Senaryo | Eski Davranış | Yeni Davranış |
