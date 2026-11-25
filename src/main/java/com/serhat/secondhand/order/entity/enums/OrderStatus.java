@@ -29,7 +29,7 @@ public enum OrderStatus {
      * Statuses in which an order can be cancelled by the buyer.
      */
     public static final Set<OrderStatus> CANCELLABLE_STATUSES =
-            EnumSet.of(PENDING, CONFIRMED, MEETUP_PENDING);
+            EnumSet.of(PENDING, CONFIRMED, MEETUP_PENDING, VERIFICATION_LOCKED);
 
     /**
      * Statuses in which an order can be refunded by the buyer.

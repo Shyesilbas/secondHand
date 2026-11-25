@@ -25,5 +25,6 @@ Orchestrates the Aura conversational assistant (Google Gemini), semantic multi-v
 
 ## API
 - **Agent & Chat (`/api/v1/ai`):** `POST /agents/query` (`AgentController`, `AgentQueryResponse`) · `POST /chats` · `POST /chats/new` · `DELETE /chats/history` (`AiChatController`).
-- **Memory (`/api/v1/ai/memories`):** `GET /` · `PUT /` · `DELETE /` (`UserMemoryDto`).
+- **Memory (`/api/v1/ai/memories`, `AiChatController`):** `GET /` · `PUT /` · `DELETE /` (`UserMemoryDto`) · `DELETE /interests?interest=` (remove one interest).
+- **Admin diagnostics (`GeminiController`, `/api/v1/ai/tests`, `hasRole('ADMIN')`):** `GET /gemini/hello` · `POST /ask` · `GET /quick`.
 - **Summaries (`AiSummaryController`, `/api/v1/ai/summary`, `@PublicEndpoint`):** `GET /user/{user-id}` · `GET /listing/{listing-id}`.

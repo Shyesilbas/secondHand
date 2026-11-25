@@ -113,25 +113,4 @@ class ShippingServiceImplTest {
         assertThat(requestCaptor.getValue().getSenderAddress()).isEqualTo("Seller St 1, Istanbul");
         assertThat(requestCaptor.getValue().getReceiverAddress()).isEqualTo("Buyer Ave 5, Ankara");
     }
-
-    @Test
-    void completeShipping_andCancelShipping_updateStateAndHandleMissing() {
-        ShippingDto deliveredDto = ShippingDto.builder().id(100L).status(ShippingStatus.DELIVERED).build();
-        when(shippingRepository.findById(100L)).thenReturn(Optional.of(shipping));
-        when(shippingRepository.save(shipping)).thenReturn(shipping);
-        when(shippingMapper.toDto(shipping)).thenReturn(deliveredDto);
-
-        Result<ShippingDto> delivered = shippingService.completeShipping(100L);
-        assertThat(delivered.isSuccess()).isTrue();
-        assertThat(shipping.getStatus()).isEqualTo(ShippingStatus.DELIVERED);
-        assertThat(shipping.getDeliveredAt()).isNotNull();
-
-        Result<Void> cancelled = shippingService.cancelShipping(100L);
-        assertThat(cancelled.isSuccess()).isTrue();
-        assertThat(shipping.getStatus()).isEqualTo(ShippingStatus.CANCELLED);
-
-        when(shippingRepository.findById(999L)).thenReturn(Optional.empty());
-        assertThat(shippingService.cancelShipping(999L).isError()).isTrue();
-        verify(shippingRepository, org.mockito.Mockito.never()).delete(any());
-    }
 }

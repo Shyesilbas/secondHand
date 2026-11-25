@@ -7,7 +7,9 @@ public enum OrderCancellationCause {
     /** The system cancelled a cargo order the seller did not ship in time. */
     SHIP_DEADLINE_MISSED,
     /** The system cancelled an unshipped cargo order because the seller was banned. */
-    SELLER_RESTRICTED;
+    SELLER_RESTRICTED,
+    /** The system cancelled a Safe Meetup order whose handover never happened in time. */
+    MEETUP_EXPIRED;
 
     public boolean isSystemCancellation() {
         return this != PARTICIPANT_REQUEST;

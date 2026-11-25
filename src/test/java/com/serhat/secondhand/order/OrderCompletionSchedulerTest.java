@@ -184,4 +184,21 @@ class OrderCompletionSchedulerTest {
         verify(cancellationService).cancelForRestrictedSeller(9L);
         verify(orderLog).logSchedulerCompleted(1);
     }
+
+    @Test
+    void staleLockedMeetupOrder_isCancelledThroughTheCompensationPath() {
+        Order locked = order(5L, OrderStatus.VERIFICATION_LOCKED, LocalDateTime.now().minusDays(8));
+        locked.setDeliveryMethod(com.serhat.secondhand.order.entity.enums.DeliveryMethod.SAFE_MEETUP);
+        when(orderRepository.findIdsByStatusCreatedBefore(eq(OrderStatus.VERIFICATION_LOCKED),
+                eq(com.serhat.secondhand.order.entity.enums.DeliveryMethod.SAFE_MEETUP), any(), any()))
+                .thenReturn(List.of(5L));
+        when(orderRepository.findByIdWithShippingAndUser(5L)).thenReturn(Optional.of(locked));
+        when(cancellationService.cancelStaleMeetupOrder(5L)).thenReturn(com.serhat.secondhand.core.result.Result.success(null));
+
+        scheduler.autoUpdateOrderStatus();
+
+        verify(cancellationService).cancelStaleMeetupOrder(5L);
+        verify(escrowService, never()).cancel(any(), any());
+        verify(orderLog).logSchedulerCompleted(1);
+    }
 }

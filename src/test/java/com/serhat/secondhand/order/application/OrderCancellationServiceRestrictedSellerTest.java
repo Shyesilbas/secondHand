@@ -97,4 +97,39 @@ class OrderCancellationServiceRestrictedSellerTest {
         assertThat(result.getErrorCode()).isEqualTo(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED.getCode());
         verifyNoInteractions(escrow, events, outbox);
     }
+
+    @Test
+    void staleLockedMeetupCancellationRestoresStockAndRefunds() {
+        Order order = order(DeliveryMethod.SAFE_MEETUP);
+        order.setStatus(OrderStatus.VERIFICATION_LOCKED);
+        OrderItemCancel record = mock(OrderItemCancel.class);
+        when(record.getOrderItem()).thenReturn(order.getOrderItems().get(0));
+        when(persistence.reloadOrderWithItems(11L)).thenReturn(Result.success(order));
+        when(planner.validateCancellableItems(any())).thenReturn(Result.success());
+        when(planner.buildCancellationPlan(any(), any()))
+                .thenReturn(new OrderItemCompensationPlanner.CancellationPlan(List.of(record), BigDecimal.TEN));
+        when(escrow.cancel(any(), any())).thenReturn(Result.success());
+        when(planner.areAllItemsCancelled(order)).thenReturn(true);
+        when(persistence.saveOrderAndReload(order)).thenReturn(Result.success(order));
+        when(mapper.toDto(order)).thenReturn(new OrderDto());
+
+        assertThat(service.cancelStaleMeetupOrder(11L).isSuccess()).isTrue();
+
+        verify(persistence).persistCancellationRecordsAndRestoreStock(List.of(record));
+        ArgumentCaptor<OrderCancelledEvent> event = ArgumentCaptor.forClass(OrderCancelledEvent.class);
+        verify(events).publishEvent(event.capture());
+        assertThat(event.getValue().cause()).isEqualTo(OrderCancellationCause.MEETUP_EXPIRED);
+        verify(outbox).enqueueOrderCancelled(any());
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCELLED);
+    }
+
+    @Test
+    void cargoOrderIsNotCancelledAsStaleMeetup() {
+        when(persistence.reloadOrderWithItems(11L)).thenReturn(Result.success(order(DeliveryMethod.CARGO)));
+
+        var result = service.cancelStaleMeetupOrder(11L);
+
+        assertThat(result.isError()).isTrue();
+        verifyNoInteractions(escrow, events, outbox);
+    }
 }

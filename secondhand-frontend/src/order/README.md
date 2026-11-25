@@ -45,7 +45,7 @@ Generated from code; the hook files are the source of truth.
 - **`CARGO` Delivery:**
   - Seller submits `ShipOrderForm` choosing a supported carrier (`providerName`).
   - Backend returns a tracking code; status becomes `SHIPPED`.
-  - Delivery is confirmed via carrier integration or auto-completed after 72 hours.
+  - The backend marks the order `DELIVERED` on a timer (no carrier callback); the buyer confirms it, or it auto-completes 72 hours after delivery (`autoCompleteAt`).
 - **`SAFE_MEETUP` Handover:**
   - Buyer receives a 6-digit OTP code and QR code.
   - At the physical meetup, the seller inputs the code into `MeetupHandoverSection` or scans the QR.

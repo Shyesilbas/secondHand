@@ -31,4 +31,4 @@ Manages buyer-seller price negotiations (`offers` table), counter-offer chains, 
 - `POST /` — create offer (`CreateOfferRequest`).
 - `GET /{id}` — offer details (buyer or seller only).
 - `POST /{id}/accept` · `POST /{id}/reject` · `POST /{id}/counter` (`CounterOfferRequest`).
-- `GET /made` & `GET /received` — paginated offers made or received by the authenticated user.
+- `GET /api/v1/users/me/offers/made` & `GET /api/v1/users/me/offers/received` (`UserController`) — paginated offers made or received by the authenticated user.

@@ -109,7 +109,7 @@ Liste ekranlarında sayılar tek tek değil, Redis pipeline ile toplu okunur (`g
 
 ## 6. Frontend: istek sayısını sınırlama
 
-Bir liste sayfasında onlarca kart olduğu için her kartın kendi başına periyodik istek atması engellenmiştir. Tüm ekranlar [`useActiveReservationCount`](../secondhand-frontend/src/cart/hooks/useActiveReservationCount.js) hook'unu kullanır:
+Bir liste sayfasında onlarca kart olduğu için kartlar social proof isteği atmaz. Sayaçları yalnızca `ListingDetailPage`, [`useActiveReservationCount`](../secondhand-frontend/src/cart/hooks/useActiveReservationCount.js) hook'u ile okur:
 
 ```js
 useQuery({
@@ -123,7 +123,6 @@ useQuery({
 
 | Ekran | Ayar | Sonuç |
 | :--- | :--- | :--- |
-| `ListingCard` | `enabled: isCardHovered` | İstek yalnızca kartın üzerine gelindiğinde atılır; polling yoktur. |
 | `ListingDetailPage` | `enablePolling: true`, `pollInterval: 10 dk` | Sayfa açıkken 10 dakikada bir yenilenir. |
 
 - Aynı ilan için sonuç 30 sn taze sayılır; bu sürede tekrar istek atılmaz.

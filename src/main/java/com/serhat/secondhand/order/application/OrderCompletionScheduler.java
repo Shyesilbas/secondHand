@@ -8,7 +8,6 @@ import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
-import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.shipping.entity.Shipping;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -103,10 +102,13 @@ public class OrderCompletionScheduler {
                 orderRepository.findIdsByStatusMeetupVerifiedBefore(OrderStatus.HANDOVER_CONFIRMED,
                         DeliveryMethod.SAFE_MEETUP, now.minusHours(OrderBusinessConstants.MEETUP_AUTO_COMPLETION_HOURS), FIRST_BATCH),
                 OrderStatus.HANDOVER_CONFIRMED, this::completeVerifiedMeetup, now);
-        updatedCount += processEach(
-                orderRepository.findIdsByStatusCreatedBefore(OrderStatus.MEETUP_PENDING,
-                        DeliveryMethod.SAFE_MEETUP, now.minusDays(7), FIRST_BATCH),
-                OrderStatus.MEETUP_PENDING, this::cancelStaleMeetup, now);
+        LocalDateTime meetupStaleCutoff = now.minusDays(OrderBusinessConstants.MEETUP_STALE_DAYS);
+        for (OrderStatus awaitingHandover : List.of(OrderStatus.MEETUP_PENDING, OrderStatus.VERIFICATION_LOCKED)) {
+            updatedCount += processEach(
+                    orderRepository.findIdsByStatusCreatedBefore(awaitingHandover,
+                            DeliveryMethod.SAFE_MEETUP, meetupStaleCutoff, FIRST_BATCH),
+                    awaitingHandover, this::cancelStaleMeetup, now);
+        }
 
         orderLog.logSchedulerCompleted(updatedCount);
     }
@@ -207,7 +209,7 @@ public class OrderCompletionScheduler {
 
     private boolean completeVerifiedMeetup(Order order, LocalDateTime now) {
         if (order.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP || order.getMeetupVerifiedAt() == null
-                || Duration.between(order.getMeetupVerifiedAt(), now).toHours() < 24) {
+                || Duration.between(order.getMeetupVerifiedAt(), now).toHours() < OrderBusinessConstants.MEETUP_AUTO_COMPLETION_HOURS) {
             return false;
         }
         OrderStatus oldStatus = order.getStatus();
@@ -230,24 +232,15 @@ public class OrderCompletionScheduler {
     }
 
     private boolean cancelStaleMeetup(Order order, LocalDateTime now) {
-        if (order.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP
-                || Duration.between(order.getCreatedAt(), now).toDays() < 7) {
+        if (order.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP || order.getCreatedAt() == null
+                || Duration.between(order.getCreatedAt(), now).toDays() < OrderBusinessConstants.MEETUP_STALE_DAYS) {
             return false;
         }
-        OrderStatus oldStatus = order.getStatus();
-
-        // Release/Refund escrow back to the buyer
-        var orchestratorResult = escrowService.cancel(order, order.getOrderItems());
-        if (orchestratorResult.isError()) {
+        var result = orderCancellationService.cancelStaleMeetupOrder(order.getId());
+        if (result.isError()) {
+            log.warn("Stale meetup order {} could not be cancelled: {}", order.getOrderNumber(), result.getErrorCode());
             return false;
         }
-
-        order.setStatus(OrderStatus.CANCELLED);
-        order.setPaymentStatus(PaymentStatus.REFUNDED);
-        Order savedOrder = orderRepository.save(order);
-
-        eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), OrderStatus.CANCELLED.name()));
-        orderLog.logOrderCancelled(savedOrder.getOrderNumber(), false, "SYSTEM");
         return true;
     }
 

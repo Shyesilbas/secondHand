@@ -25,15 +25,7 @@ Generated from code; the hook files are the source of truth.
 
 ### Shared Size Systems (`data/common/sizes.json`)
 The form dynamically offers size values based on the target `audience` and garment `group`:
-- **`LETTER`:** XXS, XS, S, M, L, XL, XXL, 3XL
-- **`WOMEN_NUMERIC`:** 32, 34, 36, 38, 40, 42, 44, 46, 48
-- **`MEN_NUMERIC`:** 44, 46, 48, 50, 52, 54, 56, 58
-- **`JEANS`:** W28_L30 through W38_L34
-- **`SHOE_EU`:** 35 through 48
-- **`KIDS_SHOE_EU`:** 16 through 35
-- **`KIDS_AGE`:** 2Y, 3Y, 4Y, 5Y, 6-7Y, 8-9Y, 10-11Y, 12-13Y
-- **`BABY_MONTHS`:** 0-3M, 3-6M, 6-9M, 9-12M, 12-18M, 18-24M
-- **`ONE_SIZE`:** Standard accessories and bags
+- Systems: `LETTER`, `WOMEN_NUMERIC`, `MEN_NUMERIC`, `JEANS`, `SHOE_EU`, `KIDS_SHOE_EU`, `KIDS_AGE`, `BABY_MONTHS`, `ONE_SIZE`. Their values live only in `sizes.json`; read them there instead of copying them here.
 
 ### Audience Restrictions
 - Audiences: `WOMEN`, `MEN`, `UNISEX`, `GIRL`, `BOY`, `BABY`.

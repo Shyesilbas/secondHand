@@ -212,7 +212,7 @@ Alıcı ve satıcının yüz yüze teslimatında kullanılan 6 haneli teslimat k
 Satıcının alıcı kodunu tahmin etmesini engellemek için:
 - **Maksimum Hatalı Deneme:** 3 deneme.
 - **Kilitlenme:** 3. hatalı denemede sipariş durumu `OrderStatus.VERIFICATION_LOCKED` yapılır ve `verificationLockedUntil = LocalDateTime.now().plusMinutes(15)` atanır.
-- 15 dakika boyunca teslimat doğrulama yapılamaz (`HTTP 403 Forbidden`). 15 dakika dolduğunda sayaç otomatik sıfırlanarak sipariş tekrar `MEETUP_PENDING` durumuna geçer.
+- 15 dakika boyunca teslimat doğrulama yapılamaz (`HTTP 403 Forbidden`). Süre dolunca kilit kendiliğinden kalkmaz: süre sonrasındaki ilk denemede sayaç sıfırlanır ve sipariş `MEETUP_PENDING` durumuna döner (`OrderCompletionService`); alıcının kodu yeniden üretmesi de kilidi kaldırır.
 
 ### 5.3 Aura AI Canlı İlan Arama Hız Sınırı (`AuraAgentSearchRateLimiter`)
 Aura sohbeti sırasında kullanıcının canlı ilan arama motorunu aşırı yüklemesini önlemek için:

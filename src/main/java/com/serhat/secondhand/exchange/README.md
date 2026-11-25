@@ -10,7 +10,7 @@ Provides cached currency conversion rates between `USD`, `EUR`, and `TRY` via Ex
 
 ## Business Rules & Invariants
 - **Supported ISO Currencies:** Validates `from` and `to` strictly against `USD`, `EUR`, and `TRY` (case-insensitive, normalized to uppercase).
-- **Bounded Timeouts & Structured Errors:** Outbound `RestTemplate` calls use 5s connection and 10s read timeouts (`ExchangeConfig`); failures map to `EXCHANGE_SERVICE_UNAVAILABLE` (`503`), `EXCHANGE_SERVICE_ERROR` (`502`), or `EXCHANGE_UNEXPECTED_ERROR` (`500`).
+- **Bounded Timeouts & Structured Errors:** Outbound `RestTemplate` calls use 5s connection and 10s read timeouts (set in `ExchangeRateService`); failures map to `EXCHANGE_SERVICE_UNAVAILABLE` (`503`), `EXCHANGE_SERVICE_ERROR` (`502`), or `EXCHANGE_UNEXPECTED_ERROR` (`500`).
 
 ## Redis & Caching
 - Spring cache `payment:exchangeRates` (`CacheConfig`, key `#from.toUpperCase() + '_' + #to.toUpperCase()`, 2h TTL).

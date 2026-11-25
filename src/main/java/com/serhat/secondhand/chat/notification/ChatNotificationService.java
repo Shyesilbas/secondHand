@@ -7,7 +7,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.serhat.secondhand.core.websocket.StompFanoutPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ChatNotificationService {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final StompFanoutPublisher stompPublisher;
     private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final IUserService userService;
 
     public void sendMessage(ChatMessageDto dto) {
-        messagingTemplate.convertAndSend("/topic/chat/" + dto.getChatRoomId(), dto);
+        stompPublisher.send("/topic/chat/" + dto.getChatRoomId(), dto);
         
         String senderName = "Someone";
         try {

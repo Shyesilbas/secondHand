@@ -105,8 +105,8 @@ CREATE INDEX IF NOT EXISTS idx_complaints_review_queue
 
 ### 3.1. Redis Veri Yapısı ve Key Standardı
 * **Key:** `v4:complaints:delayed_queue`
-* **Member:** `complaint_id` (UUID string)
-* **Score:** `eligible_for_review_at` anının Unix Epoch Saniyesi (`timestampInSeconds`)
+* **Member:** şikayet id'si (UUID string)
+* **Score:** `eligible_for_review_at` anının Unix Epoch saniyesi (`ComplaintReviewQueue.score`)
 
 ### 3.2. Yaşam Döngüsü Adımları:
 1. **Şikayet Kaydı Anında (`POST /api/v1/complaints`):**
@@ -271,7 +271,7 @@ Sistem keyfi veya orantısız cezaların önüne geçmek için 4 kademeli bir ya
   - `is_chat_restricted = TRUE`
   - `is_listing_restricted = TRUE`
   - **İlanların Otomatik Kaldırılması:** Kullanıcının yayındaki tüm aktif ilanları derhal `ListingStatus.INACTIVE` durumuna getirilerek yayından kaldırılır.
-  - **Ücret İadesi Yapılmaması Politikası (No Refund Policy):** Kural ihlali sebebiyle kaldırılan ilanlar için satıcının önceden ödemiş olduğu ilan yayınlama ücreti (`listing_fee`) ve vitrin/öne çıkarma ücreti (`showcase_fee`) **kesinlikle iade edilmez**. Kullanıcı sözleşmesi ihlali nedeniyle ücretler platformda irat kaydedilir.
+  - **Ücret İadesi Yapılmaması Politikası (No Refund Policy):** Kural ihlali sebebiyle kaldırılan ilanlar için satıcının önceden ödemiş olduğu ilan yayınlama ücreti ve vitrin/öne çıkarma ücreti **kesinlikle iade edilmez**. Kullanıcı sözleşmesi ihlali nedeniyle ücretler platformda irat kaydedilir.
 * **Kısıtlanan Yetkiler:**
   - Mesaj gönderemez (Sohbet ekranında *"Hesabınız topluluk kuralları ihlali nedeniyle [Tarih]'e kadar mesajlaşmaya kapatılmıştır"* banner'ı çıkar).
   - Yeni ilan veremez veya taslak yayınlayamaz.
@@ -285,7 +285,7 @@ Sistem keyfi veya orantısız cezaların önüne geçmek için 4 kademeli bir ya
 * **Yaptırım:**
   - `AccountStatus = BLOCKED`. Kullanıcının tüm oturumları (JWT refresh token'ları) anında sonlandırılır.
   - Yayındaki tüm ilanları kalıcı olarak yayından kaldırılır (`ListingStatus.INACTIVE`).
-  - **Ücret İadesi Yapılmaz:** Hiçbir `listing_fee` veya `showcase_fee` iadesi yapılmaz.
+  - **Ücret İadesi Yapılmaz:** Hiçbir ilan veya vitrin ücreti iade edilmez.
 
 ### 5.2. Banlanan Kullanıcıların Finansal ve Sipariş Hakları (Financial & Escrow Rights Protection)
 
@@ -299,9 +299,9 @@ Kullanıcı `TEMP_BAN_7_DAYS` veya `PERM_BAN` cezası aldığında platform davr
 2. **Satıcı Olarak Banlanan Kullanıcı:**
    - **Kargodaki Siparişler:** Satıcının önceden kargoya teslim ettiği ürünlerin süreci devam eder. Alıcı teslim alıp onay verdiğinde, escrow'da bekleyen hak ediş tutarı satıcının eWallet hesabına eksiksiz aktarılır.
    - **Bakiye Çekme Hakkı (Payout / Withdrawal):** Satıcının eWallet hesabındaki mevcut ve escrow'dan serbest bırakılan bakiyeyi banka hesabına çekme hakkı engellenemez (`withdraw` işlemi her zaman aktiftir).
-   - **Henüz Kargolanmamış Siparişler:** Satıcı banlandığı sırada henüz kargo şubesine teslim edilmemiş siparişler varsa; alıcıyı belirsizlikte bırakmamak adına sipariş sistem tarafından derhal iptal edilir ve ürün bedeli alıcının hesabına iade edilir.
+   - **Henüz Kargolanmamış Siparişler:** Satıcı banlandığında, bütün kalemleri bu satıcıya ait ve henüz kargolanmamış cargo siparişleri sistem tarafından iptal edilir ve bedel alıcıya iade edilir (`BannedSellerOrderCancellationListener`, ayrıntı [`order-lifecycle-and-compensation-management.md`](order-lifecycle-and-compensation-management.md)). Çok satıcılı ve meetup siparişleri normal deadline yollarında kalır.
 3. **İade Edilmeyen Tek Kalem (No-Refund Policy):**
-   - Kural ihlali sebebiyle kaldırılan ilanların önceden ödenmiş olan **ilan yayınlama ücreti (`listing_fee`)** ve **vitrin öne çıkarma ücreti (`showcase_fee`)** ceza niteliğinde platform tarafından irat kaydedilir ve kesinlikle iade edilmez. Ancak ürün satışından doğan reel hak edişler korunur.
+   - Kural ihlali sebebiyle kaldırılan ilanların önceden ödenmiş olan **ilan yayınlama ücreti** ve **vitrin öne çıkarma ücreti** ceza niteliğinde platform tarafından irat kaydedilir ve kesinlikle iade edilmez. Ancak ürün satışından doğan reel hak edişler korunur.
 
 ### 5.3. Kasıtlı / İftira Amaçlı Şikayetler ve Sabotaj Yaptırımları (Malicious Reporting & Sabotage Defense)
 
@@ -315,7 +315,7 @@ C2C pazaryerlerinde sistemin kötüye kullanılmasını (örneğin rakip bir sat
    - **İlk Kasıtlı İftira / Kötü Niyetli Şikayet:**
      - Kullanıcı doğrudan **7 Günlük Geçici Hesap Banı (`TEMP_BAN_7_DAYS`)** alır (`banned_until = NOW() + 7 DAYS`).
      - Yayındaki **tüm aktif ilanları derhal `ListingStatus.INACTIVE` yapılarak yayından kaldırılır**.
-     - İlan listeleme ücreti (`listing_fee`) ve vitrin ücreti (`showcase_fee`) **kesinlikle iade edilmez**.
+     - İlan listeleme ücreti ve vitrin ücreti **kesinlikle iade edilmez**.
      - 7 gün boyunca mesaj gönderemez, yeni ilan açamaz, teklif veremez.
    - **İkinci İftira veya Organize Sabotaj:**
      - İftira/kötü niyetli şikayetin tekrarlanması veya organize rakip karalama kampanyası (Sybil/bot saldırısı) tespit edildiğinde kullanıcı **doğrudan Kalıcı Olarak Engellenir (`PERM_BAN`)**.

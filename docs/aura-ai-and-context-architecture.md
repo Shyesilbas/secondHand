@@ -38,7 +38,7 @@ Aura, kullanıcının platform içi niyetini analiz ederek yalnızca statik meti
 
 ### A. Giriş Noktası: [`AgentController.java`](../src/main/java/com/serhat/secondhand/ai/agent/api/AgentController.java)
 - **Endpoint:** `POST /api/v1/ai/agents/query`
-- **Girdi:** `AgentQueryRequest` (`message`, `context`, `uiContext`: `currentRoute`, `listingId`, `categoryId`, `searchQuery`).
+- **Girdi:** `AgentQueryRequest` (`message`, `context`, `agentMode`, `uiContext` (`AgentUiContextRequest`): `currentPage`, `route`, `listingId`, `filters`).
 - **İşleyiş:**
   1. `AgentQueryService.buildContext()` ile aktif kullanıcının domain bağlamını ve bellek profilini toplar.
   2. `AuraListingSearchOrchestrator.augment()` ile kullanıcının mesajı bir arama niyeti içeriyorsa katalog sorgusu çalıştırır.

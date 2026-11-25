@@ -82,32 +82,6 @@ public class ShippingServiceImpl implements ShippingService {
     }
 
     @Override
-    @Transactional
-    public Result<ShippingDto> completeShipping(Long shippingId) {
-        return shippingRepository.findById(shippingId)
-                .map(shipping -> {
-                    shipping.markAsDelivered();
-                    Shipping saved = shippingRepository.save(shipping);
-                    log.info("Shipping {} marked as delivered", shippingId);
-                    return Result.success(shippingMapper.toDto(saved));
-                })
-                .orElseGet(() -> Result.error("Shipping not found with id: " + shippingId));
-    }
-
-    @Override
-    @Transactional
-    public Result<Void> cancelShipping(Long shippingId) {
-        return shippingRepository.findById(shippingId)
-                .map(shipping -> {
-                    shipping.cancel();
-                    shippingRepository.save(shipping);
-                    log.info("Shipping {} cancelled", shippingId);
-                    return Result.<Void>success();
-                })
-                .orElseGet(() -> Result.error("Shipping not found with id: " + shippingId));
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public Optional<ShippingDto> getById(Long shippingId) {
         return shippingRepository.findById(shippingId)

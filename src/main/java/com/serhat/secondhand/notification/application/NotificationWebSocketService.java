@@ -3,7 +3,7 @@ package com.serhat.secondhand.notification.application;
 import com.serhat.secondhand.notification.dto.NotificationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.serhat.secondhand.core.websocket.StompFanoutPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class NotificationWebSocketService {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final StompFanoutPublisher stompPublisher;
 
     public void sendNotificationToUser(Long userId, NotificationDto notification) {
         try {
             String destination = "/user/" + userId + "/notifications";
-            messagingTemplate.convertAndSend(destination, notification);
+            stompPublisher.send(destination, notification);
             log.info("Notification sent via WebSocket to user: {}, destination: {}", userId, destination);
         } catch (Exception e) {
             log.error("Failed to send notification via WebSocket to user: {}", userId, e);
@@ -26,7 +26,7 @@ public class NotificationWebSocketService {
     public void sendBroadcast(NotificationDto notification) {
         try {
             String destination = "/topic/notifications";
-            messagingTemplate.convertAndSend(destination, notification);
+            stompPublisher.send(destination, notification);
             log.info("Notification broadcast via WebSocket, destination: {}", destination);
         } catch (Exception e) {
             log.error("Failed to broadcast notification via WebSocket", e);

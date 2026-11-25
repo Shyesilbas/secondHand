@@ -13,7 +13,7 @@ Enables users to curate named collections of listings (`favorite_lists`, `favori
   - Max lists per user: `countByOwner >= maxListsPerUser` -> `FAVORITE_LIST_LIMIT_EXCEEDED`.
   - Unique list name per owner: `UNIQUE (user_id, name)` -> `FAVORITE_LIST_NAME_EXISTS`.
   - Max items per list: `countByFavoriteList >= maxItemsPerList` -> `FAVORITE_LIST_ITEM_LIMIT_EXCEEDED`.
-  - Unique listing per list: `UNIQUE (favorite_list_id, listing_id)` -> `FAVORITE_LIST_ITEM_ALREADY_EXISTS`.
+  - Unique listing per list: checked in code (`existsByFavoriteListAndListing` -> `ITEM_ALREADY_IN_LIST`) and enforced by `uk_favorite_list_items_list_listing` (V64), so a concurrent duplicate insert also maps to `ITEM_ALREADY_IN_LIST`.
 - **Visibility & Like Rules:**
   - Private lists (`is_public = false`) are visible only to their owner (`FAVORITE_LIST_PRIVATE`) and cannot be liked (`CANNOT_LIKE_PRIVATE_LIST`).
   - Public lists (`is_public = true`) can be viewed by anyone and liked once per authenticated non-owner (`UNIQUE (favorite_list_id, user_id)`, `CANNOT_LIKE_OWN_LIST`, `ALREADY_LIKED`).

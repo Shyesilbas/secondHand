@@ -1,12 +1,12 @@
 # secondHand — Unified Agent Guide
 
-C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL 15, Redis 7, Kafka 3.7) and React 19 frontend (`secondhand-frontend/`). Single source of truth for all AI agents (`CLAUDE.md`, `GEMINI.md`, `CODEX.md` point here).
+C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL 15, Redis 7, Kafka 3.7) and React 19 frontend (`secondhand-frontend/`). Single source of truth for all AI agents (`CLAUDE.md`, `GEMINI.md`, `CODEX.md` and `.github/copilot-instructions.md` point here).
 
 ## Commands
 - **Start all:** `./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]` (Docker: Postgres 5433, Redis 6379, Kafka 9092; then backend and frontend).
 - **Backend:** `mvn spring-boot:run` | unit tests: `mvn test [-Dtest=<Class>]` (plain Mockito `*Test`, default) | JaCoCo + tests: `mvn -B verify` | integration tests (needs Docker): `mvn test -Pintegration-tests -Dtest=ConcurrentStockAndPaymentIntegrationTest`.
 - **Frontend:** `cd secondhand-frontend && npm run dev | build | lint`.
-- **Verify:** `./scripts/verify.sh` = `python3 scripts/check_docs.py` (0 issues after doc changes) + `python3 scripts/check_api_endpoints.py` (0 warnings) + zero-emoji scan + frontend lint. `python3 scripts/check_docs.py --changed` lists docs naming changed code that were not touched (reminder).
+- **Verify:** `./scripts/verify.sh [--no-lint]` runs the zero-emoji scan, `python3 scripts/check_docs.py` (0 issues), `python3 scripts/check_api_endpoints.py` (0 warnings) and frontend lint.
 
 ## Skills (`.agents/skills/`, symlinked as `.claude/skills`)
 Load the matching skill before modifying code.
@@ -43,6 +43,5 @@ Load the matching skill before modifying code.
 Key flow: `checkout` -> `order` -> `payment` -> `escrow` -> seller `ewallet`; stock is reserved atomically in Redis (`InventoryRedisReservationService`, 15 min), then deducted in PostgreSQL via Kafka events.
 
 ## Where to Look
-1. **Module hub first:** `src/main/java/com/serhat/secondhand/<module>/README.md` (frontend: `secondhand-frontend/src/<module>/README.md`): Key Entry Points, rules, Redis/Kafka ownership, API list.
-2. **Module extras:** `payment/.docs/runbooks/add-payment-provider.md`, `listing/.docs/knowledge/`, linked from the hub. Change rules otherwise live in the hub.
-3. **Cross-module deep dives:** `docs/*.md`, indexed in `docs/README.md`. Open only when the task crosses modules or needs the "why".
+1. **Module hub first:** `src/main/java/com/serhat/secondhand/<module>/README.md` (frontend: `secondhand-frontend/src/<module>/README.md`): Key Entry Points, rules, Redis/Kafka ownership, API list, links to module runbooks and knowledge files.
+2. **Cross-module deep dives:** `docs/*.md`, indexed in `docs/README.md`. Open only when the task crosses modules or needs the "why".

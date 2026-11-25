@@ -45,7 +45,7 @@ Environment variables are configured in `.env` (copy from `.env.example`).
   - Silent 401 token refresh queue is handled in `src/common/services/api/interceptors.js`.
   - CSRF protection uses double-submit cookie pattern reading `XSRF-TOKEN` into `X-XSRF-TOKEN` headers.
   - No JWT credentials or passwords are ever saved to `localStorage` or `sessionStorage`.
-- **Real-Time Communication:** `@stomp/stompjs` over WebSocket via `src/common/hooks/useWebSocket.js`. Handles chat rooms (`/topic/chat/{roomId}`), user notification queues (`/user/{userId}/queue/messages`), and reconnection backoff.
+- **Real-Time Communication:** `@stomp/stompjs` over WebSocket via `src/common/hooks/useWebSocket.js`. Handles chat rooms (`/topic/chat/{roomId}`) and reconnection backoff.
 - **Design Standard:** Apple/Spotify-tier restrained design standard: zero emojis, neutral surfaces, subtle hairline borders, and strict `rounded-md` radius ceiling.
 - **User Feedback:** Global alerts and notifications use `NotificationContext` (`useNotification`); browser native `alert()` or `confirm()` calls are strictly forbidden.
 

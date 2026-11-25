@@ -87,13 +87,12 @@ class ListingQueryServiceBulkAndVisibilityTest {
     }
 
     @Test
-    void findByIdsHidesDraftInactiveReservedDeletedAndBlockedListingsFromNonOwners() {
+    void findByIdsHidesDraftInactiveDeletedAndBlockedListingsFromNonOwners() {
         Long viewerId = 99L;
         Listing active = listing(1L, ListingStatus.ACTIVE);
         Listing sold = listing(2L, ListingStatus.SOLD);
         Listing draft = listing(3L, ListingStatus.DRAFT);
         Listing inactive = listing(4L, ListingStatus.INACTIVE);
-        Listing reserved = listing(5L, ListingStatus.RESERVED);
         Listing deleted = listing(6L, ListingStatus.DELETED);
         Listing blockedActive = listing(7L, ListingStatus.ACTIVE);
 
@@ -103,10 +102,10 @@ class ListingQueryServiceBulkAndVisibilityTest {
 
         List<UUID> requested = List.of(
                 active.getId(), sold.getId(), draft.getId(), inactive.getId(),
-                reserved.getId(), deleted.getId(), blockedActive.getId(), active.getId());
+                deleted.getId(), blockedActive.getId(), active.getId());
 
         when(listingRepository.findAllByIdIn(anyList())).thenReturn(List.of(
-                active, sold, draft, inactive, reserved, deleted, blockedActive));
+                active, sold, draft, inactive, deleted, blockedActive));
         stubDynamicDto(active);
         stubDynamicDto(sold);
 
@@ -116,7 +115,7 @@ class ListingQueryServiceBulkAndVisibilityTest {
                 .containsExactlyInAnyOrder(active.getId(), sold.getId());
         verify(listingRepository).findAllByIdIn(List.of(
                 active.getId(), sold.getId(), draft.getId(), inactive.getId(),
-                reserved.getId(), deleted.getId(), blockedActive.getId()));
+                deleted.getId(), blockedActive.getId()));
     }
 
     @Test

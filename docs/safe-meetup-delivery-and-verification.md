@@ -67,7 +67,7 @@ sequenceDiagram
 | Durum | Açıklama | Alıcı / Satıcı Aksiyonu |
 | :--- | :--- | :--- |
 | **`MEETUP_PENDING`** | Ödeme alındı, buluşma bekleniyor. | Alıcı kodu görüntüler ve yeniler. Yalnızca **alıcı** iptal edebilir. Alıcı kod olmadan da tamamlamayı onaylayabilir. 7 gün içinde tamamlanmazsa sistem iptal eder. |
-| **`VERIFICATION_LOCKED`** | Satıcı 3 kez üst üste yanlış kod girdi. | Doğrulama 15 dakika reddedilir. |
+| **`VERIFICATION_LOCKED`** | Satıcı 3 kez üst üste yanlış kod girdi. | Doğrulama 15 dakika reddedilir. Alıcı iptal edebilir; 7 gün içinde tamamlanmazsa sistem iptal eder. |
 | **`HANDOVER_CONFIRMED`** | Kod doğrulandı; ürün el değiştirdi. | İptal edilemez. Alıcı ya da satıcı tamamlamayı onaylar; onay gelmezse 24 saat sonra sistem tamamlar. |
 | **`COMPLETED`** | Escrow serbest bırakıldı; para satıcının e-cüzdanına aktarılır. | Terminal. |
 
@@ -154,7 +154,7 @@ if (newAttempts >= 3) {
 ### E. Otomatik Serbest Bırakma (24 Saatlik Garanti)
 * Ürün elden teslim edilip `HANDOVER_CONFIRMED` statüsüne geçtikten sonra, alıcı eve gidip onay vermeyi unutursa satıcı mağdur edilmez.
 * [`OrderCompletionScheduler.java`](../src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java) `meetupVerifiedAt` üzerinden 24 saat geçtiyse siparişi tamamlar ve `escrowService.release` çağırır; para `escrow_outbox_events` → `escrow.released.v1` yoluyla satıcının cüzdanına aktarılır ([escrow dokümanı](escrow-lifecycle-and-state-machine.md)). Scheduler 5 dakikada bir çalıştığı için tamamlanma 24 saatten birkaç dakika sonra olabilir.
-* `MEETUP_PENDING` siparişi 7 gün içinde tamamlanmazsa aynı scheduler escrow'u iptal eder ve parayı alıcıya iade eder.
+* `MEETUP_PENDING` veya `VERIFICATION_LOCKED` siparişi 7 gün (`MEETUP_STALE_DAYS`) içinde tamamlanmazsa aynı scheduler siparişi iptal eder (`cancelStaleMeetupOrder`): para alıcıya döner, stok geri yüklenir.
 
 ---
 

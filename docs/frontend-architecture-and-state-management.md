@@ -115,5 +115,5 @@ Kurallar (radius tavanı, token'lar, emoji yasağı, dört veri durumu) tek yerd
 ## 7. Gerçek Zamanlı İletişim
 
 - **Bağlantı:** `useWebSocket` (chat) ve `useNotificationWebSocket` ayrı STOMP client'ları açar; hata sonrası exponential backoff ile `MAX_RECONNECT_ATTEMPTS` kadar yeniden bağlanır.
-- **Abonelikler:** chat `/user/{userId}/queue/messages`; bildirimler `/user/{userId}/notifications` ve broadcast `/topic/notifications`. Gönderim `/app/chat.sendMessage`, `/app/chat.joinRoom`, `/app/chat.leaveRoom`.
+- **Abonelikler:** chat odası `/topic/chat/{roomId}`; bildirimler `/user/{userId}/notifications` ve broadcast `/topic/notifications`. Gönderim `/app/chat.sendMessage`, `/app/chat.joinRoom`, `/app/chat.leaveRoom`.
 - **Sayaçlar:** `useBadgeCounts` `/v1/user/badges` endpoint'ini okur (`['badgeCounts', userId]`); reconnect sonrası otomatik REST senkronu yoktur. Bildirim ve e-posta okuma akışları bu key'i invalidate eder (`useInAppNotifications`, `EmailsPage`).

@@ -16,7 +16,6 @@ const STATUS_LABELS = {
   [LISTING_STATUS.SOLD]: 'Sold',
   [LISTING_STATUS.PENDING]: 'Pending',
   [LISTING_STATUS.DRAFT]: 'Draft',
-  RESERVED: 'Reserved',
 };
 
 export function listingTypeLabel(type) {

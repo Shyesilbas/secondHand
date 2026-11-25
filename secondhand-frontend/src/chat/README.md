@@ -33,7 +33,6 @@ Generated from code; the hook files are the source of truth.
 - **Broker Endpoint:** Connected via `@stomp/stompjs` using HttpOnly session cookies.
 - **Outbound Message Send:** Published to `/app/chat.sendMessage`.
 - **Inbound Room Subscription:** Subscribed to `/topic/chat/{roomId}`.
-- **User Destination Queue:** Subscribed to `/user/queue/messages` for incoming alerts while outside the active room.
 - **Presence & Read Signals:** Dispatches `/app/chat.joinRoom` and `/app/chat.leaveRoom`.
 
 ## 4. In-Chat Offer Negotiation Flow (`InChatOfferCard`)

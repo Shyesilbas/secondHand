@@ -20,7 +20,7 @@ Manages platform promotional coupons (`coupons`, `coupon_eligible_users`, `coupo
 - **Documented Redis Fallback:** If Redis is unreachable, `acquireCouponUsage` returns `NOT_COUNTED` and PostgreSQL row lock + `coupon_redemptions` count checks enforce limits safely.
 
 ## Redis & Lua Scripts
-- Keys (30-day TTL in `CouponRedisLimiterService`): `v4:coupon:usage:global:{CODE}` and `v4:coupon:usage:user:{CODE}:{userId}`.
+- Keys (30-day TTL passed by `CouponService`): `v4:coupon:usage:global:{CODE}` and `v4:coupon:usage:user:{CODE}:{userId}`.
 - Lua scripts (`src/main/resources/scripts/`): `apply_coupon_with_limit.lua` (`-1` global limit, `-2` user limit) and `release_coupon_usage.lua`.
 
 ## API

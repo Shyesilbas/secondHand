@@ -16,18 +16,22 @@ Provides cross-cutting platform infrastructure: the Spring Security filter chain
 - **Prod startup (`ProdSecurityGuard`):** also fails when `app.test-endpoints.enabled` is true or `spring.data.redis.password` (`REDIS_PASSWORD`) is empty. Cache-Control comes from Spring Security defaults, not `SecurityHeadersFilter`.
 - **Scheduling, Outbox, Seeding, Audit & OTP:**
   - `SchedulerLockConfig` secures scheduled jobs with Redis-backed ShedLock (`v4:lock:scheduler` prefix) before `@Transactional` execution.
-  - `OutboxHousekeepingScheduler` purges `PROCESSED` rows older than 7 days from `payment_outbox_events`, `order_outbox_events`, and `escrow_outbox_events`.
+  - `OutboxHousekeepingScheduler` (`app.outbox.cleanup.cron`, default 03:00) purges `PROCESSED` rows older than `app.outbox.cleanup.retention-days` (default 3) from `payment_outbox_events`, `order_outbox_events` and `escrow_outbox_events`, and old `processed_kafka_events` rows.
   - `CatalogSeedStartupRunner` executes `SeedTask` beans when `--app.seed` is passed and prunes unreferenced legacy rows via `CatalogLegacyPruner`.
   - `AuditAspect` records `@Auditable` actions asynchronously into `audit_logs`.
   - `AuditLogService` mails the owner (`SystemAuditEmailEvent`) only for security-relevant failures and changes (failed login attempt, password change). Successful login, Google login and logout are written to `audit_logs` only and shown on the security page, never mailed.
-  - `VerificationService` validates 6-digit OTPs (`CodeType`); 3 failed attempts trigger a 15-minute `VerificationLockedException` cooldown.
+  - `VerificationService` validates 6-digit OTPs (`CodeType`); each code allows 3 wrong attempts. On the last wrong account-verification attempt the code is burned and `VERIFICATION_ATTEMPTS_EXHAUSTED` (429) asks for a new code; the account is never blocked.
 
 ## Redis & Caching
 - Rate-limit keys (`RateLimitingFilter`, 60s window): `ratelimit:{category}:ip:{clientIp}:{windowBucket}` and `ratelimit:{category}:user:{userId}:{windowBucket}`.
 - Spring Cache (`CacheConfig`): `v4:<cacheName>:` prefix (`CacheConfig.CACHE_VERSION`) with explicit per-cache TTLs, transaction-aware puts/evictions and `CacheErrorHandlerConfig` (a `CachingConfigurer`) fail-open logging. Attempt counters use `ExpiringCounter` (INCR and expiry in one Lua call).
+- STOMP fan-out (`core/websocket`): `StompFanoutPublisher` publishes every chat and notification push on the Redis Pub/Sub channel `v4:ws:fanout` (`StompFanoutEnvelope`: destination + JSON body); `StompFanoutListener` on each instance hands it to the local simple broker (`StompLocalDelivery`). On a Redis publish failure the push is delivered locally and logged.
 
 ## API
 - `GET /api/v1/enums/all` (`EnumController`, `@PublicEndpoint`) — cached dictionary of system enums, type rules, and catalog metadata.
-- `GET /api/v1/admin/audit-logs` (`AuditLogController`, `ROLE_ADMIN`) — paginated audit log search.
+- `GET /api/v1/fees` (`FeeController`, `@PublicEndpoint`) — public platform fee table.
+- `POST /api/v1/admin/announcements/commission` (`CommissionAnnouncementAdminController`, `ROLE_ADMIN`) — announce a commission change.
+- `GET /api/v1/audit/enums/{event-types|event-statuses|all}` (`AuditEnumController`) — audit enum values.
+- `GET /api/v1/admin/audit-logs/{user/{user-email}|user/id/{user-id}|event-type/{event-type}|date-range|failed-attempts/user/{user-email}|failed-attempts/ip/{ip-address}}` (`AuditLogController`, `ROLE_ADMIN`) — paginated audit log queries.
 - `POST /api/v1/admin/outbox/{type}/{eventId}/requeue` (`OutboxAdminController`, `ROLE_ADMIN`) — reset one `FAILED` payment/order/escrow outbox event to `PENDING`; `OutboxMetrics` exposes `secondhand.outbox.events` gauges.
-- `GET /api/v1/test/rate-limits/ping` (`RateLimitTestController`) — rate-limit header diagnostic endpoint.
+- `GET /api/v1/test/rate-limits/{auth,payment,general}` · `POST /api/v1/test/rate-limits/{auth,payment}/burst` (`RateLimitTestController`, only with `app.test-endpoints.enabled=true`) — rate-limit bucket diagnostics.

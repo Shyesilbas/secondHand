@@ -1,15 +1,12 @@
 package com.serhat.secondhand.core.verification;
 
-import com.serhat.secondhand.auth.application.AccessRevocationService;
 import com.serhat.secondhand.core.verification.repository.VerificationRepository;
 import com.serhat.secondhand.core.config.VerificationConfig;
-import com.serhat.secondhand.core.exception.VerificationLockedException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +27,6 @@ public class VerificationService implements IVerificationService {
     private final VerificationRepository verificationRepository;
     private final UserNotificationService userNotificationService;
     private final IUserService userService;
-    private final AccessRevocationService accessRevocationService;
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final int CODE_LENGTH = 6;
@@ -134,10 +130,10 @@ public class VerificationService implements IVerificationService {
             int verificationAttemptLeft = verification.getVerificationAttemptLeft();
 
             if (verificationAttemptLeft <= 0) {
-                user.setAccountStatus(AccountStatus.BLOCKED);
-                userService.update(user);
-                accessRevocationService.revokeAllAccess(user);
-                throw new VerificationLockedException("Too many failed attempts. Your account has been blocked.");
+                // Burn the code: the user must request a new one. The account itself is never blocked here,
+                // a typo-prone user is not a moderation case.
+                markVerificationAsUsed(verification);
+                return Result.error(UserErrorCodes.VERIFICATION_ATTEMPTS_EXHAUSTED);
             }
             return Result.error(
                     String.format(UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getMessage(),

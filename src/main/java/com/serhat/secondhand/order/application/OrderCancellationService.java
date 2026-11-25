@@ -35,6 +35,8 @@ public class OrderCancellationService {
     static final String SHIP_DEADLINE_REASON = "Not shipped within "
             + com.serhat.secondhand.order.util.OrderBusinessConstants.SHIP_DEADLINE_HOURS + " hours";
     static final String SELLER_RESTRICTED_REASON = "Seller account restricted";
+    static final String MEETUP_EXPIRED_REASON = "Meetup handover not completed within "
+            + com.serhat.secondhand.order.util.OrderBusinessConstants.MEETUP_STALE_DAYS + " days";
 
     private final OrderItemCompensationPlanner compensationPlanner;
     private final OrderCancellationValidationService validationService;
@@ -89,7 +91,7 @@ public class OrderCancellationService {
      * Must run inside the caller's transaction; a failed refund marks it rollback-only.
      */
     public Result<OrderDto> cancelUnshippedOrder(Long orderId) {
-        return cancelUnshipped(orderId, OrderCancellationCause.SHIP_DEADLINE_MISSED,
+        return cancelBySystem(orderId, OrderCancellationService::isUnshippedCargo, OrderCancellationCause.SHIP_DEADLINE_MISSED,
                 CancelRefundReason.DELAYED_DELIVERY, SHIP_DEADLINE_REASON);
     }
 
@@ -98,19 +100,39 @@ public class OrderCancellationService {
      * compensation as {@link #cancelUnshippedOrder(Long)}; only the recorded reason and the messages differ.
      */
     public Result<OrderDto> cancelForRestrictedSeller(Long orderId) {
-        return cancelUnshipped(orderId, OrderCancellationCause.SELLER_RESTRICTED,
+        return cancelBySystem(orderId, OrderCancellationService::isUnshippedCargo, OrderCancellationCause.SELLER_RESTRICTED,
                 CancelRefundReason.OTHER, SELLER_RESTRICTED_REASON);
     }
 
-    private Result<OrderDto> cancelUnshipped(Long orderId, OrderCancellationCause cause,
-                                             CancelRefundReason refundReason, String reasonText) {
+    /**
+     * System cancellation of a Safe Meetup order whose handover did not happen within
+     * {@link com.serhat.secondhand.order.util.OrderBusinessConstants#MEETUP_STALE_DAYS} ({@code MEETUP_PENDING}
+     * or {@code VERIFICATION_LOCKED}). Same compensation as {@link #cancelUnshippedOrder(Long)}, so stock is restored.
+     */
+    public Result<OrderDto> cancelStaleMeetupOrder(Long orderId) {
+        return cancelBySystem(orderId, OrderCancellationService::isAwaitingHandover, OrderCancellationCause.MEETUP_EXPIRED,
+                CancelRefundReason.OTHER, MEETUP_EXPIRED_REASON);
+    }
+
+    private static boolean isUnshippedCargo(Order order) {
+        return order.getDeliveryMethod() == DeliveryMethod.CARGO
+                && (order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.PROCESSING);
+    }
+
+    private static boolean isAwaitingHandover(Order order) {
+        return order.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP
+                && (order.getStatus() == OrderStatus.MEETUP_PENDING || order.getStatus() == OrderStatus.VERIFICATION_LOCKED);
+    }
+
+    private Result<OrderDto> cancelBySystem(Long orderId, java.util.function.Predicate<Order> eligible,
+                                            OrderCancellationCause cause, CancelRefundReason refundReason,
+                                            String reasonText) {
         Result<Order> orderResult = compensationPersistenceService.reloadOrderWithItems(orderId);
         if (orderResult.isError()) {
             return orderResult.propagateError();
         }
         Order order = orderResult.getData();
-        boolean unshipped = order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.PROCESSING;
-        if (!unshipped || order.getDeliveryMethod() != DeliveryMethod.CARGO) {
+        if (!eligible.test(order)) {
             return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
         }
 

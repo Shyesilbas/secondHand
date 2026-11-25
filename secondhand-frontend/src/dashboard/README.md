@@ -24,8 +24,6 @@ The `dashboard` module delivers commercial intelligence and transaction analytic
 
 ## 3. Component Rules
 
-- **Time Range Cache Isolation:** Switching between `7D`, `30D`, `90D`, and `1Y` uses isolated query keys (`['dashboard', role, timeRange]`), preventing stale cache collisions.
-- **Chart Memory Safety:** Canvas instances and Chart.js subscribers are automatically unregistered on unmount to prevent browser memory leaks.
 - **Authentication Guard:** Both dashboard routes require active user sessions; unauthorized requests redirect to `/login`.
 
 ---

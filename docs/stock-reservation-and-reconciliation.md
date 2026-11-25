@@ -216,6 +216,6 @@ Dikkat edilen noktalar:
 
 ## 6. Bilinen sınırlar
 
-- Job tek instance varsayımıyla yazılmıştır; dağıtık kilit (ShedLock vb.) yoktur. Birden fazla instance aynı anda çalışırsa compare-and-set sayesinde yanlış değer yazılmaz, yalnızca iş tekrarlanır.
+- Job Redis tabanlı ShedLock ile tek instance'ta çalışır (`@SchedulerLock(name = "stockReservationReconciliationScheduler")`, `lockAtMostFor` 4 dk 30 sn). Kilit süresi dolup iki tur çakışsa bile compare-and-set sayesinde yanlış değer yazılmaz, yalnızca iş tekrarlanır.
 - `reserve_stock.lua` (TTL'siz rezervasyon) ve `syncStockToRedis` serviste tanımlıdır; checkout akışı bunları kullanmaz.
 - `POST /api/checkout/initiate` hata durumunda da `ResultResponses` zarfıyla döner; frontend rezervasyon alınamazsa checkout'u durdurur (`CheckoutPage`).

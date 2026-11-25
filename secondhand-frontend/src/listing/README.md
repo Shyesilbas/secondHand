@@ -39,8 +39,8 @@ Generated from code; the hook files are the source of truth.
 ## 3. Form & Dynamic Attribute Engine
 
 ### Polymorphic Form Architecture
-- Form fields dynamically assemble based on `categoryConfig` matching the selected vertical (`vehicleConfig`, `electronicsConfig`, `realEstateConfig`, `booksConfig`, `clothingConfig`, `sportsConfig`).
-- Type rules (`REQUIRED`, `OPTIONAL`, `HIDDEN`) derived from backend `/api/v1/enums/all` determine which spec fields appear.
+- Form fields assemble from the selected vertical's config in `listing/config/` (`vehicleConfig`, `electronicsConfig`, `realEstateConfig`, `booksConfig`, `clothingConfig`, `sportsConfig`), looked up through `listingTypeConfig` (`listingConfig.js`).
+- Per-type field rules (REQUIRED, OPTIONAL, HIDDEN) come from the backend catalog (`/api/v1/catalog/{vertical}/...`, `fieldRules`) and decide which spec fields appear (vertical `*CatalogUtils.js`).
 
 ### Dynamic Attributes (`listings.attributes`)
 - Attributes configured in `listing_attribute_definitions` render via `<ListingAttributeSection>`.

@@ -10,7 +10,7 @@ Manages internal user virtual balances (`e_wallets` table), deposits, withdrawal
 > - **Key Entry Points:** [`EWalletController`](api/EWalletController.java) · [`EWalletService`](application/EWalletService.java) · [`IEWalletService`](application/IEWalletService.java) · [`EWalletValidator`](validator/EWalletValidator.java) · [`EWalletPaymentProviderAdapter`](adapter/in/EWalletPaymentProviderAdapter.java)
 
 ## Business Rules & Invariants
-- **Pessimistic Row Lock First (`findByUserIdForUpdate`):** Every balance mutation (deposit, withdraw, checkout debit, escrow credit) acquires a PostgreSQL `FOR UPDATE` row lock on `e_wallets` before checking balances or mutating state.
+- **Pessimistic Row Lock First (`EWalletRepository.findByUserWithLock`):** Every balance mutation (deposit, withdraw, checkout debit, escrow credit) acquires a PostgreSQL `FOR UPDATE` row lock on `e_wallets` before checking balances or mutating state.
 - **Idempotency Under Lock (`alreadyApplied`):** Deposit, withdrawal, and payment mutations verify under the wallet row lock whether `idempotencyKey` was already recorded in `payments`, preventing duplicate charges on concurrent retries.
 - **Non-Negative Floor & 2-Decimal Precision:** `EWalletValidator` enforces `amount > 0`, `balance >= amount` on debits, and optional `walletLimit`. Balances are scaled to 2 decimal places (`RoundingMode.HALF_UP`) via `EWalletBalanceUtil.scale`.
 - **Proactive Monthly Spending Warning:** If `monthlyCompletedOutgoingSpend + requestedAmount > spendingWarningLimit`, the check endpoint alerts the user without blocking transactions.
@@ -25,9 +25,10 @@ Manages internal user virtual balances (`e_wallets` table), deposits, withdrawal
 ## API (`EWalletController`, `/api/v1/e-wallets`)
 - `POST /` — create eWallet for the authenticated user (`EwalletRequest`).
 - `GET /` — current balance, currency, and limits.
-- `POST /deposit` — deposit funds (`Idempotency-Key` header required, `DepositRequest`).
-- `POST /withdraw` — withdraw funds to bank account (`Idempotency-Key` header required, `WithdrawRequest`).
+- `POST /deposit` — deposit funds (`Idempotency-Key` header, enforced by `requireIdempotencyKey`, `DepositRequest`).
+- `POST /withdraw` — withdraw funds to bank account (`Idempotency-Key` header, enforced by `requireIdempotencyKey`, `WithdrawRequest`).
 - `PUT /update/spending-warning` & `DELETE /update/spending-warning` — set or clear `spendingWarningLimit`.
+- `PUT /limits` — update wallet limits (`UpdateLimitRequest`).
 - `GET /balance/check?amount=` — boolean check if balance covers `amount`.
 - `GET /spending-warning/check?amount=` — boolean check if `amount` crosses monthly warning threshold.
 - `GET /transactions` — paginated wallet transaction history.

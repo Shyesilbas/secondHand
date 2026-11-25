@@ -250,6 +250,10 @@ export const describeNotification = (notification, t) => {
           ? (!isSellerSide
             ? tr('notif_order_seller_restricted_buyer', '{{prefix}}siparişi satıcının hesabı kısıtlandığı için iptal edildi; ödemen iade edildi.', { prefix })
             : tr('notif_order_seller_restricted_seller', '{{prefix}}siparişi hesabın kısıtlandığı için otomatik olarak iptal edildi.', { prefix }))
+          : meta.reason === 'MEETUP_EXPIRED'
+            ? (!isSellerSide
+              ? tr('notif_order_meetup_expired_buyer', '{{prefix}}siparişi güvenli buluşma 7 gün içinde tamamlanmadığı için iptal edildi; ödemen iade edildi.', { prefix })
+              : tr('notif_order_meetup_expired_seller', '{{prefix}}siparişi güvenli buluşma 7 gün içinde tamamlanmadığı için otomatik olarak iptal edildi.', { prefix }))
           : meta.reason === 'SHIP_DEADLINE_MISSED'
             ? (!isSellerSide
               ? tr('notif_order_ship_deadline_buyer', '{{prefix}}siparişi satıcı 72 saat içinde kargoya vermediği için iptal edildi; ödemen iade edildi.', { prefix })

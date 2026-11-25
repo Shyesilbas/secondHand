@@ -449,6 +449,30 @@ public class NotificationTemplateCatalog {
                 toJson(payload));
     }
 
+    /** The system cancelled a Safe Meetup order whose handover did not happen in time; the buyer is refunded. */
+    public NotificationRequest orderCancelledMeetupExpired(Long userId, Long orderId, String orderNumber,
+                                                           int staleDays, boolean sellerSide, UUID listingId,
+                                                           String listingTitle, Integer itemCount) {
+        String message = sellerSide
+                ? "Order #" + safe(orderNumber) + " was cancelled because the meetup handover was not completed within " + staleDays + " days."
+                : "Order #" + safe(orderNumber) + " was cancelled because the meetup handover was not completed within " + staleDays + " days. Your payment was refunded.";
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.REASON, "MEETUP_EXPIRED");
+        payload.put(NotificationMetadataKeys.RECIPIENT_ROLE, sellerSide ? "SELLER" : "BUYER");
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
+        return NotificationRequest.of(
+                userId,
+                NotificationType.ORDER_CANCELLED,
+                "Order cancelled",
+                message,
+                sellerSide ? "/profile/i-sold" : "/profile/orders",
+                toJson(payload));
+    }
+
     public NotificationRequest orderCancelledSellerRestricted(Long userId, Long orderId, String orderNumber,
                                                               boolean sellerSide, UUID listingId,
                                                               String listingTitle, Integer itemCount) {

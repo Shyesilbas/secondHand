@@ -10,10 +10,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "favorite_list_items",
-    indexes = {
-        @Index(name = "idx_favorite_list_items_list_listing", columnList = "favorite_list_id, listing_id"),
-        @Index(name = "idx_favorite_list_items_listing_id", columnList = "listing_id")
-    })
+    uniqueConstraints = @UniqueConstraint(name = "uk_favorite_list_items_list_listing",
+        columnNames = {"favorite_list_id", "listing_id"}),
+    indexes = @Index(name = "idx_favorite_list_items_listing_id", columnList = "listing_id"))
 @Getter
 @Setter
 @NoArgsConstructor

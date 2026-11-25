@@ -124,7 +124,7 @@ Belirti: eski bir veritabanında ilk açılış checksum hatasıyla durur. Neden
 
 ## 7. Zamanlanmış İşler
 
-Dağıtık çalışmada çift tetiklenmeyi ShedLock engeller (`@SchedulerLock`). Başlıca işler:
+Dağıtık çalışmada çift tetiklenmeyi ShedLock engeller (`@SchedulerLock`). Outbox worker'ları ShedLock kullanmaz; satırları `SKIP LOCKED` ile aldıkları için instance'lar aynı event'i paylaşmaz. Başlıca işler:
 
 | Scheduler | Görev | Aralık |
 | :--- | :--- | :--- |

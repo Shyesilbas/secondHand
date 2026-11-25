@@ -106,6 +106,9 @@ public class OrderEmailListener {
                         + " saat içinde kargoya vermediği için iptal edildi ve ödemeniz iade edildi.";
                 case SELLER_RESTRICTED -> "Siparişiniz (" + displayName
                         + ") satıcı hesabı kısıtlandığı için iptal edildi ve ödemeniz iade edildi.";
+                case MEETUP_EXPIRED -> "Siparişiniz (" + displayName + ") güvenli buluşma "
+                        + OrderBusinessConstants.MEETUP_STALE_DAYS
+                        + " gün içinde tamamlanmadığı için iptal edildi ve ödemeniz iade edildi.";
                 case PARTICIPANT_REQUEST -> "Siparişiniz (" + displayName + ") iptal edilmiştir.";
             };
             String counterpartyMessage = switch (event.cause()) {
@@ -114,6 +117,9 @@ public class OrderEmailListener {
                         + " saat içinde kargoya verilmediği için otomatik olarak iptal edildi.";
                 case SELLER_RESTRICTED -> "Sipariş " + displayName
                         + " hesabınız kısıtlandığı için otomatik olarak iptal edildi ve alıcıya iade yapıldı.";
+                case MEETUP_EXPIRED -> "Sipariş " + displayName + " güvenli buluşma "
+                        + OrderBusinessConstants.MEETUP_STALE_DAYS
+                        + " gün içinde tamamlanmadığı için otomatik olarak iptal edildi.";
                 case PARTICIPANT_REQUEST -> "Sipariş " + displayName + " karşı taraf tarafından iptal edildi.";
             };
 

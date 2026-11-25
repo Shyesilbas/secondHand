@@ -18,7 +18,6 @@ export const LISTING_STATUS = {
     SOLD: 'SOLD',
     PENDING: 'PENDING',
     DRAFT: 'DRAFT',
-    RESERVED: 'RESERVED',
     DELETED: 'DELETED',
 };
 
@@ -27,7 +26,6 @@ export const LISTING_STATUSES = [
     { value: 'INACTIVE', label: 'Inactive' },
     { value: 'DRAFT', label: 'Draft' },
     { value: 'SOLD', label: 'Sold' },
-    { value: 'RESERVED', label: 'Reserved' },
     { value: 'DELETED', label: 'Deleted' },
 ];
 

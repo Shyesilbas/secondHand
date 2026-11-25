@@ -13,7 +13,7 @@ import { LISTING_STATUS } from '../types/index.js';
 const ACTIONS = [
   { action: 'DEACTIVATE', from: [LISTING_STATUS.ACTIVE], icon: EyeOff, label: 'bulk_deactivate', done: 'bulk_deactivated' },
   { action: 'REACTIVATE', from: [LISTING_STATUS.INACTIVE], icon: PlayCircle, label: 'bulk_reactivate', done: 'bulk_reactivated' },
-  { action: 'MARK_SOLD', from: [LISTING_STATUS.ACTIVE, LISTING_STATUS.RESERVED], icon: CheckCircle2, label: 'bulk_mark_sold', done: 'bulk_marked_sold' },
+  { action: 'MARK_SOLD', from: [LISTING_STATUS.ACTIVE], icon: CheckCircle2, label: 'bulk_mark_sold', done: 'bulk_marked_sold' },
 ];
 
 const LINK = 'rounded text-sm font-medium text-text-link transition-colors duration-150 hover:text-text-linkHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50';

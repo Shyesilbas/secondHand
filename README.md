@@ -12,7 +12,7 @@ An enterprise-grade, high-concurrency C2C second-hand marketplace platform featu
 | **Database & Cache** | PostgreSQL 15, Flyway Migrations, Redis 7 (Atomic Lua Scripts, Multi-tier Cache) |
 | **Messaging** | Apache Kafka 3.7 (KRaft mode, Transactional Outbox, Consumer Idempotency) |
 | **Frontend** | React 19, Vite 5, Tailwind CSS 3, React Query (@tanstack), Axios |
-| **Real-Time** | Spring WebSocket, STOMP protocol, Redis Pub/Sub cross-instance routing |
+| **Real-Time** | Spring WebSocket, STOMP protocol, simple broker fanned out across instances via Redis Pub/Sub |
 | **AI & External** | Google Gemini API (Aura AI), Cloudinary CDN, ExchangeRate-API, Google OAuth2 |
 | **Observability** | Spring Boot Actuator, Prometheus Metrics endpoint (`/actuator/prometheus`) |
 

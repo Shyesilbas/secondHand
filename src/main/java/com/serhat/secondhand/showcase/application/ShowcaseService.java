@@ -90,6 +90,12 @@ public class ShowcaseService implements IShowcaseService {
 
     private Result<Showcase> createShowcaseInternal(ShowcasePaymentRequest request, User user, Listing listing,
             Long userId) {
+        boolean alreadyShowcased = showcaseRepository.existsByListingIdAndEndDateAfter(listing.getId(), LocalDateTime.now());
+        Result<Void> eligibility = showcaseValidator.validateCanShowcase(listing, userId, alreadyShowcased);
+        if (eligibility.isError()) {
+            return Result.error(eligibility.getMessage(), eligibility.getErrorCode());
+        }
+
         // Pricing Calculation
         BigDecimal showcaseDailyCost = showcasePricingCalculator.dailyCost();
         BigDecimal totalCost = showcasePricingCalculator.totalCost(request.days());

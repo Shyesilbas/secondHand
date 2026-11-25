@@ -30,5 +30,5 @@ The `comparison` module allows shoppers to benchmark multiple listings side-by-s
 - **Sports:** Discipline, Equipment Type, Condition, Dimensions/Weight.
 
 ## 3. Storage & Persistence Invariants
-- Comparison items persist across page navigation and reloads using `localStorage` (`secondhand_comparison_items`).
+- Comparison items persist across page navigation and reloads using `localStorage` via `cacheService` (key `comparison_items`).
 - Stored payload keeps minimal identifiers (`id`, `title`, `price`, `imageUrl`, `category`) to avoid stale spec states.

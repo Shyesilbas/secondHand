@@ -10,10 +10,10 @@ Manages post-delivery buyer ratings (1-5 stars) and text feedback (`reviews` tab
 
 ## Business Rules & Invariants
 - **Verified Delivery & Buyer Ownership (`ReviewValidator`, `ReviewErrorCodes`):**
-  - The target `OrderItem` must exist (`ORDER_ITEM_NOT_FOUND`) and belong to a fulfilled order (`ShippingStatus.DELIVERED` for cargo, or `OrderStatus.HANDOVER_CONFIRMED` / `OrderStatus.COMPLETED` for Safe Meetup; otherwise `ORDER_ITEM_NOT_DELIVERED`).
-  - Only the order buyer (`order.buyer.id == reviewerId`) may submit the review (`NOT_ORDER_BUYER`).
-  - `rating` must be between `1` and `5` inclusive (`INVALID_RATING`).
-- **Single Review per Order Item:** Enforced by `UNIQUE (order_item_id)`; duplicate attempts return `REVIEW_ALREADY_EXISTS`.
+  - The target `OrderItem` must exist (`ORDER_ITEM_NOT_FOUND`) and belong to a fulfilled order (`ShippingStatus.DELIVERED` for cargo, or `OrderStatus.HANDOVER_CONFIRMED` / `OrderStatus.COMPLETED` for Safe Meetup, `Order.isFulfilledForReview`; otherwise `ORDER_NOT_DELIVERED`).
+  - Only the order buyer (`order.user.id == reviewer.id`) may submit the review (`ORDER_ITEM_NOT_BELONG_TO_USER`).
+  - `rating` must be between `0` and `5` inclusive (`@Min`/`@Max` on `CreateReviewRequest`, bean validation error).
+- **Single Review per Order Item:** Enforced by `UNIQUE (reviewer_id, order_item_id)` (`uk_reviews_reviewer_order_item`); duplicate attempts return `REVIEW_ALREADY_EXISTS`.
 - **Prestige & Notification Hooks:** Saving a review notifies the seller (`NotificationTemplateCatalog`), publishes `SellerEligibilityRecheckEvent` (consumed by `user` to re-evaluate the `isGreatSeller` badge), and uses SQL projections (`ReviewStatsProjection`, `ListingReviewStatsProjection`, `GreatSellerReviewMetrics`) for aggregate stats.
 - **Change rule:** New stats fields: update `ReviewStatsProjection` / `ListingReviewStatsProjection` and the `ReviewRepository` aggregate queries together.
 

@@ -10,8 +10,8 @@ Manages buyer shopping carts (`carts` table, unique on `(user_id, listing_id)`) 
 > - **Key Entry Points:** [`CartController`](api/CartController.java) · [`CartService`](application/CartService.java) · [`CartValidator`](validator/CartValidator.java) · [`CartSocialMetricService`](application/CartSocialMetricService.java)
 
 ## Business Rules & Invariants
-- **Two-Tier Stock Model (No Cart Locks):** Adding or updating cart items verifies positive PostgreSQL stock (`AVAILABLE_STOCK_INSUFFICIENT`) without taking `PESSIMISTIC_WRITE` DB locks or Redis stock holds. Hard stock reservation happens only when entering checkout (`CheckoutStockReservationService`).
-- **Self-Purchase Prevention:** Buyers cannot add their own listings to the cart (`CANNOT_ADD_OWN_LISTING`).
+- **Two-Tier Stock Model (No Cart Locks):** Adding or updating cart items verifies positive PostgreSQL stock (`CartErrorCodes.INSUFFICIENT_STOCK`) without taking `PESSIMISTIC_WRITE` DB locks or Redis stock holds. Hard stock reservation happens only when entering checkout (`CheckoutStockReservationService`).
+- **Self-Purchase Prevention:** Buyers cannot add their own listings to the cart (`ListingErrorCodes.LISTING_BELONGS_TO_USER`).
 - **Active Listing Requirement:** Only `ListingStatus.ACTIVE` items can be added or checked out.
 - **Quantity Floor & Concurrency:** Quantities must be `>= 1` (setting `0` deletes the item). Concurrent writes (`DataIntegrityViolationException`, `ObjectOptimisticLockingFailureException`) are translated into clean `Result` responses.
 - **Change rule:** New rules go into `CartValidator`; tunables bind under `app.cart.*` (`CartConfig`).

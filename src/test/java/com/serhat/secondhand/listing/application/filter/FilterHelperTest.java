@@ -36,7 +36,7 @@ class FilterHelperTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ListingStatus.class, names = {"DRAFT", "INACTIVE", "RESERVED", "DELETED"})
+    @EnumSource(value = ListingStatus.class, names = {"DRAFT", "INACTIVE", "DELETED"})
     void ownerOnlyStatusesAreRejected(ListingStatus status) {
         ListingFilterDto filters = new SportsListingFilterDto();
         filters.setStatus(status);

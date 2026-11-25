@@ -154,7 +154,7 @@ Eğer tüm adımlar başarılı geçmesine rağmen PostgreSQL `commit` anında b
 
 ### Lua Script Görevleri:
 - `reserve_stock_with_ttl.lua`: `available_stock >= qty` kontrolünü atomik yapar, stoku düşer ve 15 dk TTL ile rezervasyon anahtarını oluşturur.
-- `cancel_user_reservation.lua`: Rezervasyon anahtarını siler ve rezerve edilen miktarı `available_stock` üzerine atomik olarak iade eder.
+- `cancel_user_reservation.lua`: Rezervasyon anahtarını siler ve rezerve edilen miktarı stok key'ine atomik olarak geri ekler (stok key'i yoksa yeniden oluşturmaz).
 - Lua yok: commit sonrası `consumeReservationOnPurchase` iki düz Redis komutu çalıştırır (önce pending key `SET`, sonra reservation key `DELETE`), böylece reconciliation job ikisini birden göremez duruma düşmez.
 
 ---

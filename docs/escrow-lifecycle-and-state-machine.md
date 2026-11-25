@@ -96,7 +96,7 @@ Alıcı ürünü teslim almasına rağmen panelden onay vermeyi unutursa satıc�
 1. **Kargolu Gönderimler:** `shipping.deliveredAt` üzerinden `OrderBusinessConstants.AUTO_COMPLETION_HOURS` (72 saat) geçtiyse scheduler `escrowService.release(order)` çağırır. (İade penceresi `REFUND_WINDOW_HOURS` = 48 saattir; yani iade hakkı otomatik tamamlamadan önce biter.)
 2. **Güvenli Buluşma (`SAFE_MEETUP`):** `meetupVerifiedAt` üzerinden 24 saat geçtiyse (`HANDOVER_CONFIRMED`) aynı şekilde release edilir.
 3. **Kargolanmayan sipariş:** `CONFIRMED`/`PROCESSING` durumundaki `CARGO` siparişi 72 saatte (`SHIP_DEADLINE_HOURS`) kargolanmazsa `OrderCancellationService.cancelUnshippedOrder` çağrılır; escrow `CANCELLED` olur.
-4. **Bayat buluşma:** `MEETUP_PENDING` siparişi 7 gün içinde tamamlanmazsa scheduler doğrudan `escrowService.cancel` çağırır ve siparişi `CANCELLED` yapar.
+4. **Bayat buluşma:** `MEETUP_PENDING` veya `VERIFICATION_LOCKED` siparişi 7 gün (`MEETUP_STALE_DAYS`) içinde tamamlanmazsa scheduler `OrderCancellationService.cancelStaleMeetupOrder` çağırır; escrow refund, stok iadesi ve cancel kayıtları alıcı iptaliyle aynı yoldan yapılır.
 
 Release hata dönerse sipariş `COMPLETED` yapılmaz ve bir sonraki scheduler çalışmasında tekrar denenir.
 

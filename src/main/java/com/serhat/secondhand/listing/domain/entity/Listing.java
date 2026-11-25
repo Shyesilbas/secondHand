@@ -206,7 +206,7 @@ public class Listing {
     }
     
     private void validateCanMarkAsSold() {
-        if (this.status != ListingStatus.ACTIVE && this.status != ListingStatus.RESERVED) {
+        if (this.status != ListingStatus.ACTIVE) {
             throw new BusinessException(ListingErrorCodes.INVALID_STATUS_TRANSITION);
         }
     }

@@ -3,7 +3,6 @@ package com.serhat.secondhand.order.application.listener;
 import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.application.OrderLogService;
-import com.serhat.secondhand.order.application.event.OrderCancellationCause;
 import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
@@ -213,14 +212,20 @@ public class OrderNotificationListener {
             Long buyerId = order.getUser() != null ? order.getUser().getId() : null;
             for (Long uid : collectOrderParticipantIds(order)) {
                 boolean sellerSide = !uid.equals(buyerId);
-                var request = event.cause() == OrderCancellationCause.SELLER_RESTRICTED
-                        ? notificationTemplateCatalog.orderCancelledSellerRestricted(
-                                uid, order.getId(), orderNumber, sellerSide,
-                                summary.listingId(), summary.listingTitle(), summary.itemCount())
-                        : notificationTemplateCatalog.orderCancelledShipDeadline(
-                                uid, order.getId(), orderNumber,
-                                OrderBusinessConstants.SHIP_DEADLINE_HOURS, sellerSide,
-                                summary.listingId(), summary.listingTitle(), summary.itemCount());
+                var request = switch (event.cause()) {
+                    case SELLER_RESTRICTED -> notificationTemplateCatalog.orderCancelledSellerRestricted(
+                            uid, order.getId(), orderNumber, sellerSide,
+                            summary.listingId(), summary.listingTitle(), summary.itemCount());
+                    case MEETUP_EXPIRED -> notificationTemplateCatalog.orderCancelledMeetupExpired(
+                            uid, order.getId(), orderNumber,
+                            OrderBusinessConstants.MEETUP_STALE_DAYS, sellerSide,
+                            summary.listingId(), summary.listingTitle(), summary.itemCount());
+                    case SHIP_DEADLINE_MISSED -> notificationTemplateCatalog.orderCancelledShipDeadline(
+                            uid, order.getId(), orderNumber,
+                            OrderBusinessConstants.SHIP_DEADLINE_HOURS, sellerSide,
+                            summary.listingId(), summary.listingTitle(), summary.itemCount());
+                    case PARTICIPANT_REQUEST -> throw new IllegalStateException("Not a system cancellation: " + orderNumber);
+                };
                 var result = notificationService.createAndSend(request);
                 if (result.isError()) {
                     orderLog.logNotificationFailed("orderSystemCancelledInApp", orderNumber, result.getMessage());

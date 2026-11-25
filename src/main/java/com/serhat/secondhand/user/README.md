@@ -1,6 +1,6 @@
 # User Domain
 
-Manages user accounts (`users` table), sanitized public vs. private profiles, shipping/billing addresses (`addresses` table), membership subscriptions (`MembershipPlan`: `BASIC`, `PLUS`, `PRO`), Great Seller prestige evaluation (`GreatSellerPolicy`), and Trust & Safety restriction fields.
+Manages user accounts (`users` table), sanitized public vs. private profiles, shipping/billing addresses (`addresses` table), membership subscriptions (`MembershipPlan`: `FREE`, `PREMIUM`), Great Seller prestige evaluation (`GreatSellerPolicy`), and Trust & Safety restriction fields.
 
 > [!NOTE]
 > **Related Documentation & Runbooks:**
@@ -11,11 +11,11 @@ Manages user accounts (`users` table), sanitized public vs. private profiles, sh
 
 ## Business Rules & Invariants
 - **Private vs. Sanitized Public Profile:** `/api/v1/users/me` returns the full `UserDto` to the authenticated owner. Public endpoints (`/api/v1/users/{id}`) return `PublicUserProfileDto`, stripping email, phone, birthdate, roles, and sanction details, and exposing only `ListingStatus.ACTIVE` listings.
-- **Single Main Address (`AddressService`):** At most one address per user has `isMain = true`; designating a new main address atomically demotes the previous main address (`demoteExistingMainAddress`) in the same transaction.
-- **Memberships & Schedulers (`MembershipService`, `MembershipScheduler`):** Manages `BASIC`, `PLUS`, and `PRO` tiers and daily Aura AI usage counters (reset daily at midnight; expired plans with `autoRenew == true` charge the user's eWallet or downgrade to `BASIC`).
+- **Single Main Address (`AddressService`):** At most one address per user has `mainAddress = true`; designating a new main address first clears the flag on all of the user's addresses (`AddressRepository.resetMainAddressByUserId`) in the same transaction.
+- **Memberships & Schedulers (`MembershipService`, `MembershipScheduler`):** Two plans, `FREE` and `PREMIUM`; `MembershipPlan` holds per-plan limits (daily Aura questions 2/8, showcase slots 1/4). `downgradeExpiredPremiumUsers` runs daily at 00:01: an expired `PREMIUM` with `autoRenew` is charged from the eWallet, otherwise (or on a failed charge) the user drops to `FREE`. `resetMonthlyAiQuota` runs on the 1st of each month. The daily Aura counter (`dailyAuraUsage`, `dailyAuraResetDate`) is reset lazily by the next question, not by a scheduler.
 - **System account (`SystemAccountService`):** seeded by Flyway V62 (email `app.platform.system-account-email`, password `!`, cannot sign in) with its own eWallet. It receives listing, showcase, membership and shipping fees and funds platform coupon subsidies; its balance may go negative. Membership payments go to it.
-- **Event-Driven Great Seller Badge (`GreatSellerPolicy`):** `GreatSellerEligibilityEventListener` consumes `SellerEligibilityRecheckEvent` asynchronously to evaluate completed order volume, fulfillment speed, dispute rate, and rating (`>= 4.5`).
-- **Trust & Safety State:** Stores `warning_count` (decays to `0` after 180 infraction-free days), `banned_until`, `is_chat_restricted`, and `is_listing_restricted` (see [`complaint/README.md`](../complaint/README.md)).
+- **Event-Driven Great Seller Badge (`GreatSellerPolicy`, `GreatSellerService`):** `GreatSellerEligibilityEventListener` re-evaluates asynchronously after `OrderCompletedEvent` and `SellerEligibilityRecheckEvent`. A seller qualifies with at least `MIN_QUALIFYING_SALES` (6) paid, non-cancelled, non-refunded TRY sales of `MIN_UNIT_PRICE_TRY` (1500) or more in the last `ROLLING_WINDOW_DAYS` (60), `MIN_DISTINCT_REVIEWERS` (3) and an average rating of `MIN_AVERAGE_RATING` (4.7) or higher.
+- **Trust & Safety State:** Stores `warning_count` (lazily reset after `strike-decay`, default 180 days without a new penalty, in `SanctionExecutor`), `banned_until`, `is_chat_restricted`, and `is_listing_restricted` (see [`complaint/README.md`](../complaint/README.md)).
 - **Moderation restrictions (`UserRestrictionService`):** a ban is active while `acc_status = BLOCKED` or `banned_until` is in the future; leftover flags after expiry do nothing. `RestrictedAction` guards chat send, listing create/publish/reactivate, offers and checkout (`RestrictionErrorCodes`, 403). State is cached under `KEY_PREFIX` (restricted until the ban ends, unrestricted for `UNRESTRICTED_TTL`); a miss or Redis outage reads PostgreSQL. Withdrawals, order tracking, delivery and refunds are never restricted.
 - **Change rule:** anything that changes ban fields must call `UserRestrictionService.invalidate` after commit; a new ban publishes `UserBannedEvent`.
 
@@ -23,7 +23,7 @@ Manages user accounts (`users` table), sanitized public vs. private profiles, sh
 - **`users.can_send_message`:** default `TRUE`; seeds the create-form default of `listings.can_send_message`.
 
 ## API
-- **Profile (`UserController`, `/api/v1/users`):** `GET /me` · `GET /{id}` · `GET /{id}/listings` · `PUT /email` · `PUT /phone` · `GET /search` (`PublicUserProfileDto`, max 20) · `GET /great-sellers` · `GET /{id}/great-seller-status` · `GET /me/restriction` (`RestrictionStatusDto`) · `GET|PATCH /me/settings` (`canSendMessage`) · `GET /me/blocked-users` · `POST|DELETE /{id}/block` · `GET /{id}/block-status`.
+- **Profile (`UserController`, `/api/v1/users`):** `GET /me` · `GET /{id}` · `GET /{id}/listings` · `PUT /email` · `PUT /phone` · `GET /search` (`PublicUserProfileDto`, max 20) · `GET /great-sellers` · `GET /{id}/great-seller-status` · `GET /me/restriction` (`RestrictionStatusDto`) · `GET|PATCH /me/settings` (`canSendMessage`) · `GET /me/blocked-users` · `POST|DELETE /{id}/block` · `GET /{id}/block-status` · `POST /verification/{send|verify}` · `GET /audit-logs` (own). Reviews: `GET /me/reviews/received` · `GET /{id}/reviews/{received|written}` · `GET /{id}/review-stats`. Offers: `GET /me/offers/{made|received}` ([offer hub](../offer/README.md)). Complaints: `GET /me/complaints` · `GET /me/complaints/received` ([complaint hub](../complaint/README.md)).
 - **Addresses (`AddressController`, `/api/v1/users/addresses`):** `GET /` · `POST /` · `PUT /{id}` · `DELETE /{id}` · `POST /{id}/main`.
 - **Memberships (`MembershipController`, `/api/v1/memberships`):** `GET /status` · `GET /quote` (`MembershipQuoteDto`: premium price and eWallet balance check) · `POST /upgrade` (`MembershipUpgradeRequest`) · `POST /cancel` · `POST /toggle-auto-renew`.
 - **Badges (`UserBadgesController`, `/api/v1/user/badges`):** `GET /`.

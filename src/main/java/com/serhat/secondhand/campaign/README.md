@@ -10,7 +10,7 @@ Manages seller-created promotional discounts (`campaigns`, `campaign_eligible_ty
 
 ## Business Rules & Invariants
 - **Ownership & Vertical Exclusion (`CampaignValidator`):** Sellers may only attach listings they own (`assertOwnedBySeller`, `CampaignErrorCodes.CAMPAIGN_NOT_OWNED`). Non-discountable verticals come from `DiscountEligibility`.
-- **Value & Time Bounds:** `CampaignDiscountKind.PERCENTAGE` requires `0 < value <= 100`; `FIXED_AMOUNT` requires `value > 0`; `startsAt` must precede `endsAt`.
+- **Value & Time Bounds:** `CampaignDiscountKind.PERCENT` requires `0 < value <= 100`; `FIXED` requires `value > 0`; `startsAt` must precede `endsAt`.
 - **Scope Hierarchy (`ListingCampaignPricingUtil.isApplicable`):**
   - If `eligibleListingIds` is non-empty, only those explicit listings qualify (`applyToFutureListings = true` never widens an explicit listing whitelist).
   - If `eligibleTypes` is non-empty, matching listings qualify (including future listings when `applyToFutureListings = true`).

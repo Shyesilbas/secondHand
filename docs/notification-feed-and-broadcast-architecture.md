@@ -87,7 +87,7 @@ webSocketService.sendNotificationToUser(user.getId(), dto);
 
 - Mesaj `convertAndSend` ile bu literal hedefe yazılır; hedefte `/queue` parçası yoktur.
 - Push hatası yakalanıp loglanır; bildirim DB'de kaldığı için kullanıcı feed'i açtığında görür.
-- Broker JVM içi simple broker'dır: bir instance'ın yayınladığı push, başka instance'a bağlı kullanıcıya ulaşmaz (bildirim yine DB'dedir).
+- Broker JVM içi simple broker'dır. Her push `StompFanoutPublisher` ile Redis kanalı `v4:ws:fanout` üzerinden tüm instance'lara yayılır; her instance `StompFanoutListener` ile mesajı kendi simple broker'ına verir. Redis'e yazılamazsa push yalnızca yerel client'lara gider ve hata loglanır. Bildirim her durumda DB'dedir.
 - Kullanıcı bulunamazsa `USER_NOT_FOUND` döner. Toplu gönderim için `createAndSendBulk` tek `saveAll` yapar ve her kayıt için ayrı push gönderir.
 
 ---

@@ -120,7 +120,7 @@ public interface ErrorCode {
 2. **Çakışma Kontrolü (`ErrorCodeStatuses`):**
    - [`ErrorCodeStatuses.java`](../src/main/java/com/serhat/secondhand/core/result/ErrorCodeStatuses.java), uygulama başlarken `com.serhat.secondhand` paketindeki tüm `ErrorCode` enum'larını tarar ve bellek içi bir map (`BY_CODE`) oluşturur.
    - İki farklı enum aynı string kodu farklı HTTP status ile tanımlarsa (`putIfAbsent` kontrolü), uygulama startup aşamasında `IllegalStateException` fırlatarak çöker. Çakışan kodların üretime sızması engellenir.
-3. **Özel Exception Sınıfları:** [`BusinessException`](../src/main/java/com/serhat/secondhand/core/exception/BusinessException.java) çekirdek sınıfından türeyen 9 uzmanlaşmış sınıf (`AccountNotActiveException`, `InvalidRefreshTokenException`, `ReservationException`, `VerificationLockedException`, `EmailExistsException`, `UserAlreadyExistsException`, `UserAlreadyLoggedOutException`, `VerificationCodeMismatchException`, `AuthenticationNotFoundException`) bulunur. Bunlar da `HttpStatus` ve `ErrorCode` taşır.
+3. **Özel Exception Sınıfları:** [`BusinessException`](../src/main/java/com/serhat/secondhand/core/exception/BusinessException.java) çekirdek sınıfından türeyen 8 uzmanlaşmış sınıf (`AccountNotActiveException`, `InvalidRefreshTokenException`, `ReservationException`, `EmailExistsException`, `UserAlreadyExistsException`, `UserAlreadyLoggedOutException`, `VerificationCodeMismatchException`, `AuthenticationNotFoundException`) bulunur. Bunlar da `HttpStatus` ve `ErrorCode` taşır.
 
 ---
 

@@ -17,6 +17,7 @@ public enum UserErrorCodes implements ErrorCode {
     NO_ACTIVE_VERIFICATION_CODE("NO_ACTIVE_VERIFICATION_CODE", "No active verification code found. Please request a new code", HttpStatus.BAD_REQUEST),
     INCORRECT_VERIFICATION_CODE("INCORRECT_VERIFICATION_CODE", "Incorrect verification code", HttpStatus.BAD_REQUEST),
     INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS("INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS", "Incorrect verification code. Attempts left: %d", HttpStatus.BAD_REQUEST),
+    VERIFICATION_ATTEMPTS_EXHAUSTED("VERIFICATION_ATTEMPTS_EXHAUSTED", "Too many incorrect attempts. Please request a new code", HttpStatus.TOO_MANY_REQUESTS),
     CANNOT_BLOCK_SELF("CANNOT_BLOCK_SELF", "You cannot block yourself", HttpStatus.BAD_REQUEST),
     USER_BLOCKED("USER_BLOCKED", "This action is not available between these users", HttpStatus.FORBIDDEN),
     USER_BLOCKED_YOU("USER_BLOCKED_YOU", "This user has blocked you", HttpStatus.FORBIDDEN),

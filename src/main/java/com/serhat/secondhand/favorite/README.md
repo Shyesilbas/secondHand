@@ -9,7 +9,7 @@ Manages user listing bookmarks (`favorites` table, unique on `(user_id, listing_
 > - **Key Entry Points:** [`FavoriteController`](api/FavoriteController.java) · [`FavoriteService`](application/FavoriteService.java) · [`FavoriteStatsService`](application/FavoriteStatsService.java) · [`ListingAccessService`](application/ListingAccessService.java) · [`FavoriteMapper`](domain/mapper/FavoriteMapper.java)
 
 ## Business Rules & Invariants
-- **Active State & Self-Favorite Prevention:** Bookmarking requires `ListingStatus.ACTIVE` (`ListingAccessService.validateActive`, `FavoriteErrorCodes.LISTING_NOT_ACTIVE`). Users cannot favorite their own listings (`OWN_LISTING`).
+- **Active State & Self-Favorite Prevention:** Bookmarking requires `ListingStatus.ACTIVE` (`ListingAccessService.validateActive`, `FavoriteErrorCodes.INACTIVE_LISTING`). Users cannot favorite their own listings (`OWN_LISTING`).
 - **Idempotency & Concurrency:** Enforced by `UNIQUE (user_id, listing_id)`; concurrent duplicate inserts catch `DataIntegrityViolationException` and resolve cleanly (`ALREADY_FAVORITED`).
 - **Fail-Safe Seller Notification:** Favoriting dispatches a `LISTING_FAVORITED` alert to the seller via `NotificationEventPublisher`; notification failures are caught and logged so bookmark persistence never rolls back.
 - **Seller Broadcast Offers (`broadcastOfferToFavoriters`):** Verified listing owners can broadcast a discounted in-chat offer to all active favoriters (`findUsersByListingId`), returning `FavoriterBroadcastResponseDto`.

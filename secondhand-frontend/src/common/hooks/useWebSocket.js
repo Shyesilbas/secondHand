@@ -9,19 +9,9 @@ const INITIAL_RECONNECT_DELAY = 1000; // 1s
 const MAX_RECONNECT_DELAY = 30000; // 30s
 /** A connection counts as healthy (backoff reset) after staying up this long. */
 const STABLE_CONNECTION_MS = 10000;
-/** Bellek/render: uzun oturumlarda mesaj dizisini sınırla */
-const MAX_MESSAGES_BUFFER = 200;
-
-const appendLimited = (prev, item) => {
- const next = [...prev, item];
- return next.length > MAX_MESSAGES_BUFFER ? next.slice(-MAX_MESSAGES_BUFFER) : next;
-};
-
 const useWebSocket = (userId, options = {}) => {
  const enabled = options.enabled ?? true;
  const [isConnected, setIsConnected] = useState(false);
- const [messages, setMessages] = useState([]);
- const [unreadCount, setUnreadCount] = useState(0);
  const stompClient = useRef(null);
  const subscriptions = useRef(new Map());
  const messageCallbacks = useRef(new Set());
@@ -61,16 +51,6 @@ const useWebSocket = (userId, options = {}) => {
  reconnectAttempt.current = 0;
  }
  }, STABLE_CONNECTION_MS);
-
- const userSub = client.subscribe(
- `/user/${userId}/queue/messages`,
- (message) => {
- const messageData = JSON.parse(message.body);
- setMessages((prev) => appendLimited(prev, messageData));
- setUnreadCount((prev) => prev + 1);
- }
- );
- subscriptions.current.set(`user-${userId}`, userSub);
  },
  (error) => {
  if (!isCurrent()) {
@@ -147,9 +127,6 @@ const useWebSocket = (userId, options = {}) => {
  `/topic/chat/${chatRoomId}`,
  (message) => {
  const messageData = JSON.parse(message.body);
- setMessages(prev => appendLimited(prev, messageData));
-
- // Tüm callback'leri çağır
  messageCallbacks.current.forEach(callback => {
  callback(messageData);
  });
@@ -210,7 +187,6 @@ const useWebSocket = (userId, options = {}) => {
  chatRoomId,
  senderId
  }));
- setUnreadCount(0);
  }
  }, []);
 
@@ -230,8 +206,6 @@ const useWebSocket = (userId, options = {}) => {
  
  return {
  isConnected,
- messages,
- unreadCount,
  sendMessage,
  joinRoom,
  leaveRoom,

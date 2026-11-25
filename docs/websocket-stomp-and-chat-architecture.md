@@ -32,7 +32,7 @@ Platformda kullanıcılar arası anlık mesajlaşma ve bildirim iletimi, gelenek
 ### A. HttpOnly Cookie Handshake: [`WebSocketConfig.java`](../src/main/java/com/serhat/secondhand/core/config/WebSocketConfig.java)
 - **Endpoint:** `/ws` (düz WebSocket; SockJS fallback'i yoktur).
 - **Origin Politikası:** Wildcard (`*`) kullanılmaz. `CorsConfigProperties.allowedOrigins` kullanılır; liste boşsa `http://localhost:5173`'e düşer.
-- **Simple broker:** `/topic`, `/queue`, `/user` prefix'leri için in-memory simple broker; uygulama prefix'i `/app`. Broker JVM içidir, relay yoktur: çoklu node'da bir node'dan yayınlanan mesaj yalnızca o node'a bağlı client'lara gider.
+- **Simple broker:** `/topic`, `/queue`, `/user` prefix'leri için in-memory simple broker; uygulama prefix'i `/app`. Broker JVM içidir; çoklu node için Her push `StompFanoutPublisher` ile Redis kanalı `v4:ws:fanout` üzerinden tüm instance'lara yayılır; her instance `StompFanoutListener` ile mesajı kendi simple broker'ına verir. Redis'e yazılamazsa push yalnızca yerel client'lara gider ve hata loglanır.
 - **`CookieHandshakeInterceptor`:** Tarayıcı güvenliği gereği JavaScript tarafından okunamayan `sh_at` (Access Token) çerezini HTTP Handshake aşamasında yakalar ve WebSocket oturum özniteliğine (`ws_token`) aktarır. Çerez yoksa handshake yine geçer; reddetme CONNECT aşamasında yapılır.
 
 ---

@@ -6,6 +6,6 @@ public enum ListingBatchStatusAction {
     DEACTIVATE,
     /** INACTIVE to ACTIVE. */
     REACTIVATE,
-    /** ACTIVE or RESERVED to SOLD. */
+    /** ACTIVE to SOLD. */
     MARK_SOLD
 }

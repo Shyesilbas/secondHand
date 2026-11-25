@@ -25,7 +25,7 @@ Bu doküman platformu kullanıcının gözünden anlatır: kim ne yapabilir, bir
 3. **Checkout:** adres, teslimat yöntemi, ödeme yöntemi, kupon ve doğrulama kodu adımları. Sepet birden çok satıcıdan ürün içerirse her satıcı için ayrı sipariş oluşur ([checkout-pipeline-and-distributed-transaction-flow.md](checkout-pipeline-and-distributed-transaction-flow.md)).
 4. **Ödeme:** tutar hemen satıcıya gitmez, escrow'da bekler.
 5. **Teslimat ve onay:** teslimat alındığında alıcı onaylar; onay gelmezse sistem 72 saat sonra siparişi tamamlar. Bu sürede para satıcıya geçmez.
-6. **İade ve iptal:** teslimden sonra 48 saat içinde iade istenebilir; kargolanmamış sipariş iptal edilebilir. Kalem bazında iptal/iade yapılır ([order-lifecycle-and-compensation-management.md](order-lifecycle-and-compensation-management.md)).
+6. **İade ve iptal:** teslimden sonra 48 saat içinde iade istenebilir; alıcı siparişi `PROCESSING`'e geçmeden (`CONFIRMED`) veya buluşma beklenirken (`MEETUP_PENDING`, kod kilidi dahil `VERIFICATION_LOCKED`) iptal edebilir. Kalem bazında iptal/iade yapılır ([order-lifecycle-and-compensation-management.md](order-lifecycle-and-compensation-management.md)).
 7. **Değerlendirme:** tamamlanan siparişten sonra satıcı değerlendirilir.
 
 ## 4. Teslimat Yolları
