@@ -37,9 +37,11 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | :--- | :--- |
 | **[auth-jwt-and-security-architecture.md](auth-jwt-and-security-architecture.md)** | Stateless JWT ve refresh token rotation, Google OAuth2 SSO, OWASP security header'ları, Prod Security Guard, RBAC, IDOR ve kriptografi. |
 | **[websocket-stomp-and-chat-architecture.md](websocket-stomp-and-chat-architecture.md)** | Spring WebSocket + STOMP, HttpOnly cookie handshake, channel seviyesinde JWT, IDOR korumalı room subscription ve sohbet içi teklif. |
+| **[chat-moderation-user-blocking-and-messaging-settings.md](chat-moderation-user-blocking-and-messaging-settings.md)** | Sohbet moderasyonu mesaj gizleme (tombstone), kısıtlama UI kilidi, karşılıklı kullanıcı engelleme, engellenen kullanıcılar listesi ve global/ilan bazlı `canSendMessage` ayarı. |
 | **[notification-feed-and-broadcast-architecture.md](notification-feed-and-broadcast-architecture.md)** | Kişisel bildirimler, sistem broadcast'leri, unified feed projection (`NotificationFeedRepository`), WebSocket live push ve badge cache eviction. |
 | **[email-architecture-and-event-driven-dispatch.md](email-architecture-and-event-driven-dispatch.md)** | Event-driven e-posta gönderimi: `mail.dispatch.v1`, `EmailKafkaProducer`/`EmailKafkaConsumer`, template'ler ve idempotency. |
 | **[aura-ai-and-context-architecture.md](aura-ai-and-context-architecture.md)** | Aura AI asistanı: Gemini entegrasyonu, SSE streaming, context adapter'ları, otonom arama planlaması (`AuraListingSearchOrchestrator`), kullanıcı belleği ve güvenlik sınırları. |
+| **[aura-trust-safety-and-complaint-moderation.md](aura-trust-safety-and-complaint-moderation.md)** | Aura AI otonom şikayet moderasyonu: 2 saatlik cooling-off kuyruğu, kanıt görselleri, sanction ladder, brigade/bad-faith sinyalleri, appeal ve kısıtlama cache'i. |
 | **[external-integrations-cloudinary-and-exchange.md](external-integrations-cloudinary-and-exchange.md)** | Cloudinary (görsel depolama & CDN) ve ExchangeRate-API (2 saatlik Redis cache'li döviz kuru). |
 
 ### Katalog, veri ve altyapı
@@ -55,12 +57,6 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[adr/README.md](adr/README.md)** | Mimari Karar Kayıtları: outbox, Redis Lua stok, kalem bazlı escrow, payment provider stratejisi, HttpOnly cookie oturumu, değiştirilmez Flyway ([0001](adr/0001-transactional-outbox-with-polling.md), [0002](adr/0002-redis-lua-stock-reservation.md), [0003](adr/0003-item-level-escrow.md), [0004](adr/0004-payment-provider-port-and-strategy.md), [0005](adr/0005-httponly-cookie-jwt-sessions.md), [0006](adr/0006-immutable-flyway-migrations.md)). |
 
 ---
-
-### Öneriler (uygulanmamış)
-| Doküman | Kapsam |
-| :--- | :--- |
-| **[proposals/aura-trust-safety-and-complaint-moderation.md](proposals/aura-trust-safety-and-complaint-moderation.md)** | Aura AI otonom moderasyon tasarımı: cooling-off kuyruğu, sanction ladder, appeal. Kodda yok; yalnızca bu özellik geliştirilirken açın. |
-| **[proposals/chat-moderation-user-blocking-and-messaging-settings.md](proposals/chat-moderation-user-blocking-and-messaging-settings.md)** | Sohbet moderasyonu mesaj gizleme (tombstone), kısıtlama UI kilidi, karşılıklı kullanıcı engelleme, engellenen kullanıcılar listesi ve global/ilan bazlı `canSendMessage` ayarı (tasarım aşamasında). |
 
 ## Temel Mimari Prensipler
 

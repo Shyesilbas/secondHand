@@ -2871,5 +2871,9 @@
   "agreement_accepted_success": "Agreement accepted.",
   "agreement_accept_failed": "Could not accept agreement.",
   "agreement_status_pending": "Pending",
-  "agreement_status_accepted": "Accepted"
+  "agreement_status_accepted": "Accepted",
+  "chat_lock_blocked": "Messaging is disabled with this user.",
+  "chat_lock_listing_disabled": "Messaging has been disabled for this listing/chat.",
+  "chat_lock_user_disabled": "This user is not accepting messages.",
+  "chat_lock_restricted": "You cannot send messages due to a restriction on your account."
 }

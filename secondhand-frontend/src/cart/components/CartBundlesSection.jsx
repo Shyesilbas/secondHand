@@ -84,7 +84,7 @@ const CartBundlesSection = ({ unlockedBundles, pendingBundles, currency }) => {
                         className="h-1.5 w-full overflow-hidden rounded-sm bg-background-tertiary"
                       >
                         <div
-                          className="h-full bg-primary transition-all duration-150"
+                          className="h-full bg-primary transition-[width] duration-150"
                           style={{ width: `${progress}%` }}
                         />
                       </div>

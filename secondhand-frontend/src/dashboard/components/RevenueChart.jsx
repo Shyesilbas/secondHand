@@ -13,8 +13,9 @@ const RevenueChart = ({
   data,
   label = 'Revenue'
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colorScheme } = useColorScheme();
+  const numberLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR';
 
   if (!data || data.length === 0) {
     return <CardEmpty>{t('dash_no_trend_data', 'Bu dönemde veri yok.')}</CardEmpty>;
@@ -25,7 +26,7 @@ const RevenueChart = ({
   const chartData = {
     labels: data.map((item) => {
       const date = new Date(item.date);
-      return date.toLocaleDateString('tr-TR', {
+      return date.toLocaleDateString(numberLocale, {
         month: 'short',
         day: 'numeric'
       });
@@ -77,7 +78,7 @@ const RevenueChart = ({
         beginAtZero: true,
         border: { display: false },
         ticks: {
-          callback: (value) => (value >= 1000 ? `${(value / 1000).toFixed(0)}K` : value.toLocaleString('tr-TR')),
+          callback: (value) => (value >= 1000 ? `${(value / 1000).toFixed(0)}K` : value.toLocaleString(numberLocale)),
           font: { size: 10, weight: '500' },
           color: colors.tick,
           padding: 8

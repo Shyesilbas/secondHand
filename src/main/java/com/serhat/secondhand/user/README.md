@@ -5,7 +5,7 @@ Manages user accounts (`users` table), sanitized public vs. private profiles, sh
 > [!NOTE]
 > **Related Documentation & Runbooks:**
 > - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](/docs/auth-jwt-and-security-architecture.md) · [`docs/multi-tier-redis-caching-and-invalidation.md`](/docs/multi-tier-redis-caching-and-invalidation.md)
-> - **Proposal:** [`docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md`](/docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md)
+> - **Moderation & Blocking:** [`docs/chat-moderation-user-blocking-and-messaging-settings.md`](/docs/chat-moderation-user-blocking-and-messaging-settings.md)
 > - **Frontend Module:** [`secondhand-frontend/src/user/README.md`](/secondhand-frontend/src/user/README.md)
 > - **Key Entry Points:** [`UserController`](api/UserController.java) · [`AddressController`](api/AddressController.java) · [`MembershipController`](api/MembershipController.java) · [`UserBadgesController`](api/UserBadgesController.java) · [`UserService`](application/UserService.java) · [`IUserService`](application/IUserService.java) · [`MembershipService`](application/MembershipService.java) · [`GreatSellerPolicy`](domain/greatseller/GreatSellerPolicy.java) · [`UserRestrictionService`](application/UserRestrictionService.java)
 

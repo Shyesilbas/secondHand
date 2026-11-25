@@ -11,7 +11,7 @@ import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
 import SafeMeetupModal from './SafeMeetupModal.jsx';
-import { formatCurrency, formatDateTime } from '../../common/formatters.js';
+import { formatCurrency, formatShortDate } from '../../common/formatters.js';
 
 // Secondary actions sit next to the price as borderless icon buttons; the CTAs below carry the only edges.
 const ICON_BUTTON =
@@ -42,7 +42,8 @@ const ListingBuyBox = ({
   copiedLink,
   onChanged
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR';
   const { canMakeOffers, canCheckout } = useRestrictionFlags();
   const [isSafetyOpen, setIsSafetyOpen] = useState(false);
   const viewCount = listing.viewCount ?? listing.viewStats?.totalViews ?? 0;
@@ -57,7 +58,7 @@ const ListingBuyBox = ({
           <span className="truncate">{locationLabel}</span>
         </span>
         <span aria-hidden>·</span>
-        <span className="tabular-nums">{formatDateTime(listing.createdAt)}</span>
+        <span className="tabular-nums">{formatShortDate(listing.createdAt, dateLocale)}</span>
         {listing.listingNo && (
           <>
             <span aria-hidden>·</span>

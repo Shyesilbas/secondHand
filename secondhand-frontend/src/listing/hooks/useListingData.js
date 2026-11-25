@@ -18,14 +18,16 @@ export const useListingData = (listingId, autoFetch = true) => {
  gcTime: 30 * 60 * 1000,
  refetchOnWindowFocus: false,
  refetchOnReconnect: false,
- retry: 1,
+ retry: (failureCount, err) => err?.response?.status !== 404 && failureCount < 1,
  retryDelay: 1000,
  });
 
- const error = isError
+ // A missing listing is a normal answer (404), not a connection problem: the page shows its own wording.
+ const notFound = isError && queryError?.response?.status === 404;
+ const error = isError && !notFound
  ? getErrorMessage(queryError, ERROR_MESSAGES.NETWORK_ERROR)
  : null;
 
- return { listing: listing || null, isLoading, error, refetch };
+ return { listing: listing || null, isLoading, error, notFound, refetch };
 };
 

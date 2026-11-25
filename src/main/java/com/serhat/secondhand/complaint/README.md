@@ -4,7 +4,7 @@ User-to-user complaints (`complaints` table), optionally about a listing or a ch
 
 > [!NOTE]
 > **Related Documentation:**
-> - **Design:** [`docs/proposals/aura-trust-safety-and-complaint-moderation.md`](/docs/proposals/aura-trust-safety-and-complaint-moderation.md) · [`docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md`](/docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md)
+> - **Architecture Deep Dive:** [`docs/aura-trust-safety-and-complaint-moderation.md`](/docs/aura-trust-safety-and-complaint-moderation.md) · [`docs/chat-moderation-user-blocking-and-messaging-settings.md`](/docs/chat-moderation-user-blocking-and-messaging-settings.md)
 > - **Frontend Module:** [`secondhand-frontend/src/complaint/README.md`](/secondhand-frontend/src/complaint/README.md)
 > - **Key Entry Points:** [`ComplaintService`](application/ComplaintService.java) · [`ComplaintValidator`](validator/ComplaintValidator.java) · [`ComplaintReviewWorker`](queue/ComplaintReviewWorker.java) · [`AuraComplaintReviewHandler`](review/AuraComplaintReviewHandler.java) · [`AuraAppealReviewHandler`](review/AuraAppealReviewHandler.java) · [`SanctionPolicy`](review/SanctionPolicy.java) · [`SanctionExecutor`](review/SanctionExecutor.java)
 

@@ -59,6 +59,8 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         this.vehicleSpecSnapshotter = vehicleSpecSnapshotter;
     }
 
+    /** Transactional here, not only on createListing: the self-call skips the proxy and catalog entities load lazily. */
+    @Transactional
     @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
     public Result<UUID> createVehicleListing(VehicleCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);

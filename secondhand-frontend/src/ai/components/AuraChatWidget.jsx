@@ -134,7 +134,7 @@ const AuraChatWidgetPanel = () => {
                         </div>
                     </button>
                     <div className="flex items-center gap-1.5 shrink-0">
-                        {AI_AGENT_MODE_ENABLED ? <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`rounded-sm px-2.5 py-1 text-xs font-semibold transition ${agentMode ? 'bg-primary-700 text-white ring-1 ring-primary-600' : 'text-secondary-300 hover:bg-primary-700 hover:text-white'}`}>{t("agent")}</button> : null}
+                        {AI_AGENT_MODE_ENABLED ? <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`rounded-sm px-2.5 py-1 text-xs font-semibold transition ${agentMode ? 'bg-primary-700 text-white ring-1 ring-primary-600' : 'text-secondary-300 hover:bg-primary-700 hover:text-white'}`}>{t("agent", "Agent")}</button> : null}
                         <button type="button" onClick={() => setIsOpen(false)} className="p-2 rounded text-secondary-300 transition-colors hover:bg-primary-700 hover:text-white" aria-label={t("close")}>
                             <X className="w-4 h-4" strokeWidth={1.5} aria-hidden />
                         </button>
@@ -186,7 +186,6 @@ const AuraChatWidgetPanel = () => {
                                 <Send className="w-4 h-4" strokeWidth={1.5} />
                             </button>
                         </div>
-                        <p className="mt-2 text-sm text-text-muted">{t("your_last_conversation_is_stored_on_this")}</p>
                     </div>
                 </div>
             </div>

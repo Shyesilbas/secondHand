@@ -49,13 +49,6 @@ JDK_TYPES = {"IllegalStateException", "IllegalArgumentException", "SecurityExcep
              "RuntimeException", "NullPointerException", "UnsupportedOperationException", "DefaultTyping"}
 # Names used on purpose that are not types: anti-pattern examples and provider name strings.
 INTENTIONAL = {"PaymentService", "JetKargo"}
-# Redis keys of the unimplemented moderation proposal (docs/proposals/).
-INTENTIONAL_REDIS = {
-    "v4:complaints:delayed_queue",
-    "v4:lock:complaint:worker",
-    "v4:rate_limit:complaint:user",
-    "v4:user:restriction",
-}
 TOPIC_TOKEN_RE = re.compile(r"^[a-z][a-z0-9._-]*\.v1(?:\.DLT)?$")
 REDIS_TOKEN_RE = re.compile(r"^v[46]:[a-zA-Z0-9_:*{}<>-]+$")
 FQCN_RE = re.compile(r"\b(?:org|com|java|jakarta)\.[\w.]+\.([A-Z]\w*)")
@@ -117,7 +110,7 @@ def known_names():
 
 def known_infra():
     topics = set()
-    redis_prefixes = {"v4", "v6"} | set(INTENTIONAL_REDIS)
+    redis_prefixes = {"v4", "v6"}
     for ext in ("*.java", "*.yml", "*.properties", "*.lua"):
         for p in walk(ROOT / "src" / "main", ext):
             text = p.read_text(encoding="utf-8", errors="ignore")

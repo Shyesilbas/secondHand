@@ -244,3 +244,16 @@ select:not([multiple]):not([size]):not(.appearance-none) {
 select:not([multiple]):not([size]):not(.appearance-none):not([class*="pr-"]) {
   padding-right: 2.25rem;
 }
+
+.map-dark-tiles .leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
+}
+
+.map-dark-tiles .leaflet-control-attribution {
+  background-color: rgb(var(--color-bg-primary) / 0.85);
+  color: rgb(var(--color-text-tertiary));
+}
+
+.map-dark-tiles .leaflet-control-attribution a {
+  color: rgb(var(--color-text-link));
+}

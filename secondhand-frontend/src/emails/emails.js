@@ -270,20 +270,32 @@ const EMAIL_PALETTES = {
   light: {
     scheme: 'light',
     bg: '#FFFFFF',
+    surface: '#F8FAFC',
     text: '#334155',
     heading: '#0F172A',
     muted: '#586578',
     border: '#E2E8F0',
     accent: '#0F766E',
+    warning: '#D97706',
+    buttonBg: '#0F172A',
+    buttonHover: '#293548',
+    buttonBorder: '#0F172A',
+    buttonText: '#FFFFFF',
   },
   dark: {
     scheme: 'dark',
-    bg: '#0F172A',
+    bg: '#111827',
+    surface: '#1E293B',
     text: '#CBD5E1',
-    heading: '#F8FAFC',
+    heading: '#F1F5F9',
     muted: '#94A3B8',
     border: '#334155',
     accent: '#2DD4BF',
+    warning: '#F59E0B',
+    buttonBg: '#0F766E',
+    buttonHover: '#11847B',
+    buttonBorder: '#14B8A6',
+    buttonText: '#FFFFFF',
   },
 };
 
@@ -316,6 +328,26 @@ const buildEditorialEmailStyle = (colorScheme = 'light') => {
   img, table {
     max-width: 100% !important;
   }
+  .container, .content, section, article,
+  div:not(.button):not(.code-value),
+  table, tbody, thead, tfoot, tr, td, th, blockquote, pre {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  p, li, div, span, td, blockquote, font {
+    color: ${p.text} !important;
+  }
+  h1, h2, h3, h4, h5, h6, strong, b, th {
+    color: ${p.heading} !important;
+  }
+  a:not(.button) {
+    color: ${p.accent} !important;
+    text-decoration: underline;
+  }
+  hr {
+    border: 0 !important;
+    border-top: 1px solid ${p.border} !important;
+  }
   .container {
     max-width: 640px;
     margin: 0 !important;
@@ -335,14 +367,49 @@ const buildEditorialEmailStyle = (colorScheme = 'light') => {
   table.details td.value, table.details tr.total td, .code-value {
     color: ${p.heading} !important;
   }
+  .greeting *, .section-title *, .note-title *, .listing-title *,
+  table.details td.value *, table.details tr.total td *, .code-value * {
+    color: inherit !important;
+  }
   .muted, .amount-label, .code-label, .code-hint, .signoff, .footer, table.details td.label {
     color: ${p.muted} !important;
+  }
+  .muted *, .amount-label *, .code-label *, .code-hint *, .footer *, table.details td.label * {
+    color: inherit !important;
+  }
+  .note {
+    color: ${p.text} !important;
+    border-left-color: ${p.border} !important;
+  }
+  .note.note-warning, .note-warning {
+    border-left-color: ${p.warning} !important;
+  }
+  .code-value {
+    background-color: ${p.surface} !important;
+    border-color: ${p.border} !important;
   }
   .amount-value, .listing-price {
     color: ${p.accent} !important;
   }
-  table.details td, .signoff, .code-value {
+  .amount-value *, .listing-price * {
+    color: inherit !important;
+  }
+  table.details td, .signoff {
     border-color: ${p.border} !important;
+  }
+  table.details tr.total td {
+    border-top-color: ${p.border} !important;
+  }
+  .button {
+    background-color: ${p.buttonBg} !important;
+    color: ${p.buttonText} !important;
+    border: 1px solid ${p.buttonBorder} !important;
+  }
+  .button * {
+    color: inherit !important;
+  }
+  .button:hover {
+    background-color: ${p.buttonHover} !important;
   }
   .footer {
     border-top: 1px solid ${p.border} !important;
@@ -361,27 +428,36 @@ const buildEditorialEmailStyle = (colorScheme = 'light') => {
 
 export const getProcessedContent = (content, { colorScheme = 'light' } = {}) => {
   if (!content) return '';
-  const editorialStyle = buildEditorialEmailStyle(colorScheme);
+  const resolvedScheme = colorScheme === 'dark' ? 'dark' : 'light';
+  const schemeMeta = `<meta name="color-scheme" content="${resolvedScheme}">`;
+  const editorialStyle = buildEditorialEmailStyle(resolvedScheme);
   const formatted = formatMonetaryAmountsInText(String(content));
   const htmlEndIdx = formatted.toLowerCase().indexOf('</html>');
   const bounded = htmlEndIdx !== -1 ? formatted.slice(0, htmlEndIdx + 7) : formatted;
-  const cleaned = stripEmailEmojis(bounded);
+  const cleaned = stripEmailEmojis(bounded).replace(/<meta[^>]+name=["']color-scheme["'][^>]*>/gi, '');
 
   const isHtml = /<[a-z][\s\S]*>/i.test(cleaned);
   if (isHtml) {
     if (/<\/head>/i.test(cleaned)) {
-      return cleaned.replace(/<\/head>/i, `<base target="_top">${editorialStyle}</head>`);
+      const hasHeadOpen = /<head\b[^>]*>/i.test(cleaned);
+      const withHeadMeta = hasHeadOpen
+        ? cleaned.replace(/<head\b[^>]*>/i, (match) => `${match}${schemeMeta}`)
+        : cleaned;
+      const headEndInjection = hasHeadOpen
+        ? `<base target="_top">${editorialStyle}</head>`
+        : `${schemeMeta}<base target="_top">${editorialStyle}</head>`;
+      return withHeadMeta.replace(/<\/head>/i, headEndInjection);
     }
-    if (/<head>/i.test(cleaned)) {
-      return cleaned.replace(/<head>/i, `<head><base target="_top">${editorialStyle}`);
+    if (/<head\b[^>]*>/i.test(cleaned)) {
+      return cleaned.replace(/<head\b[^>]*>/i, (match) => `${match}${schemeMeta}<base target="_top">${editorialStyle}`);
     }
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><base target="_top">${editorialStyle}</head><body><div class="container"><div class="content">${cleaned}</div></div></body></html>`;
+    return `<!DOCTYPE html><html><head><meta charset="utf-8">${schemeMeta}<base target="_top">${editorialStyle}</head><body><div class="container"><div class="content">${cleaned}</div></div></body></html>`;
   }
 
   const escaped = cleaned
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><base target="_top">${editorialStyle}</head><body><div class="container"><div class="content" style="white-space: pre-wrap; word-wrap: break-word;">${escaped}</div></div></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">${schemeMeta}<base target="_top">${editorialStyle}</head><body><div class="container"><div class="content" style="white-space: pre-wrap; word-wrap: break-word;">${escaped}</div></div></body></html>`;
 };
 

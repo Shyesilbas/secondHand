@@ -6,7 +6,7 @@ Conversational marketplace shopping assistant, autonomous catalog search, memory
 > **Backend Counterpart & Architecture Deep Dive:**
 > - **Backend Module:** [`ai`](../../../src/main/java/com/serhat/secondhand/ai/README.md)
 > - **Architecture Deep Dive:** [`docs/aura-ai-and-context-architecture.md`](../../../docs/aura-ai-and-context-architecture.md)
-> - **Proposal (not implemented):** [`docs/proposals/aura-trust-safety-and-complaint-moderation.md`](../../../docs/proposals/aura-trust-safety-and-complaint-moderation.md)
+> - **Complaint Moderation:** [`docs/aura-trust-safety-and-complaint-moderation.md`](../../../docs/aura-trust-safety-and-complaint-moderation.md)
 
 ## 1. Overview & Purpose
 

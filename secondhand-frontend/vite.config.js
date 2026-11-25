@@ -35,6 +35,23 @@ export default defineConfig({
             if (id.includes('lucide-react')) {
               return 'lucide-react';
             }
+            if (id.includes('@tanstack/')) {
+              return 'tanstack-query';
+            }
+            if (id.includes('i18next')) {
+              return 'i18n';
+            }
+            if (id.includes('/axios/') || id.includes('@stomp/stompjs')) {
+              return 'network-realtime';
+            }
+            if (
+              id.includes('/react-dom/') ||
+              id.includes('/react-router') ||
+              id.includes('/scheduler/') ||
+              id.includes('/node_modules/react/')
+            ) {
+              return 'react-vendor';
+            }
             return 'vendor';
           }
         },

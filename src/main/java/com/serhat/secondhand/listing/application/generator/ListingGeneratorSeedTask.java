@@ -21,7 +21,9 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -74,6 +76,19 @@ class ListingGeneratorSeedTask implements SeedTask {
         return "listings-generate";
     }
 
+    /**
+     * Picks a candidate this seller has not been given yet in the batch, so one seller never gets the same
+     * product twice. After a bounded number of tries (a seller can exhaust a small catalog) it accepts a repeat.
+     */
+    private static <T> T pickUnused(GeneratorRandom random, List<T> candidates, Long seller, Set<String> used) {
+        T candidate = random.pick(candidates);
+        for (int attempt = 0; attempt < 50 && used.contains(seller + "|" + candidate); attempt++) {
+            candidate = random.pick(candidates);
+        }
+        used.add(seller + "|" + candidate);
+        return candidate;
+    }
+
     @Override
     public Result<Void> run() {
         List<Long> sellers = jdbcTemplate.queryForList("""
@@ -92,15 +107,18 @@ class ListingGeneratorSeedTask implements SeedTask {
         var electronics = electronicCount > 0 ? electronicGenerator.candidates(prices.electronics()) : List.<ElectronicListingGenerator.Candidate>of();
 
         int n = 0;
+        Set<String> used = new HashSet<>();
         for (int i = 0; i < vehicleCount; i++, n++) {
-            var candidate = random.pick(vehicles);
-            UUID id = vehicleGenerator.create(candidate, sellers.get(n % sellers.size()), random, locations.pick(random),
+            Long seller = sellers.get(n % sellers.size());
+            var candidate = pickUnused(random, vehicles, seller, used);
+            UUID id = vehicleGenerator.create(candidate, seller, random, locations.pick(random),
                     photos.vehicle(candidate.price().generation()));
             finish(id, batch, random);
         }
         for (int i = 0; i < electronicCount; i++, n++) {
-            var candidate = random.pick(electronics);
-            UUID id = electronicGenerator.create(candidate, sellers.get(n % sellers.size()), random, locations.pick(random),
+            Long seller = sellers.get(n % sellers.size());
+            var candidate = pickUnused(random, electronics, seller, used);
+            UUID id = electronicGenerator.create(candidate, seller, random, locations.pick(random),
                     photos.electronic(candidate.price()));
             finish(id, batch, random);
         }
@@ -118,7 +136,8 @@ class ListingGeneratorSeedTask implements SeedTask {
             var books = bookGenerator.candidates();
             var conditions = bookGenerator.conditions();
             for (int i = 0; i < bookCount; i++, n++) {
-                UUID id = bookGenerator.create(random.pick(books), conditions, sellers.get(n % sellers.size()), random,
+                Long seller = sellers.get(n % sellers.size());
+                UUID id = bookGenerator.create(pickUnused(random, books, seller, used), conditions, seller, random,
                         locations.pick(random));
                 finish(id, batch, random);
             }

@@ -1,11 +1,13 @@
+import { lazy, Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
 import { ROUTES } from '../../constants/routes.js';
 import { getPageName } from '../../utils/getPageName.js';
-import AuraChatWidget from '../../../ai/components/AuraChatWidget.jsx';
 import { ListingActionProvider } from '../../../listing/context/ListingActionProvider.jsx';
-import GlobalActionModal from '../../../listing/components/GlobalActionModal.jsx';
+
+const AuraChatWidget = lazy(() => import('../../../ai/components/AuraChatWidget.jsx'));
+const GlobalActionModal = lazy(() => import('../../../listing/components/GlobalActionModal.jsx'));
 
 const MainLayout = () => {
  const { pathname } = useLocation();
@@ -30,8 +32,10 @@ const MainLayout = () => {
  <Outlet />
  </main>
  {!hideFooter ? <Footer /> : null}
+ <Suspense fallback={null}>
  <AuraChatWidget />
  <GlobalActionModal />
+ </Suspense>
  </div>
  </ListingActionProvider>
  );

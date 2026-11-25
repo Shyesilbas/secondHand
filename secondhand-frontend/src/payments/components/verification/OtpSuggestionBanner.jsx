@@ -37,7 +37,7 @@ const EmailBody = ({ content }) => {
       sandbox="allow-same-origin"
       referrerPolicy="no-referrer"
       onLoad={fitHeight}
-      style={{ height }}
+      style={{ height, colorScheme }}
       className="block w-full rounded border border-border-light bg-background-primary"
     />
   );

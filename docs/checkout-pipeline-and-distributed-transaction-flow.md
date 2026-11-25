@@ -162,5 +162,5 @@ Eğer tüm adımlar başarılı geçmesine rağmen PostgreSQL `commit` anında b
 ## 5. Güvenlik ve Doğrulama Kuralları
 
 1. **Idempotency:** Checkout'ta her siparişin `externalId` değeri ödeme idempotency key'i olarak `PaymentProcessor`'a geçer (`v4:payment:idempotency:{key}`, `SET NX`). `Idempotency-Key` header'ı yalnızca eWallet endpoint'lerinde kullanılır.
-2. **Pre-check:** `PaymentPreCheckService` kullanıcıyı, kabul edilmiş agreement'ları ve gerekiyorsa OTP doğrulamasını (`PAYMENT_VERIFICATION_REQUIRED`) kontrol eder. Moderasyon yaptırımı (sanction) kontrolü yoktur; bkz. [proposals](proposals/aura-trust-safety-and-complaint-moderation.md).
+2. **Pre-check ve Kısıtlama Kontrolü:** `CheckoutOrchestrator` ve `CheckoutStockReservationService` checkout başında `UserRestrictionService.check(userId, RestrictedAction.CHECKOUT)` ile moderasyon kısıtlamasını denetler (bkz. [aura-trust-safety-and-complaint-moderation.md](aura-trust-safety-and-complaint-moderation.md)); `PaymentPreCheckService` ise kullanıcıyı, kabul edilmiş agreement'ları ve gerekiyorsa OTP doğrulamasını (`PAYMENT_VERIFICATION_REQUIRED`) kontrol eder.
 3. **IDOR Koruması:** `OrderCreationService` teslimat ve fatura adresinin alıcıya ait olduğunu doğrular; endpoint `@PreAuthorize("isAuthenticated()")`.

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useChatWindow } from '../hooks/useChatWindow.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -26,6 +27,7 @@ const ChatWindow = ({
   hasNextPage,
   isFetchingNextPage
 }) => {
+  const { t } = useTranslation();
   const { user } = useAuthState();
   const notification = useNotification();
   const {
@@ -40,13 +42,13 @@ const ChatWindow = ({
 
   const { canSendMessages } = useRestrictionFlags();
   const roomLockReasons = {
-    BLOCKED: 'Bu kullanıcıyla mesajlaşma kapalı.',
-    LISTING_MESSAGING_DISABLED: 'Bu ilan/sohbet için mesajlaşma kapatıldı.',
-    USER_MESSAGING_DISABLED: 'Bu kullanıcı mesaj almıyor.'
+    BLOCKED: t('chat_lock_blocked', 'Bu kullanıcıyla mesajlaşma kapalı.'),
+    LISTING_MESSAGING_DISABLED: t('chat_lock_listing_disabled', 'Bu ilan/sohbet için mesajlaşma kapatıldı.'),
+    USER_MESSAGING_DISABLED: t('chat_lock_user_disabled', 'Bu kullanıcı mesaj almıyor.')
   };
   let inputDisabledReason = null;
   if (!canSendMessages) {
-    inputDisabledReason = 'Hesabınızdaki kısıtlama nedeniyle mesaj gönderemezsiniz.';
+    inputDisabledReason = t('chat_lock_restricted', 'Hesabınızdaki kısıtlama nedeniyle mesaj gönderemezsiniz.');
   } else if (selectedChatRoom?.messagingDisabled) {
     inputDisabledReason =
       roomLockReasons[selectedChatRoom.messagingDisabledReason] || roomLockReasons.LISTING_MESSAGING_DISABLED;
@@ -144,7 +146,7 @@ const ChatWindow = ({
   return (
     <div
       style={{ height: '31rem' }}
-      className="fixed bottom-4 right-4 z-dropdown flex w-96 flex-col overflow-hidden rounded border border-border bg-background-primary shadow-md"
+      className="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-dropdown flex w-96 max-w-[calc(100vw-1.5rem)] flex-col overflow-hidden rounded border border-border bg-background-primary shadow-md"
     >
       {content}
     </div>

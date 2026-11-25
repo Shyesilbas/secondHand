@@ -58,6 +58,8 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         this.editionSnapshotter = editionSnapshotter;
     }
 
+    /** Transactional here, not only on createListing: the self-call skips the proxy and the edition's lazy work/authors fail. */
+    @Transactional
     @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
     public Result<UUID> createBooksListing(BooksCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);

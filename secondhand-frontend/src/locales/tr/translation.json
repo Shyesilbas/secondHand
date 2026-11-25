@@ -103,7 +103,7 @@
   "aura_greeting_5": "Selamlar! Ben Aura. İlan filtreleme, bütçe dostu teklifler verme veya teslimat süreçlerinde güvenlik kontrolleri yapma konularında size rehberlik edebilirim. Sorunuzu sormaktan çekinmeyin!",
   "aura_greeting_6": "SecondHand'e hoş geldiniz! Ben alışveriş danışmanınız Aura. Güvenli ödeme sistemimiz, ilan öne çıkarma (Showcase) veya kargo/elden teslim süreçleri hakkında sorularınızı yanıtlayabilirim. Bugün size nasıl destek olabilirim?",
   "your_marketplace_assistant": "Pazar yeri asistanınız",
-  "agent": "Temsilci",
+  "agent": "Agent",
   "quick_start": "Hızlı Başlangıç",
   "write_to_aura_enter_to_send": "Aura'ya yazın... (Göndermek için Enter)",
   "send": "Gönder",
@@ -2866,5 +2866,9 @@
   "agreement_accepted_success": "Sözleşme onaylandı.",
   "agreement_accept_failed": "Sözleşme onaylanamadı.",
   "agreement_status_pending": "Onay bekliyor",
-  "agreement_status_accepted": "Onaylandı"
+  "agreement_status_accepted": "Onaylandı",
+  "chat_lock_blocked": "Bu kullanıcıyla mesajlaşma kapalı.",
+  "chat_lock_listing_disabled": "Bu ilan/sohbet için mesajlaşma kapatıldı.",
+  "chat_lock_user_disabled": "Bu kullanıcı mesaj almıyor.",
+  "chat_lock_restricted": "Hesabınızdaki kısıtlama nedeniyle mesaj gönderemezsiniz."
 }

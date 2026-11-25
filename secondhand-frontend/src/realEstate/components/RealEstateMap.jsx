@@ -53,7 +53,7 @@ const RealEstateMap = ({ listing }) => {
 				{state === 'loading' && <Skeleton className="absolute inset-0 h-full w-full" />}
 				<div
 					ref={containerRef}
-					className={`h-full w-full ${isDark ? 'brightness-90 contrast-110' : ''}`}
+					className={`h-full w-full ${isDark ? 'map-dark-tiles' : ''}`}
 					aria-label={t("approximate_listing_location", "İlanın yaklaşık konumu")}
 				/>
 			</div>

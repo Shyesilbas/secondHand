@@ -105,7 +105,7 @@ const ListingDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthState();
-  const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
+  const { listing, isLoading, error, notFound, refetch: fetchListing } = useListingData(id);
   const { addToCart, isAddingToCart, isInCart } = useCart({ loadCartItems: true });
   const itemIsInCart = isInCart(listing?.id);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
@@ -209,6 +209,7 @@ const ListingDetailPage = () => {
   /* ── Render ──────────────────────────────────────────── */
 
   if (isLoading) return <DetailSkeleton />;
+  if (notFound) return <DetailError />;
   if (error) return <DetailError error={error} />;
   if (!listing) return null;
 

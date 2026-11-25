@@ -9,17 +9,17 @@ import { extractOtpFromEmailRecord } from '../../payments/utils/otp.js';
 
 const DEFAULT_IFRAME_HEIGHT = 320;
 
-const formatFullEmailDate = (dateString) => {
+const formatFullEmailDate = (dateString, locale = 'tr-TR') => {
   if (!dateString) return '';
   try {
     const d = new Date(dateString);
     if (Number.isNaN(d.getTime())) return formatDateTime(dateString);
-    const datePart = d.toLocaleDateString('tr-TR', {
+    const datePart = d.toLocaleDateString(locale, {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     });
-    const timePart = d.toLocaleTimeString('tr-TR', {
+    const timePart = d.toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -38,7 +38,8 @@ const EmailContent = ({
   hasPrev = false,
   hasNext = false
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR';
   const [copiedCode, setCopiedCode] = useState(false);
   const [iframeHeight, setIframeHeight] = useState(DEFAULT_IFRAME_HEIGHT);
   const scrollContainerRef = useRef(null);
@@ -135,7 +136,7 @@ const EmailContent = ({
             <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-text-tertiary">
               {email.sentAt && (
                 <time className="tabular-nums" dateTime={email.sentAt}>
-                  {formatFullEmailDate(email.sentAt)}
+                  {formatFullEmailDate(email.sentAt, dateLocale)}
                 </time>
               )}
               {email.sentAt && showSender && <span aria-hidden>·</span>}
@@ -219,8 +220,8 @@ const EmailContent = ({
           srcDoc={processedHtml}
           onLoad={handleIframeLoad}
           title={t('email_content', 'E-posta içeriği')}
-          style={{ height: `${iframeHeight}px` }}
-          className="block w-full border-0"
+          style={{ height: `${iframeHeight}px`, colorScheme }}
+          className="block w-full border-0 bg-background-primary"
           sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
         />
       </div>

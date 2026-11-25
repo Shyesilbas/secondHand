@@ -3,7 +3,7 @@
 > [!NOTE]
 > **Backend Counterpart & Architecture Deep Dive:**
 > - **Backend Module:** [`complaint`](../../../src/main/java/com/serhat/secondhand/complaint/README.md)
-> - **Design:** [`docs/proposals/aura-trust-safety-and-complaint-moderation.md`](../../../docs/proposals/aura-trust-safety-and-complaint-moderation.md)
+> - **Architecture Deep Dive:** [`docs/aura-trust-safety-and-complaint-moderation.md`](../../../docs/aura-trust-safety-and-complaint-moderation.md)
 
 ## 1. Executive Summary & Route Map
 

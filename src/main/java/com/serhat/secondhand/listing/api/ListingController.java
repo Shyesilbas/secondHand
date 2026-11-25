@@ -1,6 +1,7 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.listing.application.common.ListingCommandService;
@@ -75,7 +76,7 @@ public class ListingController {
         Long userId = currentUser != null ? currentUser.getId() : null;
         return listingQueryService.findByIdAsDto(id, userId, userId)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResultResponses.ok(Result.error(ListingErrorCodes.LISTING_NOT_FOUND)));
     }
 
     @PublicEndpoint
