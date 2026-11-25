@@ -397,11 +397,29 @@ from reportlab.pdfbase.ttfonts import TTFont  # noqa: E402
 from reportlab.platypus import (KeepTogether, PageBreak, Paragraph, SimpleDocTemplate,  # noqa: E402
                                 Spacer, Table, TableStyle)
 
-FONT_DIR = Path("/System/Library/Fonts/Supplemental")
-pdfmetrics.registerFont(TTFont("Body", str(FONT_DIR / "Arial.ttf")))
-pdfmetrics.registerFont(TTFont("Body-Bold", str(FONT_DIR / "Arial Bold.ttf")))
-pdfmetrics.registerFont(TTFont("Body-Italic", str(FONT_DIR / "Arial Italic.ttf")))
-pdfmetrics.registerFontFamily("Body", normal="Body", bold="Body-Bold", italic="Body-Italic")
+_FONT_CANDIDATES = [
+    (Path("/System/Library/Fonts/Supplemental"), "Arial.ttf", "Arial Bold.ttf", "Arial Italic.ttf"),
+    (Path("/usr/share/fonts/truetype/liberation2"), "LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf", "LiberationSans-Italic.ttf"),
+    (Path("/usr/share/fonts/truetype/liberation"), "LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf", "LiberationSans-Italic.ttf"),
+    (Path("/usr/share/fonts/truetype/dejavu"), "DejaVuSans.ttf", "DejaVuSans-Bold.ttf", "DejaVuSans-Oblique.ttf"),
+    (Path("/usr/share/fonts/truetype/noto"), "NotoSans-Regular.ttf", "NotoSans-Bold.ttf", "NotoSans-Italic.ttf"),
+    (Path("/usr/share/fonts/truetype/dejavu"), "DejaVuSans.ttf", "DejaVuSans-Bold.ttf", "DejaVuSans.ttf"),
+]
+
+
+def _register_fonts():
+    for font_dir, reg, bold, italic in _FONT_CANDIDATES:
+        paths = (font_dir / reg, font_dir / bold, font_dir / italic)
+        if all(p.is_file() for p in paths):
+            pdfmetrics.registerFont(TTFont("Body", str(paths[0])))
+            pdfmetrics.registerFont(TTFont("Body-Bold", str(paths[1])))
+            pdfmetrics.registerFont(TTFont("Body-Italic", str(paths[2])))
+            pdfmetrics.registerFontFamily("Body", normal="Body", bold="Body-Bold", italic="Body-Italic")
+            return
+    raise FileNotFoundError("Rapor icin uygun TTF font bulunamadi (Arial / LiberationSans / DejaVuSans)")
+
+
+_register_fonts()
 
 INK = colors.HexColor("#1f2933")
 MUTED = colors.HexColor("#52606d")

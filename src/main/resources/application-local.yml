@@ -1,0 +1,32 @@
+# Varsayılan geliştirme profili (local). Sır veya kişisel override eklemeyin; .env ya da config/application-local-secret.yml kullanın.
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    # Local databases are already past V1.1 in their history; out-of-order lets Flyway apply it (a no-op there).
+    # Checksum validation stays on: a migration edited after it ran fails startup instead of drifting silently.
+    out-of-order: true
+    locations: classpath:db/migration
+
+app:
+  seed: ${APP_SEED:}
+
+logging:
+  level:
+    # DEBUG prints request headers and auth details; turn it on only while debugging a login issue.
+    org.springframework.security: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

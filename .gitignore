@@ -59,7 +59,6 @@ config/application-local-secret.yml
 .env.local
 **/.env.local
 **/.env.*.local
-src/main/resources/application-local.yml
 !.env.template
 
 # Tek seferlik geliştirici scriptleri (repoya gitmez)
