@@ -20,6 +20,8 @@ logging:
     org.springframework.security: INFO
 
 management:
+  server:
+    port: ${MANAGEMENT_SERVER_PORT:8081}
   endpoints:
     web:
       exposure:
@@ -28,5 +30,8 @@ management:
     prometheus:
       enabled: true
   metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
     tags:
       application: ${spring.application.name}

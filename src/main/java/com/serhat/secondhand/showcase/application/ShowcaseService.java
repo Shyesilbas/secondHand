@@ -66,6 +66,7 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
+    @org.springframework.cache.annotation.CacheEvict(value = "showcase:active:public", allEntries = true)
     public Result<Showcase> createShowcase(Long userId, ShowcasePaymentRequest request) {
         log.info("Creating showcase for user ID: {} and listing ID: {}", userId, request.listingId());
 
@@ -121,6 +122,16 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
+    @org.springframework.cache.annotation.Cacheable(
+            value = "showcase:active:public",
+            key = "#page + ':' + #size"
+    )
+    @Transactional(readOnly = true)
+    public com.serhat.secondhand.core.dto.CachedPage<ShowcaseDto> getCachedPublicActiveShowcases(int page, int size) {
+        return com.serhat.secondhand.core.dto.CachedPage.from(getActiveShowcases(page, size, null));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<ShowcaseDto> getActiveShowcases(int page, int size, Long viewerId) {
         log.info("Fetching active showcases from database | page={}, size={}", page, size);
@@ -158,6 +169,7 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
+    @org.springframework.cache.annotation.CacheEvict(value = "showcase:active:public", allEntries = true)
     public Result<Void> extendShowcase(Long userId, UUID showcaseId, ShowcasePaymentRequest request) {
         Result<Void> daysError = validateShowcaseDays(request.days());
         if (daysError != null) return daysError;
@@ -202,6 +214,7 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
+    @org.springframework.cache.annotation.CacheEvict(value = "showcase:active:public", allEntries = true)
     public Result<Void> cancelShowcase(Long userId, UUID showcaseId) {
         return showcaseRepository.findById(showcaseId)
                 .map(showcase -> {
@@ -218,6 +231,7 @@ public class ShowcaseService implements IShowcaseService {
 
     @Override
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "showcase:active:public", allEntries = true)
     public void expireShowcases() {
         List<Showcase> expiredShowcases = showcaseRepository.findByStatusAndEndDateLessThanEqual(
                 ShowcaseStatus.ACTIVE, LocalDateTime.now());

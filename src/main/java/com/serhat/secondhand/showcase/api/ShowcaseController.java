@@ -59,8 +59,13 @@ public class ShowcaseController {
                 ? size
                 : (showcaseConfig.getActiveListDefaultSize() != null ? showcaseConfig.getActiveListDefaultSize() : 12);
         Pageable pageable = PageRequest.of(Math.max(page, 0), resolvedSize);
+        if (user == null) {
+            return ResponseEntity.ok(showcaseService
+                    .getCachedPublicActiveShowcases(pageable.getPageNumber(), pageable.getPageSize())
+                    .toPage());
+        }
         return ResponseEntity.ok(showcaseService.getActiveShowcases(pageable.getPageNumber(), pageable.getPageSize(),
-                user != null ? user.getId() : null));
+                user.getId()));
     }
 
     @GetMapping("/my")

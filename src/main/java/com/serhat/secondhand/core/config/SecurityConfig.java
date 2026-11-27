@@ -8,8 +8,10 @@ import com.serhat.secondhand.core.security.RateLimitingFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -58,6 +60,30 @@ public class SecurityConfig {
     private final PublicEndpointRegistry publicEndpointRegistry;
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain managementSecurityFilterChain(
+            HttpSecurity http,
+            @Value("${server.port:8080}") int serverPort,
+            @Value("${management.server.port:-1}") int managementPort) throws Exception {
+        // Matches only when Actuator runs on a dedicated internal management port (e.g. 8081 local, 9090 prod).
+        // Application port 8080 never exposes /actuator/prometheus publicly.
+        RequestMatcher managementPortMatcher = request ->
+                managementPort > 0 && managementPort != serverPort && request.getLocalPort() == managementPort;
+
+        http
+                .securityMatcher(managementPortMatcher)
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health/**", "/actuator/info", "/actuator/metrics/**", "/actuator/prometheus")
+                        .permitAll()
+                        .anyRequest().denyAll()
+                );
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName(null);

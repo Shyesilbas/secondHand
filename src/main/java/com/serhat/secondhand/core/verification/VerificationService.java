@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -40,7 +42,7 @@ public class VerificationService implements IVerificationService {
     }
 
     @Override
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Verification generateVerification(User user, String code, CodeType codeType) {
         var oldVerifications = verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(user,
                 codeType, LocalDateTime.now());

@@ -94,6 +94,9 @@ public class CacheConfig {
         // ── Tier 3b: Kısa süreli — 5 dakika ───────────────────────────
         RedisCacheConfiguration shortConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
 
+        // ── Tier 3c: Çok kısa süreli public liste — 60 saniye ─────────
+        RedisCacheConfiguration publicFeedConfig = defaultConfig.entryTtl(Duration.ofSeconds(60));
+
         log.info("Redis cache manager initialized | typing=As.PROPERTY EVERYTHING | keyPrefix={}:", CACHE_VERSION);
 
         // allEntries evictions (e.g. listing:userListings on listing writes) must not run KEYS,
@@ -139,6 +142,10 @@ public class CacheConfig {
                 .withCacheConfiguration("listingStats", shortConfig)
                 .withCacheConfiguration("dashboard:seller", shortConfig)
                 .withCacheConfiguration("dashboard:buyer", shortConfig)
+
+                // Tier 3c — Public liste önbellekleri (60 saniye)
+                .withCacheConfiguration("listing:bestSellers:public", publicFeedConfig)
+                .withCacheConfiguration("showcase:active:public", publicFeedConfig)
 
                 .build();
     }

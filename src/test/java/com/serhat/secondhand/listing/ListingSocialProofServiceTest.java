@@ -79,4 +79,36 @@ class ListingSocialProofServiceTest {
         assertEquals(0, result.getInCartCount());
         assertEquals(0L, result.getFavoriteCount());
     }
+
+    @Test
+    void enrichWithSocialProofBatch_usesPipelinedViewerCountsAndSkipsDuplicateFavoriteQuery() {
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        var dto1 = new com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto() {};
+        dto1.setId(id1);
+        dto1.setFavoriteStats(com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto.builder()
+                .listingId(id1).favoriteCount(7L).build());
+        var dto2 = new com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto() {};
+        dto2.setId(id2);
+        dto2.setFavoriteStats(com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto.builder()
+                .listingId(id2).favoriteCount(3L).build());
+
+        when(cartSocialMetricService.getInCartCounts(java.util.List.of(id1, id2)))
+                .thenReturn(java.util.Map.of(id1, 2, id2, 5));
+        when(listingViewService.getActiveViewerCounts(java.util.List.of(id1, id2)))
+                .thenReturn(java.util.Map.of(id1, 11, id2, 4));
+
+        socialProofService.enrichWithSocialProof(java.util.List.of(dto1, dto2));
+
+        assertEquals(11, dto1.getSocialProof().getViewsLast24Hours());
+        assertEquals(2, dto1.getSocialProof().getInCartCount());
+        assertEquals(7L, dto1.getSocialProof().getFavoriteCount());
+        assertEquals(4, dto2.getSocialProof().getViewsLast24Hours());
+        assertEquals(5, dto2.getSocialProof().getInCartCount());
+        assertEquals(3L, dto2.getSocialProof().getFavoriteCount());
+
+        verify(listingViewService).getActiveViewerCounts(java.util.List.of(id1, id2));
+        verify(listingViewService, org.mockito.Mockito.never()).getActiveViewerCount(org.mockito.ArgumentMatchers.any());
+        verify(favoriteRepository, org.mockito.Mockito.never()).countByListingIds(org.mockito.ArgumentMatchers.any());
+    }
 }

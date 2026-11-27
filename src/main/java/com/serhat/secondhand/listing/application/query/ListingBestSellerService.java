@@ -5,6 +5,7 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,11 @@ public class ListingBestSellerService {
     private final ListingSalesRankingService salesRankingService;
     private final ListingQueryService listingQueryService;
 
+    @Cacheable(
+            value = "listing:bestSellers:public",
+            key = "#requestedLimit != null ? #requestedLimit : 'default'",
+            condition = "#userId == null"
+    )
     public List<ListingDto> getBestSellers(Integer requestedLimit, Long userId) {
         int limit = clampLimit(requestedLimit);
         List<UUID> rankedIds = salesRankingService.getBestSellerRanking().listingIds();

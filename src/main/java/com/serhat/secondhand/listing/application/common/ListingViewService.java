@@ -218,12 +218,46 @@ public class ListingViewService {
         String presenceKey = "v4:listing:active_viewers:" + listingId;
         long twentyFourHoursAgo = System.currentTimeMillis() - (24L * 60L * 60L * 1000L);
         try {
-            redisTemplate.opsForZSet().removeRangeByScore(presenceKey, 0, (double) twentyFourHoursAgo);
-            Long count = redisTemplate.opsForZSet().zCard(presenceKey);
+            Long count = redisTemplate.opsForZSet().count(presenceKey, (double) twentyFourHoursAgo, Double.POSITIVE_INFINITY);
             return count != null ? count.intValue() : 0;
         } catch (Exception e) {
             log.warn("Failed to get active viewer count from Redis for listing {}: {}", listingId, e.getMessage());
             return 0;
+        }
+    }
+
+    /**
+     * Batch returns active 24h viewer counts for multiple listings in a single pipelined Redis read.
+     */
+    public Map<UUID, Integer> getActiveViewerCounts(List<UUID> listingIds) {
+        if (listingIds == null || listingIds.isEmpty()) return Collections.emptyMap();
+        long twentyFourHoursAgo = System.currentTimeMillis() - (24L * 60L * 60L * 1000L);
+        org.springframework.data.domain.Range<Double> scoreRange =
+                org.springframework.data.domain.Range.closed((double) twentyFourHoursAgo, Double.POSITIVE_INFINITY);
+        try {
+            List<Object> results = redisTemplate.executePipelined(
+                    (org.springframework.data.redis.core.RedisCallback<Object>) connection -> {
+                        for (UUID id : listingIds) {
+                            byte[] rawKey = ("v4:listing:active_viewers:" + id).getBytes(StandardCharsets.UTF_8);
+                            connection.zSetCommands().zCount(rawKey, scoreRange);
+                        }
+                        return null;
+                    });
+
+            Map<UUID, Integer> map = new HashMap<>(listingIds.size());
+            for (int i = 0; i < listingIds.size(); i++) {
+                Object res = (i < results.size()) ? results.get(i) : null;
+                int count = (res instanceof Number num) ? num.intValue() : 0;
+                map.put(listingIds.get(i), count);
+            }
+            return map;
+        } catch (Exception e) {
+            log.warn("Failed to batch get active viewer counts from Redis: {}", e.getMessage());
+            Map<UUID, Integer> fallback = new HashMap<>(listingIds.size());
+            for (UUID id : listingIds) {
+                fallback.put(id, 0);
+            }
+            return fallback;
         }
     }
 }

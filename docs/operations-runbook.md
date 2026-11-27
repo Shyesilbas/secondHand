@@ -18,7 +18,7 @@ Bu doküman çalışan sistemde sık görülen arıza durumları için adım ad�
 | Prod'da uygulama başlamıyor, `IllegalStateException` | `ProdSecurityGuard` ihlali | 6 |
 | Zamanlanmış iş (kampanya, sipariş tamamlama) çalışmıyor | Scheduler ve kilit | 7 |
 
-Health ve metrikler: `local` profilinde uygulama portunda, prod'da yalnızca `MANAGEMENT_SERVER_PORT` (varsayılan `9090`) üzerinden `/actuator/health` ve `/actuator/prometheus`. Prometheus ve Grafana compose'da yoktur.
+Health ve metrikler: ayrı yönetim portu `MANAGEMENT_SERVER_PORT` (`local` profilinde varsayılan `8081`, `prod` profilinde varsayılan `9090`) üzerinden `/actuator/health` ve `/actuator/prometheus` sunulur; `8080` üzerinde Prometheus ucu açılmaz. `docker-compose.yml` içinde Prometheus (`:9090`), Grafana (`:3000`, hazır `secondhand-overview` panosu), `redis-exporter` ve Kafka UI (`:8085`) bulunur; alarm kuralları `monitoring/prometheus/alerts.yml` altındadır.
 
 ---
 

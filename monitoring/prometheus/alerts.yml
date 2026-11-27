@@ -1,0 +1,84 @@
+groups:
+  - name: secondhand-core-alerts
+    rules:
+      - alert: SecondhandOutboxFailedEvents
+        expr: sum by (outbox) (secondhand_outbox_events{status="FAILED"}) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Failed outbox events detected ({{ $labels.outbox }})"
+          description: "Outbox '{{ $labels.outbox }}' has {{ $value }} FAILED event(s). Inspect and requeue via admin endpoint."
+
+      - alert: SecondhandOutboxPendingBacklog
+        expr: sum by (outbox) (secondhand_outbox_events{status="PENDING"}) > 50
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Outbox backlog growing ({{ $labels.outbox }})"
+          description: "Outbox '{{ $labels.outbox }}' has {{ $value }} PENDING events for over 2 minutes."
+
+      - alert: SecondhandHighHttp5xxRate
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_count{status=~"5.."}[2m]))
+            /
+            clamp_min(sum(rate(http_server_requests_seconds_count[2m])), 0.001)
+          ) > 0.02
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HTTP 5xx error rate above 2%"
+          description: "5xx error ratio is {{ $value | humanizePercentage }} over the last 2 minutes."
+
+      - alert: SecondhandHighP95Latency
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_server_requests_seconds_bucket{uri!~"/actuator.*"}[2m]))
+          ) > 1.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HTTP p95 latency above 1.5s"
+          description: "Overall API p95 latency is {{ $value | humanizeDuration }} over the last 2 minutes."
+
+      - alert: SecondhandHikariPoolSaturation
+        expr: |
+          hikaricp_connections_pending > 5
+          or
+          (hikaricp_connections_active / clamp_min(hikaricp_connections_max, 1)) > 0.9
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HikariCP connection pool saturated"
+          description: "HikariCP pool is over 90% active or has pending threads waiting for a DB connection."
+
+      - alert: SecondhandKafkaConsumerLagHigh
+        expr: max by (client_id) (kafka_consumer_fetch_manager_records_lag_max) > 100
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag above 100 records ({{ $labels.client_id }})"
+          description: "Kafka consumer {{ $labels.client_id }} has max lag of {{ $value }} records."
+
+      - alert: SecondhandRedisLowHitRatio
+        expr: |
+          (
+            rate(redis_keyspace_hits_total[5m])
+            /
+            clamp_min(rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m]), 0.001)
+          ) < 0.70
+          and
+          (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis cache hit ratio below 70%"
+          description: "Redis hit ratio dropped to {{ $value | humanizePercentage }} over the last 5 minutes."

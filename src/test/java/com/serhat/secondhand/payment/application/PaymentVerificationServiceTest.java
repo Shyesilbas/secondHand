@@ -127,4 +127,15 @@ class PaymentVerificationServiceTest {
 
         assertThat(service.validateCode(user, "654321").isSuccess()).isTrue();
     }
+
+    @Test
+    void generateVerificationUsesRequiresNewSoCodeSurvivesCheckoutRollback() throws NoSuchMethodException {
+        var method = com.serhat.secondhand.core.verification.VerificationService.class
+                .getMethod("generateVerification", User.class, String.class, CodeType.class);
+        var transactional = method.getAnnotation(org.springframework.transaction.annotation.Transactional.class);
+
+        assertThat(transactional).isNotNull();
+        assertThat(transactional.propagation())
+                .isEqualTo(org.springframework.transaction.annotation.Propagation.REQUIRES_NEW);
+    }
 }

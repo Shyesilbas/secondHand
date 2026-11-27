@@ -56,9 +56,20 @@ public class ListingSocialProofService {
 
     /**
      * Enriches a single ListingDto with its social proof metrics.
+     * Reuses favoriteCount when favoriteStats was already populated earlier in the enrichment pipeline.
      */
     public void enrichWithSocialProof(ListingDto dto) {
         if (dto == null || dto.getId() == null) return;
+        if (dto.getFavoriteStats() != null && dto.getFavoriteStats().getFavoriteCount() != null) {
+            int viewsLast24h = listingViewService.getActiveViewerCount(dto.getId());
+            int inCartCount = cartSocialMetricService.getInCartCount(dto.getId());
+            dto.setSocialProof(ListingSocialProofDto.builder()
+                    .viewsLast24Hours(viewsLast24h)
+                    .inCartCount(inCartCount)
+                    .favoriteCount(dto.getFavoriteStats().getFavoriteCount())
+                    .build());
+            return;
+        }
         dto.setSocialProof(getSocialProof(dto.getId()));
     }
 
@@ -78,29 +89,42 @@ public class ListingSocialProofService {
         if (listingIds.isEmpty()) return;
 
         Map<UUID, Integer> inCartCounts = cartSocialMetricService.getInCartCounts(listingIds);
+        Map<UUID, Integer> activeViewerCounts = listingViewService.getActiveViewerCounts(listingIds);
 
-        // Favorite counts batch lookup
+        // Reuse already-enriched favoriteStats to avoid a duplicate PostgreSQL count query.
+        List<UUID> missingFavoriteIds = dtos.stream()
+                .filter(Objects::nonNull)
+                .filter(dto -> dto.getId() != null)
+                .filter(dto -> dto.getFavoriteStats() == null || dto.getFavoriteStats().getFavoriteCount() == null)
+                .map(ListingDto::getId)
+                .distinct()
+                .toList();
+
         Map<UUID, Long> favoriteCounts = Collections.emptyMap();
-        try {
-            List<Object[]> favResults = favoriteRepository.countByListingIds(listingIds);
-            if (favResults != null) {
-                favoriteCounts = favResults.stream()
-                        .collect(Collectors.toMap(
-                                row -> (UUID) row[0],
-                                row -> ((Number) row[1]).longValue(),
-                                (existing, replacement) -> existing
-                        ));
+        if (!missingFavoriteIds.isEmpty()) {
+            try {
+                List<Object[]> favResults = favoriteRepository.countByListingIds(missingFavoriteIds);
+                if (favResults != null) {
+                    favoriteCounts = favResults.stream()
+                            .collect(Collectors.toMap(
+                                    row -> (UUID) row[0],
+                                    row -> ((Number) row[1]).longValue(),
+                                    (existing, replacement) -> existing
+                            ));
+                }
+            } catch (Exception e) {
+                log.warn("Failed to batch fetch favorite counts: {}", e.getMessage());
             }
-        } catch (Exception e) {
-            log.warn("Failed to batch fetch favorite counts: {}", e.getMessage());
         }
 
         for (ListingDto dto : dtos) {
             if (dto == null || dto.getId() == null) continue;
             UUID id = dto.getId();
-            int views = listingViewService.getActiveViewerCount(id);
+            int views = activeViewerCounts.getOrDefault(id, 0);
             int inCart = inCartCounts.getOrDefault(id, 0);
-            long fav = favoriteCounts.getOrDefault(id, 0L);
+            long fav = (dto.getFavoriteStats() != null && dto.getFavoriteStats().getFavoriteCount() != null)
+                    ? dto.getFavoriteStats().getFavoriteCount()
+                    : favoriteCounts.getOrDefault(id, 0L);
 
             dto.setSocialProof(ListingSocialProofDto.builder()
                     .viewsLast24Hours(views)
